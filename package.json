@@ -3,6 +3,7 @@
 	"displayName": "vscode-makefile-tools",
 	"description": "Provide makefile integration in VSCode",
 	"version": "0.0.1",
+	"publisher": "ms-vscode",
 	"engines": {
 		"vscode": "^1.35.0"
 	},
@@ -10,16 +11,65 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:make.build.current",
+		"onCommand:make.setConfiguration",
+		"onCommand:make.setTarget",
+		"workspaceContains:**/makefile",
+		"workspaceContains:**/Makefile"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "make.build.current",
+				"title": "MAKE: Run the MAKEFILE target of the current configuration"
+			},
+			{
+				"command": "make.setConfiguration",
+				"title": "MAKE: Set the current workspace configuration"
+			},
+			{
+				"command": "make.setTarget",
+				"title": "MAKE: Set the target to be run by make"
 			}
-		]
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Makefile",
+			"properties": {
+				"Make.Configuration.Current": {
+					"type": [
+						"string",
+						"null"
+					],
+					"default": null,
+					"description": "The makefile current configuration",
+					"scope": "resource"
+				},
+				"Make.Build.Target": {
+					"type": [
+						"string",
+						"null"
+					],
+					"default": null,
+					"description": "The current target to be run by make",
+					"scope": "resource"
+				},
+				"Make.Logging.Level": {
+					"type": [
+						"string",
+						"null"
+					],
+					"enum": [
+						"Normal",
+						"Verbose"
+					],
+					"default": "Normal",
+					"description": "The logging level for the makefile tools extension",
+					"scope": "resource"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -29,13 +79,15 @@
 		"test": "npm run compile && node ./node_modules/vscode/bin/test"
 	},
 	"devDependencies": {
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28",
-		"tslint": "^5.12.1",
+		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
-		"@types/mocha": "^2.2.42"
+		"tslint": "^5.18.0",
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28"
 	},
 	"dependencies": {
+		"module-alias": "^2.0.6",
+		"vsce": "^1.66.0",
 		"vscode-cpptools": "^2.1.2"
 	}
 }

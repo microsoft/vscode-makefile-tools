@@ -1,4 +1,4 @@
-
+First packaging 
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
@@ -13,8 +13,6 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 # vscode-makefile-tools README
-
-This is the README for your extension "vscode-makefile-tools". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 

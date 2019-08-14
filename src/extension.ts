@@ -1,27 +1,134 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+'use strict';
+
+require('module-alias/register');
+
+import * as configuration from './configuration';
+import * as cpptools from './cpptools';
+import * as fs from 'fs';
+import * as logger from './logger';
+import * as make from './make';
+import * as parser from './parser';
+import * as ui from './ui';
+import * as util from './util';
 import * as vscode from 'vscode';
+import * as cpp from 'vscode-cpptools';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+let statusBar: ui.UI = ui.getUI();
+export let extension: MakefileToolsExtension | null = null;
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-		console.log('Congratulations, your extension "vscode-makefile-tools" is now active!');
+export class MakefileToolsExtension {
+	private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
+	private cppToolsAPI?: cpp.CppToolsApi;
+	private cppConfigurationProviderRegister?: Promise<void>;
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+	constructor(public readonly extensionContext: vscode.ExtensionContext) {
+	}
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello VSCode!');
-	});
+	// Parse the dry-run output and populate data for cpptools
+	constructIntellisense(dryRunOutputStr: string) {
+		parser.parseDryRunOutput(dryRunOutputStr);
+	}
 
-	context.subscriptions.push(disposable);
+	dispose() {
+		if (this.cppToolsAPI) {
+			this.cppToolsAPI.dispose();
+		}
+	}
+
+	// Register this extension as a new provider or request an update
+	async registerCppToolsProvider() {
+		await this.ensureCppToolsProviderRegistered();
+
+		if (this.cppToolsAPI) {
+			this.cppConfigurationProvider.LogConfigurationProvider();
+			if (this.cppToolsAPI.notifyReady) {
+				this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
+			} else {
+				this.cppToolsAPI.didChangeCustomConfiguration(this.cppConfigurationProvider);
+			}
+		}
+	}
+
+	ensureCppToolsProviderRegistered() {
+		// make sure this extension is registered as provider only once
+		if (!this.cppConfigurationProviderRegister) {
+			this.cppConfigurationProviderRegister = this.registerCppTools();
+		}
+
+		return this.cppConfigurationProviderRegister;
+	}
+
+	async registerCppTools() {
+		if (!this.cppToolsAPI) {
+			this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v2);
+		}
+
+		if (this.cppToolsAPI) {
+			this.cppToolsAPI.registerCustomConfigurationProvider(this.cppConfigurationProvider);
+		}
+	}
+
+	buildCustomConfigurationProvider(
+		defines: string[],
+		includePath: string[],
+		forcedInclude: string[],
+		standard: util.StandardVersion,
+		intelliSenseMode: util.IntelliSenseMode,
+		compilerPath: string,
+		windowsSdkVersion: string,
+		filesPaths: string[]
+	) {
+		this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard,intelliSenseMode, compilerPath, windowsSdkVersion, filesPaths);
+	}	
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+// A change of target or configuration triggered a new dry-run,
+// which produced a new output string to be parsed
+export async function UpdateProvider(dryRunOutputStr: string) {
+	logger.Message("Updating the CppTools IntelliSense Configuration Provider.");
+	if (extension) {
+		extension.constructIntellisense(dryRunOutputStr);
+		extension.registerCppToolsProvider();
+	}
+}
+
+export async function activate(context: vscode.ExtensionContext) {
+	vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is now active');
+
+	statusBar = ui.getUI();
+	extension = new MakefileToolsExtension(context);
+
+	context.subscriptions.push(vscode.commands.registerCommand('make.setConfiguration', () => {
+		configuration.setNewConfiguration();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('make.setTarget', () => {
+		configuration.setNewTarget();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('make.build.current', () => {
+		vscode.window.showInformationMessage('Building current MAKEFILE configuration ' + configuration.getCurrentMakeConfiguration() + "/" + configuration.getCurrentTarget());
+		make.BuildCurrentTarget();
+	}));
+
+	// Read configuration info from settings
+	configuration.initFromSettings();
+
+	// Generate the dry-run output used for parsing the info to be sent to CppTools
+	make.DryRun();
+}
+
+export async function deactivate() {
+	vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is de-activated');
+
+	const items = [
+		extension,
+		statusBar
+	];
+
+	for (const item of items) {
+		if (item) {
+			item.dispose();
+		}
+	}
+}
