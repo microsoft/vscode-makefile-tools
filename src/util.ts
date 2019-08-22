@@ -14,6 +14,72 @@ export function checkFileExistsSync(filePath: string): boolean {
     return false;
 }
 
+export function checkDirectoryExistsSync(directoryPath: string): boolean {
+    try {
+        return fs.statSync(directoryPath).isDirectory();
+    } catch (e) {
+    }
+    return false;
+}
+
+// Evaluate whether a string looks like a path or not,
+// without using fs.stat, since dry-run may output tools
+// that are not found yet at certain locations,
+// without running the prep targets that would copy them there
+export function looksLikePath(pathStr : string) : boolean {
+    // TODO: to be implemented
+    return true;
+}
+
+// Evaluate whether the tool is invoked from the current directory
+export function pathIsCurrentDirectory(pathStr: string): boolean {
+    // Ignore any spaces or tabs before the invocation
+    pathStr = pathStr.trimLeft();
+
+    if (pathStr === "") {
+        return true;
+    }
+
+    if (process.platform === "win32") {
+        if (pathStr === ".\\") {
+            return true;
+        }
+    } else {
+        if (pathStr === "./") {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+// Helper that searches for a tool in all the paths forming the PATH environment variable
+// Returns the first one found or undefined if not found.
+// TODO: implement a variation of this helper that scans on disk for the tools installed,
+// to help when VSCode is not launched from the proper environment
+export function toolPathInEnv(name : string) : string | undefined {
+    let toolPath : string | undefined;
+
+    let envPath: string | undefined = process.env["PATH"];
+    let envPathSplit: string[] = [];
+    if (envPath) {
+        envPathSplit = envPath.split(path.delimiter);
+    }
+
+    envPathSplit.forEach(p => {
+        let fullPath: string = path.join(p, path.basename(name));
+        if (checkFileExistsSync(fullPath)) {
+            toolPath = fullPath;
+            return;
+        }
+    });
+
+    return toolPath;
+
+    // todo: if the compiler is not found in path, scan on disk and point the user to all the options
+    // (the concept of kit for cmake extension)
+}
+
 // Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
 export function spawnChildProcess(process: string, args: string[], workingDirectory: string,
     stdoutCallback: (stdout: string) => void,
@@ -46,7 +112,7 @@ export function dropNulls<T>(items: (T | null | undefined)[]): T[] {
     return items.filter(item => (item !== null && item !== undefined)) as T[];
 }
 
-// Helper to reinterpret the relative paths (to the workspace folder) printed by make as full paths
+// Helper to reinterpret one relative path (to the given current path) printed by make as full path
 export function makeFullPath(relPath: string, curPath: string | undefined): string {
     let fullPath: string = relPath;
 
@@ -57,3 +123,54 @@ export function makeFullPath(relPath: string, curPath: string | undefined): stri
     return fullPath;
 }
 
+// Helper to reinterpret the relative paths (to the given current path) printed by make as full paths
+export function makeFullPaths(relPaths: string[], curPath: string | undefined): string[] {
+    let fullPaths: string[] = [];
+
+    relPaths.forEach(p => {
+        fullPaths.push(makeFullPath(p, curPath));
+    });
+
+    return fullPaths;
+}
+
+// Helper to reinterpret one full path as relative to the given current path
+export function makeRelPath(fullPath: string, curPath: string | undefined): string {
+    let relPath: string = fullPath;
+
+    if (path.isAbsolute(relPath) && curPath) {
+        relPath = path.relative(curPath, fullPath);
+    }
+
+    return relPath;
+}
+
+// Helper to reinterpret the relative paths (to the given current path) printed by make as full paths
+export function makeRelPaths(fullPaths: string[], curPath: string | undefined): string[] {
+    let relPaths: string[] = [];
+
+    fullPaths.forEach(p => {
+        relPaths.push(makeRelPath(p, curPath));
+    });
+
+    return fullPaths;
+}
+
+export interface ShlexOptions {
+    mode: 'windows'|'posix';
+}
+  
+export function quote(str: string, opt?: ShlexOptions): string {
+    opt = opt || {
+      mode: process.platform === 'win32' ? 'windows' : 'posix',
+    };
+    if (str == '') {
+      return '""';
+    }
+    if (/[^\w@%\-+=:,./|]/.test(str)) {
+      str = str.replace(/"/g, '\\"');
+      return `"${str}"`;
+    } else {
+      return str;
+    }
+}

@@ -5,7 +5,7 @@ import * as logger from './logger';
 import * as util from './util';
 import * as vscode from 'vscode';
 
-export async function BuildCurrentTarget() {
+export async function buildCurrentTarget() {
 	let process: child_process.ChildProcess;
 
 	let commandArgs: string[] = [];
@@ -55,11 +55,13 @@ export async function DryRun() {
 		commandArgs.push(currentTarget);
 	}
 
-	// Append --dry-run (to not perform any real build operation) and --always-make
-	// (to not skip over targets when timestamps indicate nothing needs to be done)
+	// Append --dry-run (to not perform any real build operation),
+	// --always-make (to not skip over targets when timestamps indicate nothing needs to be done)
+	// and --keep-going (to ensure we get as much info as possible even when some targets fail)
 	commandArgs = commandArgs.concat(configuration.getConfigurationCommandArgs());
 	commandArgs.push("--dry-run");
 	commandArgs.push("--always-make");
+	commandArgs.push("--keep-going");
 
 	logger.Message("Generating the make dry-run output for parsing IntelliSense information... Command: " +
     configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));

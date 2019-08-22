@@ -7,7 +7,7 @@ let makeOutputChannel: vscode.OutputChannel | undefined;
 function getCurrentLoggingLevel() {
     if (!loggingLevel) {
         let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
-        loggingLevel = workspaceConfiguration.get<string>("Make.Logging.Level");
+        loggingLevel = workspaceConfiguration.get<string>("Make.loggingLevel");
     }
 
     return loggingLevel;
@@ -22,11 +22,13 @@ function GetOutputChannel() {
 }
 
 export function Message(message: string) {
-    GetOutputChannel().appendLine(message);
+    let channel = GetOutputChannel();
+    channel.appendLine(message);
 }
 
 // This is used for a few scenarios where the message already has end of line incorporated.
 // Example: stdout/stderr of a child process read before the stream is closed.
 export function MessageNoCR(message: string) {
-    GetOutputChannel().append(message);
+    let channel = GetOutputChannel();
+    channel.append(message);
 }

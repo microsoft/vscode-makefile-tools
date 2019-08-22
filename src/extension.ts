@@ -4,6 +4,7 @@ require('module-alias/register');
 
 import * as configuration from './configuration';
 import * as cpptools from './cpptools';
+import * as launch from './launch';
 import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
@@ -12,8 +13,11 @@ import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
 import * as cpp from 'vscode-cpptools';
+import { debug } from 'util';
 
 let statusBar: ui.UI = ui.getUI();
+let launcher: launch.Launcher = launch.getLauncher();
+
 export let extension: MakefileToolsExtension | null = null;
 
 export class MakefileToolsExtension {
@@ -26,7 +30,7 @@ export class MakefileToolsExtension {
 
 	// Parse the dry-run output and populate data for cpptools
 	constructIntellisense(dryRunOutputStr: string) {
-		parser.parseDryRunOutput(dryRunOutputStr);
+		parser.parseForCppToolsCustomConfigProvider(dryRunOutputStr);
 	}
 
 	dispose() {
@@ -98,17 +102,45 @@ export async function activate(context: vscode.ExtensionContext) {
 	statusBar = ui.getUI();
 	extension = new MakefileToolsExtension(context);
 
-	context.subscriptions.push(vscode.commands.registerCommand('make.setConfiguration', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('Make.setBuildConfiguration', () => {
 		configuration.setNewConfiguration();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('make.setTarget', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('Make.setBuildTarget', () => {
 		configuration.setNewTarget();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('make.build.current', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('Make.buildTarget', () => {
 		vscode.window.showInformationMessage('Building current MAKEFILE configuration ' + configuration.getCurrentMakeConfiguration() + "/" + configuration.getCurrentTarget());
-		make.BuildCurrentTarget();
+		make.buildCurrentTarget();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('Make.setLaunchConfiguration', () => {
+		configuration.setNewLaunchConfiguration();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('Make.launchDebug', () => {
+		launcher.debugCurrentTarget();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('Make.launchRun', () => {
+		launcher.runCurrentTarget();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetPath', () => {
+		return launcher.launchTargetPath();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetDir', () => {
+		return launcher.launchTargetDir();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetArgs', () => {
+		return launcher.launchTargetArgs();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetArgsConcatenated', () => {
+		return launcher.launchTargetArgsConcatenated();
 	}));
 
 	// Read configuration info from settings
@@ -123,6 +155,7 @@ export async function deactivate() {
 
 	const items = [
 		extension,
+		launcher,
 		statusBar
 	];
 

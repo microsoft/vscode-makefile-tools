@@ -111,7 +111,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 		logger.Message("-----------------------------------");
 
 		this.fileIndex.forEach(filePath => {
-			logger.Message("Sending configuration for file " + filePath.uri.toString() + "-----------------------------------");
+			logger.Message("Sending configuration for file " + filePath.uri.toString() + " -----------------------------------");
 			logger.Message("Defines: " + filePath.configuration.defines.join(";"));
 			logger.Message("Includes: " + filePath.configuration.includePath.join(";"));
 			if (filePath.configuration.forcedInclude) {
