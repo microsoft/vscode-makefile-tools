@@ -5,14 +5,14 @@ import * as vscode from 'vscode';
 import * as cpp from 'vscode-cpptools';
 
 let cummulativeBrowsePath: string[] = [];
-export function emptyCummulativeBrowsePath() {
+export function clearCummulativeBrowsePath() {
 	cummulativeBrowsePath = [];
 }
 
 export class CppConfigurationProvider implements cpp.CustomConfigurationProvider {
-	readonly name = 'Makefile Tools';
+	public readonly name = 'Makefile Tools';
 
-	readonly extensionId = 'microsoft.vscode-makefile-tools';
+	public readonly extensionId = 'microsoft.vscode-makefile-tools';
 
 	private workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = { browsePath: [] };
 
@@ -21,22 +21,22 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 		return this.fileIndex.get(norm_path);
 	}
 
-	async canProvideConfiguration(uri: vscode.Uri) {
+	public async canProvideConfiguration(uri: vscode.Uri) {
 		return !!this.getConfiguration(uri);
 	}
 
 
-	async provideConfigurations(uris: vscode.Uri[]) {
+	public async provideConfigurations(uris: vscode.Uri[]) {
 		return util.dropNulls(uris.map(u => this.getConfiguration(u)));
 	}
 
-	async canProvideBrowseConfiguration() {
+	public async canProvideBrowseConfiguration() {
 		return true;
 	}
 
-	async provideBrowseConfiguration() { return this.workspaceBrowseConfiguration; }
+	public async provideBrowseConfiguration() { return this.workspaceBrowseConfiguration; }
 
-	dispose() {}
+	public dispose() {}
 
 	private readonly fileIndex = new Map<string, cpp.SourceFileConfigurationItem>();
 
@@ -47,7 +47,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 	//                 Attention for defines syntax: _CL_=/DMyDefine#1 versus /DMyDefine1
 	//     - take into account the effect of undefines /U
 	// In case of conflicting switches, the command prompt overwrites the makefile
-	buildCustomConfigurationProvider(
+	public buildCustomConfigurationProvider(
 		defines: string[],
 		includePath: string[],
 		forcedInclude: string[],
@@ -100,30 +100,30 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 		};
 	}
 
-	LogConfigurationProvider() {
-		logger.Message("Sending Workspace Browse Configuration: -----------------------------------");
-		logger.Message("Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
-		logger.Message("Standard: " + this.workspaceBrowseConfiguration.standard);
-		logger.Message("Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath);
+	public logConfigurationProvider() {
+		logger.message("Sending Workspace Browse Configuration: -----------------------------------");
+		logger.message("Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
+		logger.message("Standard: " + this.workspaceBrowseConfiguration.standard);
+		logger.message("Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath);
 		if (process.platform === "win32") {
-			logger.Message("Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
+			logger.message("Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
 		}
-		logger.Message("-----------------------------------");
+		logger.message("-----------------------------------");
 
 		this.fileIndex.forEach(filePath => {
-			logger.Message("Sending configuration for file " + filePath.uri.toString() + " -----------------------------------");
-			logger.Message("Defines: " + filePath.configuration.defines.join(";"));
-			logger.Message("Includes: " + filePath.configuration.includePath.join(";"));
+			logger.message("Sending configuration for file " + filePath.uri.toString() + " -----------------------------------");
+			logger.message("Defines: " + filePath.configuration.defines.join(";"));
+			logger.message("Includes: " + filePath.configuration.includePath.join(";"));
 			if (filePath.configuration.forcedInclude) {
-				logger.Message("Force Includes: " + filePath.configuration.forcedInclude.join(";"));
+				logger.message("Force Includes: " + filePath.configuration.forcedInclude.join(";"));
 			}
-			logger.Message("Standard: " + filePath.configuration.standard);
-			logger.Message("IntelliSense Mode: " + filePath.configuration.intelliSenseMode);
-			logger.Message("Compiler Path: " + filePath.configuration.compilerPath);
+			logger.message("Standard: " + filePath.configuration.standard);
+			logger.message("IntelliSense Mode: " + filePath.configuration.intelliSenseMode);
+			logger.message("Compiler Path: " + filePath.configuration.compilerPath);
 			if (process.platform === "win32") {
-				logger.Message("Windows SDK Version: " + filePath.configuration.windowsSdkVersion);
+				logger.message("Windows SDK Version: " + filePath.configuration.windowsSdkVersion);
 			}
-			logger.Message("-----------------------------------");
+			logger.message("-----------------------------------");
 		});
 	}
 }

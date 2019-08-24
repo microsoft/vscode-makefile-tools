@@ -30,9 +30,9 @@ export function parseTargets(verboseLog: string): string[] {
 
 	if (matches) {
 		matches.sort();
-		logger.Message("Found the following targets:" + matches.join(";"));
+		logger.message("Found the following targets:" + matches.join(";"));
 	} else {
-		logger.Message("No targets found");
+		logger.message("No targets found");
 	}
 
 	return matches;
@@ -40,7 +40,7 @@ export function parseTargets(verboseLog: string): string[] {
 
 // Make various preprocessing transformations on the dry-run output
 // TODO: "cmd -c", "start cmd", "exit"
-function PreprocessDryRunOutput(dryRunOutputStr: string): string {
+function preprocessDryRunOutput(dryRunOutputStr: string): string {
 	let preprocessedDryRunOutputStr: string = dryRunOutputStr;
 
 	// Split multiple commands concatenated by '&&'
@@ -129,6 +129,7 @@ function parseLineAsTool(
 	}
 	toolPathInMakefile = toolPathInMakefile.trimLeft();
 	let toolFullPath: string = util.makeFullPath(toolPathInMakefile + toolNameInMakefile, currentPath);
+	toolFullPath = util.removeQuotes(toolFullPath);
 	let toolFound: boolean = util.checkFileExistsSync(toolFullPath);
 
 	// Reject a regexp match that doesn't have a real path before the tool invocation,
@@ -188,7 +189,7 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
 function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string | undefined {
 	// - or / as switch prefix
 	// ':' or '=' or one/none/more spaces/tabs between the switch and the value
-	let regexpStr = '(\\/|-)(' + sw.join("|") + ')(:|=|\\s*)(\\S+)';
+	let regexpStr = '(\\/|-)(' + sw.join("|") + ')(:|=|\\s*)(\\".*?\\"|\\S+)';
 	let regexp = RegExp(regexpStr, "mg");
 	var match: string[] | null;
 	var results: string[] = [];
@@ -296,13 +297,13 @@ function currentPathAfterCommand(line : string, currentPathHistory : string[]) :
 // with information about includes, defines, compiler path....etc... 
 // as needed by CustomConfigurationProvider
 export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
-	logger.Message('Parsing dry-run output for CppTools Custom Configuration Provider...');
+	logger.message('Parsing dry-run output for CppTools Custom Configuration Provider...');
 
 	// Do some preprocessing on the dry-run output to make the RegExp parsing easier
-	dryRunOutputStr = PreprocessDryRunOutput(dryRunOutputStr);
+	dryRunOutputStr = preprocessDryRunOutput(dryRunOutputStr);
 
 	// Empty the cummulative browse path built during the previous dry-run parsing
-	cpptools.emptyCummulativeBrowsePath();
+	cpptools.clearCummulativeBrowsePath();
 
 	// Current path starts with workspace root and can be modified
 	// with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -313,7 +314,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 	// to construct information for the CppTools custom configuration
 	let dryRunOutputLines: string[] = dryRunOutputStr.split("\n"); // \r
 	dryRunOutputLines.forEach(line => {
-		logger.Message(line);
+		logger.message(line);
 		currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
 		currentPath = currentPathHistory[currentPathHistory.length - 1];
 
@@ -330,24 +331,24 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 			if (!compilerTool.found) {
 				compilerFullPath = util.toolPathInEnv(path.basename(compilerFullPath)) || "";
 			}
-			logger.Message("Compiler path: " + compilerFullPath);
+			logger.message("Compiler path: " + compilerFullPath);
 
 			// Parse and log the includes, forced includes and the defines
 			let includes : string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
 			includes = util.makeFullPaths(includes, currentPath);
-			logger.Message("Includes: " + includes);
+			logger.message("Includes: " + includes);
 			let forcedIncludes : string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
 			forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
-			logger.Message("Forced includes: " + forcedIncludes);
+			logger.message("Forced includes: " + forcedIncludes);
 			let defines : string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
-			logger.Message("Defines: " + defines);
+			logger.message("Defines: " + defines);
 
 			// Parse the C/C++ standard
 			// TODO: implement default standard: c++11 for C nad c++17 for C++
 			// TODO: c++20 and c++latest
 			let standardStr: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["std"]);
 			let standard: util.StandardVersion = standardStr ? <util.StandardVersion>standardStr : "c++17";
-			logger.Message("Standard: " + standard);
+			logger.message("Standard: " + standard);
 
 			// Parse the IntelliSense mode
 			// how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
@@ -358,7 +359,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 				path.basename(compilerTool.fullPath).startsWith("g++")) {
 				intelliSenseMode = "gcc-x64";
 			}
-			logger.Message("IntelliSense mode: " + intelliSenseMode);
+			logger.message("IntelliSense mode: " + intelliSenseMode);
 
 			// For windows, parse the sdk version
 			// todo: scan on disk for most recent sdk installation
@@ -369,13 +370,13 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 					windowsSDKVersion = "8.1";
 				}
 
-				logger.Message('Windows SDK Version: ' + windowsSDKVersion);
+				logger.message('Windows SDK Version: ' + windowsSDKVersion);
 			}
 
 			// Parse the source files
 			let files: string[] = parseFilesFromToolArguments(compilerTool.arguments, ["cpp", "c", "cxx"]);
 			files = util.makeFullPaths(files, currentPath);
-			logger.Message("Source files: " + files.join(" "));
+			logger.message("Source files: " + files.join(" "));
 
 			if (ext.extension) {
 				ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, windowsSDKVersion, files);
@@ -384,13 +385,13 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 	});
 }
 
-// Parse the output of the make dry-run command in order to provide VSCode debugger
+// Parse the output of the make dry-run command in order to provide VS Code debugger
 // with information about binaries, their execution paths and arguments
 export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchConfiguration[] {
-	logger.Message('Parsing dry-run output for Launch (debug/run) configuration...');
+	logger.message('Parsing dry-run output for Launch (debug/run) configuration...');
 
 	// Do some preprocessing on the dry-run output to make the RegExp parsing easier
-	dryRunOutputStr = PreprocessDryRunOutput(dryRunOutputStr);
+	dryRunOutputStr = preprocessDryRunOutput(dryRunOutputStr);
 
 	// Current path starts with workspace root and can be modified
 	// with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -407,7 +408,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 	// to construct information for the launch configuration
 	let dryRunOutputLines: string[] = dryRunOutputStr.split("\n"); // \r
 	dryRunOutputLines.forEach(line => {
-		logger.Message(line);
+		logger.message(line);
 		currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
 		currentPath = currentPathHistory[currentPathHistory.length - 1];
 
@@ -427,7 +428,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 			// Parse the source files
 			let files: string[] = parseFilesFromToolArguments(compilerTool.arguments, ["cpp", "c", "cxx"]);
 			files = util.makeFullPaths(files, currentPath);
-			logger.Message("Source files to be compiled: " + files.join(" "));
+			logger.message("Source files to be compiled: " + files.join(" "));
 
 			// If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
 			// Note: no need to worry about the DLL case that this extension doesn't support yet
@@ -474,7 +475,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 					linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
 
 					if (!linkerTargetBinary) {
-						logger.Message("The link command is not generating a target binary explicitly.");
+						logger.message("The link command is not generating a target binary explicitly.");
 						// For link.exe, the default output binary takes the base name of the first file (obj, lib, etc...)
 						// that is passed to the linker.
 						if (process.platform === "win32" && path.basename(linkerTool.fullPath).startsWith("link")) {
@@ -483,12 +484,12 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 							if (files.length >= 1) {
 								let parsedPath: path.ParsedPath = path.parse(files[0]);
 								let targetBinaryFromFirstObjLib: string = parsedPath.dir + parsedPath.name + ".exe";
-								logger.Message("Assuming " + targetBinaryFromFirstObjLib)
+								logger.message("Assuming " + targetBinaryFromFirstObjLib)
 								linkerTargetBinary = targetBinaryFromFirstObjLib;
 							}
 						} else {
 							// The default output binary from a compilation/linking operation is usually a.out on linux/mac
-							logger.Message("Assuming a.out");
+							logger.message("Assuming a.out");
 							linkerTargetBinary = "a.out";
 						}
 					}
@@ -550,6 +551,17 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 		currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
 		currentPath = currentPathHistory[currentPathHistory.length - 1];
 
+		// Currently, the target binary invocation will not be identified if the line does not start with it,
+		// because we need to be able to reject matches like "link.exe /out:mybinary.exe".
+		// See comment in parseLineAsTool about not understanding well what it is that prepends
+		// the target binary tool, unless we treat it as a path and verify its location on disk.
+		// Because of this limitation, the extension might not present to the user
+		// all the scenarios of arguments defined in the makefile for this target binary.
+		// TODO: identify and parse properly all the valid scenarios of invoking a taget binary in a makefile:
+		//       - @if (not) exist binary binary arg1 arg2 arg3
+		//         (because an "@if exist" is not resolved by the dry-run and appears in the output)
+		//       - cmd /c binary arg1 arg2 arg3
+		//       - start binary
 		let targetBinaryTool : ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath);
 		if (targetBinaryTool) {
 			// Include complete launch configuration: binary, execution path and args

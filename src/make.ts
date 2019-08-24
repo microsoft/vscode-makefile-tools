@@ -17,34 +17,34 @@ export async function buildCurrentTarget() {
 	
 	commandArgs = commandArgs.concat(configuration.getConfigurationCommandArgs());
 
-	logger.Message("Building the current target ... Command: " + configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
+	logger.message("Building the current target ... Command: " + configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
 
 	try {
 		// Append without end of line since there is one already included in the stdout/stderr fragments
 		var stdout = (result: string): void => {
-			logger.MessageNoCR(result);
+			logger.messageNoCR(result);
 		};
 
 		var stderr = (result: string): void => {
-			logger.MessageNoCR(result);
+			logger.messageNoCR(result);
 		};
 
 		var closing = (retCode: number, signal: string): void => {
 			if (retCode !== 0) {
-				logger.Message("The current target failed to build.");
+				logger.message("The current target failed to build.");
 			} else {
-				logger.Message("The current target built successfully.");
+				logger.message("The current target built successfully.");
 			}
 		};
 
 		await util.spawnChildProcess(configuration.getConfigurationCommandName(), commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
 	} catch (error) {
-		logger.Message('Failed to launch make command. Make sure it is on the path. ' + error);
+		logger.message('Failed to launch make command. Make sure it is on the path. ' + error);
 		return;
 	}
 }
 
-export async function DryRun() {
+export async function dryRun() {
 	let process: child_process.ChildProcess;
 
 	let commandArgs: string[] = [];
@@ -63,7 +63,7 @@ export async function DryRun() {
 	commandArgs.push("--always-make");
 	commandArgs.push("--keep-going");
 
-	logger.Message("Generating the make dry-run output for parsing IntelliSense information... Command: " +
+	logger.message("Generating the make dry-run output for parsing IntelliSense information... Command: " +
     configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
 
 	try {
@@ -78,17 +78,17 @@ export async function DryRun() {
 		};
 		var closing = (retCode: number, signal: string): void => {
 			if (retCode !== 0) {
-				logger.Message("The make dry-run command failed.");
-				logger.Message(stderrStr);
+				logger.message("The make dry-run command failed.");
+				logger.message(stderrStr);
 			}
 
 			console.log("Make dry-run output to parse is:\n" + stdoutStr);
-			ext.UpdateProvider(stdoutStr);
+			ext.updateProvider(stdoutStr);
 		};
 
 		await util.spawnChildProcess(configuration.getConfigurationCommandName(), commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
 	} catch (error) {
-		logger.Message('Failed to launch make command. Make sure it is on the path. ' + error);
+		logger.message('Failed to launch make command. Make sure it is on the path. ' + error);
 		return;
 	}
 }

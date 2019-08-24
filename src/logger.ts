@@ -13,7 +13,7 @@ function getCurrentLoggingLevel() {
     return loggingLevel;
 }
 
-function GetOutputChannel() {
+function getOutputChannel() {
     if (!makeOutputChannel) {
         makeOutputChannel = vscode.window.createOutputChannel("Makefile tools");
     }
@@ -21,14 +21,14 @@ function GetOutputChannel() {
     return makeOutputChannel;
 }
 
-export function Message(message: string) {
-    let channel = GetOutputChannel();
+export function message(message: string) {
+    let channel = getOutputChannel();
     channel.appendLine(message);
 }
 
 // This is used for a few scenarios where the message already has end of line incorporated.
 // Example: stdout/stderr of a child process read before the stream is closed.
-export function MessageNoCR(message: string) {
-    let channel = GetOutputChannel();
+export function messageNoCR(message: string) {
+    let channel = getOutputChannel();
     channel.append(message);
 }

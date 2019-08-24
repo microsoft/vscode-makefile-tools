@@ -5,7 +5,9 @@ import * as vscode from 'vscode';
 let launcher: Launcher;
 
 export class Launcher implements vscode.Disposable {
-    launchTargetPath(): string {
+    // Command property accessible from launch.json:
+    // the full path of the target binary currently set for launch
+    public launchTargetPath(): string {
         let launchConfiguration : configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.binary;
@@ -14,7 +16,9 @@ export class Launcher implements vscode.Disposable {
         }
     }
 
-    launchTargetDir(): string {
+    // Command property accessible from launch.json:
+    // the full path from where the target binary is to be launched
+    public launchCurrentDir(): string {
         let launchConfiguration : configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.cwd;
@@ -23,7 +27,10 @@ export class Launcher implements vscode.Disposable {
         }
     }
 
-    launchTargetArgs(): string[] {
+    // Command property accessible from launch.json:
+    // the arguments sent to the target binary, returned as array of string
+    // This is used by the debug/terminal VS Code APIs.
+    public launchTargetArgs(): string[] {
         let launchConfiguration : configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.args;
@@ -32,13 +39,27 @@ export class Launcher implements vscode.Disposable {
         }
     }
 
-    launchTargetArgsConcatenated() : string {
+    // Command property accessible from launch.json:
+    // the arguments sent to the target binary, returned as one simple string
+    // This is an alternative to define the arguments in launch.json,
+    // since the string array syntax is not working.
+    // This is not a perfect solution, it all depends on how the main entry point
+    // is parsing its given arguments.
+    // Example: for [CWD>tool arg1 arg2 arg3], the tool will receive
+    // 2 arguments: tool and "arg1 arg2 arg3"
+    // As opposed to the above case when the tool will receive
+    // 4 arguments: tool, arg1, arg2, arg3
+    // TODO: investigate how we can define string array arguments
+    // for the target binary in launch.json
+    public launchTargetArgsConcat() : string {
         return this.launchTargetArgs().join(" ");
     }
 
-    async debugCurrentTarget(): Promise<vscode.DebugSession | undefined> {
-        let debugConfig: vscode.DebugConfiguration;
+    // Invoke a VS Code debugging session passing it all the information
+    // from the current launch configuration
+    public async debugCurrentTarget(): Promise<vscode.DebugSession | undefined> {
         let args: string[] = this.launchTargetArgs();
+
         let dbg: string;
         if (process.platform === "win32") {
             dbg = "cppvsdbg";
@@ -46,14 +67,16 @@ export class Launcher implements vscode.Disposable {
             dbg = "cppdbg";
         }
 
+        let debugConfig: vscode.DebugConfiguration;
         debugConfig = {
             type: dbg,
             name: `Debug My Program`,
             request: 'launch',
-            cwd: '${command:Make.launchTargetDir}',
+            cwd: '${command:Make.launchCurrentDir}',
             args,
             program: '${command:Make.launchTargetPath}'
         };
+
         await vscode.debug.startDebugging(vscode.workspace.workspaceFolders![0], debugConfig);
         return vscode.debug.activeDebugSession;
     }
@@ -67,7 +90,9 @@ export class Launcher implements vscode.Disposable {
         }
     });
 
-    async runCurrentTarget() {
+    // Invoke a VS Code running terminal passing it all the information
+    // from the current launch configuration
+    public async runCurrentTarget() {
         const terminalOptions: vscode.TerminalOptions = {
             name: 'Make/Launch',
         };
@@ -75,21 +100,22 @@ export class Launcher implements vscode.Disposable {
         // Use cmd.exe on Windows
         if (process.platform == 'win32') {
             terminalOptions.shellPath = 'C:\\Windows\\System32\\cmd.exe';
-            terminalOptions.cwd = this.launchTargetDir();
+            terminalOptions.cwd = this.launchCurrentDir();
         }
 
         if (!this.launchTerminal) {
             this.launchTerminal = vscode.window.createTerminal(terminalOptions);
         }
 
-        let quoted : string = util.quote(this.launchTargetPath());
-        quoted += " " + this.launchTargetArgs().join(" ");
-        this.launchTerminal.sendText(quoted);
+        // Add a pair of quotes just in case there is a space in the binary path
+        let terminalCommand : string = '"' + this.launchTargetPath() + '" '
+        terminalCommand += this.launchTargetArgs().join(" ");
+        this.launchTerminal.sendText(terminalCommand);
         this.launchTerminal.show();
         return this.launchTerminal;
     }
 
-    dispose() {
+    public dispose() {
         if (this.launchTerminal) {
             this.launchTerminal.dispose();
         }

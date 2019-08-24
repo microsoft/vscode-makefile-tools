@@ -156,21 +156,19 @@ export function makeRelPaths(fullPaths: string[], curPath: string | undefined): 
     return fullPaths;
 }
 
-export interface ShlexOptions {
-    mode: 'windows'|'posix';
-}
-  
-export function quote(str: string, opt?: ShlexOptions): string {
-    opt = opt || {
-      mode: process.platform === 'win32' ? 'windows' : 'posix',
-    };
-    if (str == '') {
-      return '""';
+// Helper to remove any " or ' from the middle of a path
+// because many file operations don't work properly with paths
+// having quotes in the middle.
+// Don't add here a pair of quotes surrounding the whole result string,
+// this will be done when needed at other call sites.
+export function removeQuotes(str: string): string {
+    if (str.includes('"')) {
+        str = str.replace(/"/g, "");
     }
-    if (/[^\w@%\-+=:,./|]/.test(str)) {
-      str = str.replace(/"/g, '\\"');
-      return `"${str}"`;
-    } else {
-      return str;
+
+    if (str.includes("'")) {
+        str = str.replace(/'/g, "");
     }
+
+    return str;
 }

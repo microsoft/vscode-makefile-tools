@@ -25,26 +25,26 @@ export class MakefileToolsExtension {
 	private cppToolsAPI?: cpp.CppToolsApi;
 	private cppConfigurationProviderRegister?: Promise<void>;
 
-	constructor(public readonly extensionContext: vscode.ExtensionContext) {
+	public constructor(public readonly extensionContext: vscode.ExtensionContext) {
 	}
 
 	// Parse the dry-run output and populate data for cpptools
-	constructIntellisense(dryRunOutputStr: string) {
+	public constructIntellisense(dryRunOutputStr: string) {
 		parser.parseForCppToolsCustomConfigProvider(dryRunOutputStr);
 	}
 
-	dispose() {
+	public dispose() {
 		if (this.cppToolsAPI) {
 			this.cppToolsAPI.dispose();
 		}
 	}
 
 	// Register this extension as a new provider or request an update
-	async registerCppToolsProvider() {
+	public async registerCppToolsProvider() {
 		await this.ensureCppToolsProviderRegistered();
 
 		if (this.cppToolsAPI) {
-			this.cppConfigurationProvider.LogConfigurationProvider();
+			this.cppConfigurationProvider.logConfigurationProvider();
 			if (this.cppToolsAPI.notifyReady) {
 				this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
 			} else {
@@ -53,7 +53,7 @@ export class MakefileToolsExtension {
 		}
 	}
 
-	ensureCppToolsProviderRegistered() {
+	public ensureCppToolsProviderRegistered() {
 		// make sure this extension is registered as provider only once
 		if (!this.cppConfigurationProviderRegister) {
 			this.cppConfigurationProviderRegister = this.registerCppTools();
@@ -62,7 +62,7 @@ export class MakefileToolsExtension {
 		return this.cppConfigurationProviderRegister;
 	}
 
-	async registerCppTools() {
+	public async registerCppTools() {
 		if (!this.cppToolsAPI) {
 			this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v2);
 		}
@@ -72,7 +72,7 @@ export class MakefileToolsExtension {
 		}
 	}
 
-	buildCustomConfigurationProvider(
+	public buildCustomConfigurationProvider(
 		defines: string[],
 		includePath: string[],
 		forcedInclude: string[],
@@ -88,8 +88,8 @@ export class MakefileToolsExtension {
 
 // A change of target or configuration triggered a new dry-run,
 // which produced a new output string to be parsed
-export async function UpdateProvider(dryRunOutputStr: string) {
-	logger.Message("Updating the CppTools IntelliSense Configuration Provider.");
+export async function updateProvider(dryRunOutputStr: string) {
+	logger.message("Updating the CppTools IntelliSense Configuration Provider.");
 	if (extension) {
 		extension.constructIntellisense(dryRunOutputStr);
 		extension.registerCppToolsProvider();
@@ -131,23 +131,23 @@ export async function activate(context: vscode.ExtensionContext) {
 		return launcher.launchTargetPath();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetDir', () => {
-		return launcher.launchTargetDir();
+	context.subscriptions.push(vscode.commands.registerCommand('Make.launchCurrentDir', () => {
+		return launcher.launchCurrentDir();
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetArgs', () => {
 		return launcher.launchTargetArgs();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetArgsConcatenated', () => {
-		return launcher.launchTargetArgsConcatenated();
+	context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetArgsConcat', () => {
+		return launcher.launchTargetArgsConcat();
 	}));
 
 	// Read configuration info from settings
 	configuration.initFromSettings();
 
 	// Generate the dry-run output used for parsing the info to be sent to CppTools
-	make.DryRun();
+	make.dryRun();
 }
 
 export async function deactivate() {

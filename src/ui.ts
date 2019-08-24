@@ -12,15 +12,15 @@ export class UI {
     private debugButton : vscode.StatusBarItem;
     private runButton : vscode.StatusBarItem;
 
-    SetConfiguration(configuration : string) {
+    public setConfiguration(configuration : string) {
         this.configurationButton.text = "Build configuration: " + configuration;
     }
 
-    SetTarget(target : string) {
+    public setTarget(target : string) {
         this.targetButton.text = "Target to build: " + target;
     }
 
-    SetLaunchConfiguration(launchConfigurationStr: string | undefined) {
+    public setLaunchConfiguration(launchConfigurationStr: string | undefined) {
         if (launchConfigurationStr) {
             this.launchConfigurationButton.text = "Launch configuration: ";
             this.launchConfigurationButton.text += "[";
@@ -31,7 +31,7 @@ export class UI {
         }
     }
 
-    constructor() {
+    public constructor() {
         this.configurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 6);
         this.configurationButton.command = "Make.setBuildConfiguration";
         this.configurationButton.tooltip = "Click to select the workspace make configuration";
