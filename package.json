@@ -1,135 +1,134 @@
 {
-	"name": "vscode-makefile-tools",
-	"displayName": "vscode-makefile-tools",
-	"description": "Provide makefile integration in VSCode",
-	"version": "0.0.1",
-	"publisher": "ms-vscode",
-	"engines": {
-		"vscode": "^1.35.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onCommand:Make.setBuildConfiguration",
-		"onCommand:Make.setBuildTarget",
-		"onCommand:Make.buildTarget",
-		"onCommand:Make.setLaunchConfiguration",
-		"onCommand:Make.launchDebug",
-		"onCommand:Make.launchRun",
-		"workspaceContains:**/makefile",
-		"workspaceContains:**/Makefile"
-	],
-	"main": "./out/src/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "Make.buildTarget",
-				"title": "MAKE: Run the MAKEFILE target of the current build configuration"
-			},
-			{
-				"command": "Make.launchDebug",
-				"title": "MAKE: Debug the selected binary target"
-			},
-			{
-				"command": "Make.launchRun",
-				"title": "MAKE: Run the selected binary target in the terminal"
-			},
-			{
-				"command": "Make.setBuildConfiguration",
-				"title": "MAKE: Set the current build configuration"
-			},
-			{
-				"command": "Make.setBuildTarget",
-				"title": "MAKE: Set the target to be built by make"
-			},
-			{
-				"command": "Make.setLaunchConfiguration",
-				"title": "MAKE: Set the make launch configuration"
-			}
-		],
-		"configuration": {
-			"type": "object",
-			"title": "Makefile",
-			"properties": {
-				"Make.buildConfiguration": {
-					"type": [
-						"string",
-						"null"
-					],
-					"default": null,
-					"description": "The makefile current configuration",
-					"scope": "resource"
-				},
-				"Make.buildTarget": {
-					"type": [
-						"string",
-						"null"
-					],
-					"default": null,
-					"description": "The current target to be run by make",
-					"scope": "resource"
-				},
-				"Make.launchConfiguration": {
-					"type": [
-						"object",
-						null
-					],
-					"default": null,
-					"description": "The configuration to use when running or debugging a target",
-					"properties": {
-						"binary": {
-							"type": "string",
-							"description": "The full path to the binary to run or debug"
-						},
-						"args": {
-							"type": "array",
-							"description": "Arguments to pass to program command line",
-							"items": {
-								"type": "string"
-							},
-							"default": []
-						},
-						"cwd": {
-							"type": "string",
-							"description": "Set the working directory for the program"
-						}
-					},
-					"scope": "resource"
-				},
-				"Make.loggingLevel": {
-					"type": [
-						"string",
-						"null"
-					],
-					"enum": [
-						"Normal",
-						"Verbose"
-					],
-					"default": "Normal",
-					"description": "The logging level for the makefile tools extension",
-					"scope": "resource"
-				}
-			}
-		}
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run mycompile",
-		"mycompile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "npm run mycompile && node ./node_modules/vscode/bin/test"
-	},
-	"devDependencies": {
-		"@types/mocha": "^2.2.42",
-		"@types/node": "^10.12.21",
-		"tslint": "^5.18.0",
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28"
-	},
-	"dependencies": {
-		"module-alias": "^2.0.6",
-		"vsce": "^1.66.0",
-		"vscode-cpptools": "^2.1.2"
-	}
+    "name": "vscode-makefile-tools",
+    "displayName": "vscode-makefile-tools",
+    "description": "Provide makefile integration in VS Code",
+    "version": "0.1.0",
+    "publisher": "ms-vscode",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:Make.setBuildConfiguration",
+        "onCommand:Make.setBuildTarget",
+        "onCommand:Make.buildTarget",
+        "onCommand:Make.setLaunchConfiguration",
+        "onCommand:Make.launchDebug",
+        "onCommand:Make.launchRun",
+        "workspaceContains:**/makefile",
+        "workspaceContains:**/Makefile"
+    ],
+    "main": "./out/src/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "Make.buildTarget",
+                "title": "MAKE: Run the MAKEFILE target of the current build configuration"
+            },
+            {
+                "command": "Make.launchDebug",
+                "title": "MAKE: Debug the selected binary target"
+            },
+            {
+                "command": "Make.launchRun",
+                "title": "MAKE: Run the selected binary target in the terminal"
+            },
+            {
+                "command": "Make.setBuildConfiguration",
+                "title": "MAKE: Set the current build configuration"
+            },
+            {
+                "command": "Make.setBuildTarget",
+                "title": "MAKE: Set the target to be built by make"
+            },
+            {
+                "command": "Make.setLaunchConfiguration",
+                "title": "MAKE: Set the make launch configuration"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Makefile",
+            "properties": {
+                "Make.buildConfiguration": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null,
+                    "description": "The makefile current configuration",
+                    "scope": "resource"
+                },
+                "Make.buildTarget": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null,
+                    "description": "The current target to be run by make",
+                    "scope": "resource"
+                },
+                "Make.launchConfiguration": {
+                    "type": [
+                        "object",
+                        null
+                    ],
+                    "default": null,
+                    "description": "The configuration to use when running or debugging a target",
+                    "properties": {
+                        "binary": {
+                            "type": "string",
+                            "description": "The full path to the binary to run or debug"
+                        },
+                        "args": {
+                            "type": "array",
+                            "description": "Arguments to pass to program command line",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": []
+                        },
+                        "cwd": {
+                            "type": "string",
+                            "description": "Set the working directory for the program"
+                        }
+                    },
+                    "scope": "resource"
+                },
+                "Make.loggingLevel": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "Normal",
+                        "Verbose"
+                    ],
+                    "default": "Normal",
+                    "description": "The logging level for the makefile tools extension",
+                    "scope": "resource"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run mycompile",
+        "mycompile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run mycompile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^10.12.21",
+        "tslint": "^5.18.0",
+        "typescript": "^3.3.1",
+        "vscode": "^1.1.28"
+    },
+    "dependencies": {
+        "module-alias": "^2.0.6",
+        "vscode-cpptools": "^2.1.2"
+    }
 }
