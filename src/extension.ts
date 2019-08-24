@@ -82,8 +82,8 @@ export class MakefileToolsExtension {
 		windowsSdkVersion: string,
 		filesPaths: string[]
 	) {
-		this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard,intelliSenseMode, compilerPath, windowsSdkVersion, filesPaths);
-	}	
+		this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard, intelliSenseMode, compilerPath, windowsSdkVersion, filesPaths);
+	}
 }
 
 // A change of target or configuration triggered a new dry-run,

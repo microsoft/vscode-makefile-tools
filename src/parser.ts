@@ -213,7 +213,7 @@ function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string 
 // Examples: we call this helper for /c compiler switch or /dll linker switch.
 // TODO: detect sets of switches that cancel each other to return a more
 // accurate result in case of override (example: /TC and /TP)
-function isSwitchPassedInArguments(args: string, sw: string[]) : boolean {
+function isSwitchPassedInArguments(args: string, sw: string[]): boolean {
 	// - or / as switch prefix
 	// - one or more spaces/tabs after
 	let regexpStr = '(\\s*)(\\/|-)(' + sw.join("|") + ')(\\s+|$)';
@@ -262,12 +262,12 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 // Helper that identifies system commands (cd, cd -, pushd, popd) and make.exe change directory switch
 // to calculate the effect on the current path, also remembering the transition in the history stack.
 // The current path is always the last one into the history
-function currentPathAfterCommand(line : string, currentPathHistory : string[]) : string[] {
+function currentPathAfterCommand(line: string, currentPathHistory: string[]): string[] {
 	line = line.trimLeft();
-	let currentPath : string = currentPathHistory[currentPathHistory.length - 1];
+	let currentPath: string = currentPathHistory[currentPathHistory.length - 1];
 	if (line.startsWith('cd -')) {
 		currentPathHistory.pop();
-		let lastPath : string = currentPathHistory[currentPathHistory.length - 1];
+		let lastPath: string = currentPathHistory[currentPathHistory.length - 1];
 		currentPathHistory.push(currentPath);
 		currentPathHistory.push(lastPath);
 	} else if (line.startsWith('popd') || line.includes('Leaving directory')) {
@@ -324,7 +324,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 		// that would make parseLineAsTool to not match the regular expression,
 		// therefore wrongly skipping over this compilation line?
 		const compilers: string[] = ["clang", "cl", "gcc", "cc", "icc", "icl", "g\\+\\+", "c\\+\\+"];
-		let compilerTool : ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
+		let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
 		if (compilerTool) {
 			// Compiler path is either what the makefile provides or found in the PATH environment variable or empty
 			let compilerFullPath = compilerTool.fullPath || "";
@@ -334,13 +334,13 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 			logger.message("Compiler path: " + compilerFullPath);
 
 			// Parse and log the includes, forced includes and the defines
-			let includes : string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
+			let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
 			includes = util.makeFullPaths(includes, currentPath);
 			logger.message("Includes: " + includes);
-			let forcedIncludes : string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
+			let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
 			forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
 			logger.message("Forced includes: " + forcedIncludes);
-			let defines : string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
+			let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
 			logger.message("Defines: " + defines);
 
 			// Parse the C/C++ standard
@@ -387,7 +387,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 
 // Parse the output of the make dry-run command in order to provide VS Code debugger
 // with information about binaries, their execution paths and arguments
-export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchConfiguration[] {
+export function parseForLaunchConfiguration(dryRunOutputStr: string): LaunchConfiguration[] {
 	logger.message('Parsing dry-run output for Launch (debug/run) configuration...');
 
 	// Do some preprocessing on the dry-run output to make the RegExp parsing easier
@@ -399,9 +399,9 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 	let currentPathHistory: string[] = [currentPath];
 
 	// array of full path executables built by this makefile
-	let targetBinaries : string[] = [];
+	let targetBinaries: string[] = [];
 	// array of launch configurations, for each of the binaries above
-	let launchConfigurations : LaunchConfiguration[] = [];
+	let launchConfigurations: LaunchConfiguration[] = [];
 
 	// The first pass of reading the dry-run output, line by line
 	// searching for compilers, linkers and directory changing commands
@@ -414,8 +414,8 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 
 		// A target binary is usually produced by the linker with the /out or /o switch
 		// but there are several scenarios of compiler producing an output binary directly
-		let compilerTargetBinary : string | undefined;
-		let linkerTargetBinary : string | undefined;
+		let compilerTargetBinary: string | undefined;
+		let linkerTargetBinary: string | undefined;
 
 		// List of compiler tools plus the most common aliases cc and c++
 		// ++ needs to be escaped for the regular expression in parseLineAsTool.
@@ -513,9 +513,9 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 			// in which case the execution path is defaulting to workspace root folder
 			// and there are no args.
 			launchConfigurations.push({
-				binary : targetBinary,
-				cwd : vscode.workspace.rootPath || "",
-				args : []
+				binary: targetBinary,
+				cwd: vscode.workspace.rootPath || "",
+				args: []
 			});
 		}
 	});
@@ -539,9 +539,9 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 	currentPathHistory = [currentPath];
 
 	// Make also an array with only the base file names of the found target binaries.
-	let targetBinariesNames : string[] = [];
+	let targetBinariesNames: string[] = [];
 	targetBinaries.forEach(target => {
-		let parsedPath : path.ParsedPath = path.parse(target);
+		let parsedPath: path.ParsedPath = path.parse(target);
 		if (!targetBinariesNames.includes(parsedPath.name)) {
 			targetBinariesNames.push(parsedPath.name);
 		}
@@ -562,16 +562,16 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string) : LaunchCon
 		//         (because an "@if exist" is not resolved by the dry-run and appears in the output)
 		//       - cmd /c binary arg1 arg2 arg3
 		//       - start binary
-		let targetBinaryTool : ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath);
+		let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath);
 		if (targetBinaryTool) {
 			// Include complete launch configuration: binary, execution path and args
 			// are known from parsing the dry-run
-			let splitArgs : string[] = targetBinaryTool.arguments.split(" ");
+			let splitArgs: string[] = targetBinaryTool.arguments.split(" ");
 			launchConfigurations.push({
-				binary : targetBinaryTool.fullPath,
-				cwd : currentPath,
+				binary: targetBinaryTool.fullPath,
+				cwd: currentPath,
 				// TODO: consider optionally quoted arguments
-				args : splitArgs
+				args: splitArgs
 			});
 		}
 	});

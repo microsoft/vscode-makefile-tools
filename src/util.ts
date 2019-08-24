@@ -26,7 +26,7 @@ export function checkDirectoryExistsSync(directoryPath: string): boolean {
 // without using fs.stat, since dry-run may output tools
 // that are not found yet at certain locations,
 // without running the prep targets that would copy them there
-export function looksLikePath(pathStr : string) : boolean {
+export function looksLikePath(pathStr: string): boolean {
     // TODO: to be implemented
     return true;
 }
@@ -57,8 +57,8 @@ export function pathIsCurrentDirectory(pathStr: string): boolean {
 // Returns the first one found or undefined if not found.
 // TODO: implement a variation of this helper that scans on disk for the tools installed,
 // to help when VSCode is not launched from the proper environment
-export function toolPathInEnv(name : string) : string | undefined {
-    let toolPath : string | undefined;
+export function toolPathInEnv(name: string): string | undefined {
+    let toolPath: string | undefined;
 
     let envPath: string | undefined = process.env["PATH"];
     let envPathSplit: string[] = [];

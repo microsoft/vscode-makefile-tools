@@ -23,7 +23,7 @@ export interface MakeConfiguration {
 	// It can have full path, relative path or only tool name
 	// Don't include args in commandName
 	commandName: string;
-	
+
 	// options used in the build invocation
 	// don't use more than one argument in a string
 	commandArgs: string[];
@@ -47,13 +47,13 @@ export function setCurrentMakeConfiguration(configuration: string) {
 
 // Read the current configuration from settings storage, update status bar item
 function readCurrentMakeConfiguration() {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
+	let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
 	currentMakeConfiguration = workspaceConfiguration.get<string>("Make.buildConfiguration");
 	if (!currentMakeConfiguration) {
 		logger.message("No current configuration is defined in the settings file");
 		currentMakeConfiguration = "Default";
-    }
-    
+	}
+
 	statusBar.setConfiguration(currentMakeConfiguration);
 }
 
@@ -61,16 +61,16 @@ function readCurrentMakeConfiguration() {
 // TODO: support dll debugging.
 export interface LaunchConfiguration {
 	// todo: add symbol search paths
-	binary : string; // full path
-	cwd : string;    // execution path
-	args : string[]; // arguments
+	binary: string; // full path
+	cwd: string;    // execution path
+	args: string[]; // arguments
 }
-function launchConfigurationToString(configuration : LaunchConfiguration) : string {
-	let str : string = configuration.cwd;
+function launchConfigurationToString(configuration: LaunchConfiguration): string {
+	let str: string = configuration.cwd;
 	str += ">";
 	str += util.makeRelPath(configuration.binary, configuration.cwd);
 	str += "(";
-	str +=configuration.args.join(",");
+	str += configuration.args.join(",");
 	str += ")";
 	return str;
 }
@@ -80,7 +80,7 @@ function stringToLaunchConfiguration(str: string): LaunchConfiguration | undefin
 	let match = regexp.exec(str);
 
 	if (match) {
-		let fullPath : string = util.makeFullPath(match[2], match[1]);
+		let fullPath: string = util.makeFullPath(match[2], match[1]);
 		let splitArgs: string[] = match[3].split(",");
 
 		return {
@@ -102,13 +102,13 @@ export function setCurrentLaunchConfiguration(configuration: LaunchConfiguration
 
 // Read the current launch configuration from settings storage, update status bar item
 function readCurrentLaunchConfiguration() {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
+	let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
 	currentLaunchConfiguration = workspaceConfiguration.get<LaunchConfiguration>("Make.launchConfiguration");
 	if (currentLaunchConfiguration) {
 		statusBar.setLaunchConfiguration(launchConfigurationToString(currentLaunchConfiguration));
 	} else {
 		statusBar.setLaunchConfiguration("No current launch configuration is defined in the settings file");
-    }
+	}
 }
 
 // Command name and args are used when building from within the VS Code Makefile Tools Extension,
@@ -262,7 +262,7 @@ export async function setNewLaunchConfiguration() {
 
 			logger.message("The dry-run output for parsing the binaries launch configuration");
 			logger.message(stdoutStr);
-			let binariesLaunchConfigurations : LaunchConfiguration[] = parser.parseForLaunchConfiguration(stdoutStr);
+			let binariesLaunchConfigurations: LaunchConfiguration[] = parser.parseForLaunchConfiguration(stdoutStr);
 			selectLaunchConfiguration(binariesLaunchConfigurations);
 		};
 
@@ -301,8 +301,8 @@ export async function setNewTarget() {
 				logger.message(stderrStr);
 			}
 
-            // Don't log stdoutStr in this case, because -p output is too verbose to be useful in any logger area
-			let makefileTargets : string[] = parser.parseTargets(stdoutStr);
+			// Don't log stdoutStr in this case, because -p output is too verbose to be useful in any logger area
+			let makefileTargets: string[] = parser.parseTargets(stdoutStr);
 			makefileTargets.sort();
 			selectTarget(makefileTargets);
 		};
@@ -317,7 +317,7 @@ export async function setNewTarget() {
 // Fill a drop-down with all the target names run by building the makefile for the current configuration
 // Triggers a cpptools configuration provider update after selection.
 // TODO: change the UI list to multiple selections mode and store an array of current active targets
-export async function selectTarget(makefileTargets : string[]) {
+export async function selectTarget(makefileTargets: string[]) {
 	const chosen = await vscode.window.showQuickPick(makefileTargets);
 	if (chosen) {
 		currentTarget = chosen;
@@ -333,8 +333,8 @@ export async function selectTarget(makefileTargets : string[]) {
 // Fill a drop-down with all the launch configurations found for binaries built by the makefile
 // under the scope of the current build configuration and target
 // Selection updates current launch configuration that will be ready for the next debug/run operation
-export async function selectLaunchConfiguration(launchConfigurations : LaunchConfiguration[]) {
-	let items : string[] = [];
+export async function selectLaunchConfiguration(launchConfigurations: LaunchConfiguration[]) {
+	let items: string[] = [];
 	launchConfigurations.forEach(config => {
 		items.push(launchConfigurationToString(config));
 	});

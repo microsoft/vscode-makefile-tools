@@ -8,7 +8,7 @@ export class Launcher implements vscode.Disposable {
     // Command property accessible from launch.json:
     // the full path of the target binary currently set for launch
     public launchTargetPath(): string {
-        let launchConfiguration : configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
+        let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.binary;
         } else {
@@ -19,7 +19,7 @@ export class Launcher implements vscode.Disposable {
     // Command property accessible from launch.json:
     // the full path from where the target binary is to be launched
     public launchCurrentDir(): string {
-        let launchConfiguration : configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
+        let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.cwd;
         } else {
@@ -31,7 +31,7 @@ export class Launcher implements vscode.Disposable {
     // the arguments sent to the target binary, returned as array of string
     // This is used by the debug/terminal VS Code APIs.
     public launchTargetArgs(): string[] {
-        let launchConfiguration : configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
+        let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.args;
         } else {
@@ -51,7 +51,7 @@ export class Launcher implements vscode.Disposable {
     // 4 arguments: tool, arg1, arg2, arg3
     // TODO: investigate how we can define string array arguments
     // for the target binary in launch.json
-    public launchTargetArgsConcat() : string {
+    public launchTargetArgsConcat(): string {
         return this.launchTargetArgs().join(" ");
     }
 
@@ -108,7 +108,7 @@ export class Launcher implements vscode.Disposable {
         }
 
         // Add a pair of quotes just in case there is a space in the binary path
-        let terminalCommand : string = '"' + this.launchTargetPath() + '" '
+        let terminalCommand: string = '"' + this.launchTargetPath() + '" '
         terminalCommand += this.launchTargetArgs().join(" ");
         this.launchTerminal.sendText(terminalCommand);
         this.launchTerminal.show();

@@ -5,18 +5,18 @@ import * as vscode from 'vscode';
 let ui: UI;
 
 export class UI {
-    private configurationButton : vscode.StatusBarItem;
-    private targetButton  : vscode.StatusBarItem;
-    private launchConfigurationButton  : vscode.StatusBarItem;
-    private buildButton  : vscode.StatusBarItem;
-    private debugButton : vscode.StatusBarItem;
-    private runButton : vscode.StatusBarItem;
+    private configurationButton: vscode.StatusBarItem;
+    private targetButton: vscode.StatusBarItem;
+    private launchConfigurationButton: vscode.StatusBarItem;
+    private buildButton: vscode.StatusBarItem;
+    private debugButton: vscode.StatusBarItem;
+    private runButton: vscode.StatusBarItem;
 
-    public setConfiguration(configuration : string) {
+    public setConfiguration(configuration: string) {
         this.configurationButton.text = "Build configuration: " + configuration;
     }
 
-    public setTarget(target : string) {
+    public setTarget(target: string) {
         this.targetButton.text = "Target to build: " + target;
     }
 

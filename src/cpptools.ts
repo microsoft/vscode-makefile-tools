@@ -36,7 +36,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 
 	public async provideBrowseConfiguration() { return this.workspaceBrowseConfiguration; }
 
-	public dispose() {}
+	public dispose() { }
 
 	private readonly fileIndex = new Map<string, cpp.SourceFileConfigurationItem>();
 

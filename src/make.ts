@@ -14,7 +14,7 @@ export async function buildCurrentTarget() {
 	if (currentTarget) {
 		commandArgs.push(currentTarget);
 	}
-	
+
 	commandArgs = commandArgs.concat(configuration.getConfigurationCommandArgs());
 
 	logger.message("Building the current target ... Command: " + configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
@@ -64,7 +64,7 @@ export async function dryRun() {
 	commandArgs.push("--keep-going");
 
 	logger.message("Generating the make dry-run output for parsing IntelliSense information... Command: " +
-    configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
+		configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
 
 	try {
 		let stdoutStr: string = "";
