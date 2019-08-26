@@ -102,28 +102,28 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 
     public logConfigurationProvider() {
         logger.message("Sending Workspace Browse Configuration: -----------------------------------");
-        logger.message("Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
-        logger.message("Standard: " + this.workspaceBrowseConfiguration.standard);
-        logger.message("Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath);
+        logger.message("    Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
+        logger.message("    Standard: " + this.workspaceBrowseConfiguration.standard);
+        logger.message("    Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath);
         if (process.platform === "win32") {
-            logger.message("Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
+            logger.message("    Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
         }
-        logger.message("-----------------------------------");
+        logger.message("----------------------------------------------------------------------------");
 
         this.fileIndex.forEach(filePath => {
             logger.message("Sending configuration for file " + filePath.uri.toString() + " -----------------------------------");
-            logger.message("Defines: " + filePath.configuration.defines.join(";"));
-            logger.message("Includes: " + filePath.configuration.includePath.join(";"));
+            logger.message("    Defines: " + filePath.configuration.defines.join(";"));
+            logger.message("    Includes: " + filePath.configuration.includePath.join(";"));
             if (filePath.configuration.forcedInclude) {
-                logger.message("Force Includes: " + filePath.configuration.forcedInclude.join(";"));
+                logger.message("    Force Includes: " + filePath.configuration.forcedInclude.join(";"));
             }
-            logger.message("Standard: " + filePath.configuration.standard);
-            logger.message("IntelliSense Mode: " + filePath.configuration.intelliSenseMode);
-            logger.message("Compiler Path: " + filePath.configuration.compilerPath);
+            logger.message("    Standard: " + filePath.configuration.standard);
+            logger.message("    IntelliSense Mode: " + filePath.configuration.intelliSenseMode);
+            logger.message("    Compiler Path: " + filePath.configuration.compilerPath);
             if (process.platform === "win32") {
-                logger.message("Windows SDK Version: " + filePath.configuration.windowsSdkVersion);
+                logger.message("    Windows SDK Version: " + filePath.configuration.windowsSdkVersion);
             }
-            logger.message("-----------------------------------");
+            logger.message("---------------------------------------------------------------------------------------------------");
         });
     }
 }

@@ -66,18 +66,15 @@ export function toolPathInEnv(name: string): string | undefined {
         envPathSplit = envPath.split(path.delimiter);
     }
 
-    envPathSplit.forEach(p => {
-        let fullPath: string = path.join(p, path.basename(name));
-        if (checkFileExistsSync(fullPath)) {
-            toolPath = fullPath;
-            return;
-        }
-    });
-
-    return toolPath;
-
     // todo: if the compiler is not found in path, scan on disk and point the user to all the options
     // (the concept of kit for cmake extension)
+
+    return envPathSplit.find(p => {
+        let fullPath: string = path.join(p, path.basename(name));
+        if (checkFileExistsSync(fullPath)) {
+            return fullPath;
+        }
+    });
 }
 
 // Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr

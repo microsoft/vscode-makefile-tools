@@ -66,7 +66,7 @@ export interface LaunchConfiguration {
     cwd: string;    // execution path
     args: string[]; // arguments
 }
-function launchConfigurationToString(configuration: LaunchConfiguration): string {
+export function launchConfigurationToString(configuration: LaunchConfiguration): string {
     let str: string = configuration.cwd;
     str += ">";
     str += util.makeRelPath(configuration.binary, configuration.cwd);
@@ -76,7 +76,7 @@ function launchConfigurationToString(configuration: LaunchConfiguration): string
     return str;
 }
 
-function stringToLaunchConfiguration(str: string): LaunchConfiguration | undefined {
+export function stringToLaunchConfiguration(str: string): LaunchConfiguration | undefined {
     let regexp = /(.*)\>(.*)\((.*)\)/mg;
     let match = regexp.exec(str);
 
@@ -243,7 +243,7 @@ export async function setNewLaunchConfiguration() {
     let stdoutStr: string = "";
     let stderrStr: string = "";
 
-    logger.message("Parsing launch configuration for the binaries built by the makefile ... Command: " + configurationCommandName + " " + commandArgs.join(" "));
+    logger.message("Generating the dry-run to parse launch configuration for the binaries built by the makefile ... Command: " + configurationCommandName + " " + commandArgs.join(" "));
 
     let process: child_process.ChildProcess;
     try {
@@ -304,7 +304,7 @@ export async function setNewTarget() {
 
             // Don't log stdoutStr in this case, because -p output is too verbose to be useful in any logger area
             let makefileTargets: string[] = parser.parseTargets(stdoutStr);
-            makefileTargets.sort();
+            makefileTargets = makefileTargets.sort();
             selectTarget(makefileTargets);
         };
 
@@ -340,7 +340,10 @@ export async function selectLaunchConfiguration(launchConfigurations: LaunchConf
         items.push(launchConfigurationToString(config));
     });
 
-    items.sort();
+    items = items.sort();
+
+    // TODO: create a quick pick with description and details for items
+    // to better view the long targets commands
 
     const chosen = await vscode.window.showQuickPick(items);
     if (chosen) {
