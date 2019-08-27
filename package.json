@@ -25,27 +25,27 @@
         "commands": [
             {
                 "command": "Make.buildTarget",
-                "title": "MAKE: Run the MAKEFILE target of the current build configuration"
+                "title": "Make: Run the MAKEFILE target of the current build configuration"
             },
             {
                 "command": "Make.launchDebug",
-                "title": "MAKE: Debug the selected binary target"
+                "title": "Make: Debug the selected binary target"
             },
             {
                 "command": "Make.launchRun",
-                "title": "MAKE: Run the selected binary target in the terminal"
+                "title": "Make: Run the selected binary target in the terminal"
             },
             {
                 "command": "Make.setBuildConfiguration",
-                "title": "MAKE: Set the current build configuration"
+                "title": "Make: Set the current build configuration"
             },
             {
                 "command": "Make.setBuildTarget",
-                "title": "MAKE: Set the target to be built by make"
+                "title": "Make: Set the target to be built by make"
             },
             {
                 "command": "Make.setLaunchConfiguration",
-                "title": "MAKE: Set the make launch configuration"
+                "title": "Make: Set the make launch configuration"
             }
         ],
         "configuration": {
@@ -122,10 +122,13 @@
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
-        "@types/node": "^10.12.21",
+        "@types/node": "^10.14.16",
         "tslint": "^5.18.0",
-        "typescript": "^3.3.1",
-        "vscode": "^1.1.28"
+        "tslint-microsoft-contrib": "^6.2.0",
+        "tslint-no-unused-expression-chai": "^0.1.4",
+        "vrsource-tslint-rules": "^6.0.0",
+        "typescript": "^3.5.3",
+        "vscode": "^1.1.36"
     },
     "dependencies": {
         "module-alias": "^2.0.6",

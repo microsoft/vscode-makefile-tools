@@ -1,3 +1,5 @@
+// Launch support: debug and run in terminal
+
 import * as configuration from './configuration';
 import * as util from './util';
 import * as vscode from 'vscode';
@@ -92,13 +94,13 @@ export class Launcher implements vscode.Disposable {
 
     // Invoke a VS Code running terminal passing it all the information
     // from the current launch configuration
-    public async runCurrentTarget() {
+    public async runCurrentTarget(): Promise<vscode.Terminal> {
         const terminalOptions: vscode.TerminalOptions = {
             name: 'Make/Launch',
         };
 
         // Use cmd.exe on Windows
-        if (process.platform == 'win32') {
+        if (process.platform === 'win32') {
             terminalOptions.shellPath = 'C:\\Windows\\System32\\cmd.exe';
             terminalOptions.cwd = this.launchCurrentDir();
         }
@@ -108,14 +110,14 @@ export class Launcher implements vscode.Disposable {
         }
 
         // Add a pair of quotes just in case there is a space in the binary path
-        let terminalCommand: string = '"' + this.launchTargetPath() + '" '
+        let terminalCommand: string = '"' + this.launchTargetPath() + '" ';
         terminalCommand += this.launchTargetArgs().join(" ");
         this.launchTerminal.sendText(terminalCommand);
         this.launchTerminal.show();
         return this.launchTerminal;
     }
 
-    public dispose() {
+    public dispose(): void {
         if (this.launchTerminal) {
             this.launchTerminal.dispose();
         }

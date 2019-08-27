@@ -1,3 +1,5 @@
+// Helper APIs used by this extension
+
 import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as path from 'path';

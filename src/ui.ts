@@ -1,3 +1,5 @@
+// UI support for this extension: buttons and quickpicks.
+
 import * as configuration from './configuration';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -12,15 +14,15 @@ export class UI {
     private debugButton: vscode.StatusBarItem;
     private runButton: vscode.StatusBarItem;
 
-    public setConfiguration(configuration: string) {
+    public setConfiguration(configuration: string): void {
         this.configurationButton.text = "Build configuration: " + configuration;
     }
 
-    public setTarget(target: string) {
+    public setTarget(target: string): void {
         this.targetButton.text = "Target to build: " + target;
     }
 
-    public setLaunchConfiguration(launchConfigurationStr: string | undefined) {
+    public setLaunchConfiguration(launchConfigurationStr: string | undefined): void {
         if (launchConfigurationStr) {
             this.launchConfigurationButton.text = "Launch configuration: ";
             this.launchConfigurationButton.text += "[";

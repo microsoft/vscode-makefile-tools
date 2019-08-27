@@ -1,3 +1,5 @@
+// Support for make operations
+
 import * as child_process from 'child_process';
 import * as configuration from './configuration';
 import * as ext from './extension';
@@ -5,12 +7,12 @@ import * as logger from './logger';
 import * as util from './util';
 import * as vscode from 'vscode';
 
-export async function buildCurrentTarget() {
+export async function buildCurrentTarget(): Promise<void> {
     let process: child_process.ChildProcess;
 
     let commandArgs: string[] = [];
     // Prepend the target to the arguments given in the configurations json.
-    let currentTarget = configuration.getCurrentTarget();
+    let currentTarget: string | undefined = configuration.getCurrentTarget();
     if (currentTarget) {
         commandArgs.push(currentTarget);
     }
@@ -21,15 +23,15 @@ export async function buildCurrentTarget() {
 
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
-        var stdout = (result: string): void => {
+        let stdout = (result: string): void => {
             logger.messageNoCR(result);
         };
 
-        var stderr = (result: string): void => {
+        let stderr = (result: string): void => {
             logger.messageNoCR(result);
         };
 
-        var closing = (retCode: number, signal: string): void => {
+        let closing = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
                 logger.message("The current target failed to build.");
             } else {
@@ -44,13 +46,13 @@ export async function buildCurrentTarget() {
     }
 }
 
-export async function dryRun() {
+export async function dryRun(): Promise<void> {
     let process: child_process.ChildProcess;
 
     let commandArgs: string[] = [];
 
     // Prepend the target to the arguments given in the configurations json.
-    let currentTarget = configuration.getCurrentTarget();
+    let currentTarget: string | undefined = configuration.getCurrentTarget();
     if (currentTarget) {
         commandArgs.push(currentTarget);
     }
@@ -70,19 +72,21 @@ export async function dryRun() {
         let stdoutStr: string = "";
         let stderrStr: string = "";
 
-        var stdout = (result: string): void => {
+        let stdout = (result: string): void => {
             stdoutStr += result;
         };
-        var stderr = (result: string): void => {
+
+        let stderr = (result: string): void => {
             stderrStr += result;
         };
-        var closing = (retCode: number, signal: string): void => {
+
+        let closing = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
                 logger.message("The make dry-run command failed.");
                 logger.message(stderrStr);
             }
 
-            console.log("Make dry-run output to parse is:\n" + stdoutStr);
+            //console.log("Make dry-run output to parse is:\n" + stdoutStr);
             ext.updateProvider(stdoutStr);
         };
 
@@ -92,4 +96,3 @@ export async function dryRun() {
         return;
     }
 }
-

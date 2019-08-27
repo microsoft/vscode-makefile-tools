@@ -1,6 +1,6 @@
-'use strict';
+// Makefile Tools extension
 
-require('module-alias/register');
+'use strict';
 
 import * as configuration from './configuration';
 import * as cpptools from './cpptools';
@@ -29,18 +29,18 @@ export class MakefileToolsExtension {
     }
 
     // Parse the dry-run output and populate data for cpptools
-    public constructIntellisense(dryRunOutputStr: string) {
+    public constructIntellisense(dryRunOutputStr: string): void {
         parser.parseForCppToolsCustomConfigProvider(dryRunOutputStr);
     }
 
-    public dispose() {
+    public dispose(): void {
         if (this.cppToolsAPI) {
             this.cppToolsAPI.dispose();
         }
     }
 
     // Register this extension as a new provider or request an update
-    public async registerCppToolsProvider() {
+    public async registerCppToolsProvider(): Promise<void> {
         await this.ensureCppToolsProviderRegistered();
 
         if (this.cppToolsAPI) {
@@ -53,7 +53,7 @@ export class MakefileToolsExtension {
         }
     }
 
-    public ensureCppToolsProviderRegistered() {
+    public ensureCppToolsProviderRegistered(): Promise<void> {
         // make sure this extension is registered as provider only once
         if (!this.cppConfigurationProviderRegister) {
             this.cppConfigurationProviderRegister = this.registerCppTools();
@@ -62,7 +62,7 @@ export class MakefileToolsExtension {
         return this.cppConfigurationProviderRegister;
     }
 
-    public async registerCppTools() {
+    public async registerCppTools(): Promise<void> {
         if (!this.cppToolsAPI) {
             this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v2);
         }
@@ -81,14 +81,14 @@ export class MakefileToolsExtension {
         compilerPath: string,
         windowsSdkVersion: string,
         filesPaths: string[]
-    ) {
+    ): void {
         this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard, intelliSenseMode, compilerPath, windowsSdkVersion, filesPaths);
     }
 }
 
 // A change of target or configuration triggered a new dry-run,
 // which produced a new output string to be parsed
-export async function updateProvider(dryRunOutputStr: string) {
+export async function updateProvider(dryRunOutputStr: string): Promise<void> {
     logger.message("Updating the CppTools IntelliSense Configuration Provider.");
     if (extension) {
         extension.constructIntellisense(dryRunOutputStr);
@@ -96,7 +96,7 @@ export async function updateProvider(dryRunOutputStr: string) {
     }
 }
 
-export async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
     vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is now active');
 
     statusBar = ui.getUI();
@@ -150,7 +150,7 @@ export async function activate(context: vscode.ExtensionContext) {
     make.dryRun();
 }
 
-export async function deactivate() {
+export async function deactivate(): Promise<void> {
     vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is de-activated');
 
     const items = [

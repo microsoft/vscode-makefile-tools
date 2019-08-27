@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "mycompile",
+            "type": "npm",
+            "script": "mycompile",
+            "problemMatcher": [
+                "$tsc-watch"
+            ],
+            "isBackground": true
+        }
+    ]
+}

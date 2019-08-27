@@ -10,7 +10,6 @@ import * as logger from './logger';
 import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
-import { LaunchConfiguration } from './configuration';
 
 const compilers: string[] = ["clang", "cl", "gcc", "cc", "icc", "icl", "g\\+\\+", "c\\+\\+"];
 const linkers: string[] = ["link", "ilink", "ld", "gcc", "clang", "cc", "g\\+\\+", "c\\+\\+"]; // any aliases/symlinks ?
@@ -19,20 +18,22 @@ const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 export function parseTargets(verboseLog: string): string[] {
     // Extract the text between "# Files" and "# Finished Make data base" lines
     // There can be more than one matching section.
-    let regexpExtract = /(# Files\n*)([\s\S]*?)(# Finished Make data base)/mg;
-    let result: string[] | null;
-    let extractedLog : string = "";
+    let regexpExtract: RegExp = /(# Files\n*)([\s\S]*?)(# Finished Make data base)/mg;
+    let result: RegExpExecArray | null;
+    let extractedLog: string = "";
 
-    var matches: string[] = [];
-    var match: string[] | null;
+    let matches: string[] = [];
+    let match: string[] | null;
 
-    while (result = regexpExtract.exec(verboseLog)) {
+    result = regexpExtract.exec(verboseLog);
+    while (result) {
         extractedLog = result[2];
 
         // skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target
-        let regexpTarget = /^(?!\n?[#\.])(?<!^\n?# Not a target:\s*)\s*(\S+):\s+/mg;
+        let regexpTarget: RegExp = /^(?!\n?[#\.])(?<!^\n?# Not a target:\s*)\s*(\S+):\s+/mg;
 
-        while (match = regexpTarget.exec(extractedLog)) {
+        match = regexpTarget.exec(extractedLog);
+        while (match) {
             // Make sure we don't insert duplicates.
             // They can be caused by the makefile syntax of defining variables for a target.
             // That creates multiple lines with the same target name followed by :,
@@ -40,7 +41,11 @@ export function parseTargets(verboseLog: string): string[] {
             if (!matches.includes(match[1])) {
                 matches.push(match[1]);
             }
+
+            match = regexpTarget.exec(extractedLog);
         }
+
+        result = regexpExtract.exec(verboseLog);
     }
 
     if (matches) {
@@ -61,7 +66,7 @@ function preprocessDryRunOutput(dryRunOutputStr: string): string {
     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n"); // \r
     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n"); // \r
 
-    // Extract the link command 
+    // Extract the link command
     // Keep the /link switch to the cl command because otherwise we will see compiling without /c
     // and we will deduce some other output binary based on its /Fe or /Fo or first source given,
     // instead of the output binary defined via the link operation (which will be parsed on the next line).
@@ -100,7 +105,7 @@ interface ToolInvocation {
 
 // Helper that parses the given line as a tool invocation.
 // The full path that is returned is calculated with the following logic:
-//     - make a full path out of the one given in the makefile 
+//     - make a full path out of the one given in the makefile
 //       and the current path that is calculated as of now
 //     - if the tool is not found at the full path above and if requested,
 //       it will be searched in all the paths of the PATH environment variable
@@ -124,7 +129,7 @@ function parseLineAsTool(
 
         // make sure to append extension if the array of tools has only one element,
         // in which case .join is not doing anything
-        if (toolNames.length == 1) {
+        if (toolNames.length === 1) {
             regexpStr += ('\\.exe');
         }
 
@@ -134,7 +139,7 @@ function parseLineAsTool(
     regexpStr += toolNames.join('|') + ')[\\s\\"]+(.*)$';
 
     let regexp: RegExp = RegExp(regexpStr, "mg");
-    let match = regexp.exec(line);
+    let match: RegExpExecArray | null = regexp.exec(line);
 
     if (!match) {
         return undefined;
@@ -187,25 +192,17 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
     // - can be wrapped by a pair of ', before the switch prefix and after the switch value
     // - the value can be wrapped by a pair of "
     // - one or none or more spaces/tabs between the switch and the value
-    let regexpStr = '(^|\\s+)\\\'?(\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*))(\\".*?\\"|[^\\\'\\s]+)\\\'?';
-    let regexp = RegExp(regexpStr, "mg");
-    var match: string[] | null;
-    var results: string[] = [];
+    let regexpStr: string = '(^|\\s+)\\\'?(\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*))(\\".*?\\"|[^\\\'\\s]+)\\\'?';
+    let regexp: RegExp = RegExp(regexpStr, "mg");
+    let match: RegExpExecArray | null;
+    let results: string[] = [];
 
-    while (match = regexp.exec(args)) {
+    match = regexp.exec(args);
+    while (match) {
         let result: string = match[5].trim();
-
-        // Reject a case when the given switch is a substring of another switch:
-        // Hypotethical example switches "sw" and "switch" (todo: find real example):
-        // -switch:value should be parsed as switch="switch" and value="value",
-        // but with the regexp above and without the check below
-        // it is parsed as switch="sw" and value="itch:value"
-        if (match[5].includes(":") || match[5].includes("=")) {
-            continue;
-        }
-
         result = result.replace(/"/g, "");
         results.push(result);
+        match = regexp.exec(args);
     }
 
     return results;
@@ -226,25 +223,17 @@ function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string 
     // - can be wrapped by a pair of ', before the switch prefix and after the switch value
     // - the value can be wrapped by a pair of "
     // -  ':' or '=' or one/none/more spaces/tabs between the switch and the value
-    let regexpStr = '(^|\\s+)\\\'?(\\/|-)(' + sw.join("|") + ')(:|=|\\s*)(\\".*?\\"|[^\\\'\\s]+)\\\'?';
-    let regexp = RegExp(regexpStr, "mg");
-    var match: string[] | null;
-    var results: string[] = [];
+    let regexpStr: string = '(^|\\s+)\\\'?(\\/|-)(' + sw.join("|") + ')(:|=|\\s*)(\\".*?\\"|[^\\\'\\s]+)\\\'?';
+    let regexp: RegExp = RegExp(regexpStr, "mg");
+    let match: RegExpExecArray | null;
+    let results: string[] = [];
 
-    while (match = regexp.exec(args)) {
+    match = regexp.exec(args);
+    while (match) {
         let result: string = match[5].trim();
-
-        // Reject a case when the given switch is a substring of another switch:
-        // Hypotethical example switches "sw" and "switch" (todo: find real example):
-        // -switch:value should be parsed as switch="switch" and value="value",
-        // but with the regexp above and without the check below
-        // it is parsed as switch="sw" and value="itch:value"
-        if (match[5].includes(":") || match[5].includes("=")) {
-            continue;
-        }
-
         result = result.replace(/"/g, "");
         results.push(result);
+        match = regexp.exec(args);
     }
 
     return results.pop();
@@ -252,7 +241,7 @@ function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string 
 
 // Helper that answers whether a particular switch is passed to the tool.
 // When calling this helper, we are not interested in obtaining the
-// (or there is no) value passed in via the switch. 
+// (or there is no) value passed in via the switch.
 // There must be at least one space/tab before the switch,
 // so that we don't match a path by mistake.
 // Same after the switch, in case the given name is a substring
@@ -263,11 +252,10 @@ function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string 
 function isSwitchPassedInArguments(args: string, sw: string[]): boolean {
     // - or / as switch prefix
     // - one or more spaces/tabs after
-    let regexpStr = '(\\s*)(\\/|-)(' + sw.join("|") + ')(\\s+|$)';
-    let regexp = RegExp(regexpStr, "mg");
-    var match: string[] | null;
+    let regexpStr: string = '(\\s*)(\\/|-)(' + sw.join("|") + ')(\\s+|$)';
+    let regexp: RegExp = RegExp(regexpStr, "mg");
 
-    if (match = regexp.exec(args)) {
+    if (regexp.exec(args)) {
         return true;
     }
 
@@ -282,7 +270,7 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
     // one or more spaces/tabs before and after
     // with or without quotes surrounding the argument
     // (todo: handle the scenario when quotes enclose just the directory path, without the file name)
-    let regexpStr = '(';
+    let regexpStr: string = '(';
     exts.forEach(ext => {
         regexpStr += '\\".*?\\.' + ext + '\\"|';
         regexpStr += '\\S+\\.' + ext;
@@ -293,14 +281,16 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
     });
     regexpStr += ')';
 
-    let regexp = RegExp(regexpStr, "mg");
-    var match: string[] | null;
-    var files: string[] = [];
+    let regexp: RegExp = RegExp(regexpStr, "mg");
+    let match: string[] | null;
+    let files: string[] = [];
 
-    while (match = regexp.exec(args)) {
+    match = regexp.exec(args);
+    while (match) {
         let result: string = match[1].trim();
         result = result.replace(/"/g, "");
         files.push(result);
+        match = regexp.exec(args);
     }
 
     return files;
@@ -313,7 +303,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
     line = line.trimLeft();
 
     let lastCurrentPath: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
-    let newCurrentPath : string = "";
+    let newCurrentPath: string = "";
 
     if (line.startsWith('cd -')) {
         // Swap the last two current paths in the history.
@@ -321,17 +311,17 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
             currentPathHistory.pop();
         }
 
-        let lastCurrentPath2 : string = (currentPathHistory.length > 0) ? currentPathHistory.pop() || "" : lastCurrentPath;
+        let lastCurrentPath2: string = (currentPathHistory.length > 0) ? currentPathHistory.pop() || "" : lastCurrentPath;
 
-        logger.message("Analyzing line: " +line);
+        logger.message("Analyzing line: " + line);
         logger.message("CD- command: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2);
         currentPathHistory.push(lastCurrentPath);
         currentPathHistory.push(lastCurrentPath2);
     } else if (line.startsWith('popd') || line.includes('Leaving directory')) {
-        let lastCurrentPath : string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
+        let lastCurrentPath: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
         currentPathHistory.pop();
-        let lastCurrentPath2 : string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
-        logger.message("Analyzing line: " +line);
+        let lastCurrentPath2: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
+        logger.message("Analyzing line: " + line);
         logger.message("POPD command or end of MAKE -C: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2);
     } else if (line.startsWith('cd')) {
         newCurrentPath = util.makeFullPath(line.slice(3), lastCurrentPath);
@@ -346,23 +336,23 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         }
 
         currentPathHistory.push(newCurrentPath);
-        logger.message("Analyzing line: " +line);
+        logger.message("Analyzing line: " + line);
         logger.message("CD command: entering directory " + newCurrentPath);
     } else if (line.startsWith('pushd')) {
         newCurrentPath = util.makeFullPath(line.slice(6), lastCurrentPath);
         currentPathHistory.push(newCurrentPath);
-        logger.message("Analyzing line: " +line);
+        logger.message("Analyzing line: " + line);
         logger.message("PUSHD command: entering directory " + newCurrentPath);
     } else if (line.includes('Entering directory')) {
         // equivalent to pushd
-        let match = line.match("(.*)(Entering directory ')(.*)'");
+        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ')(.*)'");
         if (match) {
             newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
         } else {
             newCurrentPath = "Could not parse directory";
         }
 
-        logger.message("Analyzing line: " +line);
+        logger.message("Analyzing line: " + line);
         logger.message("MAKE -C: entering directory " + newCurrentPath);
         currentPathHistory.push(newCurrentPath);
     }
@@ -371,9 +361,9 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
 }
 
 // Parse the output of the make dry-run command in order to provide CppTools
-// with information about includes, defines, compiler path....etc... 
+// with information about includes, defines, compiler path....etc...
 // as needed by CustomConfigurationProvider
-export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
+export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): void {
     logger.message('Parsing dry-run output for CppTools Custom Configuration Provider...');
 
     // Do some preprocessing on the dry-run output to make the RegExp parsing easier
@@ -404,9 +394,9 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
             logger.message("Found compiler command: " + line);
 
             // Compiler path is either what the makefile provides or found in the PATH environment variable or empty
-            let compilerFullPath = compilerTool.fullPath || "";
+            let compilerFullPath: string = compilerTool.fullPath || "";
             if (!compilerTool.found) {
-                let toolBaseName : string = path.basename(compilerFullPath);
+                let toolBaseName: string = path.basename(compilerFullPath);
                 compilerFullPath = util.toolPathInEnv(toolBaseName) || "";
             }
             logger.message("    Compiler path: " + compilerFullPath);
@@ -430,7 +420,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 
             // Parse the IntelliSense mode
             // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
-            var intelliSenseMode: util.IntelliSenseMode = "msvc-x64";
+            let intelliSenseMode: util.IntelliSenseMode = "msvc-x64";
             if (path.basename(compilerTool.fullPath).startsWith("clang")) {
                 intelliSenseMode = "clang-x64";
             } else if (path.basename(compilerTool.fullPath).startsWith("gcc") ||
@@ -441,7 +431,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 
             // For windows, parse the sdk version
             // todo: scan on disk for most recent sdk installation
-            var windowsSDKVersion: string | undefined = "";
+            let windowsSDKVersion: string | undefined = "";
             if (process.platform === "win32") {
                 windowsSDKVersion = process.env["WindowsSDKVersion"];
                 if (!windowsSDKVersion) {
@@ -465,7 +455,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string) {
 
 // Parse the output of the make dry-run command in order to provide VS Code debugger
 // with information about binaries, their execution paths and arguments
-export function parseForLaunchConfiguration(dryRunOutputStr: string): LaunchConfiguration[] {
+export function parseForLaunchConfiguration(dryRunOutputStr: string): configuration.LaunchConfiguration[] {
     logger.message('Parsing dry-run output for Launch (debug/run) configuration...');
 
     // Do some preprocessing on the dry-run output to make the RegExp parsing easier
@@ -479,7 +469,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): LaunchConf
     // array of full path executables built by this makefile
     let targetBinaries: string[] = [];
     // array of launch configurations, for each of the binaries above
-    let launchConfigurations: LaunchConfiguration[] = [];
+    let launchConfigurations: configuration.LaunchConfiguration[] = [];
 
     // The first pass of reading the dry-run output, line by line
     // searching for compilers, linkers and directory changing commands
@@ -596,7 +586,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): LaunchConf
             // Include limited launch configuration, when only the binary is known,
             // in which case the execution path is defaulting to workspace root folder
             // and there are no args.
-            let launchConfiguration : LaunchConfiguration = {
+            let launchConfiguration: configuration.LaunchConfiguration = {
                 binary: targetBinary,
                 cwd: vscode.workspace.rootPath || "",
                 args: []
@@ -656,7 +646,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): LaunchConf
             // Include complete launch configuration: binary, execution path and args
             // are known from parsing the dry-run
             let splitArgs: string[] = targetBinaryTool.arguments.split(" ");
-            let launchConfiguration: LaunchConfiguration = {
+            let launchConfiguration: configuration.LaunchConfiguration = {
                 binary: targetBinaryTool.fullPath,
                 cwd: currentPath,
                 // TODO: consider optionally quoted arguments

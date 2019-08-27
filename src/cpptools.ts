@@ -1,3 +1,5 @@
+// Support for integration with CppTools Custom Configuration Provider
+
 import * as logger from './logger';
 import * as path from 'path';
 import * as util from './util';
@@ -5,7 +7,7 @@ import * as vscode from 'vscode';
 import * as cpp from 'vscode-cpptools';
 
 let cummulativeBrowsePath: string[] = [];
-export function clearCummulativeBrowsePath() {
+export function clearCummulativeBrowsePath(): void {
     cummulativeBrowsePath = [];
 }
 
@@ -17,26 +19,25 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     private workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = { browsePath: [] };
 
     private getConfiguration(uri: vscode.Uri): cpp.SourceFileConfigurationItem | undefined {
-        const norm_path = path.normalize(uri.fsPath);
+        const norm_path: string = path.normalize(uri.fsPath);
         return this.fileIndex.get(norm_path);
     }
 
-    public async canProvideConfiguration(uri: vscode.Uri) {
+    public async canProvideConfiguration(uri: vscode.Uri): Promise<boolean> {
         return !!this.getConfiguration(uri);
     }
 
-
-    public async provideConfigurations(uris: vscode.Uri[]) {
+    public async provideConfigurations(uris: vscode.Uri[]): Promise<cpp.SourceFileConfigurationItem[]> {
         return util.dropNulls(uris.map(u => this.getConfiguration(u)));
     }
 
-    public async canProvideBrowseConfiguration() {
+    public async canProvideBrowseConfiguration(): Promise<boolean> {
         return true;
     }
 
-    public async provideBrowseConfiguration() { return this.workspaceBrowseConfiguration; }
+    public async provideBrowseConfiguration(): Promise<cpp.WorkspaceBrowseConfiguration> { return this.workspaceBrowseConfiguration; }
 
-    public dispose() { }
+    public dispose(): void { }
 
     private readonly fileIndex = new Map<string, cpp.SourceFileConfigurationItem>();
 
@@ -44,7 +45,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     //     - incorporate relevant settings from the environment
     //           INCLUDE= for include paths
     //           _CL_= parse for defines, undefines, standard and response files
-    //                 Attention for defines syntax: _CL_=/DMyDefine#1 versus /DMyDefine1
+    //                 Attention for defines syntax: _CL_=/DMyDefine#1 versus /DMyDefine=1
     //     - take into account the effect of undefines /U
     // In case of conflicting switches, the command prompt overwrites the makefile
     public buildCustomConfigurationProvider(
@@ -55,7 +56,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         intelliSenseMode: util.IntelliSenseMode,
         compilerPath: string,
         windowsSdkVersion: string,
-        filesPaths: string[]) {
+        filesPaths: string[]): void {
         const configuration: cpp.SourceFileConfiguration = {
             defines,
             standard,
@@ -100,7 +101,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         };
     }
 
-    public logConfigurationProvider() {
+    public logConfigurationProvider(): void {
         logger.message("Sending Workspace Browse Configuration: -----------------------------------");
         logger.message("    Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
         logger.message("    Standard: " + this.workspaceBrowseConfiguration.standard);
@@ -127,4 +128,3 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         });
     }
 }
-
