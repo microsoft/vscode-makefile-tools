@@ -1,7 +1,6 @@
 // UI support for this extension: buttons and quickpicks.
 
 import * as configuration from './configuration';
-import * as path from 'path';
 import * as vscode from 'vscode';
 
 let ui: UI;
@@ -15,16 +14,16 @@ export class UI {
     private runButton: vscode.StatusBarItem;
 
     public setConfiguration(configuration: string): void {
-        this.configurationButton.text = "Build configuration: " + configuration;
+        this.configurationButton.text = "$(settings) Build configuration: " + configuration;
     }
 
     public setTarget(target: string): void {
-        this.targetButton.text = "Target to build: " + target;
+        this.targetButton.text = "$(tag) Target to build: " + target;
     }
 
     public setLaunchConfiguration(launchConfigurationStr: string | undefined): void {
         if (launchConfigurationStr) {
-            this.launchConfigurationButton.text = "Launch configuration: ";
+            this.launchConfigurationButton.text = "$(rocket) Launch configuration: ";
             this.launchConfigurationButton.text += "[";
             this.launchConfigurationButton.text += launchConfigurationStr;
             this.launchConfigurationButton.text += "]";
@@ -35,36 +34,36 @@ export class UI {
 
     public constructor() {
         this.configurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 6);
-        this.configurationButton.command = "Make.setBuildConfiguration";
+        this.configurationButton.command = "Makefile.setBuildConfiguration";
         this.configurationButton.tooltip = "Click to select the workspace make configuration";
         this.configurationButton.show();
 
         this.targetButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 5);
-        this.targetButton.command = "Make.setBuildTarget";
+        this.targetButton.command = "Makefile.setBuildTarget";
         this.targetButton.tooltip = "Click to select the target to be run by make";
         this.targetButton.show();
 
         this.buildButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4);
-        this.buildButton.command = "Make.buildTarget";
+        this.buildButton.command = "Makefile.buildTarget";
         this.buildButton.tooltip = "Click to build the selected target";
-        this.buildButton.text = "Build";
+        this.buildButton.text = "$(gear) Build";
         this.buildButton.show();
 
         this.launchConfigurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 3);
-        this.launchConfigurationButton.command = "Make.setLaunchConfiguration";
+        this.launchConfigurationButton.command = "Makefile.setLaunchConfiguration";
         this.launchConfigurationButton.tooltip = "Click to select the make launch configuration (binary, args and current path)";
         this.launchConfigurationButton.show();
 
         this.debugButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
-        this.debugButton.command = "Make.launchDebug";
+        this.debugButton.command = "Makefile.launchDebug";
         this.debugButton.tooltip = "Click to debug the selected executable";
-        this.debugButton.text = "Debug";
+        this.debugButton.text = "$(bug) Debug";
         this.debugButton.show();
 
         this.runButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
-        this.runButton.command = "Make.launchRun";
+        this.runButton.command = "Makefile.launchRun";
         this.runButton.tooltip = "Click to launch the selected executable";
-        this.runButton.text = "Run";
+        this.runButton.text = "$(terminal) Run";
         this.runButton.show();
     }
 

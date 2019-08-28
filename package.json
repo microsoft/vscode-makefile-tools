@@ -1,22 +1,51 @@
 {
-    "name": "vscode-makefile-tools",
-    "displayName": "vscode-makefile-tools",
-    "description": "Provide makefile integration in VS Code",
+    "name": "makefile-tools",
+    "displayName": "Makefile Tools",
+    "description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
     "version": "0.1.0",
     "publisher": "ms-vscode",
+    "preview": true,
+    "icon": "MakefileTools.png",
+    "readme": "README.md",
+    "author": {
+        "name": "Microsoft Corporation"
+    },
+    "license": "SEE LICENSE IN LICENSE.txt",
     "engines": {
         "vscode": "^1.30.0"
     },
-    "categories": [
-        "Other"
-    ],
-    "activationEvents": [
-        "onCommand:Make.setBuildConfiguration",
-        "onCommand:Make.setBuildTarget",
-        "onCommand:Make.buildTarget",
-        "onCommand:Make.setLaunchConfiguration",
-        "onCommand:Make.launchDebug",
-        "onCommand:Make.launchRun",
+    "bugs": {
+        "url": "https://github.com/Microsoft/vscode-makefile-tools/issues",
+        "email": "c_cpp_support@microsoft.com"
+      },
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/Microsoft/vscode-makefile-tools.git"
+      },
+      "homepage": "https://github.com/Microsoft/vscode-makefile-tools",
+      "qna": "https://github.com/Microsoft/vscode-makefile-tools/issues",
+      "keywords": [
+        "C",
+        "C++",
+        "IntelliSense",
+        "Microsoft",
+        "Makefile"
+      ],
+      "categories": [
+        "Programming Languages",
+        "Debuggers",
+        "Formatters",
+        "Linters",
+        "Other",
+        "Snippets"
+      ],
+        "activationEvents": [
+        "onCommand:Makefile.setBuildConfiguration",
+        "onCommand:Makefile.setBuildTarget",
+        "onCommand:Makefile.buildTarget",
+        "onCommand:Makefile.setLaunchConfiguration",
+        "onCommand:Makefile.launchDebug",
+        "onCommand:Makefile.launchRun",
         "workspaceContains:**/makefile",
         "workspaceContains:**/Makefile"
     ],
@@ -24,27 +53,27 @@
     "contributes": {
         "commands": [
             {
-                "command": "Make.buildTarget",
-                "title": "Make: Run the MAKEFILE target of the current build configuration"
+                "command": "Makefile.buildTarget",
+                "title": "Make: Build the makefile target of the current build configuration"
             },
             {
-                "command": "Make.launchDebug",
+                "command": "Makefile.launchDebug",
                 "title": "Make: Debug the selected binary target"
             },
             {
-                "command": "Make.launchRun",
+                "command": "Makefile.launchRun",
                 "title": "Make: Run the selected binary target in the terminal"
             },
             {
-                "command": "Make.setBuildConfiguration",
+                "command": "Makefile.setBuildConfiguration",
                 "title": "Make: Set the current build configuration"
             },
             {
-                "command": "Make.setBuildTarget",
+                "command": "Makefile.setBuildTarget",
                 "title": "Make: Set the target to be built by make"
             },
             {
-                "command": "Make.setLaunchConfiguration",
+                "command": "Makefile.setLaunchConfiguration",
                 "title": "Make: Set the make launch configuration"
             }
         ],
@@ -52,7 +81,7 @@
             "type": "object",
             "title": "Makefile",
             "properties": {
-                "Make.buildConfiguration": {
+                "Makefile.buildConfiguration": {
                     "type": [
                         "string",
                         "null"
@@ -61,7 +90,7 @@
                     "description": "The makefile current configuration",
                     "scope": "resource"
                 },
-                "Make.buildTarget": {
+                "Makefile.buildTarget": {
                     "type": [
                         "string",
                         "null"
@@ -70,7 +99,7 @@
                     "description": "The current target to be run by make",
                     "scope": "resource"
                 },
-                "Make.launchConfiguration": {
+                "Makefile.launchConfiguration": {
                     "type": [
                         "object",
                         null
@@ -97,7 +126,7 @@
                     },
                     "scope": "resource"
                 },
-                "Make.loggingLevel": {
+                "Makefile.loggingLevel": {
                     "type": [
                         "string",
                         "null"
@@ -117,7 +146,6 @@
         "vscode:prepublish": "npm run mycompile",
         "mycompile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "npm run mycompile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
@@ -128,10 +156,12 @@
         "tslint-no-unused-expression-chai": "^0.1.4",
         "vrsource-tslint-rules": "^6.0.0",
         "typescript": "^3.5.3",
-        "vscode": "^1.1.36"
+        "vscode-test": "^0.4.1",
+        "@types/vscode": "^1.35.0"
     },
     "dependencies": {
         "module-alias": "^2.0.6",
+        "vscode-jsonrpc": "3.5.0",
         "vscode-cpptools": "^2.1.2"
     }
 }

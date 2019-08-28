@@ -39,8 +39,8 @@ export interface MakeConfiguration {
 // Last configuration name picked from the set defined in .vscode\make_configurations.json.
 // Saved into the settings storage. Also reflected in the configuration status bar button.
 // If no particular current configuration is defined in settings, set to 'Default'.
-let currentMakeConfiguration: string | undefined;
-export function getCurrentMakeConfiguration(): string | undefined { return currentMakeConfiguration; }
+let currentMakeConfiguration: string;
+export function getCurrentMakeConfiguration(): string { return currentMakeConfiguration; }
 export function setCurrentMakeConfiguration(configuration: string): void {
     currentMakeConfiguration = configuration;
     statusBar.setConfiguration(currentMakeConfiguration);
@@ -50,10 +50,12 @@ export function setCurrentMakeConfiguration(configuration: string): void {
 // Read the current configuration from settings storage, update status bar item
 function readCurrentMakeConfiguration(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
-    currentMakeConfiguration = workspaceConfiguration.get<string>("Make.buildConfiguration");
-    if (!currentMakeConfiguration) {
+    let buildConfiguration : string | undefined = workspaceConfiguration.get<string>("Makefile.buildConfiguration");
+    if (!buildConfiguration) {
         logger.message("No current configuration is defined in the settings file");
         currentMakeConfiguration = "Default";
+    } else {
+        currentMakeConfiguration = buildConfiguration;
     }
 
     statusBar.setConfiguration(currentMakeConfiguration);
@@ -105,11 +107,11 @@ export function setCurrentLaunchConfiguration(configuration: LaunchConfiguration
 // Read the current launch configuration from settings storage, update status bar item
 function readCurrentLaunchConfiguration(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
-    currentLaunchConfiguration = workspaceConfiguration.get<LaunchConfiguration>("Make.launchConfiguration");
+    currentLaunchConfiguration = workspaceConfiguration.get<LaunchConfiguration>("Makefile.launchConfiguration");
     if (currentLaunchConfiguration) {
         statusBar.setLaunchConfiguration(launchConfigurationToString(currentLaunchConfiguration));
     } else {
-        statusBar.setLaunchConfiguration("No current launch configuration is defined in the settings file");
+        statusBar.setLaunchConfiguration("No launch configuration set");
     }
 }
 
@@ -157,13 +159,23 @@ let makeConfigurations: MakeConfiguration[] = [];
 export function getMakeConfigurations(): MakeConfiguration[] { return makeConfigurations; }
 export function setMakeConfigurations(configurations: MakeConfiguration[]): void { makeConfigurations = configurations; }
 
+// TODOs:
+//     - add a schema for make_configurations.json
+//     - assist the user with UI for creating this file
+//     - more type validation for reading the json
+//     - add optional configure parameters: configure command and configure command args
+//       for when the code base needs a specific workflow to run before the make invocation
 function readMakeConfigurations(): void {
     let configurationsJsonPath: string = vscode.workspace.rootPath + "\/.vscode\/make_configurations.json";
     if (util.checkFileExistsSync(configurationsJsonPath)) {
         logger.message("Reading configurations from file \/.vscode\/make_configurations.json");
         const jsonConfigurationsContent: Buffer = fs.readFileSync(configurationsJsonPath);
 
-        makeConfigurations = JSON.parse(jsonConfigurationsContent.toString());
+        try {
+            makeConfigurations = JSON.parse(jsonConfigurationsContent.toString());
+        } catch (error) {
+            vscode.window.showErrorMessage("Failed to parse make_configurations.json");
+        }
     } else {
         logger.message("Configurations file \/.vscode\/make_configurations.json not found");
     }
@@ -178,15 +190,16 @@ export function setCurrentTarget(target: string | undefined): void { currentTarg
 
 // Read current target from settings storage, update status bar item
 function readCurrentTarget(): void {
-    // If no particular target is defined in settings, use 'Default' for the button
-    // but keep the variable empty, to not apend it to the make command.
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
-    currentTarget = workspaceConfiguration.get<string>("Make.buildTarget");
-    if (!currentTarget) {
+    let buildTarget : string | undefined = workspaceConfiguration.get<string>("Makefile.buildTarget");
+    if (!buildTarget) {
         logger.message("No target defined in the settings file");
         statusBar.setTarget("Default");
+        // If no particular target is defined in settings, use 'Default' for the button
+        // but keep the variable empty, to not apend it to the make command.
         currentTarget = "";
     } else {
+        currentTarget = buildTarget;
         statusBar.setTarget(currentTarget);
     }
 }
@@ -209,11 +222,13 @@ export async function setNewConfiguration(): Promise<void> {
         return k.name;
     }));
 
-    const chosen: string | undefined = await vscode.window.showQuickPick(items);
+    let options : vscode.QuickPickOptions = {};
+    options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
+    const chosen: string | undefined = await vscode.window.showQuickPick(items, options);
     if (chosen) {
         currentMakeConfiguration = chosen;
         let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
-        workspaceConfiguration.update("Make.buildConfiguration", currentMakeConfiguration);
+        workspaceConfiguration.update("Makefile.buildConfiguration", currentMakeConfiguration);
 
         setCurrentMakeConfiguration(currentMakeConfiguration);
 
@@ -244,19 +259,18 @@ export async function setNewLaunchConfiguration(): Promise<void> {
     let stdoutStr: string = "";
     let stderrStr: string = "";
 
-    logger.message("Generating the dry-run to parse launch configuration for the binaries built by the makefile ... Command: " + configurationCommandName + " " + commandArgs.join(" "));
+    logger.message("Generating the dry-run to parse launch configuration for the binaries built by the makefile. Command: " + configurationCommandName + " " + commandArgs.join(" "));
 
-    let process: child_process.ChildProcess;
     try {
-        let stdout = (result: string): void => {
+        let stdout : any = (result: string): void => {
             stdoutStr += result;
         };
 
-        let stderr = (result: string): void => {
+        let stderr : any = (result: string): void => {
             stderrStr += result;
         };
 
-        let closing = (retCode: number, signal: string): void => {
+        let closing : any = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
                 logger.message("The verbose make dry-run command for parsing binaries launch configuration failed.");
                 logger.message(stderrStr);
@@ -270,7 +284,7 @@ export async function setNewLaunchConfiguration(): Promise<void> {
 
         await util.spawnChildProcess(configurationCommandName, commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        logger.message('Failed to launch make command. Make sure it is on the path. ' + error);
+        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
         return;
     }
 }
@@ -285,19 +299,19 @@ export async function setNewTarget(): Promise<void> {
     let stdoutStr: string = "";
     let stderrStr: string = "";
 
-    logger.message("Parsing the targets in the makefile ... Command: " + configurationCommandName + " " + commandArgs.join(" "));
+    logger.message("Parsing the targets in the makefile. Command: " + configurationCommandName + " " + commandArgs.join(" "));
 
     let process: child_process.ChildProcess;
     try {
-        let stdout = (result: string): void => {
+        let stdout : any = (result: string): void => {
             stdoutStr += result;
         };
 
-        let stderr = (result: string): void => {
+        let stderr : any = (result: string): void => {
             stderrStr += result;
         };
 
-        let closing = (retCode: number, signal: string): void => {
+        let closing : any = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
                 logger.message("The verbose make dry-run command for parsing targets failed.");
                 logger.message(stderrStr);
@@ -311,7 +325,7 @@ export async function setNewTarget(): Promise<void> {
 
         await util.spawnChildProcess(configurationCommandName, commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        logger.message('Failed to launch make command. Make sure it is on the path. ' + error);
+        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
         return;
     }
 }
@@ -320,13 +334,16 @@ export async function setNewTarget(): Promise<void> {
 // Triggers a cpptools configuration provider update after selection.
 // TODO: change the UI list to multiple selections mode and store an array of current active targets
 export async function selectTarget(makefileTargets: string[]): Promise<void> {
-    const chosen: string | undefined = await vscode.window.showQuickPick(makefileTargets);
+    let options : vscode.QuickPickOptions = {};
+    options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
+    const chosen: string | undefined = await vscode.window.showQuickPick(makefileTargets, options);
+
     if (chosen) {
         currentTarget = chosen;
         statusBar.setTarget(currentTarget);
 
         let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
-        workspaceConfiguration.update("Make.buildTarget", currentTarget);
+        workspaceConfiguration.update("Makefile.buildTarget", currentTarget);
 
         make.dryRun();
     }
@@ -346,11 +363,14 @@ export async function selectLaunchConfiguration(launchConfigurations: LaunchConf
     // TODO: create a quick pick with description and details for items
     // to better view the long targets commands
 
-    const chosen: string | undefined = await vscode.window.showQuickPick(items);
+    let options : vscode.QuickPickOptions = {};
+    options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
+    const chosen: string | undefined = await vscode.window.showQuickPick(items, options);
+
     if (chosen) {
         statusBar.setLaunchConfiguration(chosen);
         currentLaunchConfiguration = stringToLaunchConfiguration(chosen);
         let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
-        workspaceConfiguration.update("Make.launchConfiguration", currentLaunchConfiguration);
+        workspaceConfiguration.update("Makefile.launchConfiguration", currentLaunchConfiguration);
     }
 }

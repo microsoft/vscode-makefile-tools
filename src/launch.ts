@@ -1,7 +1,7 @@
 // Launch support: debug and run in terminal
 
 import * as configuration from './configuration';
-import * as util from './util';
+import * as logger from './logger';
 import * as vscode from 'vscode';
 
 let launcher: Launcher;
@@ -60,6 +60,13 @@ export class Launcher implements vscode.Disposable {
     // Invoke a VS Code debugging session passing it all the information
     // from the current launch configuration
     public async debugCurrentTarget(): Promise<vscode.DebugSession | undefined> {
+        if (!configuration.getCurrentLaunchConfiguration()) {
+            vscode.window.showErrorMessage("Currently there is no launch configuration set.");
+            logger.message("Cannot start debugging because there is no launch configuration set. " +
+                "Define one in the settings file or use the Makefile.setLaunchConfigurationCommand");
+            return;
+        }
+
         let args: string[] = this.launchTargetArgs();
 
         let dbg: string;
@@ -74,12 +81,19 @@ export class Launcher implements vscode.Disposable {
             type: dbg,
             name: `Debug My Program`,
             request: 'launch',
-            cwd: '${command:Make.launchCurrentDir}',
+            cwd: '${command:Makefile.launchCurrentDir}',
             args,
-            program: '${command:Make.launchTargetPath}'
+            program: '${command:Makefile.launchTargetPath}'
         };
 
-        await vscode.debug.startDebugging(vscode.workspace.workspaceFolders![0], debugConfig);
+        let startFolder : vscode.WorkspaceFolder;
+        if (vscode.workspace.workspaceFolders) {
+            startFolder = vscode.workspace.workspaceFolders[0];
+            await vscode.debug.startDebugging(startFolder, debugConfig);
+        } else {
+            await vscode.debug.startDebugging(undefined, debugConfig);
+        }
+
         return vscode.debug.activeDebugSession;
     }
 
@@ -107,6 +121,14 @@ export class Launcher implements vscode.Disposable {
 
         if (!this.launchTerminal) {
             this.launchTerminal = vscode.window.createTerminal(terminalOptions);
+        }
+
+        if (!configuration.getCurrentLaunchConfiguration()) {
+            vscode.window.showErrorMessage("Currently there is no launch configuration set.");
+            logger.message("Cannot start debugging because there is no launch configuration set. " +
+                "Define one in the settings file or use the Makefile.setLaunchConfigurationCommand");
+
+            return this.launchTerminal;
         }
 
         // Add a pair of quotes just in case there is a space in the binary path

@@ -1,7 +1,5 @@
 // Makefile Tools extension
 
-'use strict';
-
 import * as configuration from './configuration';
 import * as cpptools from './cpptools';
 import * as launch from './launch';
@@ -13,7 +11,6 @@ import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
 import * as cpp from 'vscode-cpptools';
-import { debug } from 'util';
 
 let statusBar: ui.UI = ui.getUI();
 let launcher: launch.Launcher = launch.getLauncher();
@@ -102,44 +99,56 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     statusBar = ui.getUI();
     extension = new MakefileToolsExtension(context);
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.setBuildConfiguration', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setBuildConfiguration', () => {
         configuration.setNewConfiguration();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.setBuildTarget', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setBuildTarget', () => {
         configuration.setNewTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.buildTarget', () => {
-        vscode.window.showInformationMessage('Building current MAKEFILE configuration ' + configuration.getCurrentMakeConfiguration() + "/" + configuration.getCurrentTarget());
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.buildTarget', () => {
+        let config : string | undefined = configuration.getCurrentMakeConfiguration();
+        let target : string | undefined = configuration.getCurrentTarget();
+        let configAndTarget : string = '"' + config;
+
+        if (target) {
+            target = target.trimLeft();
+            if (target !== "") {
+                configAndTarget += "/" + target;
+            }
+        }
+
+        configAndTarget += '"';
+        vscode.window.showInformationMessage('Building current makefile configuration ' + configAndTarget);
         make.buildCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.setLaunchConfiguration', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setLaunchConfiguration', () => {
         configuration.setNewLaunchConfiguration();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.launchDebug', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchDebug', () => {
         launcher.debugCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.launchRun', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchRun', () => {
         launcher.runCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetPath', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetPath', () => {
         return launcher.launchTargetPath();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.launchCurrentDir', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchCurrentDir', () => {
         return launcher.launchCurrentDir();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetArgs', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetArgs', () => {
         return launcher.launchTargetArgs();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Make.launchTargetArgsConcat', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetArgsConcat', () => {
         return launcher.launchTargetArgsConcat();
     }));
 
@@ -153,7 +162,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 export async function deactivate(): Promise<void> {
     vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is de-activated');
 
-    const items = [
+    const items : any = [
         extension,
         launcher,
         statusBar

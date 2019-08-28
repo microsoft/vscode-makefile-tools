@@ -9,7 +9,7 @@ let makeOutputChannel: vscode.OutputChannel | undefined;
 function getCurrentLoggingLevel(): string | undefined {
     if (!loggingLevel) {
         let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
-        loggingLevel = workspaceConfiguration.get<string>("Make.loggingLevel");
+        loggingLevel = workspaceConfiguration.get<string>("Makefile.loggingLevel");
     }
 
     return loggingLevel;
@@ -25,6 +25,7 @@ function getOutputChannel(): vscode.OutputChannel {
 
 export function message(message: string): void {
     let channel: vscode.OutputChannel = getOutputChannel();
+    channel.show();
     channel.appendLine(message);
 }
 
@@ -32,5 +33,6 @@ export function message(message: string): void {
 // Example: stdout/stderr of a child process read before the stream is closed.
 export function messageNoCR(message: string): void {
     let channel: vscode.OutputChannel = getOutputChannel();
+    channel.show();
     channel.append(message);
 }

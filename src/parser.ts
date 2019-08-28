@@ -364,7 +364,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
 // with information about includes, defines, compiler path....etc...
 // as needed by CustomConfigurationProvider
 export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): void {
-    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider...');
+    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.');
 
     // Do some preprocessing on the dry-run output to make the RegExp parsing easier
     dryRunOutputStr = preprocessDryRunOutput(dryRunOutputStr);
@@ -456,7 +456,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
 // Parse the output of the make dry-run command in order to provide VS Code debugger
 // with information about binaries, their execution paths and arguments
 export function parseForLaunchConfiguration(dryRunOutputStr: string): configuration.LaunchConfiguration[] {
-    logger.message('Parsing dry-run output for Launch (debug/run) configuration...');
+    logger.message('Parsing dry-run output for Launch (debug/run) configuration.');
 
     // Do some preprocessing on the dry-run output to make the RegExp parsing easier
     dryRunOutputStr = preprocessDryRunOutput(dryRunOutputStr);

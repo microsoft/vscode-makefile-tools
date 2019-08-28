@@ -8,8 +8,6 @@ import * as util from './util';
 import * as vscode from 'vscode';
 
 export async function buildCurrentTarget(): Promise<void> {
-    let process: child_process.ChildProcess;
-
     let commandArgs: string[] = [];
     // Prepend the target to the arguments given in the configurations json.
     let currentTarget: string | undefined = configuration.getCurrentTarget();
@@ -19,19 +17,19 @@ export async function buildCurrentTarget(): Promise<void> {
 
     commandArgs = commandArgs.concat(configuration.getConfigurationCommandArgs());
 
-    logger.message("Building the current target ... Command: " + configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
+    logger.message("Building the current target. Command: " + configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
 
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
-        let stdout = (result: string): void => {
+        let stdout : any = (result: string): void => {
             logger.messageNoCR(result);
         };
 
-        let stderr = (result: string): void => {
+        let stderr : any = (result: string): void => {
             logger.messageNoCR(result);
         };
 
-        let closing = (retCode: number, signal: string): void => {
+        let closing : any = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
                 logger.message("The current target failed to build.");
             } else {
@@ -41,14 +39,12 @@ export async function buildCurrentTarget(): Promise<void> {
 
         await util.spawnChildProcess(configuration.getConfigurationCommandName(), commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        logger.message('Failed to launch make command. Make sure it is on the path. ' + error);
+        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
         return;
     }
 }
 
 export async function dryRun(): Promise<void> {
-    let process: child_process.ChildProcess;
-
     let commandArgs: string[] = [];
 
     // Prepend the target to the arguments given in the configurations json.
@@ -65,34 +61,34 @@ export async function dryRun(): Promise<void> {
     commandArgs.push("--always-make");
     commandArgs.push("--keep-going");
 
-    logger.message("Generating the make dry-run output for parsing IntelliSense information... Command: " +
+    logger.message("Generating the make dry-run output for parsing IntelliSense information. Command: " +
         configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
 
     try {
         let stdoutStr: string = "";
         let stderrStr: string = "";
 
-        let stdout = (result: string): void => {
+        let stdout : any = (result: string): void => {
             stdoutStr += result;
         };
 
-        let stderr = (result: string): void => {
+        let stderr : any = (result: string): void => {
             stderrStr += result;
         };
 
-        let closing = (retCode: number, signal: string): void => {
+        let closing : any = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
                 logger.message("The make dry-run command failed.");
                 logger.message(stderrStr);
             }
 
-            //console.log("Make dry-run output to parse is:\n" + stdoutStr);
+            console.log("Make dry-run output to parse is:\n" + stdoutStr);
             ext.updateProvider(stdoutStr);
         };
 
         await util.spawnChildProcess(configuration.getConfigurationCommandName(), commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        logger.message('Failed to launch make command. Make sure it is on the path. ' + error);
+        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
         return;
     }
 }

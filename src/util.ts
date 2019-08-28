@@ -60,8 +60,6 @@ export function pathIsCurrentDirectory(pathStr: string): boolean {
 // TODO: implement a variation of this helper that scans on disk for the tools installed,
 // to help when VSCode is not launched from the proper environment
 export function toolPathInEnv(name: string): string | undefined {
-    let toolPath: string | undefined;
-
     let envPath: string | undefined = process.env["PATH"];
     let envPathSplit: string[] = [];
     if (envPath) {
@@ -98,6 +96,14 @@ export function spawnChildProcess(process: string, args: string[], workingDirect
 
         child.on('close', (retCode: number, signal: string) => {
             closingCallback(retCode, signal);
+        });
+
+        child.on('exit', (code: number) => {
+            if (code !== 0) {
+                reject(new Error(`${process} exited with error code ${code}`));
+            } else {
+                resolve();
+            }
         });
 
         if (child.pid === undefined) {
