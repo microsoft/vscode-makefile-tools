@@ -358,7 +358,9 @@ export async function selectLaunchConfiguration(launchConfigurations: LaunchConf
         items.push(launchConfigurationToString(config));
     });
 
-    items = items.sort();
+    items = items.sort().filter(function(elem, index, selef) {
+        return index === selef.indexOf(elem);
+    })
 
     // TODO: create a quick pick with description and details for items
     // to better view the long targets commands

@@ -11,8 +11,13 @@ import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
 
+// List of compiler tools plus the most common aliases cc and c++
+// ++ needs to be escaped for the regular expression in parseLineAsTool.
+// todo: any other scenarios of aliases and symlinks
+// that would make parseLineAsTool to not match the regular expression,
+// therefore wrongly skipping over compilation lines?
 const compilers: string[] = ["clang", "cl", "gcc", "cc", "icc", "icl", "g\\+\\+", "c\\+\\+"];
-const linkers: string[] = ["link", "ilink", "ld", "gcc", "clang", "cc", "g\\+\\+", "c\\+\\+"]; // any aliases/symlinks ?
+const linkers: string[] = ["link", "ilink", "ld", "gcc", "clang", "cc", "g\\+\\+", "c\\+\\+"];
 const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 export function parseTargets(verboseLog: string): string[] {
@@ -252,7 +257,7 @@ function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string 
 function isSwitchPassedInArguments(args: string, sw: string[]): boolean {
     // - or / as switch prefix
     // - one or more spaces/tabs after
-    let regexpStr: string = '(\\s*)(\\/|-)(' + sw.join("|") + ')(\\s+|$)';
+    let regexpStr: string = '((\\s+)|^)(\\/|-)(' + sw.join("|") + ')((\\s+)|$)';
     let regexp: RegExp = RegExp(regexpStr, "mg");
 
     if (regexp.exec(args)) {
@@ -384,11 +389,6 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
         currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
         currentPath = currentPathHistory[currentPathHistory.length - 1];
 
-        // List of compiler tools plus the most common aliases cc and c++
-        // ++ needs to be escaped for the regular expression in parseLineAsTool.
-        // todo: any other scenarios of aliases and symlinks
-        // that would make parseLineAsTool to not match the regular expression,
-        // therefore wrongly skipping over this compilation line?
         let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
         if (compilerTool) {
             logger.message("Found compiler command: " + line);
@@ -487,22 +487,18 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
         let compilerTargetBinary: string | undefined;
 
         if (process.platform === "win32") {
-            // List of compiler tools plus the most common aliases cc and c++
-            // ++ needs to be escaped for the regular expression in parseLineAsTool.
-            // todo: any other scenarios of aliases and symlinks
-            // that would make parseLineAsTool to not match the regular expression,
-            // therefore wrongly skipping over this compilation line?
             let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
             if (compilerTool) {
                 // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
                 // Note: no need to worry about the DLL case that this extension doesn't support yet
                 // since a compiler can produce implicitly only an executable.
-                if (path.basename(compilerTool.fullPath).startsWith("cl")) {
-                    if (!isSwitchPassedInArguments(compilerTool.arguments, ["c"])) {
-                        logger.message("Found non -c compiler command:\n" + line);
 
-                        // First read the value of the /Fe switch (for cl.exe) or -o for compilers on linux/mac
-                        compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe", "o"]);
+                if (path.basename(compilerTool.fullPath).startsWith("cl")) {
+                    if (!isSwitchPassedInArguments(compilerTool.arguments, ["c", "P", "E", "EP"])) {
+                        logger.message("Found compiler command:\n" + line);
+
+                        // First read the value of the /Fe switch (for cl.exe)
+                        compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
 
                         // Then assume first object file base name (defined with /Fo) + exe
                         // Note: /Fo is not allowed on multiple sources compilations so there will be only one if found
@@ -541,9 +537,11 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
         if (linkerTool) {
             // TODO: implement launch support for DLLs and LIBs, besides executables.
             if (!isSwitchPassedInArguments(linkerTool.arguments, ["dll", "lib", "shared"])) {
-                // Gcc/Clang tools can also perform linking so don't parse any output binary if -c is given
-                // (-o will point to an object file and not an executable or library)
-                if (!isSwitchPassedInArguments(linkerTool.arguments, ["c"])) {
+                // Gcc/Clang tools can also perform linking so don't parse any output binary
+                // if there are switches passed in to cause early stop of compilation: -c, -E, -S
+                // (-o will not point to an executable)
+                // Also, the ld switches -r and -Ur do not produce executables.
+                if (!isSwitchPassedInArguments(linkerTool.arguments, ["c", "E", "S", "r", "Ur"])) {
                     linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
                     logger.message("Found linker command: " + line);
 
@@ -565,7 +563,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                             linkerTargetBinary = "a.out";
                         }
                     } else {
-                        logger.message("Producing target binary with -out: " + linkerTargetBinary);
+                        logger.message("Producing target binary: " + linkerTargetBinary);
                     }
                 }
 
@@ -596,6 +594,11 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
             launchConfigurations.push(launchConfiguration);
         }
     });
+
+    // If no binaries are found to be built, there is no point in parsing for invoking targets
+    if (targetBinaries.length === 0) {
+        return launchConfigurations;
+    }
 
     // For each of the built binaries identified in the dry-run pass above,
     // search the makefile for possible targets that are invoking them,
@@ -642,10 +645,10 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
         let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath);
         if (targetBinaryTool) {
             logger.message("Found binary execution command: " + line);
-
             // Include complete launch configuration: binary, execution path and args
             // are known from parsing the dry-run
             let splitArgs: string[] = targetBinaryTool.arguments.split(" ");
+
             let launchConfiguration: configuration.LaunchConfiguration = {
                 binary: targetBinaryTool.fullPath,
                 cwd: currentPath,
@@ -657,6 +660,16 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
             launchConfigurations.push(launchConfiguration);
         }
     });
+
+    // Target binary launch configuration duplicates may be generated in the following scenarios.
+    // They will be filtered later when dealing with the UI pick. 
+    //    - a target binary invoked several times with the same arguments and from the same path
+    //    - a target binary invoked once with no parameters is still a duplicate
+    //      of the entry generated by the linker command which produced the binary
+    //    - sometimes the same binary is linked more than once in the same location
+    //      (example: instrumentation) but the launch configurations list need only one entry,
+    //      corresponding to the final binary, not the intermediate ones.
+    // Also, sort for better searching experience in big code bases.
 
     return launchConfigurations;
 }
