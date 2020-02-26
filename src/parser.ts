@@ -16,8 +16,8 @@ import * as vscode from 'vscode';
 // todo: any other scenarios of aliases and symlinks
 // that would make parseLineAsTool to not match the regular expression,
 // therefore wrongly skipping over compilation lines?
-const compilers: string[] = ["clang", "cl", "gcc", "cc", "icc", "icl", "g\\+\\+", "c\\+\\+"];
-const linkers: string[] = ["link", "ilink", "ld", "gcc", "clang", "cc", "g\\+\\+", "c\\+\\+"];
+const compilers: string[] = ["clang\\+\\+", "clang", "cl", "gcc", "cc", "icc", "icl", "g\\+\\+", "c\\+\\+"];
+const linkers: string[] = ["link", "ilink", "ld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
 const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 export function parseTargets(verboseLog: string): string[] {
@@ -68,8 +68,47 @@ function preprocessDryRunOutput(dryRunOutputStr: string): string {
     let preprocessedDryRunOutputStr: string = dryRunOutputStr;
 
     // Split multiple commands concatenated by '&&' or by ";"
-    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n"); // \r
-    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n"); // \r
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
+
+    // Concatenate lines ending with ' \', forming one complete command
+    // TODO: figure out how to do this with string replace
+    //preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\s+\\$/mg, " ");
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace("\r\n", "\n");
+    let regexp = /\s+\\$/mg;
+    let match = regexp.exec(preprocessedDryRunOutputStr);
+    while (match) {
+        let result = match[0];
+        result = result.concat("\n");
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(result, " ");
+        match = regexp.exec(preprocessedDryRunOutputStr);
+    }
+
+    // Process some more makefile output weirdness
+    let preprocessedDryRunOutputLines : string[] = [];
+    preprocessedDryRunOutputStr.split("\n").forEach(line => {
+        let strC = "--mode=compile";
+        let idxC = line.indexOf(strC);
+        if (idxC >= 0) {
+            line = line.replace(line.substring(0, idxC), "");
+            line = line.replace(strC, "")
+        }
+
+        let strL = "--mode=link";
+        let idxL = line.indexOf(strL);
+        if (idxL >= 0) {
+            line = line.replace(line.substring(0, idxL), "");
+            line = line.replace(strL, "")
+        }
+
+        preprocessedDryRunOutputLines.push(line);
+
+        if (idxL >= 0 && idxC >= 0) {
+            logger.message("Not supporting --mode=compile and --mode=link on the same line");
+        }
+    })
+    
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputLines.join("\n");
 
     // Extract the link command
     // Keep the /link switch to the cl command because otherwise we will see compiling without /c
@@ -81,7 +120,7 @@ function preprocessDryRunOutput(dryRunOutputStr: string): string {
     // but cl.exe source.cpp /Fetest.exe /link /out:test2.exe produces only test2.exe.
     // For now, ignore any output binary rules of cl while having the /link switch.
     if (process.platform === "win32") {
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ \/link /g, "/link \n link.exe "); // \r
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ \/link /g, "/link \n link.exe ");
     }
 
     // TODO: Insert preprocessed files content
@@ -270,21 +309,23 @@ function isSwitchPassedInArguments(args: string, sw: string[]): boolean {
 // Helper that parses for files (of given extensions) that are given as arguments to a tool
 // TODO: consider non standard extensions (or no extension at all) in the presence of TC/TP.
 // Attention to obj, pdb or exe files tied to /Fo, /Fd and /Fe
+// TODO: consider also ' besides "
 function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
     // no switch prefix and no association yet with a preceding switch
-    // one or more spaces/tabs before and after
+    // one or more spaces/tabs before (or beginning of line) and after (or end of line)
     // with or without quotes surrounding the argument
+    //    - if surrounding quotes, don't allow another quote in between
     // (todo: handle the scenario when quotes enclose just the directory path, without the file name)
     let regexpStr: string = '(';
     exts.forEach(ext => {
-        regexpStr += '\\".*?\\.' + ext + '\\"|';
+        regexpStr += '\\".[^\\"]*?\\.' + ext + '\\"|';
         regexpStr += '\\S+\\.' + ext;
         // Make sure we don't append '|' after the last extension value
         if (ext !== exts[exts.length - 1]) {
             regexpStr += '|';
         }
     });
-    regexpStr += ')';
+    regexpStr += ')(\\s+|$)';
 
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: string[] | null;
@@ -306,6 +347,7 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 // The current path is always the last one into the history.
 function currentPathAfterCommand(line: string, currentPathHistory: string[]): string[] {
     line = line.trimLeft();
+    line = line.trimRight();
 
     let lastCurrentPath: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
     let newCurrentPath: string = "";
@@ -384,7 +426,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
 
     // Read the dry-run output line by line, searching for compilers and directory changing commands
     // to construct information for the CppTools custom configuration
-    let dryRunOutputLines: string[] = dryRunOutputStr.split("\n"); // \r
+    let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
     dryRunOutputLines.forEach(line => {
         currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
         currentPath = currentPathHistory[currentPathHistory.length - 1];
@@ -474,7 +516,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
     // The first pass of reading the dry-run output, line by line
     // searching for compilers, linkers and directory changing commands
     // to construct information for the launch configuration
-    let dryRunOutputLines: string[] = dryRunOutputStr.split("\n"); // \r
+    let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
     dryRunOutputLines.forEach(line => {
         currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
         currentPath = currentPathHistory[currentPathHistory.length - 1];
