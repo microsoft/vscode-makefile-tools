@@ -17,29 +17,29 @@
     "bugs": {
         "url": "https://github.com/Microsoft/vscode-makefile-tools/issues",
         "email": "c_cpp_support@microsoft.com"
-      },
-      "repository": {
+    },
+    "repository": {
         "type": "git",
         "url": "https://github.com/Microsoft/vscode-makefile-tools.git"
-      },
-      "homepage": "https://github.com/Microsoft/vscode-makefile-tools",
-      "qna": "https://github.com/Microsoft/vscode-makefile-tools/issues",
-      "keywords": [
+    },
+    "homepage": "https://github.com/Microsoft/vscode-makefile-tools",
+    "qna": "https://github.com/Microsoft/vscode-makefile-tools/issues",
+    "keywords": [
         "C",
         "C++",
         "IntelliSense",
         "Microsoft",
         "Makefile"
-      ],
-      "categories": [
+    ],
+    "categories": [
         "Programming Languages",
         "Debuggers",
         "Formatters",
         "Linters",
         "Other",
         "Snippets"
-      ],
-        "activationEvents": [
+    ],
+    "activationEvents": [
         "onCommand:Makefile.setBuildConfiguration",
         "onCommand:Makefile.setBuildTarget",
         "onCommand:Makefile.buildTarget",
@@ -150,18 +150,18 @@
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
-        "@types/node": "^10.14.16",
-        "tslint": "^5.18.0",
+        "@types/node": "^10.17.16",
+        "tslint": "^5.20.1",
         "tslint-microsoft-contrib": "^6.2.0",
         "tslint-no-unused-expression-chai": "^0.1.4",
+        "typescript": "^3.8.2",
         "vrsource-tslint-rules": "^6.0.0",
-        "typescript": "^3.5.3",
-        "vscode-test": "^0.4.1",
-        "@types/vscode": "^1.35.0"
+        "vscode": "^1.1.36",
+        "vscode-test": "^0.4.1"
     },
     "dependencies": {
-        "module-alias": "^2.0.6",
-        "vscode-jsonrpc": "3.5.0",
-        "vscode-cpptools": "^2.1.2"
+        "module-alias": "^2.2.2",
+        "vscode-cpptools": "^2.1.2",
+        "vscode-jsonrpc": "^3.6.2"
     }
 }
