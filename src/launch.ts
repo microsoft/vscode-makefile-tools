@@ -4,6 +4,7 @@ import * as configuration from './configuration';
 import * as extension from './extension';
 import * as logger from './logger';
 import * as path from 'path';
+import * as util from './util';
 import * as vscode from 'vscode';
 
 let launcher: Launcher;
@@ -60,7 +61,22 @@ export class Launcher implements vscode.Disposable {
     }
 
     // Invoke a VS Code debugging session passing it all the information
-    // from the current launch configuration
+    // from the current launch configuration.
+    // Debugger (imperfect) guess logic:
+    //    - VS for msvc toolset, lldb for clang toolset, gdb for anything else.
+    //    - debugger path is assumed to be the same as the compiler path.
+    // Exceptions for miMode:
+    //    - if the above logic results in a debugger that is missing, try the other one.
+    //      This is needed either because the system might not be equipped
+    //      with the preffered debugger that corresponds to the toolset in use,
+    //      but also because there might be a compiler alias that is not properly identified
+    //      (example: "cc" alias that points to clang but is not identified as clang,
+    //       therefore requesting a gdb debugger which may be missing
+    //       because there is no gcc toolset installed).
+    //       TODO: implement proper detection of aliases and their commands.
+    // Exceptions for miDebuggerPath:
+    //    - intentionally do not provide a miDebuggerPath On MAC, because the debugger knows how to find automatically
+    // the right lldb-mi when miMode is lldb and miDebuggerPath is undefined.
     public async debugCurrentTarget(): Promise<vscode.DebugSession | undefined> {
         if (!configuration.getCurrentLaunchConfiguration()) {
             vscode.window.showErrorMessage("Currently there is no launch configuration set.");
@@ -76,18 +92,28 @@ export class Launcher implements vscode.Disposable {
         let isClangCompiler : boolean | undefined = parsedObjPath?.name.startsWith("clang");
         let isMsvcCompiler : boolean | undefined = !isClangCompiler && parsedObjPath?.name.startsWith("cl");
         let dbg: string = (isMsvcCompiler) ? "cppvsdbg" : "cppdbg";
-        let miDebuggerPath : string = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : "";
+        let miDebuggerPath : string | undefined = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : undefined;
 
         let miMode: string = "";
         if (parsedObjPath?.name.startsWith("clang")) {
             miMode = "lldb";
+            if (miDebuggerPath && !util.checkFileExistsSync(path.join(miDebuggerPath, "lldb"))) {
+                miMode = "gdb";
+            }
         } else if (!parsedObjPath?.name.startsWith("cl")) {
             miMode = "gdb";
+            if (miDebuggerPath && !util.checkFileExistsSync(path.join(miDebuggerPath, "gdb"))) {
+                miMode = "lldb";
+            }
         }
 
-        miDebuggerPath = path.join(miDebuggerPath, miMode);
-        if (process.platform === "win32") {
-            miDebuggerPath = miDebuggerPath + ".exe";
+        if (miMode === "lldb" && process.platform === "darwin") {
+            miDebuggerPath = undefined;
+        } else if (miDebuggerPath) {
+            miDebuggerPath = path.join(miDebuggerPath, miMode);
+            if (process.platform === "win32") {
+                miDebuggerPath = miDebuggerPath + ".exe";
+            }
         }
 
         let debugConfig: vscode.DebugConfiguration;
