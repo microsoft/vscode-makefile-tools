@@ -84,7 +84,7 @@ export class MakefileToolsExtension {
         this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard, intelliSenseMode, compilerPath, filesPaths, windowsSdkVersion);
     }
 
-    public getCompilerFullPath() { return this.compilerFullPath; }
+    public getCompilerFullPath() : string | undefined { return this.compilerFullPath; }
 }
 
 // A change of target or configuration triggered a new dry-run,

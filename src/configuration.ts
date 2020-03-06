@@ -284,7 +284,7 @@ export async function setNewLaunchConfiguration(): Promise<void> {
 
         await util.spawnChildProcess(configurationCommandName, commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
+        logger.message(error);
         return;
     }
 }
@@ -325,7 +325,7 @@ export async function setNewTarget(): Promise<void> {
 
         await util.spawnChildProcess(configurationCommandName, commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
+        logger.message(error);
         return;
     }
 }
@@ -358,9 +358,9 @@ export async function selectLaunchConfiguration(launchConfigurations: LaunchConf
         items.push(launchConfigurationToString(config));
     });
 
-    items = items.sort().filter(function(elem, index, selef) {
-        return index === selef.indexOf(elem);
-    })
+    items = items.sort().filter(function(elem, index, self) : boolean {
+        return index === self.indexOf(elem);
+    });
 
     // TODO: create a quick pick with description and details for items
     // to better view the long targets commands
