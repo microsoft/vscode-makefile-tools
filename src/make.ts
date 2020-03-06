@@ -39,7 +39,8 @@ export async function buildCurrentTarget(): Promise<void> {
 
         await util.spawnChildProcess(configuration.getConfigurationCommandName(), commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
+        // No need for notification popup, since the build result is visible already in the output channel
+        logger.message(error);
         return;
     }
 }
@@ -88,7 +89,7 @@ export async function dryRun(): Promise<void> {
 
         await util.spawnChildProcess(configuration.getConfigurationCommandName(), commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
+        logger.message(error);
         return;
     }
 }

@@ -8,6 +8,7 @@ import * as parser from './parser';
 import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 let statusBar: ui.UI = ui.getUI();
 
@@ -59,6 +60,21 @@ function readCurrentMakeConfiguration(): void {
     }
 
     statusBar.setConfiguration(currentMakeConfiguration);
+}
+
+let makePath: string | undefined;
+export function getMakePath(): string | undefined { return makePath; }
+export function setMakePath(path: string): void { makePath = path; }
+
+// Read the path (full or directory only) of the make tool if defined in settings.
+// It represents a default to look for if no other path is already included
+// in make_configurations.json, with commandName.
+function readMakePath(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration();
+    makePath = workspaceConfiguration.get<string>("Makefile.makePath");
+    if (!makePath) {
+        logger.message("No path to the make tool is defined in the settings file");
+    }
 }
 
 // Currently, the makefile extension supports debugging only an executable.
@@ -142,14 +158,38 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         }
     });
 
+    let makeParsedPathSettings: path.ParsedPath | undefined = makePath ? path.parse(makePath) : undefined;
+    let makeParsedPathConfigurations: path.ParsedPath | undefined = makeConfiguration ? path.parse(makeConfiguration?.commandName) : undefined;
+
+    // Arguments for the make tool can be defined as commandArgs in make_configurations.json.
+    // When not defined, default to empty array.
+    configurationCommandArgs = makeConfiguration?.commandArgs || [];
+
+    // Name of the make tool can be defined as commandName in make_configurations.json or as Makefile.makePath setting.
+    // When none defined, default to "make".
+    configurationCommandName = makeParsedPathConfigurations?.name || makeParsedPathSettings?.name || "make";
+
+    // Prepend the directory path, if defined in either make_configurations.json or settings (first has priority).
+    let configurationCommandPath: string = makeParsedPathConfigurations?.dir || makeParsedPathSettings?.dir || "";
+    configurationCommandName = path.join(configurationCommandPath, configurationCommandName);
+
     if (makeConfiguration) {
-        configurationCommandName = makeConfiguration.commandName;
-        configurationCommandArgs = makeConfiguration.commandArgs;
         logger.message("Found command '" + configurationCommandName + " " + configurationCommandArgs.join(" ") + "' for configuration " + currentMakeConfiguration);
-    } else {
-        configurationCommandName = "make";
-        configurationCommandArgs = [];
-        logger.message("Couldn't find explicit command for configuration " + currentMakeConfiguration + ". Assuming make.exe with no arguments.");
+    }
+
+    // Some useful warnings about properly defining the make tool (file name, path and arguments).
+    if (!makeParsedPathSettings && !makeParsedPathConfigurations) {
+        logger.message("It is recommended to define the full path of the make tool in settings (via Makefile.makePath) OR define commandName/commandArgs in make_configurations.json.");
+    }
+
+    if ((!makeParsedPathSettings || makeParsedPathSettings.name === "") &&
+    (!makeParsedPathConfigurations || makeParsedPathConfigurations.name === "")) {
+        logger.message("Could not find any make tool file name in make_configurations.json, nor in settings. Assuming make.");
+    }
+
+    if ((!makeParsedPathSettings || makeParsedPathSettings?.dir === "") &&
+    (!makeParsedPathConfigurations || makeParsedPathConfigurations?.dir === "")) {
+        logger.message("For the extension to work, make must be on the path.");
     }
 }
 
@@ -206,6 +246,7 @@ function readCurrentTarget(): void {
 
 // Initialization from settings (or backup default rules), done at activation time
 export function initFromSettings(): void {
+    readMakePath();
     readCurrentMakeConfiguration();
     readCurrentMakeConfigurationCommand();
     readCurrentTarget();
@@ -284,7 +325,7 @@ export async function setNewLaunchConfiguration(): Promise<void> {
 
         await util.spawnChildProcess(configurationCommandName, commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
+        logger.message(error);
         return;
     }
 }
@@ -325,7 +366,7 @@ export async function setNewTarget(): Promise<void> {
 
         await util.spawnChildProcess(configurationCommandName, commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to launch make command. Make sure it is on the path. ' + error);
+        logger.message(error);
         return;
     }
 }
@@ -358,9 +399,9 @@ export async function selectLaunchConfiguration(launchConfigurations: LaunchConf
         items.push(launchConfigurationToString(config));
     });
 
-    items = items.sort().filter(function(elem, index, selef) {
-        return index === selef.indexOf(elem);
-    })
+    items = items.sort().filter(function(elem, index, self) : boolean {
+        return index === self.indexOf(elem);
+    });
 
     // TODO: create a quick pick with description and details for items
     // to better view the long targets commands
