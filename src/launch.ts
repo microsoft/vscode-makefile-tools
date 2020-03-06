@@ -77,6 +77,7 @@ export class Launcher implements vscode.Disposable {
     // Exceptions for miDebuggerPath:
     //    - intentionally do not provide a miDebuggerPath On MAC, because the debugger knows how to find automatically
     // the right lldb-mi when miMode is lldb and miDebuggerPath is undefined.
+    // Additionally, cppvsdbg ignores miMode and miDebuggerPath.
     public async debugCurrentTarget(): Promise<vscode.DebugSession | undefined> {
         if (!configuration.getCurrentLaunchConfiguration()) {
             vscode.window.showErrorMessage("Currently there is no launch configuration set.");
@@ -95,7 +96,7 @@ export class Launcher implements vscode.Disposable {
         let miDebuggerPath : string | undefined = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : undefined;
 
         // Initial debugger guess
-        let miMode: string = "";
+        let miMode: string | undefined;
         if (parsedObjPath?.name.startsWith("clang")) {
             miMode = "lldb";
         } else if (!parsedObjPath?.name.startsWith("cl")) {
@@ -103,13 +104,13 @@ export class Launcher implements vscode.Disposable {
         }
 
         // If the first chosen debugger is not installed, try the other one.
-        if (miDebuggerPath) {
-            let debuggerPath:string = path.join(miDebuggerPath, miMode);
+        if (miDebuggerPath && miMode) {
+            let debuggerPath: string = path.join(miDebuggerPath, miMode);
             if (process.platform === "win32") {
                 // On mingw a file is not found if the extension is not part of the path
                 debuggerPath = debuggerPath + ".exe";
             }
-            
+
             if (!util.checkFileExistsSync(debuggerPath)) {
                 miMode = (miMode === "gdb") ? "lldb" : "gdb";
             }
@@ -119,7 +120,7 @@ export class Launcher implements vscode.Disposable {
         // to allow the debugger extension to find it automatically
         if (miMode === "lldb" && process.platform === "darwin") {
             miDebuggerPath = undefined;
-        } else if (miDebuggerPath) {
+        } else if (miDebuggerPath && miMode) {
             miDebuggerPath = path.join(miDebuggerPath, miMode);
             if (process.platform === "win32") {
                 miDebuggerPath = miDebuggerPath + ".exe";
