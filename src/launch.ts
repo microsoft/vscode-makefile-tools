@@ -1,7 +1,9 @@
 // Launch support: debug and run in terminal
 
 import * as configuration from './configuration';
+import * as extension from './extension';
 import * as logger from './logger';
+import * as path from 'path';
 import * as vscode from 'vscode';
 
 let launcher: Launcher;
@@ -69,11 +71,23 @@ export class Launcher implements vscode.Disposable {
 
         let args: string[] = this.launchTargetArgs();
 
-        let dbg: string;
+        let compilerPath : string | undefined = extension.extension?.getCompilerFullPath();
+        let parsedObjPath : path.ParsedPath | undefined = compilerPath ? path.parse(compilerPath) : undefined;
+        let isClangCompiler : boolean | undefined = parsedObjPath?.name.startsWith("clang");
+        let isMsvcCompiler : boolean | undefined = !isClangCompiler && parsedObjPath?.name.startsWith("cl");
+        let dbg: string = (isMsvcCompiler) ? "cppvsdbg" : "cppdbg";
+        let miDebuggerPath : string = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : "";
+
+        let miMode: string = "";
+        if (parsedObjPath?.name.startsWith("clang")) {
+            miMode = "lldb";
+        } else if (!parsedObjPath?.name.startsWith("cl")) {
+            miMode = "gdb";
+        }
+
+        miDebuggerPath = path.join(miDebuggerPath, miMode);
         if (process.platform === "win32") {
-            dbg = "cppvsdbg";
-        } else {
-            dbg = "cppdbg";
+            miDebuggerPath = miDebuggerPath + ".exe";
         }
 
         let debugConfig: vscode.DebugConfiguration;
@@ -83,7 +97,9 @@ export class Launcher implements vscode.Disposable {
             request: 'launch',
             cwd: '${command:Makefile.launchCurrentDir}',
             args,
-            program: '${command:Makefile.launchTargetPath}'
+            program: '${command:Makefile.launchTargetPath}',
+            miMode: miMode,
+            miDebuggerPath: miDebuggerPath
         };
 
         let startFolder : vscode.WorkspaceFolder;

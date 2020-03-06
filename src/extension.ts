@@ -21,6 +21,7 @@ export class MakefileToolsExtension {
     private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
     private cppToolsAPI?: cpp.CppToolsApi;
     private cppConfigurationProviderRegister?: Promise<void>;
+    private compilerFullPath ?: string;
 
     public constructor(public readonly extensionContext: vscode.ExtensionContext) {
     }
@@ -76,11 +77,14 @@ export class MakefileToolsExtension {
         standard: util.StandardVersion,
         intelliSenseMode: util.IntelliSenseMode,
         compilerPath: string,
-        windowsSdkVersion: string,
-        filesPaths: string[]
+        filesPaths: string[],
+        windowsSdkVersion?: string
     ): void {
-        this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard, intelliSenseMode, compilerPath, windowsSdkVersion, filesPaths);
+        this.compilerFullPath = compilerPath;
+        this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard, intelliSenseMode, compilerPath, filesPaths, windowsSdkVersion);
     }
+
+    public getCompilerFullPath() { return this.compilerFullPath; }
 }
 
 // A change of target or configuration triggered a new dry-run,

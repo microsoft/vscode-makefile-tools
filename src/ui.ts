@@ -33,34 +33,34 @@ export class UI {
     }
 
     public constructor() {
-        this.configurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 6);
+        this.configurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.6);
         this.configurationButton.command = "Makefile.setBuildConfiguration";
         this.configurationButton.tooltip = "Click to select the workspace make configuration";
         this.configurationButton.show();
 
-        this.targetButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 5);
+        this.targetButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.5);
         this.targetButton.command = "Makefile.setBuildTarget";
         this.targetButton.tooltip = "Click to select the target to be run by make";
         this.targetButton.show();
 
-        this.buildButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4);
+        this.buildButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.4);
         this.buildButton.command = "Makefile.buildTarget";
         this.buildButton.tooltip = "Click to build the selected target";
         this.buildButton.text = "$(gear) Build";
         this.buildButton.show();
 
-        this.launchConfigurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 3);
+        this.launchConfigurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.3);
         this.launchConfigurationButton.command = "Makefile.setLaunchConfiguration";
         this.launchConfigurationButton.tooltip = "Click to select the make launch configuration (binary, args and current path)";
         this.launchConfigurationButton.show();
 
-        this.debugButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
+        this.debugButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.2);
         this.debugButton.command = "Makefile.launchDebug";
         this.debugButton.tooltip = "Click to debug the selected executable";
         this.debugButton.text = "$(bug) Debug";
         this.debugButton.show();
 
-        this.runButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
+        this.runButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.1);
         this.runButton.command = "Makefile.launchRun";
         this.runButton.tooltip = "Click to launch the selected executable";
         this.runButton.text = "$(terminal) Run";

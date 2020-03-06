@@ -42,7 +42,7 @@ export function pathIsCurrentDirectory(pathStr: string): boolean {
         return true;
     }
 
-    if (process.platform === "win32") {
+    if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
         if (pathStr === ".\\") {
             return true;
         }
@@ -139,11 +139,35 @@ export function makeFullPaths(relPaths: string[], curPath: string | undefined): 
     return fullPaths;
 }
 
+export function formatMingW(path : string) : string {
+    //path = path.replace(/\//g, '\\');
+    path = path.replace(/\\/g, '/');
+    path = path.replace(':', '');
+
+    if (!path.startsWith('\\') && !path.startsWith('/')) {
+        //path = '\\' + path;
+        path = '/' + path;
+    }
+
+    return path;
+}
 // Helper to reinterpret one full path as relative to the given current path
 export function makeRelPath(fullPath: string, curPath: string | undefined): string {
     let relPath: string = fullPath;
 
-    if (path.isAbsolute(relPath) && curPath) {
+    if (path.isAbsolute(fullPath) && curPath) {
+        // Tricky path formatting for mingw (and possibly other subsystems - cygwin?, ...),
+        // causing the relative path calculation to be wrong.
+        // For process.platform "win32", an undefined process.env.MSYSTEM guarantees pure windows
+        // and no formatting is necessary.
+        if (process.platform === "win32" && process.env.MSYSTEM !== undefined) {
+            fullPath = formatMingW(fullPath);
+
+            if (path.isAbsolute(curPath)) {
+                curPath = formatMingW(curPath);
+            }
+        }
+
         relPath = path.relative(curPath, fullPath);
     }
 

@@ -55,8 +55,8 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         standard: util.StandardVersion,
         intelliSenseMode: util.IntelliSenseMode,
         compilerPath: string,
-        windowsSdkVersion: string,
-        filesPaths: string[]): void {
+        filesPaths: string[],
+        windowsSdkVersion?: string): void {
         const configuration: cpp.SourceFileConfiguration = {
             defines,
             standard,
@@ -106,7 +106,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         logger.message("    Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
         logger.message("    Standard: " + this.workspaceBrowseConfiguration.standard);
         logger.message("    Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath);
-        if (process.platform === "win32") {
+        if (process.platform === "win32" && this.workspaceBrowseConfiguration.windowsSdkVersion) {
             logger.message("    Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
         }
         logger.message("----------------------------------------------------------------------------");
@@ -121,7 +121,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
             logger.message("    Standard: " + filePath.configuration.standard);
             logger.message("    IntelliSense Mode: " + filePath.configuration.intelliSenseMode);
             logger.message("    Compiler Path: " + filePath.configuration.compilerPath);
-            if (process.platform === "win32") {
+            if (process.platform === "win32" && filePath.configuration.windowsSdkVersion) {
                 logger.message("    Windows SDK Version: " + filePath.configuration.windowsSdkVersion);
             }
             logger.message("---------------------------------------------------------------------------------------------------");

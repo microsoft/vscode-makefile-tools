@@ -439,7 +439,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             let compilerFullPath: string = compilerTool.fullPath || "";
             if (!compilerTool.found) {
                 let toolBaseName: string = path.basename(compilerFullPath);
-                compilerFullPath = util.toolPathInEnv(toolBaseName) || "";
+                compilerFullPath = path.join(util.toolPathInEnv(toolBaseName) || "", toolBaseName);
             }
             logger.message("    Compiler path: " + compilerFullPath);
 
@@ -472,15 +472,12 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             logger.message("    IntelliSense mode: " + intelliSenseMode);
 
             // For windows, parse the sdk version
-            // todo: scan on disk for most recent sdk installation
             let windowsSDKVersion: string | undefined = "";
             if (process.platform === "win32") {
                 windowsSDKVersion = process.env["WindowsSDKVersion"];
-                if (!windowsSDKVersion) {
-                    windowsSDKVersion = "8.1";
+                if (windowsSDKVersion) {
+                    logger.message('Windows SDK Version: ' + windowsSDKVersion);
                 }
-
-                logger.message('Windows SDK Version: ' + windowsSDKVersion);
             }
 
             // Parse the source files
@@ -489,7 +486,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             logger.message("    Source files: " + files.join(";"));
 
             if (ext.extension) {
-                ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, windowsSDKVersion, files);
+                ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files, windowsSDKVersion);
             }
         }
     });
@@ -543,12 +540,14 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                         compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
 
                         // Then assume first object file base name (defined with /Fo) + exe
+                        // The binary is produced in the same folder where the compiling operation takes place,
+                        // and not in an eventual different obj path.
                         // Note: /Fo is not allowed on multiple sources compilations so there will be only one if found
                         if (!compilerTargetBinary) {
                             let objFile: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fo"]);
                             if (objFile) {
                                 let parsedObjPath: path.ParsedPath = path.parse(objFile);
-                                compilerTargetBinary = parsedObjPath.dir + parsedObjPath.name + ".exe";
+                                compilerTargetBinary = parsedObjPath.name + ".exe";
                                 logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
                                     compilerTargetBinary + " from the first object passed in with /Fo");
                             }
@@ -557,11 +556,13 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                         }
 
                         // Then assume first source file base name + exe.
+                        // The binary is produced in the same folder where the compiling operation takes place,
+                        // and not in an eventual different source path.
                         if (!compilerTargetBinary) {
                             let srcFiles: string[] | undefined = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
                             if (srcFiles.length >= 1) {
                                 let parsedSourcePath: path.ParsedPath = path.parse(srcFiles[0]);
-                                compilerTargetBinary = parsedSourcePath.dir + path.sep + parsedSourcePath.name + ".exe";
+                                compilerTargetBinary = parsedSourcePath.name + ".exe";
                                 logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
                                     compilerTargetBinary + " from the first source file passed in");
                             }
@@ -590,17 +591,20 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                     if (!linkerTargetBinary) {
                         // For Microsoft link.exe, the default output binary takes the base name
                         // of the first file (obj, lib, etc...) that is passed to the linker.
+                        // The binary is produced in the same folder where the linking operation takes place,
+                        // and not in an eventual different obj/lib path.
                         if (process.platform === "win32" && path.basename(linkerTool.fullPath).startsWith("link")) {
                             let files: string[] = parseFilesFromToolArguments(linkerTool.arguments, ["obj", "lib"]);
                             if (files.length >= 1) {
                                 let parsedPath: path.ParsedPath = path.parse(files[0]);
-                                let targetBinaryFromFirstObjLib: string = parsedPath.dir + parsedPath.name + ".exe";
+                                let targetBinaryFromFirstObjLib: string = parsedPath.name + ".exe";
                                 logger.message("The link command is not producing a target binary explicitly. Assuming " +
                                     targetBinaryFromFirstObjLib + " based on first object passed in");
                                 linkerTargetBinary = targetBinaryFromFirstObjLib;
                             }
                         } else {
-                            // The default output binary from a linking operation is usually a.out on linux/mac
+                            // The default output binary from a linking operation is usually a.out on linux/mac,
+                            // produced in the same folder where the toolset is run.
                             logger.message("The link command is not producing a target binary explicitly. Assuming a.out");
                             linkerTargetBinary = "a.out";
                         }
