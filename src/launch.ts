@@ -94,19 +94,29 @@ export class Launcher implements vscode.Disposable {
         let dbg: string = (isMsvcCompiler) ? "cppvsdbg" : "cppdbg";
         let miDebuggerPath : string | undefined = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : undefined;
 
+        // Initial debugger guess
         let miMode: string = "";
         if (parsedObjPath?.name.startsWith("clang")) {
             miMode = "lldb";
-            if (miDebuggerPath && !util.checkFileExistsSync(path.join(miDebuggerPath, "lldb"))) {
-                miMode = "gdb";
-            }
         } else if (!parsedObjPath?.name.startsWith("cl")) {
             miMode = "gdb";
-            if (miDebuggerPath && !util.checkFileExistsSync(path.join(miDebuggerPath, "gdb"))) {
-                miMode = "lldb";
+        }
+
+        // If the first chosen debugger is not installed, try the other one.
+        if (miDebuggerPath) {
+            let debuggerPath:string = path.join(miDebuggerPath, miMode);
+            if (process.platform === "win32") {
+                // On mingw a file is not found if the extension is not part of the path
+                debuggerPath = debuggerPath + ".exe";
+            }
+            
+            if (!util.checkFileExistsSync(debuggerPath)) {
+                miMode = (miMode === "gdb") ? "lldb" : "gdb";
             }
         }
 
+        // Exception for MAC-lldb, intentionally don't provide the debugger path,
+        // to allow the debugger extension to find it automatically
         if (miMode === "lldb" && process.platform === "darwin") {
             miDebuggerPath = undefined;
         } else if (miDebuggerPath) {
