@@ -87,7 +87,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         // of all the compiler invocations of the current configuration
         filesPaths.forEach(filePath => {
             this.fileIndex.set(path.normalize(filePath), {
-                uri: vscode.Uri.file(filePath).toString(),
+                uri: filePath,
                 configuration,
             });
 

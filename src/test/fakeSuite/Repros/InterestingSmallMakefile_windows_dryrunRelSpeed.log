@@ -9,39 +9,39 @@ if exist bin rmdir /s /q bin
 if exist out rmdir /s /q out
 if exist intermediate rmdir /s /q intermediate
 if not exist out mkdir out
-if not exist bin\ARCH1\Debug mkdir bin\ARCH1\Debug
-if not exist intermediate\ARCH1\Debug mkdir intermediate\ARCH1\Debug
-cl .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=1 /c
-cl		.\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=1 /c
-copy main.obj intermediate\ARCH1\Debug
-copy test1.obj intermediate\ARCH1\Debug
-copy test2.obj intermediate\ARCH1\Debug
+if not exist bin\ARCH1\RelSpeed mkdir bin\ARCH1\RelSpeed
+if not exist intermediate\ARCH1\RelSpeed mkdir intermediate\ARCH1\RelSpeed
+cl .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSpeed /O2 /Od /Zi /std:c++14	/DARCH=1 /c
+cl		.\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=1 /c
+copy main.obj intermediate\ARCH1\RelSpeed
+copy test1.obj intermediate\ARCH1\RelSpeed
+copy test2.obj intermediate\ARCH1\RelSpeed
 del *.obj
-link.exe /out:bin\ARCH1\Debug\main.exe intermediate\ARCH1\Debug\main.obj intermediate\ARCH1\Debug\test1.obj intermediate\ARCH1\Debug\test2.obj /DEBUG
-if not exist bin\ARCH2\Debug mkdir bin\ARCH2\Debug
-if not exist intermediate\ARCH2\Debug mkdir intermediate\ARCH2\Debug
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl"  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=2 /c
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=2 /c
-copy main.obj intermediate\ARCH2\Debug
-copy test1.obj intermediate\ARCH2\Debug
-copy test2.obj intermediate\ARCH2\Debug
+link.exe /out:bin\ARCH1\RelSpeed\main.exe intermediate\ARCH1\RelSpeed\main.obj intermediate\ARCH1\RelSpeed\test1.obj intermediate\ARCH1\RelSpeed\test2.obj /DEBUG
+if not exist bin\ARCH2\RelSpeed mkdir bin\ARCH2\RelSpeed
+if not exist intermediate\ARCH2\RelSpeed mkdir intermediate\ARCH2\RelSpeed
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl"  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSpeed /O2 /Od /Zi /std:c++14	/DARCH=2 /c
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=2 /c
+copy main.obj intermediate\ARCH2\RelSpeed
+copy test1.obj intermediate\ARCH2\RelSpeed
+copy test2.obj intermediate\ARCH2\RelSpeed
 del *.obj
-link /out:bin\ARCH2\Debug\main.exe intermediate\ARCH2\Debug\main.obj intermediate\ARCH2\Debug\test1.obj intermediate\ARCH2\Debug\test2.obj /DEBUG
-if not exist "bin\ARC H3\Debug" mkdir "bin\ARC H3\Debug"
-if not exist "intermediate\ARC H3\Debug" mkdir "intermediate\ARC H3\Debug"
-"cl" .\src\main.cpp .\src\test1.cpp   /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=3 /c
-"cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=3 /c
-copy main.obj "intermediate\ARC H3\Debug"
-copy test1.obj "intermediate\ARC H3\Debug"
-copy test2.obj "intermediate\ARC H3\Debug"
+link /out:bin\ARCH2\RelSpeed\main.exe intermediate\ARCH2\RelSpeed\main.obj intermediate\ARCH2\RelSpeed\test1.obj intermediate\ARCH2\RelSpeed\test2.obj /DEBUG
+if not exist "bin\ARC H3\RelSpeed" mkdir "bin\ARC H3\RelSpeed"
+if not exist "intermediate\ARC H3\RelSpeed" mkdir "intermediate\ARC H3\RelSpeed"
+"cl" .\src\main.cpp .\src\test1.cpp   /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSpeed /O2 /Od /Zi /std:c++14	/DARCH=3 /c
+"cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=3 /c
+copy main.obj "intermediate\ARC H3\RelSpeed"
+copy test1.obj "intermediate\ARC H3\RelSpeed"
+copy test2.obj "intermediate\ARC H3\RelSpeed"
 del *.obj
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\link" /out:"bin\InterestingSmallMakefile\ARC H3\Debug\main.exe" "intermediate\ARC H3\Debug\main.obj" "intermediate\ARC H3\Debug\test1.obj" "intermediate\ARC H3\Debug\test2.obj" /DEBUG
-"bin\ARCH1\Debug"\main.exe str1a str1b str1c
-bin\ARCH2\Debug\main  str2a str2b str2c
-"bin\InterestingSmallMakefile\ARC H3\Debug\main.exe"  str3a str3b str3c
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\link" /out:"bin\ARC H3\RelSpeed\main.exe" "intermediate\ARC H3\RelSpeed\main.obj" "intermediate\ARC H3\RelSpeed\test1.obj" "intermediate\ARC H3\RelSpeed\test2.obj" /DEBUG
+"bin\ARCH1\RelSpeed"\main.exe str1a str1b str1c
+bin\ARCH2\RelSpeed\main  str2a str2b str2c
+"bin\ARC H3\RelSpeed\main.exe"  str3a str3b str3c
 xcopy bin out /sdy
 
-# Make data base, printed on Fri Mar 13 00:17:58 2020
+# Make data base, printed on Fri Mar 13 00:18:11 2020
 
 # Variables
 
@@ -210,7 +210,7 @@ CTANGLE = ctangle
 # environment
 __VSCMD_PREINIT_PATH = C:\Program Files\Microsoft MPI\Bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Git\cmd;C:\Program Files (x86)\CMake\bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\PuTTY\;C:\Program Files\PowerShell\6\;C:\Users\andris\AppData\Local\CloudBuild;C:\Program Files\Conan\conan;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin;c:\Program Files (x86)\Ninja;C:\Users\andris\AppData\Roaming\npm;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\andris\AppData\Local\Microsoft\WindowsApps
 # command line
-OPT = Debug
+OPT = RelSpeed
 # environment
 WindowsSdkDir = C:\Program Files (x86)\Windows Kits\10\
 # default
@@ -237,14 +237,14 @@ PUBLIC = C:\Users\Public
 LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
 # environment
 CommonProgramW6432 = C:\Program Files\Common Files
-# makefile (from `makefile', line 3)
+# makefile (from `makefile', line 8)
 LINK_FLAGS = /DEBUG
 # environment
 ProgramData = C:\ProgramData
 # environment
 WindowsSDKVersion = 10.0.18362.0\
 # automatic
--*-command-variables-*- := OPT=Debug
+-*-command-variables-*- := OPT=RelSpeed
 # environment
 VSCMD_VER = 16.4.5
 # environment
@@ -407,8 +407,8 @@ NETFXSDKDir = C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\
 MAKEINFO = makeinfo
 # environment
 WindowsSDK_ExecutablePath_x86 = C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\
-# makefile (from `makefile', line 2)
-EXTRA_FLAGS = /DDebug /RTC /Od /Zi
+# makefile (from `makefile', line 7)
+EXTRA_FLAGS = /DRelSpeed /O2 /Od /Zi
 # default
 TEX = tex
 # environment
@@ -422,7 +422,7 @@ INCLUDES1 = /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\Subfold
 # environment
 USERDOMAIN_ROAMINGPROFILE = REDMOND
 # variable set hash-table stats:
-# Load=188/1024=18%, Rehash=0, Collisions=52/476=11%
+# Load=188/1024=18%, Rehash=0, Collisions=52/478=11%
 
 # Pattern-specific Variable Values
 
@@ -1673,5 +1673,5 @@ Execute_Arch2: Arch2_main.exe
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Fri Mar 13 00:17:58 2020
+# Finished Make data base on Fri Mar 13 00:18:11 2020
 

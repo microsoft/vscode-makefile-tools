@@ -25,7 +25,7 @@ Sending Workspace Browse Configuration: -----------------------------------
     Standard: c++17
     Compiler Path: cl.exe
 ----------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/main.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\main.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 
@@ -33,7 +33,7 @@ Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/tes
     IntelliSense Mode: msvc-x64
     Compiler Path: cl.exe
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test1.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\test1.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 
@@ -41,7 +41,7 @@ Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/tes
     IntelliSense Mode: msvc-x64
     Compiler Path: cl.exe
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test2.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\test2.cpp -----------------------------------
     Defines: MyDefine2;Debug;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 
@@ -60,7 +60,7 @@ Sending Workspace Browse Configuration: -----------------------------------
     Standard: c++17
     Compiler Path: cl.exe
 ----------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/main.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\main.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 
@@ -68,7 +68,7 @@ Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/tes
     IntelliSense Mode: msvc-x64
     Compiler Path: cl.exe
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test1.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\test1.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 
@@ -76,7 +76,7 @@ Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/tes
     IntelliSense Mode: msvc-x64
     Compiler Path: cl.exe
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test2.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\test2.cpp -----------------------------------
     Defines: MyDefine2;Debug;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 
@@ -109,7 +109,7 @@ Sending Workspace Browse Configuration: -----------------------------------
     Standard: c++17
     Compiler Path: cl.exe
 ----------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/main.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\main.cpp -----------------------------------
     Defines: MyDefine;RelSize;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 
@@ -117,7 +117,7 @@ Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/tes
     IntelliSense Mode: msvc-x64
     Compiler Path: cl.exe
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test1.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\test1.cpp -----------------------------------
     Defines: MyDefine;RelSize;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 
@@ -125,7 +125,7 @@ Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/tes
     IntelliSense Mode: msvc-x64
     Compiler Path: cl.exe
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test2.cpp -----------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\test2.cpp -----------------------------------
     Defines: MyDefine2;RelSize;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
     Force Includes: 

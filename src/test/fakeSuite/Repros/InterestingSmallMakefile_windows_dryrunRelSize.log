@@ -12,7 +12,7 @@ if not exist out mkdir out
 if not exist bin\ARCH1\RelSize mkdir bin\ARCH1\RelSize
 if not exist intermediate\ARCH1\RelSize mkdir intermediate\ARCH1\RelSize
 cl .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSize /O1 /std:c++14	/DARCH=1 /c
-cl		.\src\test2.cpp -I"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSize /O1 /DARCH=1 /c
+cl		.\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSize /O1 /DARCH=1 /c
 copy main.obj intermediate\ARCH1\RelSize
 copy test1.obj intermediate\ARCH1\RelSize
 copy test2.obj intermediate\ARCH1\RelSize
@@ -21,7 +21,7 @@ link.exe /out:bin\ARCH1\RelSize\main.exe intermediate\ARCH1\RelSize\main.obj int
 if not exist bin\ARCH2\RelSize mkdir bin\ARCH2\RelSize
 if not exist intermediate\ARCH2\RelSize mkdir intermediate\ARCH2\RelSize
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl"  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSize /O1 /std:c++14	/DARCH=2 /c
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl.exe"  .\src\test2.cpp  -I"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSize /O1 /DARCH=2 /c
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSize /O1 /DARCH=2 /c
 copy main.obj intermediate\ARCH2\RelSize
 copy test1.obj intermediate\ARCH2\RelSize
 copy test2.obj intermediate\ARCH2\RelSize
@@ -30,7 +30,7 @@ link /out:bin\ARCH2\RelSize\main.exe intermediate\ARCH2\RelSize\main.obj interme
 if not exist "bin\ARC H3\RelSize" mkdir "bin\ARC H3\RelSize"
 if not exist "intermediate\ARC H3\RelSize" mkdir "intermediate\ARC H3\RelSize"
 "cl" .\src\main.cpp .\src\test1.cpp   /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSize /O1 /std:c++14	/DARCH=3 /c
-"cl.exe"  .\src\test2.cpp  -I"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSize /O1 /DARCH=3 /c
+"cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSize /O1 /DARCH=3 /c
 copy main.obj "intermediate\ARC H3\RelSize"
 copy test1.obj "intermediate\ARC H3\RelSize"
 copy test2.obj "intermediate\ARC H3\RelSize"
@@ -168,7 +168,7 @@ LINT = lint
 # environment
 WindowsLibPath = C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.18362.0
 # makefile (from `makefile', line 15)
-INCLUDES2 = -I"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc
+INCLUDES2 = -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc
 # default
 LINT.c = $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
 # environment

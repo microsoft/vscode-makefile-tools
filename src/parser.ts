@@ -67,6 +67,15 @@ export function parseTargets(verboseLog: string): string[] {
 function preprocessDryRunOutput(dryRunOutputStr: string): string {
     let preprocessedDryRunOutputStr: string = dryRunOutputStr;
 
+    // Expand {REPO:VSCODE-MAKEFILE-TOOLS} to the full path of the root of the extension
+    // This is used for the pre-created dry-run logs consumed by the tests,
+    // in order to be able to have source files and includes for the test repro
+    // within the test subfolder of the extension repo, while still exercising full paths for parsing
+    // and not generating a different output with every new location where Makefile Tools is enlisted.
+    // A real user scenario wouldn't need this construct.
+    let extensionRootPath: string = path.resolve(__dirname, "../../");
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+
     // Split multiple commands concatenated by '&&' or by ";"
     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
