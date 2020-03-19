@@ -81,9 +81,7 @@ function preprocessDryRunOutput(dryRunOutputStr: string): string {
     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
 
     // Concatenate lines ending with ' \', forming one complete command
-    // TODO: figure out how to do this with string replace
-    //preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\s+\\$/mg, " ");
-    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace("\r\n", "\n");
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\r\\n/mg, "\n");
     let regexp : RegExp = /\s+\\$/mg;
     let match: RegExpExecArray | null = regexp.exec(preprocessedDryRunOutputStr);
     while (match) {

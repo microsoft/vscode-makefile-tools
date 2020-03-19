@@ -31,7 +31,6 @@ import * as make from '../../make';
 import * as util from '../../util';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { fstat } from 'fs';
 
 // TODO: refactor initialization and cleanup of each test
 suite('Fake dryrun parsing', /*async*/() => {
@@ -88,10 +87,6 @@ suite('Fake dryrun parsing', /*async*/() => {
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-            // The extension log is printing lines after \r\n were replaced with \n
-            // (see comments in parser.ts - preprocessDryRunOutput).
-            // Committing the baseline always puts the \r\n back, so preprocess here before the comparison
-            baselineLogContent = baselineLogContent.replace("\r\n", "\n");
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }
