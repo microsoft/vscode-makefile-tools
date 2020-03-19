@@ -54,7 +54,7 @@ export function parseTargets(verboseLog: string): string[] {
     }
 
     if (matches) {
-        logger.message("Found the following targets:" + matches.join(";"));
+        logger.message("Found the following targets: " + matches.join(";"));
     } else {
         logger.message("No targets found");
     }
@@ -101,7 +101,13 @@ function preprocessDryRunOutput(dryRunOutputStr: string): string {
             line = line.replace(strL, "");
         }
 
-        preprocessedDryRunOutputLines.push(line);
+        // Ignore any lines containing $ because they are redundant and not useful
+        // for IntelliSense config provider or launch parsing.
+        // These lines are produced by the verbose log switch --print-data-base,
+        // which is useful in parsing for build targets.
+        if (!line.includes("$")) {
+            preprocessedDryRunOutputLines.push(line);
+        }
 
         if (idxL >= 0 && idxC >= 0) {
             logger.message("Not supporting --mode=compile and --mode=link on the same line");
@@ -433,7 +439,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
 
         let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
         if (compilerTool) {
-            logger.message("Found compiler command: " + line);
+            logger.message("Found compiler command: " + line, "Verbose");
 
             // Compiler path is either what the makefile provides or found in the PATH environment variable or empty
             let compilerFullPath: string = compilerTool.fullPath || "";
@@ -441,24 +447,24 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
                 let toolBaseName: string = path.basename(compilerFullPath);
                 compilerFullPath = path.join(util.toolPathInEnv(toolBaseName) || "", toolBaseName);
             }
-            logger.message("    Compiler path: " + compilerFullPath);
+            logger.message("    Compiler path: " + compilerFullPath, "Verbose");
 
             // Parse and log the includes, forced includes and the defines
             let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
             includes = util.makeFullPaths(includes, currentPath);
-            logger.message("    Includes: " + includes.join(";"));
+            logger.message("    Includes: " + includes.join(";"), "Verbose");
             let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
             forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
-            logger.message("    Forced includes: " + forcedIncludes.join(";"));
+            logger.message("    Forced includes: " + forcedIncludes.join(";"), "Verbose");
             let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
-            logger.message("    Defines: " + defines.join(";"));
+            logger.message("    Defines: " + defines.join(";"), "Verbose");
 
             // Parse the C/C++ standard
             // TODO: implement default standard: c++11 for C nad c++17 for C++
             // TODO: c++20 and c++latest
             let standardStr: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["std"]);
             let standard: util.StandardVersion = standardStr ? <util.StandardVersion>standardStr : "c++17";
-            logger.message("    Standard: " + standard);
+            logger.message("    Standard: " + standard, "Verbose");
 
             // Parse the IntelliSense mode
             // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
@@ -469,21 +475,21 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
                 path.basename(compilerTool.fullPath).startsWith("g++")) {
                 intelliSenseMode = "gcc-x64";
             }
-            logger.message("    IntelliSense mode: " + intelliSenseMode);
+            logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
 
             // For windows, parse the sdk version
             let windowsSDKVersion: string | undefined = "";
             if (process.platform === "win32") {
                 windowsSDKVersion = process.env["WindowsSDKVersion"];
                 if (windowsSDKVersion) {
-                    logger.message('Windows SDK Version: ' + windowsSDKVersion);
+                    logger.message('Windows SDK Version: ' + windowsSDKVersion, "Verbose");
                 }
             }
 
             // Parse the source files
             let files: string[] = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
             files = util.makeFullPaths(files, currentPath);
-            logger.message("    Source files: " + files.join(";"));
+            logger.message("    Source files: " + files.join(";"), "Verbose");
 
             if (ext.extension) {
                 ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files, windowsSDKVersion);
@@ -534,7 +540,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
 
                 if (path.basename(compilerTool.fullPath).startsWith("cl")) {
                     if (!isSwitchPassedInArguments(compilerTool.arguments, ["c", "P", "E", "EP"])) {
-                        logger.message("Found compiler command:\n" + line);
+                        logger.message("Found compiler command:\n" + line, "Verbose");
 
                         // First read the value of the /Fe switch (for cl.exe)
                         compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
@@ -549,10 +555,10 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                                 let parsedObjPath: path.ParsedPath = path.parse(objFile);
                                 compilerTargetBinary = parsedObjPath.name + ".exe";
                                 logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                    compilerTargetBinary + " from the first object passed in with /Fo");
+                                    compilerTargetBinary + " from the first object passed in with /Fo", "Verbose");
                             }
                         } else {
-                            logger.message("Producing target binary with /Fe: " + compilerTargetBinary);
+                            logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose");
                         }
 
                         // Then assume first source file base name + exe.
@@ -564,7 +570,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                                 let parsedSourcePath: path.ParsedPath = path.parse(srcFiles[0]);
                                 compilerTargetBinary = parsedSourcePath.name + ".exe";
                                 logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                    compilerTargetBinary + " from the first source file passed in");
+                                    compilerTargetBinary + " from the first source file passed in", "Verbose");
                             }
                         }
                     }
@@ -586,7 +592,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                 // Also, the ld switches -r and -Ur do not produce executables.
                 if (!isSwitchPassedInArguments(linkerTool.arguments, ["c", "E", "S", "r", "Ur"])) {
                     linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
-                    logger.message("Found linker command: " + line);
+                    logger.message("Found linker command: " + line, "Verbose");
 
                     if (!linkerTargetBinary) {
                         // For Microsoft link.exe, the default output binary takes the base name
@@ -599,17 +605,17 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                                 let parsedPath: path.ParsedPath = path.parse(files[0]);
                                 let targetBinaryFromFirstObjLib: string = parsedPath.name + ".exe";
                                 logger.message("The link command is not producing a target binary explicitly. Assuming " +
-                                    targetBinaryFromFirstObjLib + " based on first object passed in");
+                                    targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose");
                                 linkerTargetBinary = targetBinaryFromFirstObjLib;
                             }
                         } else {
                             // The default output binary from a linking operation is usually a.out on linux/mac,
                             // produced in the same folder where the toolset is run.
-                            logger.message("The link command is not producing a target binary explicitly. Assuming a.out");
+                            logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose");
                             linkerTargetBinary = "a.out";
                         }
                     } else {
-                        logger.message("Producing target binary: " + linkerTargetBinary);
+                        logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
                     }
                 }
 
@@ -622,7 +628,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
         // It is not possible to have compilerTargetBinary and linkerTargetBinary both defined,
         // because a dry-run output line cannot be a compilation and an explicit link at the same time.
         // (cl.exe with /link switch is split into two lines - cl.exe and link.exe - during dry-run preprocessing).
-        // Also for gcc/clang, -o switch or the default output will be a .o in the presenece of -c and an executable otherwise.
+        // Also for gcc/clang, -o switch or the default output will be a .o in the presence of -c and an executable otherwise.
         let targetBinary: string | undefined = linkerTargetBinary || compilerTargetBinary;
         if (targetBinary) {
             targetBinaries.push(targetBinary);
@@ -636,7 +642,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                 args: []
             };
 
-            logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration));
+            logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
             launchConfigurations.push(launchConfiguration);
         }
     });
@@ -690,10 +696,10 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
         //       - start binary
         let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath);
         if (targetBinaryTool) {
-            logger.message("Found binary execution command: " + line);
+            logger.message("Found binary execution command: " + line, "Verbose");
             // Include complete launch configuration: binary, execution path and args
             // are known from parsing the dry-run
-            let splitArgs: string[] = targetBinaryTool.arguments.split(" ");
+            let splitArgs: string[] = targetBinaryTool.arguments ? targetBinaryTool.arguments.split(" ") : [];
 
             let launchConfiguration: configuration.LaunchConfiguration = {
                 binary: targetBinaryTool.fullPath,
@@ -702,7 +708,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
                 args: splitArgs
             };
 
-            logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration));
+            logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
             launchConfigurations.push(launchConfiguration);
         }
     });

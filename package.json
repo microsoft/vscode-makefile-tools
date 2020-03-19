@@ -138,6 +138,15 @@
                     "default": "Normal",
                     "description": "The logging level for the makefile tools extension",
                     "scope": "resource"
+                },
+                "Makefile.makePath": {
+                    "type": "string"
+                },
+                "Makefile.buildLog": {
+                    "type": "string"
+                },
+                "Makefile.extensionLog": {
+                    "type": "string"
                 }
             }
         }
@@ -146,20 +155,23 @@
         "vscode:prepublish": "npm run mycompile",
         "mycompile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "test": "npm run mycompile && node ./node_modules/vscode/bin/test"
+        "pretest": "npm run mycompile",
+        "test": "node ./out/src/test/runTest.js"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
-        "@types/node": "^10.17.16",
+        "@types/node": "^10.17.17",
         "tslint": "^5.20.1",
         "tslint-microsoft-contrib": "^6.2.0",
         "tslint-no-unused-expression-chai": "^0.1.4",
-        "typescript": "^3.8.2",
+        "typescript": "^3.8.3",
         "vrsource-tslint-rules": "^6.0.0",
         "vscode": "^1.1.36",
         "vscode-test": "^0.4.1"
     },
     "dependencies": {
+        "@types/glob": "^7.1.1",
+        "glob": "^7.1.6",
         "module-alias": "^2.2.2",
         "vscode-cpptools": "^2.1.2",
         "vscode-jsonrpc": "^3.6.2"

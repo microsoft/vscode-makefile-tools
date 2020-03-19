@@ -31,6 +31,10 @@ export class MakefileToolsExtension {
         parser.parseForCppToolsCustomConfigProvider(dryRunOutputStr);
     }
 
+    public emptyCustomConfigurationProvider() : void {
+        this.cppConfigurationProvider.empty();
+    }
+
     public dispose(): void {
         if (this.cppToolsAPI) {
             this.cppToolsAPI.dispose();
@@ -39,10 +43,10 @@ export class MakefileToolsExtension {
 
     // Register this extension as a new provider or request an update
     public async registerCppToolsProvider(): Promise<void> {
+        this.cppConfigurationProvider.logConfigurationProvider();
         await this.ensureCppToolsProviderRegistered();
 
         if (this.cppToolsAPI) {
-            this.cppConfigurationProvider.logConfigurationProvider();
             if (this.cppToolsAPI.notifyReady) {
                 this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
             } else {
@@ -92,6 +96,7 @@ export class MakefileToolsExtension {
 export async function updateProvider(dryRunOutputStr: string): Promise<void> {
     logger.message("Updating the CppTools IntelliSense Configuration Provider.");
     if (extension) {
+        extension.emptyCustomConfigurationProvider();
         extension.constructIntellisense(dryRunOutputStr);
         extension.registerCppToolsProvider();
     }
@@ -156,11 +161,20 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return launcher.launchTargetArgsConcat();
     }));
 
+    configuration.readLoggingLevel();
+    configuration.readExtensionLog();
+
+    // Delete the extension log file, if exists
+    let extensionLog : string | undefined = configuration.getExtensionLog();
+    if (extensionLog) {
+        fs.unlinkSync(extensionLog);
+    }
+
     // Read configuration info from settings
     configuration.initFromSettings();
 
     // Generate the dry-run output used for parsing the info to be sent to CppTools
-    make.dryRun();
+    make.parseBuildOrDryRun();
 }
 
 export async function deactivate(): Promise<void> {

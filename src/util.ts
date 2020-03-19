@@ -24,6 +24,24 @@ export function checkDirectoryExistsSync(directoryPath: string): boolean {
     return false;
 }
 
+export function deleteFileSync(filePath: string): void {
+    try {
+        fs.unlinkSync(filePath);
+    } catch (e) {
+    }
+}
+
+export function readFile(filePath: string): string | undefined {
+    try {
+        if (checkFileExistsSync(filePath)) {
+            return fs.readFileSync(filePath).toString();
+        }
+    } catch (e) {
+    }
+
+    return undefined;
+}
+
 // Evaluate whether a string looks like a path or not,
 // without using fs.stat, since dry-run may output tools
 // that are not found yet at certain locations,

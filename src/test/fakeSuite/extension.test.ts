@@ -1,0 +1,245 @@
+// Makefile Tools Extension tests without sources and makefiles.
+// These tests take advantage of the possibility of parsing
+// a previously created dry-run 'make' output log.
+// Each tested operation produces logging in the 'Makefile Tools'
+// output channel and also in a log file on disk (defined via settings),
+// which is compared with a baseline.
+
+// TODO: add a suite of tests operating on real stand-alone makefile repos,
+// thus emulating more closely the Makefile Tools end to end usage scenarios.
+// For this we need to refactor the make process spawning in the extension,
+// so that these tests would produce a deterministic output.
+
+// Thus, this suite is not able to test the entire functionality of the extension
+// (anything that is related to a real invocation of the make tool is not yet supported),
+// but the remaining scenarios represent an acceptable amount of testing coverage.
+// For this suite, even if only parsing is involved, it cannot run any test on any platform
+// because of differences in path processing, extension naming, CppTools defaults (sdk, standard),
+// debugger settings, etc...
+// TODO: figure out a way to test correctly any test on any platform
+// (possibly define a property to be considered when querying for process.platform).
+
+// Some of these tests need also some fake binaries being checked in
+// (enough to pass an 'if exists' check), to cover the identification of launch binaries
+// that are called with arguments in the makefile.
+// See comment in parser.ts, parseLineAsTool and parseForLaunchConfiguration.
+
+import * as assert from 'assert';
+import * as configuration from '../../configuration';
+import * as launch from '../../launch';
+import * as make from '../../make';
+import * as util from '../../util';
+import * as path from 'path';
+import * as vscode from 'vscode';
+
+// TODO: refactor initialization and cleanup of each test
+suite('Fake dryrun parsing', /*async*/() => {
+    // Interesting scenarios with string paths, corner cases in defining includes/defines,
+    // complex configurations-targets-files associations.
+    // TODO: adapt the makefile on mac/linux/mingw and add new tests in this suite
+    // to parse the dry-run logs obtained on those platforms.
+    if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
+        test('Interesting small makefile - windows', /*async*/() => {
+            let extensionLogPath: string | undefined = configuration.getExtensionLog();
+            // Cannot compare with a baseline if there is no extension log defined for this test
+            // Use Makefile.extensionLog in test workspace settings.
+            // We could set this here, but would loose all the logging between the first loading
+            // of the repro project by the test framework and this entry to the test function,
+            // which would complicate the comparison with the baseline.
+            assert(extensionLogPath, "Please define an extension log for the test");
+            if (!extensionLogPath) {
+                return; // no need to run the remaining of the test
+            }
+
+            configuration.startListeningToSettingsChanged();
+
+            /*await*/ configuration.prepareConfigurationsQuickPick();
+            /*await*/ configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
+
+            /*await*/ configuration.parseTargetsFromBuildLog();
+            /*await*/ configuration.setTargetByName("execute_Arch3");
+
+            make.prepareBuildCurrentTarget();
+
+            /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
+            /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)");
+
+            launch.getLauncher().prepareDebugCurrentTarget();
+            launch.getLauncher().prepareRunCurrentTarget();
+
+            // A bit more coverage, "RelSize" and "RelSpeed" are set up
+            // to exercise different combinations of pre-created build log and/or make tools.
+            /*await*/ configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
+            /*await*/ configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
+
+            // Settings reset for the next test run.
+            configuration.stopListeningToSettingsChanged();
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+            workspaceConfiguration.update("buildConfiguration", undefined);
+            workspaceConfiguration.update("buildTarget", undefined);
+            workspaceConfiguration.update("launchConfiguration", undefined);
+
+            // Compare the output log with the baseline
+            // TODO: incorporate relevant diff snippets into the test log.
+            let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
+            let baselineLogPath: string = path.join(parsedPath.dir, "InterestingSmallMakefile_windows_baseline.out");
+            let extensionLogContent: string = util.readFile(extensionLogPath) || "";
+            let baselineLogContent: string = util.readFile(baselineLogPath) || "";
+            let extensionRootPath: string = path.resolve(__dirname, "../../../../");
+            baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+            assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
+        });
+    }
+
+    // dry-run logs for https://github.com/rui314/8cc.git
+    // Linux
+    if (process.platform === "linux") {
+        test('8cc - linux', /*async*/() => {
+            let extensionLogPath: string | undefined = configuration.getExtensionLog();
+            // Cannot compare with a baseline if there is no extension log defined for this test
+            // Use Makefile.extensionLog in test workspace settings.
+            // We could set this here, but would loose all the logging between the first loading
+            // of the repro project by the test framework and this entry to the test function,
+            // which would complicate the comparison with the baseline.
+            assert(extensionLogPath, "Please define an extension log for the test");
+            if (!extensionLogPath) {
+                return; // no need to run the remaining of the test
+            }
+
+            configuration.startListeningToSettingsChanged();
+
+        // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
+        // there is no need in running configuration.prepareConfigurationsQuickPick for each
+        ///*await*/ configuration.prepareConfigurationsQuickPick();
+        /*await*/ configuration.setConfigurationByName("8cc_linux");
+
+        /*await*/ configuration.parseTargetsFromBuildLog();
+        /*await*/ configuration.setTargetByName("all");
+
+            make.prepareBuildCurrentTarget();
+
+        /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
+        /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
+
+            launch.getLauncher().prepareDebugCurrentTarget();
+            launch.getLauncher().prepareRunCurrentTarget();
+
+            // Settings reset for the next test run.
+            configuration.stopListeningToSettingsChanged();
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+            workspaceConfiguration.update("buildConfiguration", undefined);
+            workspaceConfiguration.update("buildTarget", undefined);
+            workspaceConfiguration.update("launchConfiguration", undefined);
+
+            // Compare the output log with the baseline
+            // TODO: incorporate relevant diff snippets into the test log.
+            let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
+            let baselineLogPath: string = path.join(parsedPath.dir, "8cc_linux_baseline.out");
+            let extensionLogContent: string = util.readFile(extensionLogPath) || "";
+            let baselineLogContent: string = util.readFile(baselineLogPath) || "";
+            let extensionRootPath: string = path.resolve(__dirname, "../../../../");
+            baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+            assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
+        });
+    }
+
+    // dry-run logs for https://github.com/FidoProject/Fido.git
+    // Linux
+    if (process.platform === "linux") {
+        test('Fido - linux', /*async*/() => {
+            let extensionLogPath: string | undefined = configuration.getExtensionLog();
+            // Cannot compare with a baseline if there is no extension log defined for this test
+            // Use Makefile.extensionLog in test workspace settings.
+            // We could set this here, but would loose all the logging between the first loading
+            // of the repro project by the test framework and this entry to the test function,
+            // which would complicate the comparison with the baseline.
+            assert(extensionLogPath, "Please define an extension log for the test");
+            if (!extensionLogPath) {
+                return; // no need to run the remaining of the test
+            }
+
+            configuration.startListeningToSettingsChanged();
+
+        ///*await*/ configuration.prepareConfigurationsQuickPick();
+        /*await*/ configuration.setConfigurationByName("Fido_linux");
+
+        /*await*/ configuration.parseTargetsFromBuildLog();
+        /*await*/ configuration.setTargetByName("bin/foo.o");
+
+            make.prepareBuildCurrentTarget();
+
+        /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
+        /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
+
+            launch.getLauncher().prepareDebugCurrentTarget();
+            launch.getLauncher().prepareRunCurrentTarget();
+
+            // Settings reset for the next test run.
+            configuration.stopListeningToSettingsChanged();
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+            workspaceConfiguration.update("buildConfiguration", undefined);
+            workspaceConfiguration.update("buildTarget", undefined);
+            workspaceConfiguration.update("launchConfiguration", undefined);
+
+            // Compare the output log with the baseline
+            // TODO: incorporate relevant diff snippets into the test log.
+            let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
+            let baselineLogPath: string = path.join(parsedPath.dir, "Fido_linux_baseline.out");
+            let extensionLogContent: string = util.readFile(extensionLogPath) || "";
+            let baselineLogContent: string = util.readFile(baselineLogPath) || "";
+            let extensionRootPath: string = path.resolve(__dirname, "../../../../");
+            baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+            assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
+        });
+    }
+
+    // dry-run logs for https://github.com/jakogut/tinyvm.git
+    // Linux
+    if (process.platform === "linux") {
+        test('tinyvm - linux', /*async*/() => {
+            let extensionLogPath: string | undefined = configuration.getExtensionLog();
+            // Cannot compare with a baseline if there is no extension log defined for this test
+            // Use Makefile.extensionLog in test workspace settings.
+            // We could set this here, but would loose all the logging between the first loading
+            // of the repro project by the test framework and this entry to the test function,
+            // which would complicate the comparison with the baseline.
+            assert(extensionLogPath, "Please define an extension log for the test");
+            if (!extensionLogPath) {
+                return; // no need to run the remaining of the test
+            }
+
+            configuration.startListeningToSettingsChanged();
+
+        ///*await*/ configuration.prepareConfigurationsQuickPick();
+        /*await*/ configuration.setConfigurationByName("tinyvm_linux_pedantic");
+
+        /*await*/ configuration.parseTargetsFromBuildLog();
+        /*await*/ configuration.setTargetByName("tvmi");
+
+            make.prepareBuildCurrentTarget();
+
+        /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
+        /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");
+
+            launch.getLauncher().prepareDebugCurrentTarget();
+            launch.getLauncher().prepareRunCurrentTarget();
+
+            // Settings reset for the next test run.
+            configuration.stopListeningToSettingsChanged();
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+            workspaceConfiguration.update("buildConfiguration", undefined);
+            workspaceConfiguration.update("buildTarget", undefined);
+            workspaceConfiguration.update("launchConfiguration", undefined);
+
+            // Compare the output log with the baseline
+            // TODO: incorporate relevant diff snippets into the test log.
+            let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
+            let baselineLogPath: string = path.join(parsedPath.dir, "Fido_baselineLinux.out");
+            let extensionLogContent: string = util.readFile(extensionLogPath) || "";
+            let baselineLogContent: string = util.readFile(baselineLogPath) || "";
+            let extensionRootPath: string = path.resolve(__dirname, "../../../../");
+            baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+            assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
+        });
+    }
+});

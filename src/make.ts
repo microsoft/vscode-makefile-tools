@@ -1,13 +1,12 @@
 // Support for make operations
 
-import * as child_process from 'child_process';
 import * as configuration from './configuration';
 import * as ext from './extension';
 import * as logger from './logger';
 import * as util from './util';
 import * as vscode from 'vscode';
 
-export async function buildCurrentTarget(): Promise<void> {
+export function prepareBuildCurrentTarget(): string[] {
     let commandArgs: string[] = [];
     // Prepend the target to the arguments given in the configurations json.
     let currentTarget: string | undefined = configuration.getCurrentTarget();
@@ -18,7 +17,11 @@ export async function buildCurrentTarget(): Promise<void> {
     commandArgs = commandArgs.concat(configuration.getConfigurationCommandArgs());
 
     logger.message("Building the current target. Command: " + configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
+    return commandArgs;
+}
 
+export async function buildCurrentTarget(): Promise<void> {
+    let commandArgs: string[] = prepareBuildCurrentTarget();
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
         let stdout : any = (result: string): void => {
@@ -44,8 +47,25 @@ export async function buildCurrentTarget(): Promise<void> {
         return;
     }
 }
+export function parseBuild(): boolean {
+    let buildLog : string | undefined = configuration.getConfigurationBuildLog();
+    let buildLogContent: string | undefined = buildLog ? util.readFile(buildLog) : undefined;
+    if (buildLogContent) {
+        logger.message('Parsing the provided build log "' + buildLog + '" for IntelliSense integration with CppTools...');
+        ext.updateProvider(buildLogContent);
+        return true;
+    }
 
-export async function dryRun(): Promise<void> {
+    return false;
+}
+
+export async function parseBuildOrDryRun(): Promise<void> {
+    // If a build log is specified in make_configurations.json or in settings
+    // (and if it exists on disk) it must be parsed instead of invoking a dry-run make command.
+    if (parseBuild()) {
+        return;
+    }
+
     let commandArgs: string[] = [];
 
     // Prepend the target to the arguments given in the configurations json.
@@ -61,6 +81,7 @@ export async function dryRun(): Promise<void> {
     commandArgs.push("--dry-run");
     commandArgs.push("--always-make");
     commandArgs.push("--keep-going");
+    commandArgs.push("--print-data-base");
 
     logger.message("Generating the make dry-run output for parsing IntelliSense information. Command: " +
         configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));

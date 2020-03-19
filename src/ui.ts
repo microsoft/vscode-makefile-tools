@@ -1,6 +1,5 @@
 // UI support for this extension: buttons and quickpicks.
 
-import * as configuration from './configuration';
 import * as vscode from 'vscode';
 
 let ui: UI;

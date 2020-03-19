@@ -39,6 +39,22 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 
     public dispose(): void { }
 
+    // Reset the workspace browse configuration and empty the array of files
+    // Used when Makefile Tools extension is performing a configuration change operation.
+    // When the new configuration does not contain information about some files
+    // that were part of the previous configuration, without this empty helper
+    // the IntelliSense information of those files will be preserved
+    // when actually it shouldn't.
+    public empty() : void {
+        this.fileIndex.clear();
+        this.workspaceBrowseConfiguration = {
+            browsePath: [],
+            compilerPath: undefined,
+            standard: undefined,
+            windowsSdkVersion: undefined
+        };
+    }
+
     private readonly fileIndex = new Map<string, cpp.SourceFileConfigurationItem>();
 
     // TODO: Finalize the content parsed from the dry-run output:

@@ -1,0 +1,145 @@
+Resolving extension log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\MakefileTools.out"
+Found build log path setting "./dummy_dryrun.log"
+Resolving build log path to  "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log"
+No current configuration is defined in the settings file
+Reading configurations from file /.vscode/make_configurations.json
+No target defined in the settings file
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log" for IntelliSense integration with CppTools...
+Updating the CppTools IntelliSense Configuration Provider.
+Parsing dry-run output for CppTools Custom Configuration Provider.
+Sending Workspace Browse Configuration: -----------------------------------
+    Browse Path: 
+    Standard: undefined
+    Compiler Path: undefined
+----------------------------------------------------------------------------
+Reading configurations from file /.vscode/make_configurations.json
+Found the following configurations defined in make_configurations.json: InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;Fido_linux;tinyvm_linux_pedantic
+Setting configuration - InterestingSmallMakefile_windows_configDebug
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log" for IntelliSense integration with CppTools...
+Updating the CppTools IntelliSense Configuration Provider.
+Parsing dry-run output for CppTools Custom Configuration Provider.
+Sending Workspace Browse Configuration: -----------------------------------
+    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2
+    Standard: c++17
+    Compiler Path: cl.exe
+----------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/main.cpp -----------------------------------
+    Defines: MyDefine;Debug;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++14
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test1.cpp -----------------------------------
+    Defines: MyDefine;Debug;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++14
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test2.cpp -----------------------------------
+    Defines: MyDefine2;Debug;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++17
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log" for targets...
+Found the following targets: Arch3_main.exe;all;create_dirs_Arch3;builds;create_dirs;rebuild;buildArch3;Arch1_main.exe;Execute_Arch3;create_dirs_Arch1;runs;clean;buildArch1;create_dirs_Arch2;Execute_Arch1;Arch2_main.exe;buildArch2;install;Execute_Arch2
+Setting target execute_Arch3
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log" for IntelliSense integration with CppTools...
+Updating the CppTools IntelliSense Configuration Provider.
+Parsing dry-run output for CppTools Custom Configuration Provider.
+Sending Workspace Browse Configuration: -----------------------------------
+    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2
+    Standard: c++17
+    Compiler Path: cl.exe
+----------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/main.cpp -----------------------------------
+    Defines: MyDefine;Debug;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++14
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test1.cpp -----------------------------------
+    Defines: MyDefine;Debug;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++14
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test2.cpp -----------------------------------
+    Defines: MyDefine2;Debug;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++17
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Building the current target. Command: c:\some\other\fake\path execute_Arch3
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log" for launch configurations...
+Parsing dry-run output for Launch (debug/run) configuration.
+Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\ARCH1\Debug\main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\ARCH2\Debug\main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c)
+Setting launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)"
+Created the following debug config:
+   type = cppvsdbg
+   cwd = ${command:Makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   args = str3a str3b str3c
+   program = ${command:Makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe)
+   miMode = undefined
+   miDebuggerPath = undefined
+Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe" str3a str3b str3c' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'
+Setting configuration - InterestingSmallMakefile_windows_configRelSize
+Found command 'c:\some\other\fake\make OPT=RelSize' for configuration InterestingSmallMakefile_windows_configRelSize
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunRelSize.log" defined for configuration "InterestingSmallMakefile_windows_configRelSize
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunRelSize.log"
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunRelSize.log" for IntelliSense integration with CppTools...
+Updating the CppTools IntelliSense Configuration Provider.
+Parsing dry-run output for CppTools Custom Configuration Provider.
+Sending Workspace Browse Configuration: -----------------------------------
+    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2
+    Standard: c++17
+    Compiler Path: cl.exe
+----------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/main.cpp -----------------------------------
+    Defines: MyDefine;RelSize;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++14
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test1.cpp -----------------------------------
+    Defines: MyDefine;RelSize;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++14
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file file:///c%3A/repos2/vscode-makefile-tools/src/test/fakeSuite/Repros/src/test2.cpp -----------------------------------
+    Defines: MyDefine2;RelSize;ARCH=3
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src
+    Force Includes: 
+    Standard: c++17
+    IntelliSense Mode: msvc-x64
+    Compiler Path: cl.exe
+---------------------------------------------------------------------------------------------------
+Setting configuration - InterestingSmallMakefile_windows_configRelSpeed
+Found command 'c:\fake\path\make OPT=RelSpeed' for configuration InterestingSmallMakefile_windows_configRelSpeed
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log" for IntelliSense integration with CppTools...
+Updating the CppTools IntelliSense Configuration Provider.
+Parsing dry-run output for CppTools Custom Configuration Provider.
+Sending Workspace Browse Configuration: -----------------------------------
+    Browse Path: 
+    Standard: undefined
+    Compiler Path: undefined
+----------------------------------------------------------------------------
