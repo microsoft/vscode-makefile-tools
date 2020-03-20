@@ -1,0 +1,1888 @@
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_file.c -o libtvm/tvm_file.o
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_parser.c -o libtvm/tvm_parser.o
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_preprocessor.c -o libtvm/tvm_preprocessor.o
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_memory.c -o libtvm/tvm_memory.o
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_htab.c -o libtvm/tvm_htab.o
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm.c -o libtvm/tvm.o
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_lexer.c -o libtvm/tvm_lexer.o
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_program.c -o libtvm/tvm_program.o
+ar rcs lib/libtvm.a libtvm/tvm_file.o libtvm/tvm_parser.o libtvm/tvm_preprocessor.o libtvm/tvm_memory.o libtvm/tvm_htab.o libtvm/tvm.o libtvm/tvm_lexer.o libtvm/tvm_program.o
+clang src/tvmi.c -ltvm -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -Llib/ -o bin/tvmi
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c tdb/tdb.c -o tdb/tdb.o
+clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c tdb/main.c -o tdb/main.o
+clang tdb/tdb.o tdb/main.o -ltvm -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -Llib/ -o bin/tdb
+# GNU Make 4.2.1
+# Built for x86_64-pc-msys
+# Copyright (C) 1988-2016 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Fri Mar 20 10:09:06 2020
+
+# Variables
+
+# 'override' directive
+GNUMAKEFLAGS := 
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# default
+.SHELLFLAGS := -c
+# makefile (from 'GNUmakefile', line 25)
+FREESTANDING = no
+# makefile
+MAKEFLAGS = Bknp -- $(MAKEOVERRIDES)
+# default
+F77FLAGS = $(FFLAGS)
+# default
+CWEAVE = cweave
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# environment
+!:: = ::\
+# environment
+LOGINSHELL = bash
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+HOMEDRIVE = C:
+# automatic
+@F = $(notdir $@)
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# makefile
+CURDIR := /c/git/tinyvm
+# makefile
+SHELL = /bin/sh
+# environment
+CONFIG_SITE = /mingw32/etc/config.site
+# default
+CO = co
+# environment
+ProgramFiles(x86) = C:\Program Files (x86)
+# environment
+WINDIR = C:\Windows
+# environment
+TZ = America/Los_Angeles
+# environment
+_ = /usr/bin/make
+# makefile (from 'GNUmakefile', line 23)
+OPTIMIZATION = -O3
+# default
+PREPROCESS.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -F
+# default
+LINK.m = $(OBJC) $(OBJCFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)
+# default
+OUTPUT_OPTION = -o $@
+# default
+COMPILE.cpp = $(COMPILE.cc)
+# environment
+CLIENTNAME = ANDRIS
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# makefile (from 'GNUmakefile', line 1)
+MAKEFILE_LIST :=  GNUmakefile
+# makefile (from 'GNUmakefile', line 16)
+LIB_DIR = lib
+# environment
+FPS_BROWSER_USER_PROFILE_STRING = Default
+# makefile (from 'GNUmakefile', line 21)
+DEBUG = no
+# environment
+USERNAME = andris
+# default
+LINK.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# makefile (from 'GNUmakefile', line 1)
+CC = clang
+# environment
+CommonProgramFiles(x86) = C:\Program Files (x86)\Common Files
+# environment
+INFOPATH = /usr/local/info:/usr/share/info:/usr/info:/share/info
+# default
+CHECKOUT,v = +$(if $(wildcard $@),,$(CO) $(COFLAGS) $< $@)
+# environment
+MSYSTEM_CHOST = i686-w64-mingw32
+# environment
+tmp = C:\Users\andris\AppData\Local\Temp
+# default
+LEX.m = $(LEX) $(LFLAGS) -t
+# default
+CPP = $(CC) -E
+# default
+LINK.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+MAKE_HOST := x86_64-pc-msys
+# environment
+PATH = /mingw32/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+# default
+LD = ld
+# default
+TEXI2DVI = texi2dvi
+# default
+YACC = yacc
+# default
+COMPILE.mod = $(M2C) $(M2FLAGS) $(MODFLAGS) $(TARGET_ARCH)
+# makefile (from 'GNUmakefile', line 44)
+CFLAGS = -Wall -pipe -Iinclude/ -std=gnu11 $(PEDANTIC_FLAGS) $(OPTIMIZATION)
+# environment
+PROCESSOR_ARCHITECTURE = AMD64
+# default
+LINK.r = $(FC) $(FFLAGS) $(RFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+USERPROFILE = C:\Users\andris
+# default
+LINT = lint
+# default
+COMPILE.f = $(FC) $(FFLAGS) $(TARGET_ARCH) -c
+# environment
+MSYSTEM_CARCH = i686
+# default
+LINT.c = $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
+# default
+YACC.m = $(YACC) $(YFLAGS)
+# environment
+!C: = C:\msys64
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# default
+YACC.y = $(YACC) $(YFLAGS)
+# default
+AR = ar
+# environment
+MSYSTEM_PREFIX = /mingw32
+# environment
+NUMBER_OF_PROCESSORS = 4
+# makefile (from 'GNUmakefile', line 6)
+PEDANTIC_FLAGS = -Werror -pedantic -pedantic-errors
+# environment
+ORIGINAL_TEMP = /c/Users/andris/AppData/Local/Temp
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
+# default
+TANGLE = tangle
+# environment
+ProgramW6432 = C:\Program Files
+# default
+GET = get
+# automatic
+%F = $(notdir $%)
+# default
+MAKEFILES := 
+# default
+COMPILE.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+CTANGLE = ctangle
+# default
+.LIBPATTERNS = lib%.dll.a %.dll.a lib%.a %.lib lib%.dll %.dll
+# environment
+ORIGINAL_PATH = /c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/
+# environment
+COMPUTERNAME = azandris-win
+# default
+LINK.C = $(LINK.cc)
+# environment
+WD = C:\msys64\usr\bin\
+# environment
+PROGRAMFILES = C:\Program Files
+# default
+.LOADED := 
+# default
+LINK.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# environment
+USERDNSDOMAIN = REDMOND.CORP.MICROSOFT.COM
+# default
+PREPROCESS.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -F
+# environment
+PKG_CONFIG_PATH = /mingw32/lib/pkgconfig:/mingw32/share/pkgconfig
+# default
+LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# makefile (from 'GNUmakefile', line 17)
+INC_DIR = include
+# makefile (from 'GNUmakefile', line 9)
+LIBTVM_SOURCES = $(wildcard libtvm/*.c)
+# environment
+PUBLIC = C:\Users\Public
+# environment
+MANPATH = /mingw32/local/man:/mingw32/share/man:/usr/local/man:/usr/share/man:/usr/man:/share/man
+# default
+LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# environment
+HOME = /home/andris
+# makefile (from 'GNUmakefile', line 18)
+PROGRAM_DIR = programs
+# makefile (from 'GNUmakefile', line 12)
+TDB_SOURCES = $(wildcard tdb/*.c)
+# makefile (from 'GNUmakefile', line 27)
+PROFILER = operf
+# environment
+CommonProgramW6432 = C:\Program Files\Common Files
+# environment
+ProgramData = C:\ProgramData
+# automatic
+-*-command-variables-*- := PEDANTIC=yes
+# environment
+PRINTER = OneNote
+# environment
+COMMONPROGRAMFILES = C:\Program Files\Common Files
+# environment
+LOGONSERVER = \\CY1-RED-DC-19
+# makefile (from 'GNUmakefile', line 10)
+LIBTVM_OBJECTS = $(LIBTVM_SOURCES:.c=.o)
+# environment
+MSYSCON = mintty.exe
+# makefile (from 'GNUmakefile', line 13)
+TDB_OBJECTS = $(TDB_SOURCES:.c=.o)
+# environment
+USERDOMAIN = REDMOND
+# environment
+HOSTNAME = azandris-win
+# environment
+MAKELEVEL := 0
+# default
+COMPILE.m = $(OBJC) $(OBJCFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+MAKE = $(MAKE_COMMAND)
+# command line
+PEDANTIC = yes
+# environment
+SHLVL = 1
+# makefile (from 'GNUmakefile', line 28)
+PROF_ARGS = "programs/tinyvm/euler/euler7.vm"
+# default
+AS = as
+# environment
+ACLOCAL_PATH = /mingw32/share/aclocal:/usr/share/aclocal
+# default
+PREPROCESS.S = $(CC) -E $(CPPFLAGS)
+# environment
+MAKEOVERRIDES = ${-*-command-variables-*-}
+# default
+COMPILE.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+MAKE_VERSION := 4.2.1
+# environment
+USER = andris
+# default
+FC = f77
+# environment
+MINGW_CHOST = i686-w64-mingw32
+# makefile
+.DEFAULT_GOAL := all
+# environment
+OneDrive = C:\Users\andris\OneDrive
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# makefile (from 'GNUmakefile', line 5)
+LFLAGS = $(CFLAGS) -Llib/
+# environment
+DriverData = C:\Windows\System32\Drivers\DriverData
+# environment
+LOCALAPPDATA = C:\Users\andris\AppData\Local
+# default
+ARFLAGS = rv
+# default
+WEAVE = weave
+# default
+MAKE_COMMAND := make
+# default
+LINK.cpp = $(LINK.cc)
+# default
+F77 = $(FC)
+# environment
+OLDPWD = /c/git/Fido
+# makefile (from 'GNUmakefile', line 19)
+INSTALL_PREFIX = /usr
+# default
+.VARIABLES := 
+# default
+PC = pc
+# automatic
+*F = $(notdir $*)
+# environment
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 79 Stepping 1, GenuineIntel
+# environment
+OS = Windows_NT
+# default
+COMPILE.def = $(M2C) $(M2FLAGS) $(DEFFLAGS) $(TARGET_ARCH)
+# default
+LEX = lex
+# default
+RM = rm -f
+# environment
+HOMEPATH = \Users\andris
+# environment
+PROMPT = $P$G
+# environment
+MFLAGS = -Bknp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+ORIGINAL_TMP = /c/Users/andris/AppData/Local/Temp
+# makefile (from 'GNUmakefile', line 4)
+OFLAGS = 
+# default
+LEX.l = $(LEX) $(LFLAGS) -t
+# environment
+PSModulePath = C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules;C:\Program Files (x86)\Microsoft Azure Information Protection\Powershell;C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\
+# environment
+SYSTEMROOT = C:\Windows
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+MINGW_PREFIX = /mingw32
+# automatic
++F = $(notdir $+)
+# default
+M2C = m2c
+# environment
+APPDATA = C:\Users\andris\AppData\Roaming
+# environment
+TEMP = /tmp
+# environment
+COMSPEC = C:\Windows\system32\cmd.exe
+# environment
+MSYSTEM = MINGW32
+# environment
+CONTITLE = MinGW x32
+# makefile (from 'GNUmakefile', line 7)
+FREESTANDING_FLAGS = -nostdlib -nodefaultlibs -fno-builtin -Imlibc/include
+# default
+COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# automatic
+<F = $(notdir $<)
+# environment
+PS1 = \[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[35m\]$MSYSTEM\[\e[0m\] \[\e[33m\]\w\[\e[0m\]\n\$ 
+# default
+CXX = g++
+# environment
+temp = C:\Users\andris\AppData\Local\Temp
+# default
+COFLAGS = 
+# makefile (from 'GNUmakefile', line 15)
+BIN_DIR = bin
+# environment
+PWD = /c/git/tinyvm
+# environment
+UATDATA = C:\Windows\CCM\UATData\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77
+# default
+COMPILE.C = $(COMPILE.cc)
+# automatic
+^F = $(notdir $^)
+# default
+COMPILE.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(TARGET_MACH) -c
+# default
+LINK.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+SUFFIXES := .out .a .ln .o .c .cc .C .cpp .p .f .F .m .r .y .l .ym .yl .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+# environment
+SYSTEMDRIVE = C:
+# default
+COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# environment
+SESSIONNAME = RDP-Tcp#89
+# environment
+PROCESSOR_REVISION = 4f01
+# default
+COMPILE.s = $(AS) $(ASFLAGS) $(TARGET_MACH)
+# default
+.INCLUDE_DIRS = /usr/include /usr/include
+# environment
+TMP = /tmp
+# default
+COMPILE.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -c
+# default
+.RECIPEPREFIX := 
+# default
+MAKEINFO = makeinfo
+# default
+MAKE_TERMERR := /dev/pty0
+# default
+OBJC = cc
+# default
+TEX = tex
+# environment
+LANG = en_US.UTF-8
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+TERM = xterm
+# environment
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
+# default
+LINK.f = $(FC) $(FFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+MINGW_PACKAGE_PREFIX = mingw-w64-i686
+# environment
+USERDOMAIN_ROAMINGPROFILE = REDMOND
+# variable set hash-table stats:
+# Load=198/1024=19%, Rehash=0, Collisions=63/333=19%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# SCCS: could not be stat'd.
+# . (device 452300810, inode 281474977515765): 22 files, 38 impossibilities.
+# libtvm (device 452300810, inode 281474977515830): 11 files, 24 impossibilities.
+# tdb (device 452300810, inode 281474977515868): 7 files, 6 impossibilities.
+# libtvm/SCCS: could not be stat'd.
+# tdb/SCCS: could not be stat'd.
+# libtvm/RCS: could not be stat'd.
+# tdb/RCS: could not be stat'd.
+# RCS: could not be stat'd.
+
+# 40 files, 68 impossibilities in 9 directories.
+
+# Implicit Rules
+
+%.o: %.c
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.out:
+
+%.a:
+
+%.ln:
+
+%.o:
+
+%: %.o
+#  recipe to execute (built-in):
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.c:
+
+%: %.c
+#  recipe to execute (built-in):
+	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.ln: %.c
+#  recipe to execute (built-in):
+	$(LINT.c) -C$* $<
+
+%.cc:
+
+%: %.cc
+#  recipe to execute (built-in):
+	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.cc
+#  recipe to execute (built-in):
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+
+%.C:
+
+%: %.C
+#  recipe to execute (built-in):
+	$(LINK.C) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.C
+#  recipe to execute (built-in):
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+
+%.cpp:
+
+%: %.cpp
+#  recipe to execute (built-in):
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.cpp
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+%.p:
+
+%: %.p
+#  recipe to execute (built-in):
+	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.p
+#  recipe to execute (built-in):
+	$(COMPILE.p) $(OUTPUT_OPTION) $<
+
+%.f:
+
+%: %.f
+#  recipe to execute (built-in):
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.f
+#  recipe to execute (built-in):
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+%.F:
+
+%: %.F
+#  recipe to execute (built-in):
+	$(LINK.F) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.F
+#  recipe to execute (built-in):
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+
+%.f: %.F
+#  recipe to execute (built-in):
+	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
+
+%.m:
+
+%: %.m
+#  recipe to execute (built-in):
+	$(LINK.m) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.m
+#  recipe to execute (built-in):
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+%.r:
+
+%: %.r
+#  recipe to execute (built-in):
+	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.r
+#  recipe to execute (built-in):
+	$(COMPILE.r) $(OUTPUT_OPTION) $<
+
+%.f: %.r
+#  recipe to execute (built-in):
+	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
+
+%.y:
+
+%.ln: %.y
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 $(LINT.c) -C$* y.tab.c 
+	 $(RM) y.tab.c
+
+%.c: %.y
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 mv -f y.tab.c $@
+
+%.l:
+
+%.ln: %.l
+#  recipe to execute (built-in):
+	@$(RM) $*.c
+	 $(LEX.l) $< > $*.c
+	$(LINT.c) -i $*.c -o $@
+	 $(RM) $*.c
+
+%.c: %.l
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.l) $< > $@
+
+%.r: %.l
+#  recipe to execute (built-in):
+	$(LEX.l) $< > $@ 
+	 mv -f lex.yy.r $@
+
+%.ym:
+
+%.m: %.ym
+#  recipe to execute (built-in):
+	$(YACC.m) $< 
+	 mv -f y.tab.c $@
+
+%.yl:
+
+%.s:
+
+%: %.s
+#  recipe to execute (built-in):
+	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.s
+#  recipe to execute (built-in):
+	$(COMPILE.s) -o $@ $<
+
+%.S:
+
+%: %.S
+#  recipe to execute (built-in):
+	$(LINK.S) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.S
+#  recipe to execute (built-in):
+	$(COMPILE.S) -o $@ $<
+
+%.s: %.S
+#  recipe to execute (built-in):
+	$(PREPROCESS.S) $< > $@
+
+%.mod:
+
+%: %.mod
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ -e $@ $^
+
+%.o: %.mod
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ $<
+
+%.sym:
+
+%.def:
+
+%.sym: %.def
+#  recipe to execute (built-in):
+	$(COMPILE.def) -o $@ $<
+
+%.h:
+
+%.info:
+
+%.dvi:
+
+%.tex:
+
+%.dvi: %.tex
+#  recipe to execute (built-in):
+	$(TEX) $<
+
+%.texinfo:
+
+%.info: %.texinfo
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.texinfo
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.texi:
+
+%.info: %.texi
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.texi
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.txinfo:
+
+%.info: %.txinfo
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.txinfo
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.w:
+
+%.c: %.w
+#  recipe to execute (built-in):
+	$(CTANGLE) $< - $@
+
+%.tex: %.w
+#  recipe to execute (built-in):
+	$(CWEAVE) $< - $@
+
+%.ch:
+
+%.web:
+
+%.p: %.web
+#  recipe to execute (built-in):
+	$(TANGLE) $<
+
+%.tex: %.web
+#  recipe to execute (built-in):
+	$(WEAVE) $<
+
+%.sh:
+
+%: %.sh
+#  recipe to execute (built-in):
+	cat $< >$@ 
+	 chmod a+x $@
+
+%.elc:
+
+%.el:
+
+(%): %
+#  recipe to execute (built-in):
+	$(AR) $(ARFLAGS) $@ $<
+
+%.out: %
+#  recipe to execute (built-in):
+	@rm -f $@ 
+	 cp $< $@
+
+%.c: %.w %.ch
+#  recipe to execute (built-in):
+	$(CTANGLE) $^ $@
+
+%.tex: %.w %.ch
+#  recipe to execute (built-in):
+	$(CWEAVE) $^ $@
+
+%:: %,v
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: RCS/%,v
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: RCS/%
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: s.%
+#  recipe to execute (built-in):
+	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+
+%:: SCCS/s.%
+#  recipe to execute (built-in):
+	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+
+# 92 implicit rules, 5 (5.4%) terminal.
+
+# Files
+
+# Not a target:
+.web.p:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TANGLE) $<
+
+tdb/main.o: tdb/main.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'tdb/main'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := tdb/main.o
+# automatic
+# % := 
+# automatic
+# * := tdb/main
+# automatic
+# + := tdb/main.c
+# automatic
+# | := 
+# automatic
+# < := tdb/main.c
+# automatic
+# ^ := tdb/main.c
+# automatic
+# ? := tdb/main.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Not a target:
+.l.r:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LEX.l) $< > $@ 
+	 mv -f lex.yy.r $@
+
+libtvm/tvm_lexer.o: libtvm/tvm_lexer.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'libtvm/tvm_lexer'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm/tvm_lexer.o
+# automatic
+# % := 
+# automatic
+# * := libtvm/tvm_lexer
+# automatic
+# + := libtvm/tvm_lexer.c
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm_lexer.c
+# automatic
+# ^ := libtvm/tvm_lexer.c
+# automatic
+# ? := libtvm/tvm_lexer.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Not a target:
+.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.ym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.f.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.l:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.m) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.y:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.def.sym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.def) -o $@ $<
+
+libtvm/tvm_memory.o: libtvm/tvm_memory.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'libtvm/tvm_memory'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm/tvm_memory.o
+# automatic
+# % := 
+# automatic
+# * := libtvm/tvm_memory
+# automatic
+# + := libtvm/tvm_memory.c
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm_memory.c
+# automatic
+# ^ := libtvm/tvm_memory.c
+# automatic
+# ? := libtvm/tvm_memory.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PHONY: clean
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.p.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.p) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.p:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+libtvm/tvm_memory.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0889868
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.txinfo.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# Not a target:
+.a:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+submodules:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'GNUmakefile', line 62):
+	git submodule update --init
+
+# Not a target:
+.yl:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.l.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $*.c
+	 $(LEX.l) $< > $*.c
+	$(LINT.c) -i $*.c -o $@
+	 $(RM) $*.c
+
+# Not a target:
+.F.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+
+# Not a target:
+libtvm/tvm_parser.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0889868
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.texi.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# Not a target:
+.w.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(CTANGLE) $< - $@
+
+# Not a target:
+.texi.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# Not a target:
+.ch:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.m.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.cc:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.cc.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+
+tdb/tdb.o: tdb/tdb.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'tdb/tdb'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := tdb/tdb.o
+# automatic
+# % := 
+# automatic
+# * := tdb/tdb
+# automatic
+# + := tdb/tdb.c
+# automatic
+# | := 
+# automatic
+# < := tdb/tdb.c
+# automatic
+# ^ := tdb/tdb.c
+# automatic
+# ? := tdb/tdb.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Not a target:
+.def:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.SUFFIXES: .out .a .ln .o .c .cc .C .cpp .p .f .F .m .r .y .l .ym .yl .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+libtvm/tvm_htab.o: libtvm/tvm_htab.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'libtvm/tvm_htab'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm/tvm_htab.o
+# automatic
+# % := 
+# automatic
+# * := libtvm/tvm_htab
+# automatic
+# + := libtvm/tvm_htab.c
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm_htab.c
+# automatic
+# ^ := libtvm/tvm_htab.c
+# automatic
+# ? := libtvm/tvm_htab.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+uninstall:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'GNUmakefile', line 54):
+	rm -rf /usr/bin/tvmi
+	rm -rf /usr/include/tvmi
+	rm -rf /usr/lib/libtvm*
+
+mlibc: submodules
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'GNUmakefile', line 65):
+	(cd mlibc && $(MAKE))
+
+# Not a target:
+.c.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+libtvm/tvm.o: libtvm/tvm.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'libtvm/tvm'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm/tvm.o
+# automatic
+# % := 
+# automatic
+# * := libtvm/tvm
+# automatic
+# + := libtvm/tvm.c
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm.c
+# automatic
+# ^ := libtvm/tvm.c
+# automatic
+# ? := libtvm/tvm.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Not a target:
+.r.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.r) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.r:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+libtvm: libtvm/tvm_file.o libtvm/tvm_parser.o libtvm/tvm_preprocessor.o libtvm/tvm_memory.o libtvm/tvm_htab.o libtvm/tvm.o libtvm/tvm_lexer.o libtvm/tvm_program.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := libtvm/tvm_file.o libtvm/tvm_parser.o libtvm/tvm_preprocessor.o libtvm/tvm_memory.o libtvm/tvm_htab.o libtvm/tvm.o libtvm/tvm_lexer.o libtvm/tvm_program.o
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm_file.o
+# automatic
+# ^ := libtvm/tvm_file.o libtvm/tvm_parser.o libtvm/tvm_preprocessor.o libtvm/tvm_memory.o libtvm/tvm_htab.o libtvm/tvm.o libtvm/tvm_lexer.o libtvm/tvm_program.o
+# automatic
+# ? := libtvm/tvm_file.o libtvm/tvm_parser.o libtvm/tvm_preprocessor.o libtvm/tvm_memory.o libtvm/tvm_htab.o libtvm/tvm.o libtvm/tvm_lexer.o libtvm/tvm_program.o
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=3/70=4%
+#  recipe to execute (from 'GNUmakefile', line 59):
+	ar rcs $(LIB_DIR)/libtvm.a $(LIBTVM_OBJECTS)
+
+tdb: libtvm tdb/tdb.o tdb/main.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := tdb
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := libtvm tdb/tdb.o tdb/main.o
+# automatic
+# | := 
+# automatic
+# < := libtvm
+# automatic
+# ^ := libtvm tdb/tdb.o tdb/main.o
+# automatic
+# ? := libtvm tdb/tdb.o tdb/main.o
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/33=3%
+#  recipe to execute (from 'GNUmakefile', line 72):
+	$(CC) $(TDB_OBJECTS) -ltvm $(LFLAGS) -o $(BIN_DIR)/tdb
+
+rebuild: clean all
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+libtvm/tvm_program.o: libtvm/tvm_program.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'libtvm/tvm_program'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm/tvm_program.o
+# automatic
+# % := 
+# automatic
+# * := libtvm/tvm_program
+# automatic
+# + := libtvm/tvm_program.c
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm_program.c
+# automatic
+# ^ := libtvm/tvm_program.c
+# automatic
+# ? := libtvm/tvm_program.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Not a target:
+.ym.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.m) $< 
+	 mv -f y.tab.c $@
+
+.NOTPARALLEL: clean
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.y.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 $(LINT.c) -C$* y.tab.c 
+	 $(RM) y.tab.c
+
+# Not a target:
+libtvm/tvm_preprocessor.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0889868
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+tdb/main.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.1046143
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.elc:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.l.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.l) $< > $@
+
+# Not a target:
+libtvm/tvm_lexer.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0889868
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.out:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+all: libtvm tvmi tdb
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/96=0%
+
+# Not a target:
+.C:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.C) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.r.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.S:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.S) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.texinfo.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# Not a target:
+.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.w.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(CWEAVE) $< - $@
+
+# Not a target:
+.c.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINT.c) -C$* $<
+
+# Not a target:
+.s.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.s) -o $@ $<
+
+# Not a target:
+.s:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+.SILENT: clean
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.texinfo.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# Not a target:
+.el:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.lm.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.m) $< > $@
+
+# Not a target:
+.y.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 mv -f y.tab.c $@
+
+# Not a target:
+tdb/tdb.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.1046143
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.web.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(WEAVE) $<
+
+# Not a target:
+.texinfo:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+libtvm/tvm_file.o: libtvm/tvm_file.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'libtvm/tvm_file'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm/tvm_file.o
+# automatic
+# % := 
+# automatic
+# * := libtvm/tvm_file
+# automatic
+# + := libtvm/tvm_file.c
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm_file.c
+# automatic
+# ^ := libtvm/tvm_file.c
+# automatic
+# ? := libtvm/tvm_file.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Not a target:
+.h:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+libtvm/tvm_htab.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0889868
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+libtvm/tvm.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0889868
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+libtvm/tvm_program.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0889868
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.tex.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEX) $<
+
+# Not a target:
+.cpp.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.cpp:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+clean:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'GNUmakefile', line 81):
+	rm -rf $(BIN_DIR)/* $(LIB_DIR)/* libtvm/*.o tdb/*.o gmon.out *.save *.o core* vgcore*
+
+# Not a target:
+.C.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.texi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.txinfo:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.txinfo.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# Not a target:
+GNUmakefile:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0733575
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.sh:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	cat $< >$@ 
+	 chmod a+x $@
+
+# Not a target:
+.S.s:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.S) $< > $@
+
+# Not a target:
+.mod:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ -e $@ $^
+
+# Not a target:
+.mod.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ $<
+
+profile: tvmi
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'GNUmakefile', line 75):
+	time $(PROFILER) $(BIN_DIR)/tvmi $(PROF_ARGS)
+
+# Not a target:
+.F.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
+
+tvmi: libtvm
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := tvmi
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := libtvm
+# automatic
+# | := 
+# automatic
+# < := libtvm
+# automatic
+# ^ := libtvm
+# automatic
+# ? := libtvm
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 69):
+	$(CC) src/tvmi.c -ltvm $(LFLAGS) -o $(BIN_DIR)/tvmi
+
+libtvm/tvm_parser.o: libtvm/tvm_parser.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'libtvm/tvm_parser'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm/tvm_parser.o
+# automatic
+# % := 
+# automatic
+# * := libtvm/tvm_parser
+# automatic
+# + := libtvm/tvm_parser.c
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm_parser.c
+# automatic
+# ^ := libtvm/tvm_parser.c
+# automatic
+# ? := libtvm/tvm_parser.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Not a target:
+.w:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.S.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.S) -o $@ $<
+
+# Not a target:
+.F:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.F) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+libtvm/tvm_file.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:38:52.0889868
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.web:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.sym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+install: libtvm tvmi
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'GNUmakefile', line 49):
+	cp -f $(BIN_DIR)/tvmi $(INSTALL_PREFIX)/bin/
+	cp -rf $(INC_DIR)/tvm $(INSTALL_PREFIX)/include/
+	cp -f $(LIB_DIR)/libtvm* $(INSTALL_PREFIX)/lib/
+
+libtvm/tvm_preprocessor.o: libtvm/tvm_preprocessor.c
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'libtvm/tvm_preprocessor'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := libtvm/tvm_preprocessor.o
+# automatic
+# % := 
+# automatic
+# * := libtvm/tvm_preprocessor
+# automatic
+# + := libtvm/tvm_preprocessor.c
+# automatic
+# | := 
+# automatic
+# < := libtvm/tvm_preprocessor.c
+# automatic
+# ^ := libtvm/tvm_preprocessor.c
+# automatic
+# ? := libtvm/tvm_preprocessor.c
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
+#  recipe to execute (from 'GNUmakefile', line 78):
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# files hash-table stats:
+# Load=107/1024=10%, Rehash=0, Collisions=549/1995=28%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 2 (1) / strings = 693 / storage = 10162 B / avg = 14 B
+# current buf: size = 8162 B / used = 2013 B / count = 116 / avg = 17 B
+# other used: total = 8149 B / count = 577 / avg = 14 B
+# other free: total = 13 B / max = 13 B / min = 13 B / avg = 13 B
+
+# strcache performance: lookups = 1057 / hit rate = 34%
+# hash-table stats:
+# Load=693/8192=8%, Rehash=0, Collisions=215/1057=20%
+# Finished Make data base on Fri Mar 20 10:09:06 2020
+

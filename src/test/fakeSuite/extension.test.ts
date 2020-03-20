@@ -41,9 +41,9 @@ suite('Fake dryrun parsing', /*async*/() => {
     // The output log varies depending on finding a particular VS toolset or not.
     // We need to test the scenario of providing in the makefile a full path to the compiler,
     // so there is no way around this. Using only compiler name and relying on path is not sufficient.
-    // Also, for the cases when a path (relative or full) is given to the compiler in the makefile,
-    // the parser will skip over the compiler command (see comment in parser.ts - parseLineAsTool),
-    // so again, we need to find the toolset that is referenced in the makefile.
+    // Also, for the cases when a path (relative or full) is given to the compiler in the makefile
+    // and the compiler is not found there, the parser will skip over the compiler command
+    // (see comment in parser.ts - parseLineAsTool), so again, we need to find the toolset that is referenced in the makefile.
     // TODO: mock various scenarios of VS environments without depending on what is installed.
     // TODO: adapt the makefile on mac/linux/mingw and add new tests in this suite
     // to parse the dry-run logs obtained on those platforms.
@@ -105,9 +105,9 @@ suite('Fake dryrun parsing', /*async*/() => {
     }
 
     // dry-run logs for https://github.com/rui314/8cc.git
-    // Linux
-    if (process.platform === "linux") {
-        test('8cc - linux', /*async*/() => {
+    if (process.platform === "linux" ||
+        (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
+        test('8cc - linux - and mingw', /*async*/() => {
             let extensionLogPath: string | undefined = configuration.getExtensionLog();
             // Cannot compare with a baseline if there is no extension log defined for this test
             // Use Makefile.extensionLog in test workspace settings.
@@ -121,16 +121,16 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.startListeningToSettingsChanged();
 
-        /*await*/ configuration.prepareConfigurationsQuickPick();
-        /*await*/ configuration.setConfigurationByName("8cc_linux");
+            /*await*/ configuration.prepareConfigurationsQuickPick();
+            /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
 
-        /*await*/ configuration.parseTargetsFromBuildLog();
-        /*await*/ configuration.setTargetByName("all");
+            /*await*/ configuration.parseTargetsFromBuildLog();
+            /*await*/ configuration.setTargetByName("all");
 
             make.prepareBuildCurrentTarget();
 
-        /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
-        /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
+            /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
+            /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
 
             launch.getLauncher().prepareDebugCurrentTarget();
             launch.getLauncher().prepareRunCurrentTarget();
@@ -147,7 +147,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             // Until then, print into base and diff files for easier viewing
             // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
-            let baselineLogPath: string = path.join(parsedPath.dir, "8cc_linux_baseline.out");
+            let baselineLogPath: string = path.join(parsedPath.dir, process.platform === "linux" ? "8cc_linux_baseline.out" : "8cc_mingw_baseline.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
@@ -159,8 +159,8 @@ suite('Fake dryrun parsing', /*async*/() => {
     }
 
     // dry-run logs for https://github.com/FidoProject/Fido.git
-    // Linux
-    if (process.platform === "linux") {
+    if (process.platform === "linux" ||
+        (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
         test('Fido - linux', /*async*/() => {
             let extensionLogPath: string | undefined = configuration.getExtensionLog();
             // Cannot compare with a baseline if there is no extension log defined for this test
@@ -181,18 +181,18 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.startListeningToSettingsChanged();
 
-        // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
-        // there is no need in running configuration.prepareConfigurationsQuickPick for each
-        ///*await*/ configuration.prepareConfigurationsQuickPick();
-        /*await*/ configuration.setConfigurationByName("Fido_linux");
+            // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
+            // there is no need in running configuration.prepareConfigurationsQuickPick for each
+            ///*await*/ configuration.prepareConfigurationsQuickPick();
+            /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
 
-        /*await*/ configuration.parseTargetsFromBuildLog();
-        /*await*/ configuration.setTargetByName("bin/foo.o");
+            /*await*/ configuration.parseTargetsFromBuildLog();
+            /*await*/ configuration.setTargetByName("bin/foo.o");
 
             make.prepareBuildCurrentTarget();
 
-        /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
-        /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
+            /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
+            /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
 
             launch.getLauncher().prepareDebugCurrentTarget();
             launch.getLauncher().prepareRunCurrentTarget();
@@ -209,7 +209,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             // Until then, print into base and diff files for easier viewing
             // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
-            let baselineLogPath: string = path.join(parsedPath.dir, "Fido_linux_baseline.out");
+            let baselineLogPath: string = path.join(parsedPath.dir, process.platform === "linux" ? "Fido_linux_baseline.out" : "Fido_mingw_baseline.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
@@ -221,8 +221,8 @@ suite('Fake dryrun parsing', /*async*/() => {
     }
 
     // dry-run logs for https://github.com/jakogut/tinyvm.git
-    // Linux
-    if (process.platform === "linux") {
+    if (process.platform === "linux" ||
+        (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
         test('tinyvm - linux', /*async*/() => {
             let extensionLogPath: string | undefined = configuration.getExtensionLog();
             // Cannot compare with a baseline if there is no extension log defined for this test
@@ -235,26 +235,26 @@ suite('Fake dryrun parsing', /*async*/() => {
                 return; // no need to run the remaining of the test
             }
 
-             // When there are more than one test run in a suite,
+            // When there are more than one test run in a suite,
             // the extension activation is executed only in the beginning.
             // Clear the extension log from the previous test,
             // since the extension clears it only in the beginning of activation.
             fs.unlinkSync(extensionLogPath);
 
-           configuration.startListeningToSettingsChanged();
+            configuration.startListeningToSettingsChanged();
 
-        // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
-        // there is no need in running configuration.prepareConfigurationsQuickPick for each
-        // /*await*/ configuration.prepareConfigurationsQuickPick();
-        /*await*/ configuration.setConfigurationByName("tinyvm_linux_pedantic");
+            // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
+            // there is no need in running configuration.prepareConfigurationsQuickPick for each
+            // /*await*/ configuration.prepareConfigurationsQuickPick();
+            /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
 
-        /*await*/ configuration.parseTargetsFromBuildLog();
-        /*await*/ configuration.setTargetByName("tvmi");
+            /*await*/ configuration.parseTargetsFromBuildLog();
+            /*await*/ configuration.setTargetByName("tvmi");
 
             make.prepareBuildCurrentTarget();
 
-        /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
-        /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");
+            /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
+            /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");
 
             launch.getLauncher().prepareDebugCurrentTarget();
             launch.getLauncher().prepareRunCurrentTarget();
@@ -271,7 +271,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             // Until then, print into base and diff files for easier viewing
             // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
-            let baselineLogPath: string = path.join(parsedPath.dir, "tinyvm_linux_baseline.out");
+            let baselineLogPath: string = path.join(parsedPath.dir, process.platform === "linux" ? "tinyvm_linux_baseline.out" : "tinyvm_mingw_baseline.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");

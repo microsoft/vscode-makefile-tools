@@ -1,0 +1,2034 @@
+Compiling with SFML flags
+-pthread -lsfml-network -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+g++ -std=c++11   -c -o src/Adadelta.o src/Adadelta.cpp
+g++ -std=c++11   -c -o src/Backpropagation.o src/Backpropagation.cpp
+g++ -std=c++11   -c -o src/FidoControlSystem.o src/FidoControlSystem.cpp
+g++ -std=c++11   -c -o src/GeneticAlgo.o src/GeneticAlgo.cpp
+g++ -std=c++11   -c -o src/Interpolator.o src/Interpolator.cpp
+g++ -std=c++11   -c -o src/Layer.o src/Layer.cpp
+g++ -std=c++11   -c -o src/LSInterpolator.o src/LSInterpolator.cpp
+g++ -std=c++11   -c -o src/main.o src/main.cpp
+g++ -std=c++11   -c -o src/NeuralNet.o src/NeuralNet.cpp
+g++ -std=c++11   -c -o src/Neuron.o src/Neuron.cpp
+g++ -std=c++11   -c -o src/Pruner.o src/Pruner.cpp
+g++ -std=c++11   -c -o src/QLearn.o src/QLearn.cpp
+g++ -std=c++11   -c -o src/SGDTrainer.o src/SGDTrainer.cpp
+g++ -std=c++11   -c -o src/Simulator/Emitter.o src/Simulator/Emitter.cpp
+g++ -std=c++11   -c -o src/Simulator/Robby.o src/Simulator/Robby.cpp
+g++ -std=c++11   -c -o src/Simulator/Simlink.o src/Simulator/Simlink.cpp
+g++ -std=c++11   -c -o src/WireFitQLearn.o src/WireFitQLearn.cpp
+mkdir -p bin/
+cp src/*.o bin/
+mkdir -p bin/Simulator/
+cp src/Simulator/*.o bin/Simulator/
+g++ -std=c++11  -pthread -lsfml-network -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio  bin/Adadelta.o bin/Backpropagation.o bin/FidoControlSystem.o bin/GeneticAlgo.o bin/Interpolator.o bin/Layer.o bin/LSInterpolator.o bin/main.o bin/NeuralNet.o bin/Neuron.o bin/Pruner.o bin/QLearn.o bin/SGDTrainer.o bin/Simulator/Emitter.o bin/Simulator/Robby.o bin/Simulator/Simlink.o bin/WireFitQLearn.o   -o bin/foo.o -pthread -lsfml-network -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+echo "Made object files in ../bin/"
+# GNU Make 4.2.1
+# Built for x86_64-pc-msys
+# Copyright (C) 1988-2016 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Fri Mar 20 10:04:57 2020
+
+# Variables
+
+# 'override' directive
+GNUMAKEFLAGS := 
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# default
+.SHELLFLAGS := -c
+# makefile
+MAKEFLAGS = Bknp
+# default
+F77FLAGS = $(FFLAGS)
+# default
+CWEAVE = cweave
+# makefile (from 'Makefile', line 16)
+TARGET = bin/foo.o
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# environment
+!:: = ::\
+# environment
+LOGINSHELL = bash
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+HOMEDRIVE = C:
+# automatic
+@F = $(notdir $@)
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# makefile
+CURDIR := /c/git/Fido
+# makefile
+SHELL = /bin/sh
+# environment
+CONFIG_SITE = /mingw32/etc/config.site
+# default
+CO = co
+# environment
+ProgramFiles(x86) = C:\Program Files (x86)
+# environment
+WINDIR = C:\Windows
+# environment
+TZ = America/Los_Angeles
+# environment
+_ = /usr/bin/make
+# default
+PREPROCESS.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -F
+# default
+LINK.m = $(OBJC) $(OBJCFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)
+# default
+OUTPUT_OPTION = -o $@
+# default
+COMPILE.cpp = $(COMPILE.cc)
+# environment
+CLIENTNAME = ANDRIS
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# makefile (from 'Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# environment
+FPS_BROWSER_USER_PROFILE_STRING = Default
+# environment
+USERNAME = andris
+# default
+LINK.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# makefile (from 'Makefile', line 13)
+SOURCES = $(shell find src/ -name "*.cpp")
+# makefile (from 'Makefile', line 1)
+CXXFLAGS = -std=c++11
+# default
+CC = cc
+# environment
+CommonProgramFiles(x86) = C:\Program Files (x86)\Common Files
+# environment
+INFOPATH = /usr/local/info:/usr/share/info:/usr/info:/share/info
+# default
+CHECKOUT,v = +$(if $(wildcard $@),,$(CO) $(COFLAGS) $< $@)
+# environment
+MSYSTEM_CHOST = i686-w64-mingw32
+# environment
+tmp = C:\Users\andris\AppData\Local\Temp
+# default
+LEX.m = $(LEX) $(LFLAGS) -t
+# default
+CPP = $(CC) -E
+# default
+LINK.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+MAKE_HOST := x86_64-pc-msys
+# environment
+PATH = /mingw32/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+# default
+LD = ld
+# default
+TEXI2DVI = texi2dvi
+# default
+YACC = yacc
+# default
+COMPILE.mod = $(M2C) $(M2FLAGS) $(MODFLAGS) $(TARGET_ARCH)
+# environment
+PROCESSOR_ARCHITECTURE = AMD64
+# default
+LINK.r = $(FC) $(FFLAGS) $(RFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+USERPROFILE = C:\Users\andris
+# default
+LINT = lint
+# default
+COMPILE.f = $(FC) $(FFLAGS) $(TARGET_ARCH) -c
+# environment
+MSYSTEM_CARCH = i686
+# default
+LINT.c = $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
+# default
+YACC.m = $(YACC) $(YFLAGS)
+# environment
+!C: = C:\msys64
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# default
+YACC.y = $(YACC) $(YFLAGS)
+# default
+AR = ar
+# environment
+MSYSTEM_PREFIX = /mingw32
+# environment
+NUMBER_OF_PROCESSORS = 4
+# makefile (from 'Makefile', line 5)
+LDFLAGS = -pthread -lsfml-network -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+# environment
+ORIGINAL_TEMP = /c/Users/andris/AppData/Local/Temp
+# makefile (from 'Makefile', line 17)
+LIB = build/fido.a
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
+# default
+TANGLE = tangle
+# environment
+ProgramW6432 = C:\Program Files
+# default
+GET = get
+# automatic
+%F = $(notdir $%)
+# default
+MAKEFILES := 
+# default
+COMPILE.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+CTANGLE = ctangle
+# default
+.LIBPATTERNS = lib%.dll.a %.dll.a lib%.a %.lib lib%.dll %.dll
+# environment
+ORIGINAL_PATH = /c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/
+# environment
+COMPUTERNAME = azandris-win
+# default
+LINK.C = $(LINK.cc)
+# environment
+WD = C:\msys64\usr\bin\
+# environment
+PROGRAMFILES = C:\Program Files
+# default
+.LOADED := 
+# default
+LINK.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# environment
+USERDNSDOMAIN = REDMOND.CORP.MICROSOFT.COM
+# default
+PREPROCESS.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -F
+# environment
+PKG_CONFIG_PATH = /mingw32/lib/pkgconfig:/mingw32/share/pkgconfig
+# makefile (from 'Makefile', line 15)
+BINS = $(OBJECTS:src/%=bin/%)
+# default
+LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+PUBLIC = C:\Users\Public
+# environment
+MANPATH = /mingw32/local/man:/mingw32/share/man:/usr/local/man:/usr/share/man:/usr/man:/share/man
+# default
+LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# environment
+HOME = /home/andris
+# environment
+CommonProgramW6432 = C:\Program Files\Common Files
+# environment
+ProgramData = C:\ProgramData
+# environment
+PRINTER = OneNote
+# environment
+COMMONPROGRAMFILES = C:\Program Files\Common Files
+# environment
+LOGONSERVER = \\CY1-RED-DC-19
+# environment
+MSYSCON = mintty.exe
+# makefile (from 'Makefile', line 2)
+PREFIX = /usr/local
+# environment
+USERDOMAIN = REDMOND
+# environment
+HOSTNAME = azandris-win
+# environment
+MAKELEVEL := 0
+# default
+COMPILE.m = $(OBJC) $(OBJCFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+SHLVL = 1
+# default
+AS = as
+# environment
+ACLOCAL_PATH = /mingw32/share/aclocal:/usr/share/aclocal
+# default
+PREPROCESS.S = $(CC) -E $(CPPFLAGS)
+# default
+COMPILE.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+MAKE_VERSION := 4.2.1
+# environment
+USER = andris
+# default
+FC = f77
+# environment
+MINGW_CHOST = i686-w64-mingw32
+# makefile
+.DEFAULT_GOAL := all
+# environment
+OneDrive = C:\Users\andris\OneDrive
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+DriverData = C:\Windows\System32\Drivers\DriverData
+# environment
+LOCALAPPDATA = C:\Users\andris\AppData\Local
+# default
+ARFLAGS = rv
+# default
+WEAVE = weave
+# default
+MAKE_COMMAND := make
+# default
+LINK.cpp = $(LINK.cc)
+# default
+F77 = $(FC)
+# environment
+OLDPWD = /c/git/8cc
+# default
+.VARIABLES := 
+# default
+PC = pc
+# automatic
+*F = $(notdir $*)
+# environment
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 79 Stepping 1, GenuineIntel
+# environment
+OS = Windows_NT
+# default
+COMPILE.def = $(M2C) $(M2FLAGS) $(DEFFLAGS) $(TARGET_ARCH)
+# default
+LEX = lex
+# default
+RM = rm -f
+# environment
+HOMEPATH = \Users\andris
+# environment
+PROMPT = $P$G
+# environment
+MFLAGS = -Bknp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+ORIGINAL_TMP = /c/Users/andris/AppData/Local/Temp
+# default
+LEX.l = $(LEX) $(LFLAGS) -t
+# environment
+PSModulePath = C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules;C:\Program Files (x86)\Microsoft Azure Information Protection\Powershell;C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\
+# environment
+SYSTEMROOT = C:\Windows
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+MINGW_PREFIX = /mingw32
+# automatic
++F = $(notdir $+)
+# default
+M2C = m2c
+# environment
+APPDATA = C:\Users\andris\AppData\Roaming
+# environment
+TEMP = /tmp
+# environment
+COMSPEC = C:\Windows\system32\cmd.exe
+# environment
+MSYSTEM = MINGW32
+# 'override' directive
+.SHELLSTATUS := 0
+# environment
+CONTITLE = MinGW x32
+# default
+COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# automatic
+<F = $(notdir $<)
+# environment
+PS1 = \[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[35m\]$MSYSTEM\[\e[0m\] \[\e[33m\]\w\[\e[0m\]\n\$ 
+# default
+CXX = g++
+# environment
+temp = C:\Users\andris\AppData\Local\Temp
+# default
+COFLAGS = 
+# environment
+PWD = /c/git/Fido
+# environment
+UATDATA = C:\Windows\CCM\UATData\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77
+# default
+COMPILE.C = $(COMPILE.cc)
+# automatic
+^F = $(notdir $^)
+# default
+COMPILE.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(TARGET_MACH) -c
+# default
+LINK.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+SUFFIXES := .out .a .ln .o .c .cc .C .cpp .p .f .F .m .r .y .l .ym .yl .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+# environment
+SYSTEMDRIVE = C:
+# default
+COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# environment
+SESSIONNAME = RDP-Tcp#89
+# environment
+PROCESSOR_REVISION = 4f01
+# default
+COMPILE.s = $(AS) $(ASFLAGS) $(TARGET_MACH)
+# default
+.INCLUDE_DIRS = /usr/include /usr/include
+# environment
+TMP = /tmp
+# default
+COMPILE.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -c
+# default
+.RECIPEPREFIX := 
+# makefile (from 'Makefile', line 14)
+OBJECTS = $(SOURCES:%.cpp=%.o)
+# default
+MAKEINFO = makeinfo
+# default
+MAKE_TERMERR := /dev/pty0
+# default
+OBJC = cc
+# default
+TEX = tex
+# environment
+LANG = en_US.UTF-8
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+TERM = xterm
+# environment
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
+# default
+LINK.f = $(FC) $(FFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+MINGW_PACKAGE_PREFIX = mingw-w64-i686
+# environment
+USERDOMAIN_ROAMINGPROFILE = REDMOND
+# variable set hash-table stats:
+# Load=185/1024=18%, Rehash=0, Collisions=51/424=12%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# src/RCS: could not be stat'd.
+# SCCS: could not be stat'd.
+# . (device 452300810, inode 1407374884325205): 20 files, 19 impossibilities.
+# src/Simulator (device 452300810, inode 844424930904202): 5 files, no impossibilities.
+# src/Simulator/SCCS: could not be stat'd.
+# src (device 452300810, inode 1407374884325501): 31 files, no impossibilities.
+# src/Simulator/RCS: could not be stat'd.
+# src/SCCS: could not be stat'd.
+# RCS: could not be stat'd.
+
+# 56 files, 19 impossibilities in 9 directories.
+
+# Implicit Rules
+
+%.out:
+
+%.a:
+
+%.ln:
+
+%.o:
+
+%: %.o
+#  recipe to execute (built-in):
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.c:
+
+%: %.c
+#  recipe to execute (built-in):
+	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.ln: %.c
+#  recipe to execute (built-in):
+	$(LINT.c) -C$* $<
+
+%.o: %.c
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+%.cc:
+
+%: %.cc
+#  recipe to execute (built-in):
+	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.cc
+#  recipe to execute (built-in):
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+
+%.C:
+
+%: %.C
+#  recipe to execute (built-in):
+	$(LINK.C) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.C
+#  recipe to execute (built-in):
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+
+%.cpp:
+
+%: %.cpp
+#  recipe to execute (built-in):
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.cpp
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+%.p:
+
+%: %.p
+#  recipe to execute (built-in):
+	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.p
+#  recipe to execute (built-in):
+	$(COMPILE.p) $(OUTPUT_OPTION) $<
+
+%.f:
+
+%: %.f
+#  recipe to execute (built-in):
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.f
+#  recipe to execute (built-in):
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+%.F:
+
+%: %.F
+#  recipe to execute (built-in):
+	$(LINK.F) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.F
+#  recipe to execute (built-in):
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+
+%.f: %.F
+#  recipe to execute (built-in):
+	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
+
+%.m:
+
+%: %.m
+#  recipe to execute (built-in):
+	$(LINK.m) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.m
+#  recipe to execute (built-in):
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+%.r:
+
+%: %.r
+#  recipe to execute (built-in):
+	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.r
+#  recipe to execute (built-in):
+	$(COMPILE.r) $(OUTPUT_OPTION) $<
+
+%.f: %.r
+#  recipe to execute (built-in):
+	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
+
+%.y:
+
+%.ln: %.y
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 $(LINT.c) -C$* y.tab.c 
+	 $(RM) y.tab.c
+
+%.c: %.y
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 mv -f y.tab.c $@
+
+%.l:
+
+%.ln: %.l
+#  recipe to execute (built-in):
+	@$(RM) $*.c
+	 $(LEX.l) $< > $*.c
+	$(LINT.c) -i $*.c -o $@
+	 $(RM) $*.c
+
+%.c: %.l
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.l) $< > $@
+
+%.r: %.l
+#  recipe to execute (built-in):
+	$(LEX.l) $< > $@ 
+	 mv -f lex.yy.r $@
+
+%.ym:
+
+%.m: %.ym
+#  recipe to execute (built-in):
+	$(YACC.m) $< 
+	 mv -f y.tab.c $@
+
+%.yl:
+
+%.s:
+
+%: %.s
+#  recipe to execute (built-in):
+	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.s
+#  recipe to execute (built-in):
+	$(COMPILE.s) -o $@ $<
+
+%.S:
+
+%: %.S
+#  recipe to execute (built-in):
+	$(LINK.S) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.S
+#  recipe to execute (built-in):
+	$(COMPILE.S) -o $@ $<
+
+%.s: %.S
+#  recipe to execute (built-in):
+	$(PREPROCESS.S) $< > $@
+
+%.mod:
+
+%: %.mod
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ -e $@ $^
+
+%.o: %.mod
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ $<
+
+%.sym:
+
+%.def:
+
+%.sym: %.def
+#  recipe to execute (built-in):
+	$(COMPILE.def) -o $@ $<
+
+%.h:
+
+%.info:
+
+%.dvi:
+
+%.tex:
+
+%.dvi: %.tex
+#  recipe to execute (built-in):
+	$(TEX) $<
+
+%.texinfo:
+
+%.info: %.texinfo
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.texinfo
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.texi:
+
+%.info: %.texi
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.texi
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.txinfo:
+
+%.info: %.txinfo
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.txinfo
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.w:
+
+%.c: %.w
+#  recipe to execute (built-in):
+	$(CTANGLE) $< - $@
+
+%.tex: %.w
+#  recipe to execute (built-in):
+	$(CWEAVE) $< - $@
+
+%.ch:
+
+%.web:
+
+%.p: %.web
+#  recipe to execute (built-in):
+	$(TANGLE) $<
+
+%.tex: %.web
+#  recipe to execute (built-in):
+	$(WEAVE) $<
+
+%.sh:
+
+%: %.sh
+#  recipe to execute (built-in):
+	cat $< >$@ 
+	 chmod a+x $@
+
+%.elc:
+
+%.el:
+
+(%): %
+#  recipe to execute (built-in):
+	$(AR) $(ARFLAGS) $@ $<
+
+%.out: %
+#  recipe to execute (built-in):
+	@rm -f $@ 
+	 cp $< $@
+
+%.c: %.w %.ch
+#  recipe to execute (built-in):
+	$(CTANGLE) $^ $@
+
+%.tex: %.w %.ch
+#  recipe to execute (built-in):
+	$(CWEAVE) $^ $@
+
+%:: %,v
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: RCS/%,v
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: RCS/%
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: s.%
+#  recipe to execute (built-in):
+	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+
+%:: SCCS/s.%
+#  recipe to execute (built-in):
+	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+
+# 92 implicit rules, 5 (5.4%) terminal.
+
+# Files
+
+# Not a target:
+.web.p:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TANGLE) $<
+
+# 'override' directive
+bin/foo.o: .SHELLSTATUS := 0
+bin/foo.o: src/Adadelta.o src/Backpropagation.o src/FidoControlSystem.o src/GeneticAlgo.o src/Interpolator.o src/Layer.o src/LSInterpolator.o src/main.o src/NeuralNet.o src/Neuron.o src/Pruner.o src/QLearn.o src/SGDTrainer.o src/Simulator/Emitter.o src/Simulator/Robby.o src/Simulator/Simlink.o src/WireFitQLearn.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: 'bin/foo'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := bin/foo.o
+# automatic
+# % := 
+# automatic
+# * := bin/foo
+# automatic
+# + := src/Adadelta.o src/Backpropagation.o src/FidoControlSystem.o src/GeneticAlgo.o src/Interpolator.o src/Layer.o src/LSInterpolator.o src/main.o src/NeuralNet.o src/Neuron.o src/Pruner.o src/QLearn.o src/SGDTrainer.o src/Simulator/Emitter.o src/Simulator/Robby.o src/Simulator/Simlink.o src/WireFitQLearn.o
+# automatic
+# | := 
+# automatic
+# < := src/Adadelta.o
+# automatic
+# ^ := src/Adadelta.o src/Backpropagation.o src/FidoControlSystem.o src/GeneticAlgo.o src/Interpolator.o src/Layer.o src/LSInterpolator.o src/main.o src/NeuralNet.o src/Neuron.o src/Pruner.o src/QLearn.o src/SGDTrainer.o src/Simulator/Emitter.o src/Simulator/Robby.o src/Simulator/Simlink.o src/WireFitQLearn.o
+# automatic
+# ? := src/Adadelta.o src/Backpropagation.o src/FidoControlSystem.o src/GeneticAlgo.o src/Interpolator.o src/Layer.o src/LSInterpolator.o src/main.o src/NeuralNet.o src/Neuron.o src/Pruner.o src/QLearn.o src/SGDTrainer.o src/Simulator/Emitter.o src/Simulator/Robby.o src/Simulator/Simlink.o src/WireFitQLearn.o
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=17/214=8%
+#  recipe to execute (from 'Makefile', line 23):
+	@mkdir -p bin/
+	@cp src/*.o bin/
+	    @mkdir -p bin/Simulator/
+	    @cp src/Simulator/*.o bin/Simulator/
+	$(LINK.cpp) $(BINS) $(LOADLIBES) $(LDLIBS) -o $@ $(LDFLAGS)
+	@echo "Made object files in ../bin/"
+
+# Not a target:
+.l.r:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LEX.l) $< > $@ 
+	 mv -f lex.yy.r $@
+
+# Not a target:
+src/QLearn.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/Neuron.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.ym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.f.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.l:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.m) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.y:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.def.sym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.def) -o $@ $<
+
+.PHONY: all clean lib install
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.p.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.p) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.p:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.txinfo.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+src/main.o: src/main.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/main'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/main.o
+# automatic
+# % := 
+# automatic
+# * := src/main
+# automatic
+# + := src/main.cpp
+# automatic
+# | := 
+# automatic
+# < := src/main.cpp
+# automatic
+# ^ := src/main.cpp
+# automatic
+# ? := src/main.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.a:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.yl:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.l.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $*.c
+	 $(LEX.l) $< > $*.c
+	$(LINT.c) -i $*.c -o $@
+	 $(RM) $*.c
+
+# Not a target:
+.F.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+
+src/Pruner.o: src/Pruner.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Pruner'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Pruner.o
+# automatic
+# % := 
+# automatic
+# * := src/Pruner
+# automatic
+# + := src/Pruner.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Pruner.cpp
+# automatic
+# ^ := src/Pruner.cpp
+# automatic
+# ? := src/Pruner.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.texi.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# Not a target:
+.w.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(CTANGLE) $< - $@
+
+# Not a target:
+.texi.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# Not a target:
+.ch:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.m.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.cc:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.cc.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+
+src/SGDTrainer.o: src/SGDTrainer.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/SGDTrainer'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/SGDTrainer.o
+# automatic
+# % := 
+# automatic
+# * := src/SGDTrainer
+# automatic
+# + := src/SGDTrainer.cpp
+# automatic
+# | := 
+# automatic
+# < := src/SGDTrainer.cpp
+# automatic
+# ^ := src/SGDTrainer.cpp
+# automatic
+# ? := src/SGDTrainer.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.def:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.SUFFIXES: .out .a .ln .o .c .cc .C .cpp .p .f .F .m .r .y .l .ym .yl .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+src/Layer.o: src/Layer.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Layer'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Layer.o
+# automatic
+# % := 
+# automatic
+# * := src/Layer
+# automatic
+# + := src/Layer.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Layer.cpp
+# automatic
+# ^ := src/Layer.cpp
+# automatic
+# ? := src/Layer.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.c.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.0846419
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.r.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.r) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.r:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+src/NeuralNet.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.1002706
+#  File has been updated.
+#  Successfully updated.
+
+src/Adadelta.o: src/Adadelta.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Adadelta'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Adadelta.o
+# automatic
+# % := 
+# automatic
+# * := src/Adadelta
+# automatic
+# + := src/Adadelta.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Adadelta.cpp
+# automatic
+# ^ := src/Adadelta.cpp
+# automatic
+# ? := src/Adadelta.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+src/Simulator/Simlink.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+src/Simulator/Emitter.o: src/Simulator/Emitter.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Simulator/Emitter'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Simulator/Emitter.o
+# automatic
+# % := 
+# automatic
+# * := src/Simulator/Emitter
+# automatic
+# + := src/Simulator/Emitter.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Simulator/Emitter.cpp
+# automatic
+# ^ := src/Simulator/Emitter.cpp
+# automatic
+# ? := src/Simulator/Emitter.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.ym.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.m) $< 
+	 mv -f y.tab.c $@
+
+# Not a target:
+.y.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 $(LINT.c) -C$* y.tab.c 
+	 $(RM) y.tab.c
+
+# Not a target:
+src/FidoControlSystem.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.1002706
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.elc:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.l.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.l) $< > $@
+
+# Not a target:
+.out:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+all: bin/foo.o
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/204=0%
+
+# Not a target:
+.C:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.C) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.r.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.S:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.S) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+src/Simulator/Robby.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.texinfo.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# Not a target:
+.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.w.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(CWEAVE) $< - $@
+
+# Not a target:
+.c.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINT.c) -C$* $<
+
+# Not a target:
+.s.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.s) -o $@ $<
+
+# Not a target:
+.s:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+src/QLearn.o: src/QLearn.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/QLearn'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/QLearn.o
+# automatic
+# % := 
+# automatic
+# * := src/QLearn
+# automatic
+# + := src/QLearn.cpp
+# automatic
+# | := 
+# automatic
+# < := src/QLearn.cpp
+# automatic
+# ^ := src/QLearn.cpp
+# automatic
+# ? := src/QLearn.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+src/WireFitQLearn.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+src/Neuron.o: src/Neuron.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Neuron'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Neuron.o
+# automatic
+# % := 
+# automatic
+# * := src/Neuron
+# automatic
+# + := src/Neuron.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Neuron.cpp
+# automatic
+# ^ := src/Neuron.cpp
+# automatic
+# ? := src/Neuron.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+lib: all
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 41):
+	@mkdir -p build/
+	@ar rvs $(LIB) $(BINS)
+	@echo "Built library at $(LIB)"
+
+# Not a target:
+src/Interpolator.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.1002706
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.texinfo.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# Not a target:
+.el:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+src/LSInterpolator.o: src/LSInterpolator.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/LSInterpolator'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/LSInterpolator.o
+# automatic
+# % := 
+# automatic
+# * := src/LSInterpolator
+# automatic
+# + := src/LSInterpolator.cpp
+# automatic
+# | := 
+# automatic
+# < := src/LSInterpolator.cpp
+# automatic
+# ^ := src/LSInterpolator.cpp
+# automatic
+# ? := src/LSInterpolator.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.lm.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.m) $< > $@
+
+# Not a target:
+.y.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 mv -f y.tab.c $@
+
+# Not a target:
+.web.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(WEAVE) $<
+
+# Not a target:
+.texinfo:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.h:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+src/GeneticAlgo.o: src/GeneticAlgo.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/GeneticAlgo'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/GeneticAlgo.o
+# automatic
+# % := 
+# automatic
+# * := src/GeneticAlgo
+# automatic
+# + := src/GeneticAlgo.cpp
+# automatic
+# | := 
+# automatic
+# < := src/GeneticAlgo.cpp
+# automatic
+# ^ := src/GeneticAlgo.cpp
+# automatic
+# ? := src/GeneticAlgo.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+src/GeneticAlgo.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.1002706
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.tex.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEX) $<
+
+# Not a target:
+.cpp.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.cpp:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+clean:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 34):
+	@rm -f $(TARGET) $(OBJECTS) $(BINS) $(LIB)
+	@echo "Deleted files"
+	@rm -rf bin/ build/
+	@echo "Deleted folders"
+
+# Not a target:
+.C.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.texi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.txinfo:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+src/main.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.txinfo.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+src/NeuralNet.o: src/NeuralNet.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/NeuralNet'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/NeuralNet.o
+# automatic
+# % := 
+# automatic
+# * := src/NeuralNet
+# automatic
+# + := src/NeuralNet.cpp
+# automatic
+# | := 
+# automatic
+# < := src/NeuralNet.cpp
+# automatic
+# ^ := src/NeuralNet.cpp
+# automatic
+# ? := src/NeuralNet.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+src/Simulator/Simlink.o: src/Simulator/Simlink.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Simulator/Simlink'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Simulator/Simlink.o
+# automatic
+# % := 
+# automatic
+# * := src/Simulator/Simlink
+# automatic
+# + := src/Simulator/Simlink.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Simulator/Simlink.cpp
+# automatic
+# ^ := src/Simulator/Simlink.cpp
+# automatic
+# ? := src/Simulator/Simlink.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+src/Pruner.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+src/Backpropagation.o: src/Backpropagation.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Backpropagation'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Backpropagation.o
+# automatic
+# % := 
+# automatic
+# * := src/Backpropagation
+# automatic
+# + := src/Backpropagation.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Backpropagation.cpp
+# automatic
+# ^ := src/Backpropagation.cpp
+# automatic
+# ? := src/Backpropagation.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+src/FidoControlSystem.o: src/FidoControlSystem.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/FidoControlSystem'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/FidoControlSystem.o
+# automatic
+# % := 
+# automatic
+# * := src/FidoControlSystem
+# automatic
+# + := src/FidoControlSystem.cpp
+# automatic
+# | := 
+# automatic
+# < := src/FidoControlSystem.cpp
+# automatic
+# ^ := src/FidoControlSystem.cpp
+# automatic
+# ? := src/FidoControlSystem.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.sh:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	cat $< >$@ 
+	 chmod a+x $@
+
+# Not a target:
+src/Backpropagation.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.1002706
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+src/SGDTrainer.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.S.s:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.S) $< > $@
+
+# Not a target:
+.mod:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ -e $@ $^
+
+# Not a target:
+src/Layer.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.1002706
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.mod.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ $<
+
+# Not a target:
+.F.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.w:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+src/Adadelta.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.1002706
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.S.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.S) -o $@ $<
+
+src/Simulator/Robby.o: src/Simulator/Robby.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Simulator/Robby'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Simulator/Robby.o
+# automatic
+# % := 
+# automatic
+# * := src/Simulator/Robby
+# automatic
+# + := src/Simulator/Robby.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Simulator/Robby.cpp
+# automatic
+# ^ := src/Simulator/Robby.cpp
+# automatic
+# ? := src/Simulator/Robby.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+src/Simulator/Emitter.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.115896
+#  File has been updated.
+#  Successfully updated.
+
+src/WireFitQLearn.o: src/WireFitQLearn.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/WireFitQLearn'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/WireFitQLearn.o
+# automatic
+# % := 
+# automatic
+# * := src/WireFitQLearn
+# automatic
+# + := src/WireFitQLearn.cpp
+# automatic
+# | := 
+# automatic
+# < := src/WireFitQLearn.cpp
+# automatic
+# ^ := src/WireFitQLearn.cpp
+# automatic
+# ? := src/WireFitQLearn.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+src/LSInterpolator.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:41.1002706
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.F:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.F) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+src/Interpolator.o: src/Interpolator.cpp
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'src/Interpolator'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := src/Interpolator.o
+# automatic
+# % := 
+# automatic
+# * := src/Interpolator
+# automatic
+# + := src/Interpolator.cpp
+# automatic
+# | := 
+# automatic
+# < := src/Interpolator.cpp
+# automatic
+# ^ := src/Interpolator.cpp
+# automatic
+# ? := src/Interpolator.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/20=10%
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.web:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.sym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+install: lib
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 47):
+	install -d $(DESTDIR)/$(PREFIX)/lib/
+	install $(LIB) $(DESTDIR)/$(PREFIX)/lib/
+	mkdir -p $(DESTDIR)/$(PREFIX)/include/Fido/
+	cp -r include/* $(DESTDIR)/$(PREFIX)/include/Fido/
+
+# files hash-table stats:
+# Load=113/1024=11%, Rehash=0, Collisions=493/1737=28%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 486 / storage = 7032 B / avg = 14 B
+# current buf: size = 8162 B / used = 7032 B / count = 486 / avg = 14 B
+
+# strcache performance: lookups = 717 / hit rate = 32%
+# hash-table stats:
+# Load=486/8192=6%, Rehash=0, Collisions=199/717=28%
+# Finished Make data base on Fri Mar 20 10:04:57 2020
+
