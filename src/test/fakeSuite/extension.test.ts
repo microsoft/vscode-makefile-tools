@@ -121,9 +121,7 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.startListeningToSettingsChanged();
 
-        // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
-        // there is no need in running configuration.prepareConfigurationsQuickPick for each
-        ///*await*/ configuration.prepareConfigurationsQuickPick();
+        /*await*/ configuration.prepareConfigurationsQuickPick();
         /*await*/ configuration.setConfigurationByName("8cc_linux");
 
         /*await*/ configuration.parseTargetsFromBuildLog();
@@ -175,8 +173,16 @@ suite('Fake dryrun parsing', /*async*/() => {
                 return; // no need to run the remaining of the test
             }
 
+            // When there are more than one test run in a suite,
+            // the extension activation is executed only in the beginning.
+            // Clear the extension log from the previous test,
+            // since the extension clears it only in the beginning of activation.
+            fs.unlinkSync(extensionLogPath);
+            
             configuration.startListeningToSettingsChanged();
 
+        // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
+        // there is no need in running configuration.prepareConfigurationsQuickPick for each
         ///*await*/ configuration.prepareConfigurationsQuickPick();
         /*await*/ configuration.setConfigurationByName("Fido_linux");
 
@@ -229,9 +235,17 @@ suite('Fake dryrun parsing', /*async*/() => {
                 return; // no need to run the remaining of the test
             }
 
-            configuration.startListeningToSettingsChanged();
+             // When there are more than one test run in a suite,
+            // the extension activation is executed only in the beginning.
+            // Clear the extension log from the previous test,
+            // since the extension clears it only in the beginning of activation.
+            fs.unlinkSync(extensionLogPath);
+            
+           configuration.startListeningToSettingsChanged();
 
-        ///*await*/ configuration.prepareConfigurationsQuickPick();
+        // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
+        // there is no need in running configuration.prepareConfigurationsQuickPick for each
+        // /*await*/ configuration.prepareConfigurationsQuickPick();
         /*await*/ configuration.setConfigurationByName("tinyvm_linux_pedantic");
 
         /*await*/ configuration.parseTargetsFromBuildLog();
@@ -257,7 +271,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             // Until then, print into base and diff files for easier viewing
             // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
-            let baselineLogPath: string = path.join(parsedPath.dir, "Fido_baselineLinux.out");
+            let baselineLogPath: string = path.join(parsedPath.dir, "tinyvm_linux_baseline.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");

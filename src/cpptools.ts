@@ -75,7 +75,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         windowsSdkVersion?: string): void {
         const configuration: cpp.SourceFileConfiguration = {
             defines,
-            standard,
+            standard : standard || "c++17",
             includePath,
             forcedInclude,
             intelliSenseMode,

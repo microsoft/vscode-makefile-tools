@@ -16,15 +16,15 @@
     },
     {
         "name": "8cc_linux",
-        "buildLog": "./8cc_linux.log"
+        "buildLog": "./8cc_linux_dryrun.log"
     },
     {
         "name": "Fido_linux",
-        "buildLog": "./Fido_linux.log"
+        "buildLog": "./Fido_linux_dryrun.log"
     },
     {
         "name": "tinyvm_linux_pedantic",
-        "buildLog": "./tinyvm_linux_pedantic.log",
+        "buildLog": "./tinyvm_linux_dryrunPedantic.log",
         "commandName": "make",
         "commandArgs": ["PEDANTIC=yes"]
     }

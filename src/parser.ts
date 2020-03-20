@@ -54,7 +54,7 @@ export function parseTargets(verboseLog: string): string[] {
     }
 
     if (matches) {
-        logger.message("Found the following targets: " + matches.join(";"));
+        logger.message("Found the following build targets: " + matches.join(";"));
     } else {
         logger.message("No targets found");
     }
@@ -467,20 +467,31 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             logger.message("    Defines: " + defines.join(";"), "Verbose");
 
             // Parse the C/C++ standard
-            // TODO: implement default standard: c++11 for C nad c++17 for C++
-            // TODO: c++20 and c++latest
+            // TODO: implement default standard: c++11 for C and c++17 for C++
+            // TODO: c++20 & c++latest and more accurate setting logic (example: CMake Tools)
             let standardStr: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["std"]);
-            let standard: util.StandardVersion = standardStr ? <util.StandardVersion>standardStr : "c++17";
+            let standard: util.StandardVersion = standardStr ? <util.StandardVersion>standardStr : undefined;
             logger.message("    Standard: " + standard, "Verbose");
 
             // Parse the IntelliSense mode
+            // TODO: msvc-x86
             // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
-            let intelliSenseMode: util.IntelliSenseMode = "msvc-x64";
+            let intelliSenseMode: util.IntelliSenseMode;
             if (path.basename(compilerTool.fullPath).startsWith("clang")) {
                 intelliSenseMode = "clang-x64";
+            } else if (path.basename(compilerTool.fullPath).startsWith("cl")) {
+                intelliSenseMode = "msvc-x64";
             } else if (path.basename(compilerTool.fullPath).startsWith("gcc") ||
                 path.basename(compilerTool.fullPath).startsWith("g++")) {
                 intelliSenseMode = "gcc-x64";
+            } else {
+                if (process.platform === "win32") {
+                    intelliSenseMode = "msvc-x64";
+                } else if (process.platform === "darwin") {
+                    intelliSenseMode = "clang-x64";
+                } else {
+                    intelliSenseMode = "gcc-x64";
+                }
             }
             logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
 

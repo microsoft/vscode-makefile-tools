@@ -5,7 +5,7 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 
 // TODO: c++20, c++latest
-export type StandardVersion = 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17';
+export type StandardVersion = 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | undefined;
 export type IntelliSenseMode = "msvc-x64" | "gcc-x64" | "clang-x64";
 
 export function checkFileExistsSync(filePath: string): boolean {
