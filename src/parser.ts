@@ -463,6 +463,9 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
             forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
             logger.message("    Forced includes: " + forcedIncludes.join(";"), "Verbose");
+
+            // TODO-BUG: fix regexp for parseMultipleSwitchFromToolArguments
+            // Include dirs not detected properly in 8cc (because of '" "')
             let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
             logger.message("    Defines: " + defines.join(";"), "Verbose");
 
