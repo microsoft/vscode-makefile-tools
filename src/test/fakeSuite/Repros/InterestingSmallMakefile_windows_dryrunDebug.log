@@ -11,8 +11,8 @@ if exist intermediate rmdir /s /q intermediate
 if not exist out mkdir out
 if not exist bin\ARCH1\Debug mkdir bin\ARCH1\Debug
 if not exist intermediate\ARCH1\Debug mkdir intermediate\ARCH1\Debug
-cl .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=1 /c
-cl		.\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=1 /c
+"cl" .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=1 /c
+"cl.exe"		.\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=1 /c
 copy main.obj intermediate\ARCH1\Debug
 copy test1.obj intermediate\ARCH1\Debug
 copy test2.obj intermediate\ARCH1\Debug
@@ -20,8 +20,8 @@ del *.obj
 link.exe /out:bin\ARCH1\Debug\main.exe intermediate\ARCH1\Debug\main.obj intermediate\ARCH1\Debug\test1.obj intermediate\ARCH1\Debug\test2.obj /DEBUG
 if not exist bin\ARCH2\Debug mkdir bin\ARCH2\Debug
 if not exist intermediate\ARCH2\Debug mkdir intermediate\ARCH2\Debug
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl"  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=2 /c
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=2 /c
+cl  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=2 /c
+cl  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=2 /c
 copy main.obj intermediate\ARCH2\Debug
 copy test1.obj intermediate\ARCH2\Debug
 copy test2.obj intermediate\ARCH2\Debug
@@ -29,13 +29,13 @@ del *.obj
 link /out:bin\ARCH2\Debug\main.exe intermediate\ARCH2\Debug\main.obj intermediate\ARCH2\Debug\test1.obj intermediate\ARCH2\Debug\test2.obj /DEBUG
 if not exist "bin\ARC H3\Debug" mkdir "bin\ARC H3\Debug"
 if not exist "intermediate\ARC H3\Debug" mkdir "intermediate\ARC H3\Debug"
-"cl" .\src\main.cpp .\src\test1.cpp   /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=3 /c
-"cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=3 /c
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.16.28610\bin\Hostx86\x86\cl" .\src\main.cpp .\src\test1.cpp   /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=3 /c
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.16.27023\bin\Hostx86\x86\cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=3 /c
 copy main.obj "intermediate\ARC H3\Debug"
 copy test1.obj "intermediate\ARC H3\Debug"
 copy test2.obj "intermediate\ARC H3\Debug"
 del *.obj
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\link" /out:"bin\InterestingSmallMakefile\ARC H3\Debug\main.exe" "intermediate\ARC H3\Debug\main.obj" "intermediate\ARC H3\Debug\test1.obj" "intermediate\ARC H3\Debug\test2.obj" /DEBUG
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\bin\Hostx86\x86\link" /out:"bin\InterestingSmallMakefile\ARC H3\Debug\main.exe" "intermediate\ARC H3\Debug\main.obj" "intermediate\ARC H3\Debug\test1.obj" "intermediate\ARC H3\Debug\test2.obj" /DEBUG
 "bin\ARCH1\Debug"\main.exe str1a str1b str1c
 bin\ARCH2\Debug\main  str2a str2b str2c
 "bin\InterestingSmallMakefile\ARC H3\Debug\main.exe"  str3a str3b str3c
@@ -142,7 +142,7 @@ LINK.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 # makefile (from `makefile', line 36)
 DIR_INTERMEDIATE = $(DIR_INTERMEDIATE_ROOT)\$(ARCH)\$(OPT)
 # environment
-PATH = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\HostX86\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\VCPackages;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Team Tools\Performance Tools;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\vs2019\;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\;C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86;C:\Program Files (x86)\Windows Kits\10\bin\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\\MSBuild\Current\Bin;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\;C:\Program Files\Microsoft MPI\Bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Git\cmd;C:\Program Files (x86)\CMake\bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\PuTTY\;C:\Program Files\PowerShell\6\;C:\Users\andris\AppData\Local\CloudBuild;C:\Program Files\Conan\conan;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin;c:\Program Files (x86)\Ninja;C:\Users\andris\AppData\Roaming\npm;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
+PATH = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\VCPackages;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Team Tools\Performance Tools;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\vs2019\;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\;C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86;C:\Program Files (x86)\Windows Kits\10\bin\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\\MSBuild\Current\Bin;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\;C:\Program Files\Microsoft MPI\Bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Git\cmd;C:\Program Files (x86)\CMake\bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\PuTTY\;C:\Program Files\PowerShell\6\;C:\Users\andris\AppData\Local\CloudBuild;C:\Program Files\Conan\conan;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin;c:\Program Files (x86)\Ninja;C:\Users\andris\AppData\Roaming\npm;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
 # default
 LD = ld
 # default
@@ -182,7 +182,7 @@ ComSpec = C:\WINDOWS\system32\cmd.exe
 # default
 YACC.y = $(YACC) $(YFLAGS)
 # environment
-VCToolsVersion = 14.24.28314
+VCToolsVersion = 14.25.28610
 # environment
 WindowsSDKLibVersion = 10.0.18362.0\
 # environment
@@ -248,7 +248,7 @@ WindowsSDKVersion = 10.0.18362.0\
 # environment
 VSCMD_VER = 16.4.5
 # environment
-INCLUDE = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\cppwinrt
+INCLUDE = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\cppwinrt
 # environment
 LOGONSERVER = \\ANDRIS
 # environment
@@ -264,7 +264,7 @@ MAKECMDGOALS := all
 # default
 AS = as
 # environment
-LIBPATH = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\ATLMFC\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\lib\x86\store\references;C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.18362.0;C:\Windows\Microsoft.NET\Framework\v4.0.30319;
+LIBPATH = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\ATLMFC\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\lib\x86\store\references;C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.18362.0;C:\Windows\Microsoft.NET\Framework\v4.0.30319;
 # default
 PREPROCESS.S = $(CC) -E $(CPPFLAGS)
 # environment
@@ -376,7 +376,7 @@ CXX = g++
 # default
 COFLAGS = 
 # environment
-LIB = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\ATLMFC\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\lib\x86;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\lib\um\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\ucrt\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x86;
+LIB = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\ATLMFC\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\lib\x86;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\lib\um\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\ucrt\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x86;
 # makefile (from `makefile', line 35)
 DIR_INTERMEDIATE_ROOT = intermediate
 # environment
@@ -400,7 +400,7 @@ PROCESSOR_REVISION = 8e0a
 # default
 COMPILE.s = $(AS) $(ASFLAGS) $(TARGET_MACH)
 # environment
-VCToolsInstallDir = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\
+VCToolsInstallDir = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\
 # environment
 NETFXSDKDir = C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\
 # default
@@ -444,7 +444,7 @@ USERDOMAIN_ROAMINGPROFILE = REDMOND
 # C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\VCPackages (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/VC/VCPackages, mtime 1581551751): 48 files, no impossibilities.
 # C:\Program Files\Microsoft MPI\Bin\ (key C:/Program Files/Microsoft MPI/Bin/, mtime 1571956710): 6 files, no impossibilities.
 # C:\Program Files\dotnet\ (key C:/Program Files/dotnet/, mtime 1581551587): 13 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\HostX86\x86 (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.24.28314/bin/HostX86/x86, mtime 1581552178): 59 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\bin\HostX86\x86 (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.25.28610/bin/HostX86/x86, mtime 1581552178): 59 files, no impossibilities.
 # .\src\SCCS: could not be stat'd.
 # C:\Program Files\PowerShell\6\ (key C:/Program Files/PowerShell/6/, mtime 1571778579): 419 files, no impossibilities.
 # C:\WINDOWS\System32\OpenSSH\: could not be stat'd.
@@ -788,7 +788,7 @@ Arch3_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 	copy test1.obj "$(DIR_INTERMEDIATE)"
 	copy test2.obj "$(DIR_INTERMEDIATE)"
 	del *.obj
-	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\link" /out:"$(DIR_BIN)\$(EXE_NAME)" "$(DIR_INTERMEDIATE)\main.obj" "$(DIR_INTERMEDIATE)\test1.obj" "$(DIR_INTERMEDIATE)\test2.obj" $(LINK_FLAGS)
+	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\bin\Hostx86\x86\link" /out:"$(DIR_BIN)\$(EXE_NAME)" "$(DIR_INTERMEDIATE)\main.obj" "$(DIR_INTERMEDIATE)\test1.obj" "$(DIR_INTERMEDIATE)\test2.obj" $(LINK_FLAGS)
 	
 
 all: clean create_dirs builds runs install
@@ -1543,8 +1543,8 @@ Arch2_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=16/65=25%
 #  commands to execute (from `makefile', line 57):
-	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl"  $(SRC_FILES1)  $(FLAGS1)
-	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl.exe"  $(SRC_FILES2)  $(FLAGS2)
+	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\bin\Hostx86\x86\cl"  $(SRC_FILES1)  $(FLAGS1)
+	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.25.28610\bin\Hostx86\x86\cl.exe"  $(SRC_FILES2)  $(FLAGS2)
 	copy main.obj $(DIR_INTERMEDIATE)
 	copy test1.obj $(DIR_INTERMEDIATE)
 	copy test2.obj $(DIR_INTERMEDIATE)

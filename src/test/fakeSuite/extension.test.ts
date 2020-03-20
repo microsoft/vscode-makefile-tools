@@ -29,6 +29,7 @@ import * as configuration from '../../configuration';
 import * as launch from '../../launch';
 import * as make from '../../make';
 import * as util from '../../util';
+import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
@@ -36,6 +37,14 @@ import * as vscode from 'vscode';
 suite('Fake dryrun parsing', /*async*/() => {
     // Interesting scenarios with string paths, corner cases in defining includes/defines,
     // complex configurations-targets-files associations.
+    // For now, this test needs to run in an environment with VS 2019.
+    // The output log varies depending on finding a particular VS toolset or not.
+    // We need to test the scenario of providing in the makefile a full path to the compiler,
+    // so there is no way around this. Using only compiler name and relying on path is not sufficient.
+    // Also, for the cases when a path (relative or full) is given to the compiler in the makefile,
+    // the parser will skip over the compiler command (see comment in parser.ts - parseLineAsTool),
+    // so again, we need to find the toolset that is referenced in the makefile.
+    // TODO: mock various scenarios of VS environments without depending on what is installed.
     // TODO: adapt the makefile on mac/linux/mingw and add new tests in this suite
     // to parse the dry-run logs obtained on those platforms.
     if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
@@ -81,12 +90,16 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
+            // Until then, print into base and diff files for easier viewing
+            // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
             let baselineLogPath: string = path.join(parsedPath.dir, "InterestingSmallMakefile_windows_baseline.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+            fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+            fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }
@@ -133,12 +146,16 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
+            // Until then, print into base and diff files for easier viewing
+            // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
             let baselineLogPath: string = path.join(parsedPath.dir, "8cc_linux_baseline.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+            fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+            fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }
@@ -183,12 +200,16 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
+            // Until then, print into base and diff files for easier viewing
+            // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
             let baselineLogPath: string = path.join(parsedPath.dir, "Fido_linux_baseline.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+            fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+            fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }
@@ -233,12 +254,16 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
+            // Until then, print into base and diff files for easier viewing
+            // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
             let baselineLogPath: string = path.join(parsedPath.dir, "Fido_baselineLinux.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+            fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+            fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }
