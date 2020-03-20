@@ -178,7 +178,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             // Clear the extension log from the previous test,
             // since the extension clears it only in the beginning of activation.
             fs.unlinkSync(extensionLogPath);
-            
+
             configuration.startListeningToSettingsChanged();
 
         // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
@@ -240,7 +240,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             // Clear the extension log from the previous test,
             // since the extension clears it only in the beginning of activation.
             fs.unlinkSync(extensionLogPath);
-            
+
            configuration.startListeningToSettingsChanged();
 
         // As long as all the 'fake sources/makefile' tests share the same make_configurations.json,
