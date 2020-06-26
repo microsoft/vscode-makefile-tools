@@ -1,0 +1,2313 @@
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o main.o main.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o cpp.o cpp.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o debug.o debug.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o dict.o dict.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o gen.o gen.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o lex.o lex.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o vector.o vector.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o parse.o parse.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o buffer.o buffer.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o map.o map.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o error.o error.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o path.o path.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o file.o file.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o set.o set.c
+cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o encoding.o encoding.c
+cc -o 8cc main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o 
+# GNU Make 4.2.1
+# Built for x86_64-pc-msys
+# Copyright (C) 1988-2016 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Fri Mar 20 09:18:15 2020
+
+# Variables
+
+# 'override' directive
+GNUMAKEFLAGS := 
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# default
+.SHELLFLAGS := -c
+# makefile
+MAKEFLAGS = Bknp
+# default
+F77FLAGS = $(FFLAGS)
+# default
+CWEAVE = cweave
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# environment
+!:: = ::\
+# environment
+LOGINSHELL = bash
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+HOMEDRIVE = C:
+# automatic
+@F = $(notdir $@)
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# makefile
+CURDIR := /c/git/8cc
+# makefile
+SHELL = /bin/sh
+# environment
+CONFIG_SITE = /mingw32/etc/config.site
+# default
+CO = co
+# environment
+ProgramFiles(x86) = C:\Program Files (x86)
+# environment
+WINDIR = C:\Windows
+# environment
+TZ = America/Los_Angeles
+# environment
+_ = /usr/bin/make
+# default
+PREPROCESS.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -F
+# default
+LINK.m = $(OBJC) $(OBJCFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)
+# default
+OUTPUT_OPTION = -o $@
+# default
+COMPILE.cpp = $(COMPILE.cc)
+# environment
+CLIENTNAME = ANDRIS
+# makefile (from 'Makefile', line 5)
+ECC = ./8cc
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+# makefile (from 'Makefile', line 1)
+MAKEFILE_LIST :=  Makefile
+# environment
+FPS_BROWSER_USER_PROFILE_STRING = Default
+# environment
+USERNAME = andris
+# default
+LINK.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+CC = cc
+# environment
+CommonProgramFiles(x86) = C:\Program Files (x86)\Common Files
+# makefile (from 'Makefile', line 2)
+OBJS = cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o
+# environment
+INFOPATH = /usr/local/info:/usr/share/info:/usr/info:/share/info
+# makefile (from 'Makefile', line 4)
+TESTS := test/includeguard.bin test/union.bin test/array.bin test/funcargs.bin test/varargs.bin test/initializer.bin test/lex.bin test/enum.bin test/int.bin test/number.bin test/import.bin test/usualconv.bin test/global.bin test/constexpr.bin test/struct.bin test/sizeof.bin test/function.bin test/extern.bin test/control.bin test/conversion.bin test/iso646.bin test/staticassert.bin test/comp.bin test/float.bin test/macro.bin test/pointer.bin test/builtin.bin test/type.bin test/generic.bin test/cast.bin test/bitop.bin test/align.bin test/scope.bin test/literal.bin test/oldstyle.bin test/noreturn.bin test/arith.bin test/assign.bin test/typeof.bin test/decl.bin test/stmtexpr.bin test/line.bin
+# default
+CHECKOUT,v = +$(if $(wildcard $@),,$(CO) $(COFLAGS) $< $@)
+# environment
+MSYSTEM_CHOST = i686-w64-mingw32
+# environment
+tmp = C:\Users\andris\AppData\Local\Temp
+# default
+LEX.m = $(LEX) $(LFLAGS) -t
+# default
+CPP = $(CC) -E
+# default
+LINK.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+MAKE_HOST := x86_64-pc-msys
+# environment
+PATH = /mingw32/bin:/usr/local/bin:/usr/bin:/bin:/c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+# default
+LD = ld
+# default
+TEXI2DVI = texi2dvi
+# default
+YACC = yacc
+# default
+COMPILE.mod = $(M2C) $(M2FLAGS) $(MODFLAGS) $(TARGET_ARCH)
+# 'override' directive (from 'Makefile', line 6)
+CFLAGS = -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"$(shell pwd)"'
+# environment
+PROCESSOR_ARCHITECTURE = AMD64
+# default
+LINK.r = $(FC) $(FFLAGS) $(RFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+USERPROFILE = C:\Users\andris
+# default
+LINT = lint
+# default
+COMPILE.f = $(FC) $(FFLAGS) $(TARGET_ARCH) -c
+# environment
+MSYSTEM_CARCH = i686
+# default
+LINT.c = $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
+# default
+YACC.m = $(YACC) $(YFLAGS)
+# environment
+!C: = C:\msys64
+# environment
+ALLUSERSPROFILE = C:\ProgramData
+# default
+YACC.y = $(YACC) $(YFLAGS)
+# default
+AR = ar
+# environment
+MSYSTEM_PREFIX = /mingw32
+# environment
+NUMBER_OF_PROCESSORS = 4
+# environment
+ORIGINAL_TEMP = /c/Users/andris/AppData/Local/Temp
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
+# default
+TANGLE = tangle
+# environment
+ProgramW6432 = C:\Program Files
+# default
+GET = get
+# automatic
+%F = $(notdir $%)
+# default
+MAKEFILES := 
+# default
+COMPILE.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+CTANGLE = ctangle
+# default
+.LIBPATTERNS = lib%.dll.a %.dll.a lib%.a %.lib lib%.dll %.dll
+# environment
+ORIGINAL_PATH = /c/Windows/System32:/c/Windows:/c/Windows/System32/Wbem:/c/Windows/System32/WindowsPowerShell/v1.0/
+# environment
+COMPUTERNAME = azandris-win
+# default
+LINK.C = $(LINK.cc)
+# environment
+WD = C:\msys64\usr\bin\
+# environment
+PROGRAMFILES = C:\Program Files
+# default
+.LOADED := 
+# default
+LINK.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# environment
+USERDNSDOMAIN = REDMOND.CORP.MICROSOFT.COM
+# default
+PREPROCESS.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -F
+# environment
+PKG_CONFIG_PATH = /mingw32/lib/pkgconfig:/mingw32/share/pkgconfig
+# default
+LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+PUBLIC = C:\Users\Public
+# environment
+MANPATH = /mingw32/local/man:/mingw32/share/man:/usr/local/man:/usr/share/man:/usr/man:/share/man
+# default
+LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# environment
+HOME = /home/andris
+# environment
+CommonProgramW6432 = C:\Program Files\Common Files
+# environment
+ProgramData = C:\ProgramData
+# environment
+PRINTER = OneNote
+# environment
+COMMONPROGRAMFILES = C:\Program Files\Common Files
+# environment
+LOGONSERVER = \\CY1-RED-DC-19
+# environment
+MSYSCON = mintty.exe
+# environment
+USERDOMAIN = REDMOND
+# environment
+HOSTNAME = azandris-win
+# environment
+MAKELEVEL := 0
+# default
+COMPILE.m = $(OBJC) $(OBJCFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+MAKE = $(MAKE_COMMAND)
+# environment
+SHLVL = 1
+# default
+AS = as
+# environment
+ACLOCAL_PATH = /mingw32/share/aclocal:/usr/share/aclocal
+# default
+PREPROCESS.S = $(CC) -E $(CPPFLAGS)
+# default
+COMPILE.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# default
+MAKE_VERSION := 4.2.1
+# environment
+USER = andris
+# default
+FC = f77
+# environment
+MINGW_CHOST = i686-w64-mingw32
+# makefile
+.DEFAULT_GOAL := 8cc
+# environment
+OneDrive = C:\Users\andris\OneDrive
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+DriverData = C:\Windows\System32\Drivers\DriverData
+# environment
+LOCALAPPDATA = C:\Users\andris\AppData\Local
+# default
+ARFLAGS = rv
+# default
+WEAVE = weave
+# default
+MAKE_COMMAND := make
+# default
+LINK.cpp = $(LINK.cc)
+# default
+F77 = $(FC)
+# environment
+OLDPWD = /home/andris
+# default
+.VARIABLES := 
+# default
+PC = pc
+# automatic
+*F = $(notdir $*)
+# environment
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 79 Stepping 1, GenuineIntel
+# environment
+OS = Windows_NT
+# default
+COMPILE.def = $(M2C) $(M2FLAGS) $(DEFFLAGS) $(TARGET_ARCH)
+# default
+LEX = lex
+# default
+RM = rm -f
+# environment
+HOMEPATH = \Users\andris
+# environment
+PROMPT = $P$G
+# environment
+MFLAGS = -Bknp
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+ORIGINAL_TMP = /c/Users/andris/AppData/Local/Temp
+# default
+LEX.l = $(LEX) $(LFLAGS) -t
+# environment
+PSModulePath = C:\Program Files\WindowsPowerShell\Modules;C:\Windows\system32\WindowsPowerShell\v1.0\Modules;C:\Program Files (x86)\Microsoft Azure Information Protection\Powershell;C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\
+# environment
+SYSTEMROOT = C:\Windows
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+MINGW_PREFIX = /mingw32
+# automatic
++F = $(notdir $+)
+# default
+M2C = m2c
+# environment
+APPDATA = C:\Users\andris\AppData\Roaming
+# environment
+TEMP = /tmp
+# environment
+COMSPEC = C:\Windows\system32\cmd.exe
+# environment
+MSYSTEM = MINGW32
+# environment
+CONTITLE = MinGW x32
+# default
+COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# automatic
+<F = $(notdir $<)
+# environment
+PS1 = \[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[35m\]$MSYSTEM\[\e[0m\] \[\e[33m\]\w\[\e[0m\]\n\$ 
+# default
+CXX = g++
+# environment
+temp = C:\Users\andris\AppData\Local\Temp
+# default
+COFLAGS = 
+# environment
+PWD = /c/git/8cc
+# environment
+UATDATA = C:\Windows\CCM\UATData\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77
+# default
+COMPILE.C = $(COMPILE.cc)
+# automatic
+^F = $(notdir $^)
+# default
+COMPILE.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(TARGET_MACH) -c
+# default
+LINK.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# default
+SUFFIXES := .out .a .ln .o .c .cc .C .cpp .p .f .F .m .r .y .l .ym .yl .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+# environment
+SYSTEMDRIVE = C:
+# default
+COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# environment
+SESSIONNAME = RDP-Tcp#89
+# environment
+PROCESSOR_REVISION = 4f01
+# default
+COMPILE.s = $(AS) $(ASFLAGS) $(TARGET_MACH)
+# default
+.INCLUDE_DIRS = /usr/include /usr/include
+# environment
+TMP = /tmp
+# default
+COMPILE.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -c
+# default
+.RECIPEPREFIX := 
+# default
+MAKEINFO = makeinfo
+# default
+MAKE_TERMERR := /dev/pty0
+# default
+OBJC = cc
+# default
+TEX = tex
+# environment
+LANG = en_US.UTF-8
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+TERM = xterm
+# environment
+FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
+# default
+LINK.f = $(FC) $(FFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+MINGW_PACKAGE_PREFIX = mingw-w64-i686
+# environment
+USERDOMAIN_ROAMINGPROFILE = REDMOND
+# variable set hash-table stats:
+# Load=180/1024=18%, Rehash=0, Collisions=68/396=17%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# SCCS: could not be stat'd.
+# . (device 452300810, inode 2251799813715114): 46 files, 83 impossibilities.
+# test (device 452300810, inode 844424930834330): 59 files, no impossibilities.
+# RCS: could not be stat'd.
+
+# 105 files, 83 impossibilities in 4 directories.
+
+# Implicit Rules
+
+test/%.o: test/%.c 8cc
+#  recipe to execute (from 'Makefile', line 17):
+	$(ECC) -w -o $@ -c $<
+
+test/%.bin: test/%.o test/testmain.o
+#  recipe to execute (from 'Makefile', line 20):
+	cc -o $@ $< test/testmain.o $(LDFLAGS)
+
+%.out:
+
+%.a:
+
+%.ln:
+
+%.o:
+
+%: %.o
+#  recipe to execute (built-in):
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.c:
+
+%: %.c
+#  recipe to execute (built-in):
+	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.ln: %.c
+#  recipe to execute (built-in):
+	$(LINT.c) -C$* $<
+
+%.o: %.c
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+%.cc:
+
+%: %.cc
+#  recipe to execute (built-in):
+	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.cc
+#  recipe to execute (built-in):
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+
+%.C:
+
+%: %.C
+#  recipe to execute (built-in):
+	$(LINK.C) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.C
+#  recipe to execute (built-in):
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+
+%.cpp:
+
+%: %.cpp
+#  recipe to execute (built-in):
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.cpp
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+%.p:
+
+%: %.p
+#  recipe to execute (built-in):
+	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.p
+#  recipe to execute (built-in):
+	$(COMPILE.p) $(OUTPUT_OPTION) $<
+
+%.f:
+
+%: %.f
+#  recipe to execute (built-in):
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.f
+#  recipe to execute (built-in):
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+%.F:
+
+%: %.F
+#  recipe to execute (built-in):
+	$(LINK.F) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.F
+#  recipe to execute (built-in):
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+
+%.f: %.F
+#  recipe to execute (built-in):
+	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
+
+%.m:
+
+%: %.m
+#  recipe to execute (built-in):
+	$(LINK.m) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.m
+#  recipe to execute (built-in):
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+%.r:
+
+%: %.r
+#  recipe to execute (built-in):
+	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.r
+#  recipe to execute (built-in):
+	$(COMPILE.r) $(OUTPUT_OPTION) $<
+
+%.f: %.r
+#  recipe to execute (built-in):
+	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
+
+%.y:
+
+%.ln: %.y
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 $(LINT.c) -C$* y.tab.c 
+	 $(RM) y.tab.c
+
+%.c: %.y
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 mv -f y.tab.c $@
+
+%.l:
+
+%.ln: %.l
+#  recipe to execute (built-in):
+	@$(RM) $*.c
+	 $(LEX.l) $< > $*.c
+	$(LINT.c) -i $*.c -o $@
+	 $(RM) $*.c
+
+%.c: %.l
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.l) $< > $@
+
+%.r: %.l
+#  recipe to execute (built-in):
+	$(LEX.l) $< > $@ 
+	 mv -f lex.yy.r $@
+
+%.ym:
+
+%.m: %.ym
+#  recipe to execute (built-in):
+	$(YACC.m) $< 
+	 mv -f y.tab.c $@
+
+%.yl:
+
+%.s:
+
+%: %.s
+#  recipe to execute (built-in):
+	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.s
+#  recipe to execute (built-in):
+	$(COMPILE.s) -o $@ $<
+
+%.S:
+
+%: %.S
+#  recipe to execute (built-in):
+	$(LINK.S) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+%.o: %.S
+#  recipe to execute (built-in):
+	$(COMPILE.S) -o $@ $<
+
+%.s: %.S
+#  recipe to execute (built-in):
+	$(PREPROCESS.S) $< > $@
+
+%.mod:
+
+%: %.mod
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ -e $@ $^
+
+%.o: %.mod
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ $<
+
+%.sym:
+
+%.def:
+
+%.sym: %.def
+#  recipe to execute (built-in):
+	$(COMPILE.def) -o $@ $<
+
+%.h:
+
+%.info:
+
+%.dvi:
+
+%.tex:
+
+%.dvi: %.tex
+#  recipe to execute (built-in):
+	$(TEX) $<
+
+%.texinfo:
+
+%.info: %.texinfo
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.texinfo
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.texi:
+
+%.info: %.texi
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.texi
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.txinfo:
+
+%.info: %.txinfo
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+%.dvi: %.txinfo
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+%.w:
+
+%.c: %.w
+#  recipe to execute (built-in):
+	$(CTANGLE) $< - $@
+
+%.tex: %.w
+#  recipe to execute (built-in):
+	$(CWEAVE) $< - $@
+
+%.ch:
+
+%.web:
+
+%.p: %.web
+#  recipe to execute (built-in):
+	$(TANGLE) $<
+
+%.tex: %.web
+#  recipe to execute (built-in):
+	$(WEAVE) $<
+
+%.sh:
+
+%: %.sh
+#  recipe to execute (built-in):
+	cat $< >$@ 
+	 chmod a+x $@
+
+%.elc:
+
+%.el:
+
+(%): %
+#  recipe to execute (built-in):
+	$(AR) $(ARFLAGS) $@ $<
+
+%.out: %
+#  recipe to execute (built-in):
+	@rm -f $@ 
+	 cp $< $@
+
+%.c: %.w %.ch
+#  recipe to execute (built-in):
+	$(CTANGLE) $^ $@
+
+%.tex: %.w %.ch
+#  recipe to execute (built-in):
+	$(CWEAVE) $^ $@
+
+%:: %,v
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: RCS/%,v
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: RCS/%
+#  recipe to execute (built-in):
+	$(CHECKOUT,v)
+
+%:: s.%
+#  recipe to execute (built-in):
+	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+
+%:: SCCS/s.%
+#  recipe to execute (built-in):
+	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
+
+# 94 implicit rules, 5 (5.3%) terminal.
+
+# Files
+
+# Not a target:
+.web.p:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TANGLE) $<
+
+# Not a target:
+test/function.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/control.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# 'override' directive
+path.o: .SHELLSTATUS := 0
+path.o: path.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'path'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := path.o
+# automatic
+# % := 
+# automatic
+# * := path
+# automatic
+# + := path.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := path.c
+# automatic
+# ^ := path.c 8cc.h keyword.inc
+# automatic
+# ? := path.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+test/initializer.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.l.r:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LEX.l) $< > $@ 
+	 mv -f lex.yy.r $@
+
+# Not a target:
+.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+lex.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8811215
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.ym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.f.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.f) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.l:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.m) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+cleanobj:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 70):
+	rm -f *.o *.s test/*.o test/*.bin utiltest
+
+# Not a target:
+test/extern.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/sizeof.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.y:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.def.sym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.def) -o $@ $<
+
+# Not a target:
+test/lex.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+.PHONY: clean cleanobj test runtests fulltest self all
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/array.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/struct.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+keyword.inc:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8811215
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+test/decl.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.p.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.p) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.p:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.txinfo.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# Not a target:
+test/float.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+main.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8811215
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.a:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# 'override' directive
+parse.o: .SHELLSTATUS := 0
+parse.o: parse.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'parse'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := parse.o
+# automatic
+# % := 
+# automatic
+# * := parse
+# automatic
+# + := parse.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := parse.c
+# automatic
+# ^ := parse.c 8cc.h keyword.inc
+# automatic
+# ? := parse.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.yl:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.l.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $*.c
+	 $(LEX.l) $< > $*.c
+	$(LINT.c) -i $*.c -o $@
+	 $(RM) $*.c
+
+# Not a target:
+.F.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.texi.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# Not a target:
+.w.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(CTANGLE) $< - $@
+
+# Not a target:
+.texi.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# Not a target:
+.ch:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/conversion.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.m.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.m) $(OUTPUT_OPTION) $<
+
+# Not a target:
+test/literal.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.cc:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.cc.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+
+# Not a target:
+test/generic.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/noreturn.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.def:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.SUFFIXES: .out .a .ln .o .c .cc .C .cpp .p .f .F .m .r .y .l .ym .yl .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.c.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.r.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.r) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.r:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+test/iso646.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+8cc: 8cc.h main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := 8cc
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := 8cc.h main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o
+# automatic
+# | := 
+# automatic
+# < := 8cc.h
+# automatic
+# ^ := 8cc.h main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o
+# automatic
+# ? := 8cc.h main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/194=1%
+#  recipe to execute (from 'Makefile', line 9):
+	cc -o $@ main.o $(OBJS) $(LDFLAGS)
+
+# 'override' directive
+cpp.o: .SHELLSTATUS := 0
+cpp.o: cpp.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'cpp'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := cpp.o
+# automatic
+# % := 
+# automatic
+# * := cpp
+# automatic
+# + := cpp.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := cpp.c
+# automatic
+# ^ := cpp.c 8cc.h keyword.inc
+# automatic
+# ? := cpp.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# 'override' directive
+debug.o: .SHELLSTATUS := 0
+debug.o: debug.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'debug'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := debug.o
+# automatic
+# % := 
+# automatic
+# * := debug
+# automatic
+# + := debug.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := debug.c
+# automatic
+# ^ := debug.c 8cc.h keyword.inc
+# automatic
+# ? := debug.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+test/import.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+test: 8cc test/includeguard.bin test/union.bin test/array.bin test/funcargs.bin test/varargs.bin test/initializer.bin test/lex.bin test/enum.bin test/int.bin test/number.bin test/import.bin test/usualconv.bin test/global.bin test/constexpr.bin test/struct.bin test/sizeof.bin test/function.bin test/extern.bin test/control.bin test/conversion.bin test/iso646.bin test/staticassert.bin test/comp.bin test/float.bin test/macro.bin test/pointer.bin test/builtin.bin test/type.bin test/generic.bin test/cast.bin test/bitop.bin test/align.bin test/scope.bin test/literal.bin test/oldstyle.bin test/noreturn.bin test/arith.bin test/assign.bin test/typeof.bin test/decl.bin test/stmtexpr.bin test/line.bin
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 26):
+	$(MAKE) CC=$(ECC) CFLAGS= utiltest
+	./utiltest
+	./test/ast.sh
+	./test/negative.py
+	$(MAKE) runtests
+
+# 'override' directive
+gen.o: .SHELLSTATUS := 0
+gen.o: gen.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'gen'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := gen.o
+# automatic
+# % := 
+# automatic
+# * := gen
+# automatic
+# + := gen.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := gen.c
+# automatic
+# ^ := gen.c 8cc.h keyword.inc
+# automatic
+# ? := gen.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.ym.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.m) $< 
+	 mv -f y.tab.c $@
+
+# Not a target:
+.y.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 $(LINT.c) -C$* y.tab.c 
+	 $(RM) y.tab.c
+
+testtest:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 54):
+	$(MAKE) clean
+	$(MAKE) $(TESTS)
+	$(MAKE) runtests
+
+# Not a target:
+test/scope.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.elc:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.l.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.l) $< > $@
+
+# 'override' directive
+error.o: .SHELLSTATUS := 0
+error.o: error.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'error'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := error.o
+# automatic
+# % := 
+# automatic
+# * := error
+# automatic
+# + := error.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := error.c
+# automatic
+# ^ := error.c 8cc.h keyword.inc
+# automatic
+# ? := error.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+gen.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8811215
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+test/enum.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.out:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+stage3: stage2
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 48):
+	$(MAKE) cleanobj
+	$(MAKE) CC=./stage2 ECC=./stage2 CFLAGS= 8cc
+	mv 8cc stage3
+
+all: 8cc
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+# 'override' directive
+map.o: .SHELLSTATUS := 0
+map.o: map.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'map'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := map.o
+# automatic
+# % := 
+# automatic
+# * := map
+# automatic
+# + := map.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := map.c
+# automatic
+# ^ := map.c 8cc.h keyword.inc
+# automatic
+# ? := map.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+test/includeguard.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/usualconv.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.C:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.C) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+test/bitop.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.r.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.S:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.S) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+self: 8cc cleanobj
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 23):
+	$(MAKE) CC=$(ECC) CFLAGS= 8cc
+
+# Not a target:
+.texinfo.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# Not a target:
+.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.w.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(CWEAVE) $< - $@
+
+# Not a target:
+.c.ln:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINT.c) -C$* $<
+
+# Not a target:
+.s.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.s) -o $@ $<
+
+# Not a target:
+.s:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# 'override' directive
+dict.o: .SHELLSTATUS := 0
+dict.o: dict.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'dict'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := dict.o
+# automatic
+# % := 
+# automatic
+# * := dict
+# automatic
+# + := dict.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := dict.c
+# automatic
+# ^ := dict.c 8cc.h keyword.inc
+# automatic
+# ? := dict.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# 'override' directive
+file.o: .SHELLSTATUS := 0
+file.o: file.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'file'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := file.o
+# automatic
+# % := 
+# automatic
+# * := file
+# automatic
+# + := file.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := file.c
+# automatic
+# ^ := file.c 8cc.h keyword.inc
+# automatic
+# ? := file.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+runtests:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 33):
+	@for test in $(TESTS); do  \
+	    ./$$test || exit;      \
+	done
+
+# 'override' directive
+encoding.o: .SHELLSTATUS := 0
+encoding.o: encoding.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'encoding'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := encoding.o
+# automatic
+# % := 
+# automatic
+# * := encoding
+# automatic
+# + := encoding.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := encoding.c
+# automatic
+# ^ := encoding.c 8cc.h keyword.inc
+# automatic
+# ? := encoding.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+parse.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8811215
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.texinfo.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
+
+# Not a target:
+.el:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.lm.m:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	@$(RM) $@ 
+	 $(LEX.m) $< > $@
+
+# 'override' directive
+set.o: .SHELLSTATUS := 0
+set.o: set.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'set'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := set.o
+# automatic
+# % := 
+# automatic
+# * := set
+# automatic
+# + := set.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := set.c
+# automatic
+# ^ := set.c 8cc.h keyword.inc
+# automatic
+# ? := set.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.y.c:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(YACC.y) $< 
+	 mv -f y.tab.c $@
+
+# 'override' directive
+vector.o: .SHELLSTATUS := 0
+vector.o: vector.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'vector'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := vector.o
+# automatic
+# % := 
+# automatic
+# * := vector
+# automatic
+# + := vector.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := vector.c
+# automatic
+# ^ := vector.c 8cc.h keyword.inc
+# automatic
+# ? := vector.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+test/oldstyle.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.web.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(WEAVE) $<
+
+# Not a target:
+.texinfo:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.h:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/arith.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+stage1:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 38):
+	$(MAKE) cleanobj
+	[ -f 8cc ] || $(MAKE) 8cc
+	mv 8cc stage1
+
+# Not a target:
+test/cast.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+buffer.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+set.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8811215
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+cpp.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+debug.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.tex.dvi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(TEX) $<
+
+# Not a target:
+.cpp.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.cpp:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+clean: cleanobj
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 67):
+	rm -f 8cc stage?
+
+# Not a target:
+.C.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+
+# Not a target:
+.texi:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/varargs.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.txinfo:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.tex:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/align.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/int.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+error.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.txinfo.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
+
+# 'override' directive
+lex.o: .SHELLSTATUS := 0
+lex.o: lex.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'lex'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := lex.o
+# automatic
+# % := 
+# automatic
+# * := lex
+# automatic
+# + := lex.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := lex.c
+# automatic
+# ^ := lex.c 8cc.h keyword.inc
+# automatic
+# ? := lex.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# 'override' directive
+buffer.o: .SHELLSTATUS := 0
+buffer.o: buffer.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'buffer'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := buffer.o
+# automatic
+# % := 
+# automatic
+# * := buffer
+# automatic
+# + := buffer.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := buffer.c
+# automatic
+# ^ := buffer.c 8cc.h keyword.inc
+# automatic
+# ? := buffer.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+map.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8811215
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+test/pointer.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.sh:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	cat $< >$@ 
+	 chmod a+x $@
+
+# Not a target:
+test/typeof.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/stmtexpr.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+encoding.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+stage2: stage1
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 43):
+	$(MAKE) cleanobj
+	$(MAKE) CC=./stage1 ECC=./stage1 CFLAGS= 8cc
+	mv 8cc stage2
+
+# Not a target:
+8cc.h:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+file.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+test/number.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# 'override' directive
+main.o: .SHELLSTATUS := 0
+main.o: main.c 8cc.h keyword.inc
+#  Implicit rule search has been done.
+#  Implicit/static pattern stem: 'main'
+#  Last modified 2514-05-29 18:53:03.107374182
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := main.o
+# automatic
+# % := 
+# automatic
+# * := main
+# automatic
+# + := main.c 8cc.h keyword.inc
+# automatic
+# | := 
+# automatic
+# < := main.c
+# automatic
+# ^ := main.c 8cc.h keyword.inc
+# automatic
+# ? := main.c 8cc.h keyword.inc
+# variable set hash-table stats:
+# Load=9/32=28%, Rehash=0, Collisions=4/23=17%
+#  recipe to execute (built-in):
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+# Not a target:
+dict.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8654972
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+.S.s:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.S) $< > $@
+
+# Not a target:
+.mod:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ -e $@ $^
+
+utiltest.o: 8cc.h keyword.inc
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+utiltest: 8cc.h utiltest.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 14):
+	cc -o $@ utiltest.o $(OBJS) $(LDFLAGS)
+
+# Not a target:
+.mod.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.mod) -o $@ $<
+
+# Not a target:
+test/staticassert.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.F.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
+
+# Not a target:
+test/type.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/macro.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.w:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/assign.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.S.o:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(COMPILE.S) -o $@ $<
+
+# Not a target:
+vector.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.9280042
+#  File has been updated.
+#  Successfully updated.
+
+fulltest: testtest
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 59):
+	$(MAKE) stage1
+	$(MAKE) CC=./stage1 ECC=./stage1 CFLAGS= test
+	$(MAKE) stage2
+	$(MAKE) CC=./stage2 ECC=./stage2 CFLAGS= test
+	$(MAKE) stage3
+	cmp stage2 stage3
+
+# Not a target:
+test/builtin.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/line.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.F:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.F) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+test/constexpr.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.web:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.sym:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/union.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/comp.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+test/funcargs.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+.f:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (built-in):
+	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
+
+# Not a target:
+.info:
+#  Builtin rule
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+path.c:
+#  Implicit rule search has been done.
+#  Last modified 2020-02-20 03:35:36.8811215
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+test/global.bin:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# files hash-table stats:
+# Load=162/1024=16%, Rehash=0, Collisions=768/2283=34%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 2 (1) / strings = 881 / storage = 10264 B / avg = 11 B
+# current buf: size = 8162 B / used = 2104 B / count = 187 / avg = 11 B
+# other used: total = 8160 B / count = 694 / avg = 11 B
+# other free: total = 2 B / max = 2 B / min = 2 B / avg = 2 B
+
+# strcache performance: lookups = 1393 / hit rate = 36%
+# hash-table stats:
+# Load=881/8192=11%, Rehash=0, Collisions=260/1393=19%
+# Finished Make data base on Fri Mar 20 09:18:15 2020
+

@@ -1,27 +1,194 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
+// Makefile Tools extension
+
+import * as configuration from './configuration';
+import * as cpptools from './cpptools';
+import * as launch from './launch';
+import * as fs from 'fs';
+import * as logger from './logger';
+import * as make from './make';
+import * as parser from './parser';
+import * as ui from './ui';
+import * as util from './util';
 import * as vscode from 'vscode';
+import * as cpp from 'vscode-cpptools';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+let statusBar: ui.UI = ui.getUI();
+let launcher: launch.Launcher = launch.getLauncher();
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-		console.log('Congratulations, your extension "vscode-makefile-tools" is now active!');
+export let extension: MakefileToolsExtension | null = null;
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
+export class MakefileToolsExtension {
+    private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
+    private cppToolsAPI?: cpp.CppToolsApi;
+    private cppConfigurationProviderRegister?: Promise<void>;
+    private compilerFullPath ?: string;
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello VSCode!');
-	});
+    public constructor(public readonly extensionContext: vscode.ExtensionContext) {
+    }
 
-	context.subscriptions.push(disposable);
+    // Parse the dry-run output and populate data for cpptools
+    public constructIntellisense(dryRunOutputStr: string): void {
+        parser.parseForCppToolsCustomConfigProvider(dryRunOutputStr);
+    }
+
+    public emptyCustomConfigurationProvider() : void {
+        this.cppConfigurationProvider.empty();
+    }
+
+    public dispose(): void {
+        if (this.cppToolsAPI) {
+            this.cppToolsAPI.dispose();
+        }
+    }
+
+    // Register this extension as a new provider or request an update
+    public async registerCppToolsProvider(): Promise<void> {
+        this.cppConfigurationProvider.logConfigurationProvider();
+        await this.ensureCppToolsProviderRegistered();
+
+        if (this.cppToolsAPI) {
+            if (this.cppToolsAPI.notifyReady) {
+                this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
+            } else {
+                this.cppToolsAPI.didChangeCustomConfiguration(this.cppConfigurationProvider);
+            }
+        }
+    }
+
+    public ensureCppToolsProviderRegistered(): Promise<void> {
+        // make sure this extension is registered as provider only once
+        if (!this.cppConfigurationProviderRegister) {
+            this.cppConfigurationProviderRegister = this.registerCppTools();
+        }
+
+        return this.cppConfigurationProviderRegister;
+    }
+
+    public async registerCppTools(): Promise<void> {
+        if (!this.cppToolsAPI) {
+            this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v2);
+        }
+
+        if (this.cppToolsAPI) {
+            this.cppToolsAPI.registerCustomConfigurationProvider(this.cppConfigurationProvider);
+        }
+    }
+
+    public buildCustomConfigurationProvider(
+        defines: string[],
+        includePath: string[],
+        forcedInclude: string[],
+        standard: util.StandardVersion,
+        intelliSenseMode: util.IntelliSenseMode,
+        compilerPath: string,
+        filesPaths: string[],
+        windowsSdkVersion?: string
+    ): void {
+        this.compilerFullPath = compilerPath;
+        this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard, intelliSenseMode, compilerPath, filesPaths, windowsSdkVersion);
+    }
+
+    public getCompilerFullPath() : string | undefined { return this.compilerFullPath; }
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+// A change of target or configuration triggered a new dry-run,
+// which produced a new output string to be parsed
+export async function updateProvider(dryRunOutputStr: string): Promise<void> {
+    logger.message("Updating the CppTools IntelliSense Configuration Provider.");
+    if (extension) {
+        extension.emptyCustomConfigurationProvider();
+        extension.constructIntellisense(dryRunOutputStr);
+        extension.registerCppToolsProvider();
+    }
+}
+
+export async function activate(context: vscode.ExtensionContext): Promise<void> {
+    vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is now active');
+
+    statusBar = ui.getUI();
+    extension = new MakefileToolsExtension(context);
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setBuildConfiguration', () => {
+        configuration.setNewConfiguration();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setBuildTarget', () => {
+        configuration.setNewTarget();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.buildTarget', () => {
+        let config : string | undefined = configuration.getCurrentMakeConfiguration();
+        let target : string | undefined = configuration.getCurrentTarget();
+        let configAndTarget : string = '"' + config;
+
+        if (target) {
+            target = target.trimLeft();
+            if (target !== "") {
+                configAndTarget += "/" + target;
+            }
+        }
+
+        configAndTarget += '"';
+        vscode.window.showInformationMessage('Building current makefile configuration ' + configAndTarget);
+        make.buildCurrentTarget();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setLaunchConfiguration', () => {
+        configuration.setNewLaunchConfiguration();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchDebug', () => {
+        launcher.debugCurrentTarget();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchRun', () => {
+        launcher.runCurrentTarget();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetPath', () => {
+        return launcher.launchTargetPath();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchCurrentDir', () => {
+        return launcher.launchCurrentDir();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetArgs', () => {
+        return launcher.launchTargetArgs();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetArgsConcat', () => {
+        return launcher.launchTargetArgsConcat();
+    }));
+
+    configuration.readLoggingLevel();
+    configuration.readExtensionLog();
+
+    // Delete the extension log file, if exists
+    let extensionLog : string | undefined = configuration.getExtensionLog();
+    if (extensionLog) {
+        fs.unlinkSync(extensionLog);
+    }
+
+    // Read configuration info from settings
+    configuration.initFromSettings();
+
+    // Generate the dry-run output used for parsing the info to be sent to CppTools
+    make.parseBuildOrDryRun();
+}
+
+export async function deactivate(): Promise<void> {
+    vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is de-activated');
+
+    const items : any = [
+        extension,
+        launcher,
+        statusBar
+    ];
+
+    for (const item of items) {
+        if (item) {
+            item.dispose();
+        }
+    }
+}

@@ -1,0 +1,307 @@
+Setting configuration - Fido_mingw
+Found build log path setting "./Fido_mingw_dryrun.log" defined for configuration "Fido_mingw
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\Fido_mingw_dryrun.log"
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\Fido_mingw_dryrun.log" for IntelliSense integration with CppTools...
+Updating the CppTools IntelliSense Configuration Provider.
+Parsing dry-run output for CppTools Custom Configuration Provider.
+Sending Workspace Browse Configuration: -----------------------------------
+    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Simulator
+    Standard: c++11
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+----------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Adadelta.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Backpropagation.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\FidoControlSystem.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\GeneticAlgo.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Interpolator.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Layer.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\LSInterpolator.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\main.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\NeuralNet.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Neuron.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Pruner.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\QLearn.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SGDTrainer.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Simulator\Emitter.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Simulator\Robby.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Simulator\Simlink.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\WireFitQLearn.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\Fido_mingw_dryrun.log" for targets...
+Found the following build targets: bin/foo.o;src/main.o;src/Pruner.o;src/SGDTrainer.o;src/Layer.o;src/Adadelta.o;src/Simulator/Emitter.o;all;src/QLearn.o;src/Neuron.o;lib;src/LSInterpolator.o;src/GeneticAlgo.o;clean;src/NeuralNet.o;src/Simulator/Simlink.o;src/Backpropagation.o;src/FidoControlSystem.o;src/Simulator/Robby.o;src/WireFitQLearn.o;src/Interpolator.o;install
+Setting target bin/foo.o
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\Fido_mingw_dryrun.log" for IntelliSense integration with CppTools...
+Updating the CppTools IntelliSense Configuration Provider.
+Parsing dry-run output for CppTools Custom Configuration Provider.
+Sending Workspace Browse Configuration: -----------------------------------
+    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Simulator
+    Standard: c++11
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+----------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Adadelta.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Backpropagation.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\FidoControlSystem.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\GeneticAlgo.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Interpolator.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Layer.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\LSInterpolator.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\main.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\NeuralNet.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Neuron.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Pruner.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\QLearn.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\SGDTrainer.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Simulator\Emitter.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Simulator\Robby.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\Simulator\Simlink.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\src\WireFitQLearn.cpp -----------------------------------
+    Defines: 
+    Includes: 
+    Force Includes: 
+    Standard: c++11
+    IntelliSense Mode: gcc-x64
+    Compiler Path: C:\msys64\usr\bin\g++.exe
+---------------------------------------------------------------------------------------------------
+Building the current target. Command: c:\some\other\fake\path bin/foo.o
+Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\Fido_mingw_dryrun.log" for launch configurations...
+Parsing dry-run output for Launch (debug/run) configuration.
+Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\foo.o()
+Setting launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin/foo.o()"
+Created the following debug config:
+   type = cppdbg
+   cwd = ${command:Makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   args = 
+   program = ${command:Makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\foo.o)
+   miMode = gdb
+   miDebuggerPath = C:\msys64\usr\bin\gdb.exe
+Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\foo.o" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'

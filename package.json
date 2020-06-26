@@ -1,41 +1,179 @@
 {
-	"name": "vscode-makefile-tools",
-	"displayName": "vscode-makefile-tools",
-	"description": "Provide makefile integration in VSCode",
-	"version": "0.0.1",
-	"engines": {
-		"vscode": "^1.35.0"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onCommand:extension.helloWorld"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test"
-	},
-	"devDependencies": {
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28",
-		"tslint": "^5.12.1",
-		"@types/node": "^10.12.21",
-		"@types/mocha": "^2.2.42"
-	},
-	"dependencies": {
-		"vscode-cpptools": "^2.1.2"
-	}
+    "name": "makefile-tools",
+    "displayName": "Makefile Tools",
+    "description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
+    "version": "0.1.0",
+    "publisher": "ms-vscode",
+    "preview": true,
+    "icon": "MakefileTools.png",
+    "readme": "README.md",
+    "author": {
+        "name": "Microsoft Corporation"
+    },
+    "license": "SEE LICENSE IN LICENSE.txt",
+    "engines": {
+        "vscode": "^1.30.0"
+    },
+    "bugs": {
+        "url": "https://github.com/Microsoft/vscode-makefile-tools/issues",
+        "email": "c_cpp_support@microsoft.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Microsoft/vscode-makefile-tools.git"
+    },
+    "homepage": "https://github.com/Microsoft/vscode-makefile-tools",
+    "qna": "https://github.com/Microsoft/vscode-makefile-tools/issues",
+    "keywords": [
+        "C",
+        "C++",
+        "IntelliSense",
+        "Microsoft",
+        "Makefile"
+    ],
+    "categories": [
+        "Programming Languages",
+        "Debuggers",
+        "Formatters",
+        "Linters",
+        "Other",
+        "Snippets"
+    ],
+    "activationEvents": [
+        "onCommand:Makefile.setBuildConfiguration",
+        "onCommand:Makefile.setBuildTarget",
+        "onCommand:Makefile.buildTarget",
+        "onCommand:Makefile.setLaunchConfiguration",
+        "onCommand:Makefile.launchDebug",
+        "onCommand:Makefile.launchRun",
+        "workspaceContains:**/makefile",
+        "workspaceContains:**/Makefile"
+    ],
+    "main": "./out/src/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "Makefile.buildTarget",
+                "title": "Make: Build the makefile target of the current build configuration"
+            },
+            {
+                "command": "Makefile.launchDebug",
+                "title": "Make: Debug the selected binary target"
+            },
+            {
+                "command": "Makefile.launchRun",
+                "title": "Make: Run the selected binary target in the terminal"
+            },
+            {
+                "command": "Makefile.setBuildConfiguration",
+                "title": "Make: Set the current build configuration"
+            },
+            {
+                "command": "Makefile.setBuildTarget",
+                "title": "Make: Set the target to be built by make"
+            },
+            {
+                "command": "Makefile.setLaunchConfiguration",
+                "title": "Make: Set the make launch configuration"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Makefile",
+            "properties": {
+                "Makefile.buildConfiguration": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null,
+                    "description": "The makefile current configuration",
+                    "scope": "resource"
+                },
+                "Makefile.buildTarget": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "default": null,
+                    "description": "The current target to be run by make",
+                    "scope": "resource"
+                },
+                "Makefile.launchConfiguration": {
+                    "type": [
+                        "object",
+                        null
+                    ],
+                    "default": null,
+                    "description": "The configuration to use when running or debugging a target",
+                    "properties": {
+                        "binary": {
+                            "type": "string",
+                            "description": "The full path to the binary to run or debug"
+                        },
+                        "args": {
+                            "type": "array",
+                            "description": "Arguments to pass to program command line",
+                            "items": {
+                                "type": "string"
+                            },
+                            "default": []
+                        },
+                        "cwd": {
+                            "type": "string",
+                            "description": "Set the working directory for the program"
+                        }
+                    },
+                    "scope": "resource"
+                },
+                "Makefile.loggingLevel": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "enum": [
+                        "Normal",
+                        "Verbose"
+                    ],
+                    "default": "Normal",
+                    "description": "The logging level for the makefile tools extension",
+                    "scope": "resource"
+                },
+                "Makefile.makePath": {
+                    "type": "string"
+                },
+                "Makefile.buildLog": {
+                    "type": "string"
+                },
+                "Makefile.extensionLog": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run mycompile",
+        "mycompile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run mycompile",
+        "test": "node ./out/src/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^10.17.17",
+        "tslint": "^5.20.1",
+        "tslint-microsoft-contrib": "^6.2.0",
+        "tslint-no-unused-expression-chai": "^0.1.4",
+        "typescript": "^3.8.3",
+        "vrsource-tslint-rules": "^6.0.0",
+        "vscode": "^1.1.36",
+        "vscode-test": "^0.4.1"
+    },
+    "dependencies": {
+        "@types/glob": "^7.1.1",
+        "glob": "^7.1.6",
+        "module-alias": "^2.2.2",
+        "vscode-cpptools": "^2.1.2",
+        "vscode-jsonrpc": "^3.6.2"
+    }
 }

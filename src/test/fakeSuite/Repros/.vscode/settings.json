@@ -1,0 +1,6 @@
+{
+    "C_Cpp.default.configurationProvider": "microsoft.vscode-makefile-tools",
+    "Makefile.buildLog": "./dummy_dryrun.log",
+    "Makefile.extensionLog": "./MakefileTools.out",
+    "Makefile.makePath": "c:/some/other/fake/path"
+}

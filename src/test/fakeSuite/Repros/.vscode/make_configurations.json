@@ -1,0 +1,45 @@
+[
+    {
+        "name": "InterestingSmallMakefile_windows_configDebug",
+        "buildLog": "./InterestingSmallMakefile_windows_dryrunDebug.log"
+    },
+    {
+        "name": "InterestingSmallMakefile_windows_configRelSize",
+        "commandName": "make",
+        "commandArgs": ["OPT=RelSize"],
+        "buildLog": "./InterestingSmallMakefile_windows_dryrunRelSize.log"
+    },
+    {
+        "name": "InterestingSmallMakefile_windows_configRelSpeed",
+        "commandName": "c:/fake/path/make.exe",
+        "commandArgs": ["OPT=RelSpeed"]
+    },
+    {
+        "name": "8cc_linux",
+        "buildLog": "./8cc_linux_dryrun.log"
+    },
+    {
+        "name": "8cc_mingw",
+        "buildLog": "./8cc_mingw_dryrun.log"
+    },
+    {
+        "name": "Fido_linux",
+        "buildLog": "./Fido_linux_dryrun.log"
+    },
+    {
+        "name": "Fido_mingw",
+        "buildLog": "./Fido_mingw_dryrun.log"
+    },
+    {
+        "name": "tinyvm_linux_pedantic",
+        "buildLog": "./tinyvm_linux_dryrunPedantic.log",
+        "commandName": "make",
+        "commandArgs": ["PEDANTIC=yes"]
+    },
+    {
+        "name": "tinyvm_mingw_pedantic",
+        "buildLog": "./tinyvm_mingw_dryrunPedantic.log",
+        "commandName": "make",
+        "commandArgs": ["PEDANTIC=yes"]
+    }
+]
