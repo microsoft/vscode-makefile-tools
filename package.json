@@ -81,7 +81,7 @@
             "type": "object",
             "title": "makefile",
             "properties": {
-                "makefile.makefile_configurations": {
+                "makefile.configurations": {
                     "type": [
                         "array",
                         null
@@ -100,7 +100,7 @@
                                 "type": "string",
                                 "description": "File path to the makefile"
                             },
-                            "makeCommand": {
+                            "makePath": {
                                 "type": "string",
                                 "description": "File path to the make command"
                             },

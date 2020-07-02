@@ -11,7 +11,7 @@ Sending Workspace Browse Configuration: -----------------------------------
     Standard: undefined
     Compiler Path: undefined
 ----------------------------------------------------------------------------
-Found the following configurations defined in makefile.makefile_configurations setting: InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;Fido_linux;tinyvm_linux_pedantic
+Found the following configurations defined in makefile.configurations setting: InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;Fido_linux;tinyvm_linux_pedantic
 Setting configuration - 8cc_linux
 Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"

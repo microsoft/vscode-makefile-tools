@@ -60,7 +60,7 @@ export function parseBuild(): boolean {
 }
 
 export async function parseBuildOrDryRun(): Promise<void> {
-    // If a build log is specified in makefile.makefile_configurations or makefile.buildLog
+    // If a build log is specified in makefile.configurations or makefile.buildLog
     // (and if it exists on disk) it must be parsed instead of invoking a dry-run make command.
     if (parseBuild()) {
         return;

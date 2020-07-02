@@ -181,7 +181,7 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.startListeningToSettingsChanged();
 
-            // As long as all the 'fake sources/makefile' tests share the same makefile.makefile_configurations setting,
+            // As long as all the 'fake sources/makefile' tests share the same makefile.configurations setting,
             // there is no need in running configuration.prepareConfigurationsQuickPick for each
             ///*await*/ configuration.prepareConfigurationsQuickPick();
             /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
@@ -243,7 +243,7 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.startListeningToSettingsChanged();
 
-            // As long as all the 'fake sources/makefile' tests share the same makefile.makefile_configurations setting,
+            // As long as all the 'fake sources/makefile' tests share the same makefile.configurations setting,
             // there is no need in running configuration.prepareConfigurationsQuickPick for each
             // /*await*/ configuration.prepareConfigurationsQuickPick();
             /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");

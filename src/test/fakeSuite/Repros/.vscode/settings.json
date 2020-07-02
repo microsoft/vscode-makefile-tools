@@ -3,20 +3,20 @@
     "makefile.buildLog": "./dummy_dryrun.log",
     "makefile.extensionLog": "./MakefileTools.out",
     "makefile.makePath": "c:/some/other/fake/path",
-    "makefile.makefile_configurations": [
+    "makefile.configurations": [
         {
             "name": "InterestingSmallMakefile_windows_configDebug",
             "buildLog": "./InterestingSmallMakefile_windows_dryrunDebug.log"
         },
         {
             "name": "InterestingSmallMakefile_windows_configRelSize",
-            "makeCommand": "make",
+            "makePath": "make",
             "makeArgs": ["OPT=RelSize"],
             "buildLog": "./InterestingSmallMakefile_windows_dryrunRelSize.log"
         },
         {
             "name": "InterestingSmallMakefile_windows_configRelSpeed",
-            "makeCommand": "c:/fake/path/make.exe",
+            "makePath": "c:/fake/path/make.exe",
             "makeArgs": ["OPT=RelSpeed"]
         },
         {
@@ -38,13 +38,13 @@
         {
             "name": "tinyvm_linux_pedantic",
             "buildLog": "./tinyvm_linux_dryrunPedantic.log",
-            "makeCommand": "make",
+            "makePath": "make",
             "makeArgs": ["PEDANTIC=yes"]
         },
         {
             "name": "tinyvm_mingw_pedantic",
             "buildLog": "./tinyvm_mingw_dryrunPedantic.log",
-            "makeCommand": "make",
+            "makePath": "make",
             "makeArgs": ["PEDANTIC=yes"]
         }
     ]
