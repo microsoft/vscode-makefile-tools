@@ -2,7 +2,6 @@ Resolving extension log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite
 Found build log path setting "./dummy_dryrun.log"
 Resolving build log path to  "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log"
 No current configuration is defined in the settings file
-Reading configurations from file /.vscode/make_configurations.json
 No target defined in the settings file
 Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log" for IntelliSense integration with CppTools...
 Updating the CppTools IntelliSense Configuration Provider.
@@ -12,8 +11,7 @@ Sending Workspace Browse Configuration: -----------------------------------
     Standard: undefined
     Compiler Path: undefined
 ----------------------------------------------------------------------------
-Reading configurations from file /.vscode/make_configurations.json
-Found the following configurations defined in make_configurations.json: InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
+Found the following configurations defined in makefile.makefile_configurations setting: InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
 Setting configuration - 8cc_mingw
 Found build log path setting "./8cc_mingw_dryrun.log" defined for configuration "8cc_mingw
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log"
@@ -283,9 +281,9 @@ Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFIL
 Setting launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc()"
 Created the following debug config:
    type = cppdbg
-   cwd = ${command:Makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   cwd = ${command:makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
    args = 
-   program = ${command:Makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc)
+   program = ${command:makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc)
    miMode = gdb
    miDebuggerPath = C:\msys64\usr\bin\gdb.exe
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'

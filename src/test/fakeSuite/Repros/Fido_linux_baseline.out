@@ -299,9 +299,9 @@ Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFIL
 Setting launch target "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/foo.o()"
 Created the following debug config:
    type = cppdbg
-   cwd = ${command:Makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros)
+   cwd = ${command:makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros)
    args = 
-   program = ${command:Makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/foo.o)
+   program = ${command:makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/foo.o)
    miMode = gdb
    miDebuggerPath = /usr/bin/gdb
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/foo.o" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros'

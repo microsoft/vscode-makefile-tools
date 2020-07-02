@@ -204,9 +204,9 @@ Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFIL
 Setting launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin/tvmi()"
 Created the following debug config:
    type = cppdbg
-   cwd = ${command:Makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   cwd = ${command:makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
    args = 
-   program = ${command:Makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\tvmi)
+   program = ${command:makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\tvmi)
    miMode = lldb
    miDebuggerPath = 
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\tvmi" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'

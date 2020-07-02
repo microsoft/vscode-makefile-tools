@@ -103,21 +103,19 @@ export async function updateProvider(dryRunOutputStr: string): Promise<void> {
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-    vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is now active');
-
     statusBar = ui.getUI();
     extension = new MakefileToolsExtension(context);
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setBuildConfiguration', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', () => {
         configuration.setNewConfiguration();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setBuildTarget', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildTarget', () => {
         configuration.setNewTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.buildTarget', () => {
-        let config : string | undefined = configuration.getCurrentMakeConfiguration();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', () => {
+        let config : string | undefined = configuration.getCurrentMakefileConfiguration();
         let target : string | undefined = configuration.getCurrentTarget();
         let configAndTarget : string = '"' + config;
 
@@ -133,31 +131,31 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         make.buildCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setLaunchConfiguration', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfiguration', () => {
         configuration.setNewLaunchConfiguration();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchDebug', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchDebug', () => {
         launcher.debugCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchRun', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchRun', () => {
         launcher.runCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetPath', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetPath', () => {
         return launcher.launchTargetPath();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchCurrentDir', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchCurrentDir', () => {
         return launcher.launchCurrentDir();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetArgs', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
         return launcher.launchTargetArgs();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetArgsConcat', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgsConcat', () => {
         return launcher.launchTargetArgsConcat();
     }));
 

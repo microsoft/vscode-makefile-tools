@@ -7,21 +7,21 @@ import * as util from './util';
 import * as vscode from 'vscode';
 
 export function prepareBuildCurrentTarget(): string[] {
-    let commandArgs: string[] = [];
+    let makeArgs: string[] = [];
     // Prepend the target to the arguments given in the configurations json.
     let currentTarget: string | undefined = configuration.getCurrentTarget();
     if (currentTarget) {
-        commandArgs.push(currentTarget);
+        makeArgs.push(currentTarget);
     }
 
-    commandArgs = commandArgs.concat(configuration.getConfigurationCommandArgs());
+    makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
 
-    logger.message("Building the current target. Command: " + configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
-    return commandArgs;
+    logger.message("Building the current target. Command: " + configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));
+    return makeArgs;
 }
 
 export async function buildCurrentTarget(): Promise<void> {
-    let commandArgs: string[] = prepareBuildCurrentTarget();
+    let makeArgs: string[] = prepareBuildCurrentTarget();
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
         let stdout : any = (result: string): void => {
@@ -40,7 +40,7 @@ export async function buildCurrentTarget(): Promise<void> {
             }
         };
 
-        await util.spawnChildProcess(configuration.getConfigurationCommandName(), commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
+        await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
         // No need for notification popup, since the build result is visible already in the output channel
         logger.message(error);
@@ -60,31 +60,31 @@ export function parseBuild(): boolean {
 }
 
 export async function parseBuildOrDryRun(): Promise<void> {
-    // If a build log is specified in make_configurations.json or in settings
+    // If a build log is specified in makefile.makefile_configurations or makefile.buildLog
     // (and if it exists on disk) it must be parsed instead of invoking a dry-run make command.
     if (parseBuild()) {
         return;
     }
 
-    let commandArgs: string[] = [];
+    let makeArgs: string[] = [];
 
     // Prepend the target to the arguments given in the configurations json.
     let currentTarget: string | undefined = configuration.getCurrentTarget();
     if (currentTarget) {
-        commandArgs.push(currentTarget);
+        makeArgs.push(currentTarget);
     }
 
     // Append --dry-run (to not perform any real build operation),
     // --always-make (to not skip over targets when timestamps indicate nothing needs to be done)
     // and --keep-going (to ensure we get as much info as possible even when some targets fail)
-    commandArgs = commandArgs.concat(configuration.getConfigurationCommandArgs());
-    commandArgs.push("--dry-run");
-    commandArgs.push("--always-make");
-    commandArgs.push("--keep-going");
-    commandArgs.push("--print-data-base");
+    makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
+    makeArgs.push("--dry-run");
+    makeArgs.push("--always-make");
+    makeArgs.push("--keep-going");
+    makeArgs.push("--print-data-base");
 
     logger.message("Generating the make dry-run output for parsing IntelliSense information. Command: " +
-        configuration.getConfigurationCommandName() + " " + commandArgs.join(" "));
+        configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));
 
     try {
         let stdoutStr: string = "";
@@ -108,7 +108,7 @@ export async function parseBuildOrDryRun(): Promise<void> {
             ext.updateProvider(stdoutStr);
         };
 
-        await util.spawnChildProcess(configuration.getConfigurationCommandName(), commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
+        await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
         logger.message(error);
         return;

@@ -14,29 +14,32 @@ let statusBar: ui.UI = ui.getUI();
 
 // Each different scenario of building the same makefile, in the same environment, represents a configuration.
 // Example: "make BUILD_TYPE=Debug" and "make BUILD_TYPE=Release" can be the debug and release configurations.
-// The user can save several different such configurations in .vscode\make_configurations.json,
+// The user can save several different such configurations in makefile.makefile_configurations setting,
 // from which one can be picked via this extension and saved in settings.
 
 // Priority rules for where is the Makefile Tools extension parsing the needed information from:
-//    1. configuration build log (defined in make_configurations.json)
-//    2. build log (defined in settings)
-//    3. make command and args (defined in make_configurations.json)
-//    4. make (defined in settings) and default args
+//    1. makefile.makefile_configurations.buildLog setting
+//    2. makefile.buildLog setting
+//    3. makefile.makefile_configurations.makeCommand, makefile.makefile_configurations.makeArgs
+//    4. makefile.makePath and default args
 //    5. default make tool and args
 
-export interface MakeConfiguration {
+export interface MakefileConfiguration {
     // A name associated with a particular build command process and args/options
     name: string;
 
+    // The path (full or relative to the workspace folder) to the makefile
+    makefilePath?: string;
+
     // make, nmake, specmake...
     // This is sent to spawnChildProcess as process name
-    // It can have full path, relative path or only tool name
-    // Don't include args in commandName
-    commandName?: string;
+    // It can have full path, relative path to the workspace folder or only tool name
+    // Don't include args in makeCommand
+    makeCommand?: string;
 
     // options used in the build invocation
     // don't use more than one argument in a string
-    commandArgs?: string[];
+    makeArgs?: string[];
 
     // a pre-generated build log, from which it is preffered to parse from,
     // instead of the dry-run output of the make tool
@@ -48,31 +51,31 @@ export interface MakeConfiguration {
     // since different tools may use different arguments for the same behavior
 }
 
-// Last configuration name picked from the set defined in .vscode\make_configurations.json.
+// Last configuration name picked from the set defined in makefile.makefile_configurations setting.
 // Saved into the settings storage. Also reflected in the configuration status bar button.
 // If no particular current configuration is defined in settings, set to 'Default'.
-let currentMakeConfiguration: string;
-export function getCurrentMakeConfiguration(): string { return currentMakeConfiguration; }
-export function setCurrentMakeConfiguration(configuration: string): void {
-    currentMakeConfiguration = configuration;
-    statusBar.setConfiguration(currentMakeConfiguration);
-    logger.message("Setting configuration - " + currentMakeConfiguration);
-    getCommandForConfiguration(currentMakeConfiguration);
-    getBuildLogForConfiguration(currentMakeConfiguration);
+let currentMakefileConfiguration: string;
+export function getCurrentMakefileConfiguration(): string { return currentMakefileConfiguration; }
+export function setCurrentMakefileConfiguration(configuration: string): void {
+    currentMakefileConfiguration = configuration;
+    statusBar.setConfiguration(currentMakefileConfiguration);
+    logger.message("Setting configuration - " + currentMakefileConfiguration);
+    getCommandForConfiguration(currentMakefileConfiguration);
+    getBuildLogForConfiguration(currentMakefileConfiguration);
 }
 
 // Read the current configuration from settings storage, update status bar item
-function readCurrentMakeConfiguration(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+function readCurrentMakefileConfiguration(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     let buildConfiguration : string | undefined = workspaceConfiguration.get<string>("buildConfiguration");
     if (!buildConfiguration) {
-        logger.message("No current configuration is defined in the settings file");
-        currentMakeConfiguration = "Default";
+        logger.message("No current configuration is defined in the settings file. Assuming 'Default'.", "verbose");
+        currentMakefileConfiguration = "Default";
     } else {
-        currentMakeConfiguration = buildConfiguration;
+        currentMakefileConfiguration = buildConfiguration;
     }
 
-    statusBar.setConfiguration(currentMakeConfiguration);
+    statusBar.setConfiguration(currentMakefileConfiguration);
 }
 
 let makePath: string | undefined;
@@ -81,12 +84,27 @@ export function setMakePath(path: string): void { makePath = path; }
 
 // Read the path (full or directory only) of the make tool if defined in settings.
 // It represents a default to look for if no other path is already included
-// in make_configurations.json, with commandName.
+// in "makefile.configurations.makeCommand".
 function readMakePath(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makePath = workspaceConfiguration.get<string>("makePath");
     if (!makePath) {
-        logger.message("No path to the make tool is defined in the settings file");
+        logger.message("No path to the make tool is defined in the settings file", "verbose");
+    }
+}
+
+let makefilePath: string | undefined;
+export function getMakefilePath(): string | undefined { return makefilePath; }
+export function setMakefilePath(path: string): void { makefilePath = path; }
+// Read the full path to the makefile if defined in settings.
+// It represents a default to look for if no other makefile is already provided
+// in makefile.configurations.makefile.
+// TODO: validate and integrate with "-f [Makefile]" passed in makefile.configurations.args.
+function readMakefilePath(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    makefilePath = workspaceConfiguration.get<string>("makefilePath");
+    if (!makefilePath) {
+        logger.message("No path to the make tool is defined in the settings file", "verbose");
     }
 }
 
@@ -114,7 +132,7 @@ export function setBuildLog(path: string): void { buildLog = path; }
 // therefore offering less intellisense information for source files,
 // identifying less possible binaries to debug or not providing any makefile targets (other than the 'all' default).
 function readBuildLog(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     buildLog = workspaceConfiguration.get<string>("buildLog");
 
     if (buildLog) {
@@ -136,7 +154,7 @@ export function setLoggingLevel(logLevel: string): void { loggingLevel = logLeve
 
 // Read from settings the desired logging level for the Makefile Tools extension.
 export function readLoggingLevel(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     loggingLevel = workspaceConfiguration.get<string>("loggingLevel");
 
     if (!loggingLevel) {
@@ -157,7 +175,7 @@ export function setExtensionLog(path: string): void { extensionLog = path; }
 // Any messages that are being logged throughout the lifetime of the extension
 // are going to be appended to this file.
 export function readExtensionLog(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     extensionLog = workspaceConfiguration.get<string>("extensionLog");
 
     if (extensionLog) {
@@ -214,7 +232,7 @@ export function setCurrentLaunchConfiguration(configuration: LaunchConfiguration
 
 // Read the current launch configuration from settings storage, update status bar item
 function readCurrentLaunchConfiguration(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     currentLaunchConfiguration = workspaceConfiguration.get<LaunchConfiguration>("launchConfiguration");
     if (currentLaunchConfiguration) {
         statusBar.setLaunchConfiguration(launchConfigurationToString(currentLaunchConfiguration));
@@ -226,13 +244,13 @@ function readCurrentLaunchConfiguration(): void {
 // Command name and args are used when building from within the VS Code Makefile Tools Extension,
 // when parsing all the targets that exist and when updating the cpptools configuration provider
 // for IntelliSense.
-let configurationCommandName: string;
-export function getConfigurationCommandName(): string { return configurationCommandName; }
-export function setConfigurationCommandName(name: string): void { configurationCommandName = name; }
+let configurationMakeCommand: string;
+export function getConfigurationMakeCommand(): string { return configurationMakeCommand; }
+export function setConfigurationMakeCommand(name: string): void { configurationMakeCommand = name; }
 
-let configurationCommandArgs: string[] = [];
-export function getConfigurationCommandArgs(): string[] { return configurationCommandArgs; }
-export function setConfigurationCommandArgs(args: string[]): void { configurationCommandArgs = args; }
+let configurationMakeArgs: string[] = [];
+export function getConfigurationMakeArgs(): string[] { return configurationMakeArgs; }
+export function setConfigurationMakeArgs(args: string[]): void { configurationMakeArgs = args; }
 
 let configurationBuildLog: string | undefined;
 export function getConfigurationBuildLog(): string | undefined { return configurationBuildLog; }
@@ -240,48 +258,55 @@ export function setConfigurationBuildLog(name: string): void { configurationBuil
 
 // Read from settings storage, update status bar item
 // Current make configuration command = process name + arguments
-function readCurrentMakeConfigurationCommand(): void {
-    // Read from disk instead of from the MakeConfiguration array, to get up to date content
-    readMakeConfigurations();
-    getCommandForConfiguration(currentMakeConfiguration);
-    getBuildLogForConfiguration(currentMakeConfiguration);
+function readCurrentMakefileConfigurationCommand(): void {
+    // Read from disk instead of from the MakefileConfiguration array, to get up to date content
+    readMakefileConfigurations();
+    getCommandForConfiguration(currentMakefileConfiguration);
+    getBuildLogForConfiguration(currentMakefileConfiguration);
 }
 
-// Helper to find in the array of MakeConfiguration which command/args correspond to a configuration name
+// Helper to find in the array of MakefileConfiguration which command/args correspond to a configuration name
 export function getCommandForConfiguration(configuration: string | undefined): void {
-    let makeConfiguration: MakeConfiguration | undefined = makeConfigurations.find(k => {
+    let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
         if (k.name === configuration) {
             return { ...k, keep: true };
         }
     });
 
     let makeParsedPathSettings: path.ParsedPath | undefined = makePath ? path.parse(makePath) : undefined;
-    let makeParsedPathConfigurations: path.ParsedPath | undefined = makeConfiguration?.commandName ? path.parse(makeConfiguration?.commandName) : undefined;
+    let makeParsedPathConfigurations: path.ParsedPath | undefined = makefileConfiguration?.makeCommand ? path.parse(makefileConfiguration?.makeCommand) : undefined;
 
-    // Arguments for the make tool can be defined as commandArgs in make_configurations.json.
+    // Arguments for the make tool can be defined as makeArgs in makefile.makefile_configurations setting.
     // When not defined, default to empty array.
-    configurationCommandArgs = makeConfiguration?.commandArgs || [];
+    configurationMakeArgs = makefileConfiguration?.makeArgs || [];
 
-    // Name of the make tool can be defined as commandName in make_configurations.json or as Makefile.makePath setting.
+    // Name of the make tool can be defined as makeCommand in makefile.makefile_configurations or as makefile.makePath.
     // When none defined, default to "make".
-    configurationCommandName = makeParsedPathConfigurations?.name || makeParsedPathSettings?.name || "make";
+    configurationMakeCommand = makeParsedPathConfigurations?.name || makeParsedPathSettings?.name || "make";
 
-    // Prepend the directory path, if defined in either make_configurations.json or settings (first has priority).
+    // Prepend the directory path, if defined in either makefile.makefile_configurations or makefile.makePath (first has priority).
     let configurationCommandPath: string = makeParsedPathConfigurations?.dir || makeParsedPathSettings?.dir || "";
-    configurationCommandName = path.join(configurationCommandPath, configurationCommandName);
+    configurationMakeCommand = path.join(configurationCommandPath, configurationMakeCommand);
 
-    if (makeConfiguration?.commandName) {
-        logger.message("Found command '" + configurationCommandName + " " + configurationCommandArgs.join(" ") + "' for configuration " + configuration);
+    // Add the makefile path via the -f make switch.
+    // makefile.configurations.makefilePath overwrites makefile.makefilePath.
+    let makefileUsed: string | undefined = makefileConfiguration?.makefilePath || makefilePath;
+    if (makefileUsed) {
+        configurationMakeArgs.push(`-f ${makefileUsed}`);
     }
 
-    // Some useful warnings about properly defining the make tool (file name, path and arguments),
+    if (makefileConfiguration?.makeCommand) {
+        logger.message("Found command '" + configurationMakeCommand + " " + configurationMakeArgs.join(" ") + "' for configuration " + configuration);
+    }
+
+    // Some useful warnings about properly defining the makefile and make tool (file name, path and arguments),
     // unless a build log is provided.
     let buildLog: string | undefined = getConfigurationBuildLog();
     let buildLogContent: string | undefined = buildLog ? util.readFile(buildLog) : undefined;
     if (!buildLogContent) {
         if ((!makeParsedPathSettings || makeParsedPathSettings.name === "") &&
             (!makeParsedPathConfigurations || makeParsedPathConfigurations.name === "")) {
-            logger.message("Could not find any make tool file name in make_configurations.json, nor in settings. Assuming make.");
+            logger.message("Could not find any make tool file name in makefile.configurations.makeCommand, nor in makefile.makePath. Assuming make.", "verbose");
         }
 
         if ((!makeParsedPathSettings || makeParsedPathSettings?.dir === "") &&
@@ -290,20 +315,20 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         }
 
         if (!makeParsedPathSettings && !makeParsedPathConfigurations) {
-            logger.message("It is recommended to define the full path of the make tool in settings (via Makefile.makePath) OR define commandName/commandArgs in make_configurations.json.");
+            logger.message("It is recommended to define the full path of the make tool in settings (via makefile.makePath OR makefile.makeCommand and makefile.makeArgs.");
         }
     }
 }
 
-// Helper to find in the array of MakeConfiguration which buildLog correspond to a configuration name
+// Helper to find in the array of MakefileConfiguration which buildLog correspond to a configuration name
 export function getBuildLogForConfiguration(configuration: string | undefined): void {
-    let makeConfiguration: MakeConfiguration | undefined = makeConfigurations.find(k => {
+    let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
         if (k.name === configuration) {
             return { ...k, keep: true };
         }
     });
 
-    configurationBuildLog = makeConfiguration?.buildLog;
+    configurationBuildLog = makefileConfiguration?.buildLog;
 
     if (configurationBuildLog) {
         logger.message('Found build log path setting "' + configurationBuildLog + '" defined for configuration "' + configuration);
@@ -323,33 +348,14 @@ export function getBuildLogForConfiguration(configuration: string | undefined): 
     }
 }
 
-// The data type mapping to the content of .vscode\make_configurations.json.
-// The file is allowed to be missing, in which case the MakeConfiguration array remains empty.
-let makeConfigurations: MakeConfiguration[] = [];
-export function getMakeConfigurations(): MakeConfiguration[] { return makeConfigurations; }
-export function setMakeConfigurations(configurations: MakeConfiguration[]): void { makeConfigurations = configurations; }
+let makefileConfigurations: MakefileConfiguration[] = [];
+export function getMakefileConfigurations(): MakefileConfiguration[] { return makefileConfigurations; }
+export function setMakefileConfigurations(configurations: MakefileConfiguration[]): void { makefileConfigurations = configurations; }
 
-let configurationsJsonPath: string = vscode.workspace.rootPath + "\/.vscode\/make_configurations.json";
-
-// TODOs:
-//     - add a schema for make_configurations.json
-//     - assist the user with UI for creating this file
-//     - more type validation for reading the json
-//     - add optional configure parameters: configure command and configure command args
-//       for when the code base needs a specific workflow to run before the make invocation
-function readMakeConfigurations(): void {
-    if (util.checkFileExistsSync(configurationsJsonPath)) {
-        logger.message("Reading configurations from file \/.vscode\/make_configurations.json");
-        const jsonConfigurationsContent: Buffer = fs.readFileSync(configurationsJsonPath);
-
-        try {
-            makeConfigurations = JSON.parse(jsonConfigurationsContent.toString());
-        } catch (error) {
-            vscode.window.showErrorMessage("Failed to parse make_configurations.json");
-        }
-    } else {
-        logger.message("Configurations file \/.vscode\/make_configurations.json not found");
-    }
+// Read make configurations optionally defined by the user in settings: makefile.configurations.
+function readMakefileConfigurations(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    makefileConfigurations = workspaceConfiguration.get<MakefileConfiguration[]>("makefile_configurations") || [];
 }
 
 // Last target picked from the set of targets that are run by the makefiles
@@ -361,10 +367,10 @@ export function setCurrentTarget(target: string | undefined): void { currentTarg
 
 // Read current target from settings storage, update status bar item
 function readCurrentTarget(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     let buildTarget : string | undefined = workspaceConfiguration.get<string>("buildTarget");
     if (!buildTarget) {
-        logger.message("No target defined in the settings file");
+        logger.message("No target defined in the settings file. Assuming 'Default'.", "verbose");
         statusBar.setTarget("Default");
         // If no particular target is defined in settings, use 'Default' for the button
         // but keep the variable empty, to not append it to the make command.
@@ -390,39 +396,31 @@ export function initFromSettings(): void {
     readLoggingLevel();
     readExtensionLog();
     readMakePath();
+    readMakefilePath();
     readBuildLog();
-    readCurrentMakeConfiguration();
-    readCurrentMakeConfigurationCommand();
+    readCurrentMakefileConfiguration();
+    readCurrentMakefileConfigurationCommand();
     readCurrentTarget();
     readCurrentLaunchConfiguration();
 
-    // Listen to changes in settings and in make_configurations.json for prompter updates of the extension
-    vscode.workspace.onDidSaveTextDocument(e => {
-        if (path.normalize(e.fileName) === path.normalize(configurationsJsonPath) && !ignoreSettingsChanged) {
-            logger.message("Changes detected in make_configurations.json and triggering update");
-            readCurrentMakeConfigurationCommand();
-            make.parseBuildOrDryRun();
-        }
-    });
-
     vscode.workspace.onDidChangeConfiguration(e => {
         if (vscode.workspace.workspaceFolders && !ignoreSettingsChanged &&
-            e.affectsConfiguration('Makefile', vscode.workspace.workspaceFolders[0].uri)) {
+            e.affectsConfiguration('makefile', vscode.workspace.workspaceFolders[0].uri)) {
             logger.message("Detected a change in settings");
             // We are interested in updating only some relevant properties.
             // A subset of these should also trigger an IntelliSense config provider update.
             // Avoid unnecessary updates (for example, when settings are modified via the extension quickPick).
-            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
             let updateConfigProvider: boolean = false; // to trigger IntelliSense config provider refresh
 
             let updatedBuildConfiguration: string | undefined = workspaceConfiguration.get<string>("buildConfiguration");
-            if (updatedBuildConfiguration !== currentMakeConfiguration &&
+            if (updatedBuildConfiguration !== currentMakefileConfiguration &&
                 // Undefined build configuration results in "Default",
                 // so undefined !== "Default" is not true in this context
-                (updatedBuildConfiguration !== undefined || currentMakeConfiguration !== "Default")) {
+                (updatedBuildConfiguration !== undefined || currentMakefileConfiguration !== "Default")) {
                 logger.message("Make configuration setting changed.");
                 updateConfigProvider = true;
-                readCurrentMakeConfiguration();
+                readCurrentMakefileConfiguration();
             }
 
             let updatedTarget : string | undefined = workspaceConfiguration.get<string>("buildTarget");
@@ -446,14 +444,14 @@ export function initFromSettings(): void {
             let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>("buildLog");
             if (updatedBuildLog !== buildLog) {
                 updateConfigProvider = true;
-                logger.message("Build log setting changed.");
+                logger.message("makefile.buildLog setting changed.");
                 readBuildLog();
             }
 
             let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>("extensionLog");
             if (updatedExtensionLog !== extensionLog) {
                 // No IntelliSense update needed.
-                logger.message("MakefileTools log setting changed.");
+                logger.message("makefile.extensionLog setting changed.");
                 readExtensionLog();
             }
 
@@ -462,9 +460,23 @@ export function initFromSettings(): void {
                 // Not very likely, but it is safe to consider that a different make tool
                 // may produce a different dry-run output with potential impact on IntelliSense,
                 // so trigger an update.
-                logger.message("Make path setting changed.");
+                logger.message("makefile.makePath setting changed.");
                 updateConfigProvider = true;
                 readMakePath();
+            }
+
+            let updatedMakefilePath : string | undefined = workspaceConfiguration.get<string>("makefilePath");
+            if (updatedMakefilePath !== makefilePath) {
+                logger.message("makefile.makefilePath setting changed.");
+                updateConfigProvider = true;
+                readMakefilePath();
+            }
+
+            let updatedMakefileConfigurations : MakefileConfiguration[] | undefined = workspaceConfiguration.get<MakefileConfiguration[]>("makefile_configurations");
+            if (updatedMakefileConfigurations !== makefileConfigurations) {
+                logger.message("makefile.makefile_configurations setting changed.");
+                updateConfigProvider = true;
+                readCurrentMakefileConfigurationCommand();
             }
 
             if (updateConfigProvider) {
@@ -472,8 +484,8 @@ export function initFromSettings(): void {
                 // but there are some rules of defaults and/or overrides that may be impacted by any of the above settings,
                 // so recalculate.
                 logger.message("Some of the changes detected in settings are triggering udpates");
-                getCommandForConfiguration(currentMakeConfiguration);
-                getBuildLogForConfiguration(currentMakeConfiguration);
+                getCommandForConfiguration(currentMakefileConfiguration);
+                getBuildLogForConfiguration(currentMakefileConfiguration);
                 make.parseBuildOrDryRun();
             }
         }
@@ -481,32 +493,29 @@ export function initFromSettings(): void {
 }
 
 export /*async*/ function setConfigurationByName(configurationName: string): void {//Promise<void> {
-    currentMakeConfiguration = configurationName;
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
-    workspaceConfiguration.update("buildConfiguration", currentMakeConfiguration);
-    setCurrentMakeConfiguration(currentMakeConfiguration);
+    currentMakefileConfiguration = configurationName;
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    workspaceConfiguration.update("buildConfiguration", currentMakefileConfiguration);
+    setCurrentMakefileConfiguration(currentMakefileConfiguration);
     make.parseBuildOrDryRun();
 }
 
 export function prepareConfigurationsQuickPick(): string[] {
-    // read from the configurations file instead of currentMakefileConfiguration
-    // just in case the content changed on disk.
-    readMakeConfigurations();
-    const items: string[] = makeConfigurations.map((k => {
+    const items: string[] = makefileConfigurations.map((k => {
         return k.name;
     }));
 
     if (items.length > 0) {
-        logger.message("Found the following configurations defined in make_configurations.json: " + items.join(";"));
+        logger.message("Found the following configurations defined in makefile.makefile_configurations setting: " + items.join(";"));
     } else {
-        logger.message("No configurations defined in make_configurations.json.");
+        logger.message("No configurations defined in makefile.makefile_configurations setting.");
         items.push("Default");
     }
 
     return items;
 }
 
-// Fill a drop-down with all the configuration names defined by the user in .vscode\make_configurations.json
+// Fill a drop-down with all the configuration names defined by the user in makefile.makefile_configurations setting.
 // Triggers a cpptools configuration provider update after selection.
 export async function setNewConfiguration(): Promise<void> {
     const items: string[] = prepareConfigurationsQuickPick();
@@ -560,23 +569,23 @@ export async function setNewLaunchConfiguration(): Promise<void> {
         return;
     }
 
-    let commandArgs: string[] = [];
+    let makeArgs: string[] = [];
     // Append --dry-run (to not perform any real build operation),
     // --always-make (to not skip over targets when timestamps indicate nothing needs to be done)
     // and --keep-going (to ensure we get as much info as possible even when some targets fail)
-    commandArgs = commandArgs.concat(configurationCommandArgs);
+    makeArgs = makeArgs.concat(configurationMakeArgs);
     if (currentTarget) {
-        commandArgs.push(currentTarget);
+        makeArgs.push(currentTarget);
     }
-    commandArgs.push("--dry-run");
-    commandArgs.push("--always-make");
-    commandArgs.push("--keep-going");
-    commandArgs.push("--print-data-base");
+    makeArgs.push("--dry-run");
+    makeArgs.push("--always-make");
+    makeArgs.push("--keep-going");
+    makeArgs.push("--print-data-base");
 
     let stdoutStr: string = "";
     let stderrStr: string = "";
 
-    logger.message("Generating the dry-run to parse launch configuration for the binaries built by the makefile. Command: " + configurationCommandName + " " + commandArgs.join(" "));
+    logger.message("Generating the dry-run to parse launch configuration for the binaries built by the makefile. Command: " + configurationMakeCommand + " " + makeArgs.join(" "));
 
     try {
         let stdout : any = (result: string): void => {
@@ -599,7 +608,7 @@ export async function setNewLaunchConfiguration(): Promise<void> {
             selectLaunchConfiguration(launchConfigurationNames);
         };
 
-        await util.spawnChildProcess(configurationCommandName, commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
+        await util.spawnChildProcess(configurationMakeCommand, makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
         logger.message(error);
         return;
@@ -620,7 +629,7 @@ export function parseTargetsFromBuildLog(): string[] | undefined {
 
 // TODO: refactor the dry-run part into make.ts
 export async function setNewTarget(): Promise<void> {
-    // If a build log is specified in make_configurations.json or in settings
+    // If a build log is specified in makefile.makefile_configurations.buildLog or makefile.buildLog settings,
     // (and if it exists on disk) it must be parsed instead of invoking a dry-run make command.
     let makefileTargets: string[] | undefined = parseTargetsFromBuildLog();
     if (makefileTargets) {
@@ -628,15 +637,15 @@ export async function setNewTarget(): Promise<void> {
         return;
     }
 
-    let commandArgs: string[] = [];
+    let makeArgs: string[] = [];
     // all: must be first argument, to make sure all targets are evaluated and not a subset
     // --dry-run: to ensure no real build is performed for the targets analysis
     // -p: creates a verbose log from which targets are easy to parse
-    commandArgs = commandArgs.concat(["all", "--dry-run", "-p"], configurationCommandArgs);
+    makeArgs = makeArgs.concat(["all", "--dry-run", "-p"], configurationMakeArgs);
     let stdoutStr: string = "";
     let stderrStr: string = "";
 
-    logger.message("Parsing the targets in the makefile. Command: " + configurationCommandName + " " + commandArgs.join(" "));
+    logger.message("Parsing the targets in the makefile. Command: " + configurationMakeCommand + " " + makeArgs.join(" "));
 
     let process: child_process.ChildProcess;
     try {
@@ -660,7 +669,7 @@ export async function setNewTarget(): Promise<void> {
             selectTarget(makefileTargets);
         };
 
-        await util.spawnChildProcess(configurationCommandName, commandArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
+        await util.spawnChildProcess(configurationMakeCommand, makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
         logger.message(error);
         return;
@@ -671,7 +680,7 @@ export /*async*/ function setTargetByName(targetName: string) : void {//Promise<
     currentTarget = targetName;
     statusBar.setTarget(currentTarget);
     logger.message("Setting target " + currentTarget);
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     workspaceConfiguration.update("buildTarget", currentTarget);
     make.parseBuildOrDryRun();
 }
@@ -693,7 +702,7 @@ export /*async*/ function setLaunchConfigurationByName (launchConfigurationName:
     statusBar.setLaunchConfiguration(launchConfigurationName);
     currentLaunchConfiguration = stringToLaunchConfiguration(launchConfigurationName);
     logger.message('Setting launch target "' + launchConfigurationName + '"');
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("Makefile");
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     workspaceConfiguration.update("launchConfiguration", currentLaunchConfiguration || undefined);
 }
 

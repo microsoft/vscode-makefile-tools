@@ -83,7 +83,7 @@ export class Launcher implements vscode.Disposable {
         if (!configuration.getCurrentLaunchConfiguration()) {
             vscode.window.showErrorMessage("Currently there is no launch configuration set.");
             logger.message("Cannot start debugging because there is no launch configuration set. " +
-                "Define one in the settings file or use the Makefile.setLaunchConfigurationCommand");
+                "Define one in the settings file or use the makefile.setLaunchConfigurationCommand");
             return undefined;
         }
 
@@ -133,9 +133,9 @@ export class Launcher implements vscode.Disposable {
             type: dbg,
             name: `Debug My Program`,
             request: 'launch',
-            cwd: '${command:Makefile.launchCurrentDir}',
+            cwd: '${command:makefile.launchCurrentDir}',
             args,
-            program: '${command:Makefile.launchTargetPath}',
+            program: '${command:makefile.launchTargetPath}',
             miMode: miMode,
             miDebuggerPath: miDebuggerPath
         };
@@ -180,7 +180,7 @@ export class Launcher implements vscode.Disposable {
         if (!configuration.getCurrentLaunchConfiguration()) {
             vscode.window.showErrorMessage("Currently there is no launch configuration set.");
             logger.message("Cannot run binary because there is no launch configuration set. " +
-                "Define one in the settings file or use the Makefile.setLaunchConfigurationCommand");
+                "Define one in the settings file or use the makefile.setLaunchConfigurationCommand");
 
             return undefined;
         }
