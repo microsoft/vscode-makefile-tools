@@ -98,8 +98,8 @@ export function getMakefilePath(): string | undefined { return makefilePath; }
 export function setMakefilePath(path: string): void { makefilePath = path; }
 // Read the full path to the makefile if defined in settings.
 // It represents a default to look for if no other makefile is already provided
-// in makefile.configurations.makefile.
-// TODO: validate and integrate with "-f [Makefile]" passed in makefile.configurations.args.
+// in makefile.configurations.makefilePath.
+// TODO: validate and integrate with "-f [Makefile]" passed in makefile.configurations.makeArgs.
 function readMakefilePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makefilePath = workspaceConfiguration.get<string>("makefilePath");
