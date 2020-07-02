@@ -46,8 +46,8 @@
         "onCommand:makefile.setLaunchConfiguration",
         "onCommand:makefile.launchDebug",
         "onCommand:makefile.launchRun",
-        "workspaceContains:**/makefile",
-        "workspaceContains:**/Makefile"
+        "workspaceContains:makefile",
+        "workspaceContains:Makefile"
     ],
     "main": "./out/src/extension.js",
     "contributes": {
