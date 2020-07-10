@@ -658,9 +658,9 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
             // in which case the execution path is defaulting to workspace root folder
             // and there are no args.
             let launchConfiguration: configuration.LaunchConfiguration = {
-                binary: targetBinary,
+                binaryPath: targetBinary,
                 cwd: vscode.workspace.rootPath || "",
-                args: []
+                binaryArgs: []
             };
 
             logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
@@ -723,10 +723,10 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
             let splitArgs: string[] = targetBinaryTool.arguments ? targetBinaryTool.arguments.split(" ") : [];
 
             let launchConfiguration: configuration.LaunchConfiguration = {
-                binary: targetBinaryTool.fullPath,
+                binaryPath: targetBinaryTool.fullPath,
                 cwd: currentPath,
                 // TODO: consider optionally quoted arguments
-                args: splitArgs
+                binaryArgs: splitArgs
             };
 
             logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");

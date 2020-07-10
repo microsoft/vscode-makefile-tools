@@ -16,7 +16,7 @@ export class Launcher implements vscode.Disposable {
     public launchTargetPath(): string {
         let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
-            return launchConfiguration.binary;
+            return launchConfiguration.binaryPath;
         } else {
             return "";
         }
@@ -39,7 +39,7 @@ export class Launcher implements vscode.Disposable {
     public launchTargetArgs(): string[] {
         let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
-            return launchConfiguration.args;
+            return launchConfiguration.binaryArgs;
         } else {
             return [];
         }
