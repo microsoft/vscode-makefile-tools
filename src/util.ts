@@ -219,3 +219,28 @@ export function removeQuotes(str: string): string {
 
     return str;
 }
+
+// Helper to evaluate whether two objects represent the same content.
+// It recursively analyzes any inner subobjects and is also not affected
+// by different order of properties.
+// This is useful to identify if an object setting was changed
+// in the Makefile Tools scope.
+export function areEqual(obj1: any, obj2: any): boolean {
+    let props1: string[] = Object.getOwnPropertyNames(obj1);
+    let props2: string[] = Object.getOwnPropertyNames(obj2);
+
+    if (props1.length !== props2.length) {
+        return false;
+    }
+
+    for (let i: number = 0; i < props1.length; i++) {
+        let prop: string = props1[i];
+        let bothAreObjects: boolean = typeof (obj1[prop]) === 'object' && typeof (obj2[prop]) === 'object';
+        if ((!bothAreObjects && (obj1[prop] !== obj2[prop]))
+            || (bothAreObjects && !areEqual(obj1[prop], obj2[prop]))) {
+            return false;
+        }
+    }
+
+    return true;
+}

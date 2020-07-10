@@ -191,16 +191,18 @@ export function readExtensionLog(): void {
 // TODO: support dll debugging.
 export interface LaunchConfiguration {
     // todo: add symbol search paths
-    binary: string; // full path
-    cwd: string;    // execution path
-    args: string[]; // arguments
+    cwd: string; // execution path
+    binaryPath: string; // full path
+    binaryArgs: string[]; // arguments
+    miMode?: string;
+    miDebuggerPath?: string;
 }
 export function launchConfigurationToString(configuration: LaunchConfiguration): string {
     let str: string = configuration.cwd;
     str += ">";
-    str += util.makeRelPath(configuration.binary, configuration.cwd);
+    str += util.makeRelPath(configuration.binaryPath, configuration.cwd);
     str += "(";
-    str += configuration.args.join(",");
+    str += configuration.binaryArgs.join(",");
     str += ")";
     return str;
 }
@@ -215,8 +217,8 @@ export function stringToLaunchConfiguration(str: string): LaunchConfiguration | 
 
         return {
             cwd: match[1],
-            binary: fullPath,
-            args: splitArgs
+            binaryPath: fullPath,
+            binaryArgs: splitArgs
         };
     } else {
         return undefined;
@@ -259,13 +261,13 @@ export function setConfigurationBuildLog(name: string): void { configurationBuil
 // Read from settings storage, update status bar item
 // Current make configuration command = process name + arguments
 function readCurrentMakefileConfigurationCommand(): void {
-    // Read from disk instead of from the MakefileConfiguration array, to get up to date content
     readMakefileConfigurations();
     getCommandForConfiguration(currentMakefileConfiguration);
     getBuildLogForConfiguration(currentMakefileConfiguration);
 }
 
-// Helper to find in the array of MakefileConfiguration which command/args correspond to a configuration name
+// Helper to find in the array of MakefileConfiguration which command/args correspond to a configuration name.
+// Higher level settings (like makefile.makePath or makefilePath) also have an additional effect on the final command.
 export function getCommandForConfiguration(configuration: string | undefined): void {
     let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
         if (k.name === configuration) {
@@ -278,7 +280,11 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
     // Arguments for the make tool can be defined as makeArgs in makefile.configurations setting.
     // When not defined, default to empty array.
-    configurationMakeArgs = makefileConfiguration?.makeArgs || [];
+    // Make sure to copy from makefile.configurations.makeArgs because we are going to append more switches,
+    // which shouldn't be identified as read from settings.
+    // Make sure we start from a fresh empty configurationMakeArgs because there may be old arguments that don't apply anymore.
+    configurationMakeArgs = [];
+    configurationMakeArgs = configurationMakeArgs.concat(makefileConfiguration?.makeArgs || []);
 
     // Name of the make tool can be defined as makePath in makefile.configurations or as makefile.makePath.
     // When none defined, default to "make".
@@ -292,7 +298,8 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     // makefile.configurations.makefilePath overwrites makefile.makefilePath.
     let makefileUsed: string | undefined = makefileConfiguration?.makefilePath || makefilePath;
     if (makefileUsed) {
-        configurationMakeArgs.push(`-f ${makefileUsed}`);
+        configurationMakeArgs.push("-f");
+        configurationMakeArgs.push(makefileUsed);
     }
 
     if (makefileConfiguration?.makePath) {
@@ -415,9 +422,8 @@ export function initFromSettings(): void {
 
             let updatedBuildConfiguration: string | undefined = workspaceConfiguration.get<string>("buildConfiguration");
             if (updatedBuildConfiguration !== currentMakefileConfiguration &&
-                // Undefined build configuration results in "Default",
-                // so undefined !== "Default" is not true in this context
-                (updatedBuildConfiguration !== undefined || currentMakefileConfiguration !== "Default")) {
+                // Undefined or null build configuration results in "Default"
+                (updatedBuildConfiguration || currentMakefileConfiguration !== "Default")) {
                 logger.message("Make configuration setting changed.");
                 updateConfigProvider = true;
                 readCurrentMakefileConfiguration();
@@ -425,16 +431,15 @@ export function initFromSettings(): void {
 
             let updatedTarget : string | undefined = workspaceConfiguration.get<string>("buildTarget");
             if (updatedTarget !== currentTarget &&
-                // Undefined target results in "",
-                // so undefined !== "" is not true in this context
-                (updatedTarget !== undefined || currentTarget !== "")) {
+                // Undefined or null target results in ""
+                (updatedTarget || currentTarget !== "")) {
                 updateConfigProvider = true;
                 logger.message("Target setting changed.");
                 readCurrentTarget();
             }
 
             let updatedLaunchConfiguration : string | undefined = workspaceConfiguration.get<string>("launchConfiguration");
-            if (updatedLaunchConfiguration !== currentLaunchConfiguration) {
+            if (!util.areEqual(updatedLaunchConfiguration, currentLaunchConfiguration)) {
                 // Changing a launch configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
                 logger.message("Launch configuration setting changed.");
@@ -473,10 +478,10 @@ export function initFromSettings(): void {
             }
 
             let updatedMakefileConfigurations : MakefileConfiguration[] | undefined = workspaceConfiguration.get<MakefileConfiguration[]>("configurations");
-            if (updatedMakefileConfigurations !== makefileConfigurations) {
+            if (!util.areEqual(updatedMakefileConfigurations, makefileConfigurations)) {
                 logger.message("makefile.configurations setting changed.");
                 updateConfigProvider = true;
-                readCurrentMakefileConfigurationCommand();
+                readMakefileConfigurations();
             }
 
             if (updateConfigProvider) {
