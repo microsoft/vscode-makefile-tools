@@ -13,8 +13,7 @@ export function clearCummulativeBrowsePath(): void {
 
 export class CppConfigurationProvider implements cpp.CustomConfigurationProvider {
     public readonly name = 'Makefile Tools';
-
-    public readonly extensionId = 'microsoft.vscode-makefile-tools';
+    public readonly extensionId = 'ms-vscode.makefile-tools';
 
     private workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = { browsePath: [] };
 
