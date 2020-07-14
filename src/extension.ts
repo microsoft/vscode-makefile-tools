@@ -147,8 +147,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return launcher.launchTargetPath();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchCurrentDir', () => {
-        return launcher.launchCurrentDir();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetDirectory', () => {
+        return launcher.launchTargetDirectory();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {

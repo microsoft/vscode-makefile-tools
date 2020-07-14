@@ -98,6 +98,7 @@
                             },
                             "makefilePath": {
                                 "type": "string",
+                                "default": "makefile",
                                 "description": "File path to the makefile"
                             },
                             "makePath": {

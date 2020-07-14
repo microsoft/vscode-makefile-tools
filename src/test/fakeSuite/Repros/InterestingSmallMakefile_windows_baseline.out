@@ -97,7 +97,7 @@ Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFIL
 Setting launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)"
 Created the following debug config:
    type = cppvsdbg
-   cwd = ${command:makefile.launchCurrentDir} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   cwd = ${command:makefile.launchTargetDirectory} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
    args = str3a str3b str3c
    program = ${command:makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe)
    miMode = undefined

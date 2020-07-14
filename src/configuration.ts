@@ -283,8 +283,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     // Make sure to copy from makefile.configurations.makeArgs because we are going to append more switches,
     // which shouldn't be identified as read from settings.
     // Make sure we start from a fresh empty configurationMakeArgs because there may be old arguments that don't apply anymore.
-    configurationMakeArgs = [];
-    configurationMakeArgs = configurationMakeArgs.concat(makefileConfiguration?.makeArgs || []);
+    configurationMakeArgs = makefileConfiguration?.makeArgs?.concat() || [];
 
     // Name of the make tool can be defined as makePath in makefile.configurations or as makefile.makePath.
     // When none defined, default to "make".
