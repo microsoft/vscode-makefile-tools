@@ -74,14 +74,15 @@ export async function parseBuildOrDryRun(): Promise<void> {
         makeArgs.push(currentTarget);
     }
 
-    // Append --dry-run (to not perform any real build operation),
-    // --always-make (to not skip over targets when timestamps indicate nothing needs to be done)
-    // and --keep-going (to ensure we get as much info as possible even when some targets fail)
+    // Include all the make arguments defined in makefile.configurations.makeArgs
     makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
+
+    // Append --dry-run switches
     makeArgs.push("--dry-run");
-    makeArgs.push("--always-make");
-    makeArgs.push("--keep-going");
-    makeArgs.push("--print-data-base");
+    const dryRunSwitches: string[] | undefined = configuration.getDryRunSwitches();
+    if (dryRunSwitches) {
+        makeArgs = makeArgs.concat(dryRunSwitches);
+    }
 
     logger.message("Generating the make dry-run output for parsing IntelliSense information. Command: " +
         configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));

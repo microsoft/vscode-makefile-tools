@@ -187,6 +187,23 @@ export function readExtensionLog(): void {
     }
 }
 
+let dryRunSwitches: string[] | undefined;
+export function getDryRunSwitches(): string[] | undefined { return dryRunSwitches; }
+export function setDryRunSwitches(switches: string[]): void { dryRunSwitches = switches; }
+
+// Read from settings the dry-run switches array. If there is no user definition, the defaults are:
+//   --always-make: to not skip over up-to-date targets
+//   --keep-going: to not stop at the first error that is encountered
+//   --print-data-base: to generate verbose log output that can be parsed to identify all the makefile targets
+// Some code bases have various issues with the above make parameters: infrastructure (not build) errors,
+// infinite reconfiguration loops, resulting in the extension being unusable.
+// To work around this, the setting makefile.dryRunSwitches is providing a way to skip over the problematic make arguments,
+// even if this results in not ideal behavior: less information available to be parsed, which leads to incomplete IntelliSense or missing targets.
+export function readDryRunSwitches(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    dryRunSwitches = workspaceConfiguration.get<string[]>("dryRunSwitches");
+}
+
 // Currently, the makefile extension supports debugging only an executable.
 // TODO: support dll debugging.
 export interface LaunchConfiguration {
@@ -404,6 +421,7 @@ export function initFromSettings(): void {
     readMakePath();
     readMakefilePath();
     readBuildLog();
+    readDryRunSwitches();
     readCurrentMakefileConfiguration();
     readCurrentMakefileConfigurationCommand();
     readCurrentTarget();
@@ -481,6 +499,15 @@ export function initFromSettings(): void {
                 logger.message("makefile.configurations setting changed.");
                 updateConfigProvider = true;
                 readMakefileConfigurations();
+            }
+
+            let updatedDryRunSwitches : string[] | undefined = workspaceConfiguration.get<string[]>("dryRunSwitches");
+            if (!util.areEqual(updatedDryRunSwitches, dryRunSwitches)) {
+                // A change in makefile.dryRunSwitches should trigger an IntelliSense update
+                // only if the extension is not currently reading from a build log.
+                updateConfigProvider = !buildLog || !util.checkFileExistsSync(buildLog);
+                logger.message("makefile.dryRunSwitches setting changed.");
+                readDryRunSwitches();
             }
 
             if (updateConfigProvider) {
@@ -573,18 +600,16 @@ export async function setNewLaunchConfiguration(): Promise<void> {
         return;
     }
 
+    // Construct the array of make arguments: configuration specific arguments + target + dry-run switches.
     let makeArgs: string[] = [];
-    // Append --dry-run (to not perform any real build operation),
-    // --always-make (to not skip over targets when timestamps indicate nothing needs to be done)
-    // and --keep-going (to ensure we get as much info as possible even when some targets fail)
     makeArgs = makeArgs.concat(configurationMakeArgs);
     if (currentTarget) {
         makeArgs.push(currentTarget);
     }
     makeArgs.push("--dry-run");
-    makeArgs.push("--always-make");
-    makeArgs.push("--keep-going");
-    makeArgs.push("--print-data-base");
+    if (dryRunSwitches) {
+        makeArgs = makeArgs.concat(dryRunSwitches);
+    }
 
     let stdoutStr: string = "";
     let stderrStr: string = "";
@@ -642,10 +667,18 @@ export async function setNewTarget(): Promise<void> {
     }
 
     let makeArgs: string[] = [];
-    // all: must be first argument, to make sure all targets are evaluated and not a subset
-    // --dry-run: to ensure no real build is performed for the targets analysis
-    // -p: creates a verbose log from which targets are easy to parse
-    makeArgs = makeArgs.concat(["all", "--dry-run", "-p"], configurationMakeArgs);
+    // "all" must be the first argument passed to make, to ensure that all the targets are evaluated and not only a subset
+    makeArgs.push("all");
+
+    // Then include all the make arguments defined in makefile.configurations.makeArgs
+    makeArgs = makeArgs.concat(configurationMakeArgs);
+
+    // append dry-run switches at the end of the make command
+    makeArgs.push("--dry-run");
+    if (dryRunSwitches) {
+        makeArgs = makeArgs.concat(configurationMakeArgs, dryRunSwitches);
+    }
+
     let stdoutStr: string = "";
     let stderrStr: string = "";
 

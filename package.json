@@ -181,16 +181,35 @@
                     "scope": "resource"
                 },
                 "makefile.makePath": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "make",
+                    "description": "The path to the make tool",
+                    "scope": "resource"
                 },
                 "makefile.makefilePath": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "makefile",
+                    "description": "The path to the makefile of the project",
+                    "scope": "resource"
                 },
                 "makefile.buildLog": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The path to the build log that is read to bypass a dry-run",
+                    "scope": "resource"
                 },
                 "makefile.extensionLog": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "The path to an output file storing all content from the Makefile output channel",
+                    "scope": "resource"
+                },
+                "makefile.dryRunSwitches": {
+                    "type": "array",
+                    "default": ["--always-make", "--keep-going", "--print-data-base"],
+                    "description": "Arguments to pass to the dry-run make invocation",
+                    "items": {
+                        "type": "string"
+                    },
+                    "scope": "resource"
                 }
             }
         }
