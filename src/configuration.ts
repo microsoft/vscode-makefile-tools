@@ -1,7 +1,7 @@
 // Configuration support
 
 import * as child_process from 'child_process';
-import * as fs from 'fs';
+import * as extension from './extension';
 import * as logger from './logger';
 import * as make from './make';
 import * as parser from './parser';
@@ -52,7 +52,7 @@ export interface MakefileConfiguration {
 }
 
 // Last configuration name picked from the set defined in makefile.configurations setting.
-// Saved into the settings storage. Also reflected in the configuration status bar button.
+// Saved into the workspace state. Also reflected in the configuration status bar button.
 // If no particular current configuration is defined in settings, set to 'Default'.
 let currentMakefileConfiguration: string;
 export function getCurrentMakefileConfiguration(): string { return currentMakefileConfiguration; }
@@ -64,10 +64,9 @@ export function setCurrentMakefileConfiguration(configuration: string): void {
     getBuildLogForConfiguration(currentMakefileConfiguration);
 }
 
-// Read the current configuration from settings storage, update status bar item
+// Read the current configuration from workspace state, update status bar item
 function readCurrentMakefileConfiguration(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    let buildConfiguration : string | undefined = workspaceConfiguration.get<string>("buildConfiguration");
+    let buildConfiguration : string | undefined = extension.extension.extensionContext.workspaceState.get<string>("buildConfiguration");
     if (!buildConfiguration) {
         logger.message("No current configuration is defined in the settings file. Assuming 'Default'.", "verbose");
         currentMakefileConfiguration = "Default";
@@ -207,23 +206,51 @@ export function readDryRunSwitches(): void {
 // Currently, the makefile extension supports debugging only an executable.
 // TODO: support dll debugging.
 export interface LaunchConfiguration {
-    // todo: add symbol search paths
-    cwd: string; // execution path
-    binaryPath: string; // full path
-    binaryArgs: string[]; // arguments
+    // The following properties constitute a minimal launch configuration object.
+    // They all can be deduced from the dry-run output or build log.
+    // When the user is selecting a launch configuration, the extension is verifying
+    // whether there is an entry in the launch configurations array in settings
+    // and if not, it is generating a new one with the values computed by the parser.
+    binaryPath: string; // full path to the binary that this launch configuration is tied to
+    binaryArgs: string[]; // arguments that this binary is called with for this launch configuration
+    cwd: string; // folder from where the binary is run
+
+    // The following represent optional properties that can be additionally defined by the user in settings.
     miMode?: string;
     miDebuggerPath?: string;
-}
-export function launchConfigurationToString(configuration: LaunchConfiguration): string {
-    let str: string = configuration.cwd;
-    str += ">";
-    str += util.makeRelPath(configuration.binaryPath, configuration.cwd);
-    str += "(";
-    str += configuration.binaryArgs.join(",");
-    str += ")";
-    return str;
+    stopAtEntry?: boolean;
+    symbolSearchPath?: string;
 }
 
+let launchConfigurations: LaunchConfiguration[] = [];
+export function getLaunchConfigurations(): LaunchConfiguration[] { return launchConfigurations; }
+export function setLaunchConfigurations(configurations: LaunchConfiguration[]): void { launchConfigurations = configurations; }
+
+// Read make configurations optionally defined by the user in settings: makefile.configurations.
+function readLaunchConfigurations(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    launchConfigurations = workspaceConfiguration.get<LaunchConfiguration[]>("launchConfigurations") || [];
+}
+
+// Helper used to fill the launch configurations quick pick.
+// The input object for this method is either read from the settings or it is an object
+// constructed by the parser while analyzing the dry-run output (or the build log),
+// when the extension is trying to determine if and how (from what folder, with what arguments)
+// the makefile is invoking any of the programs that are built by the current target.
+// Properties other than cwd, binary path and args could be manually defined by the user
+// in settings (after the extension creates a first minimal launch configuration object) and are not relevant
+// for the strings being used to populate the quick pick.
+// Syntax:
+//    [CWD path]>[binaryPath]([binaryArg1,binaryArg2,binaryArg3,...])
+export function launchConfigurationToString(configuration: LaunchConfiguration): string {
+    let binPath: string = util.makeRelPath(configuration.binaryPath, configuration.cwd);
+    let binArgs: string = configuration.binaryArgs.join(",");
+    return `${configuration.cwd}>${binPath}(${binArgs})`;
+}
+
+// Helper used to construct a minimal launch configuration object
+// (only cwd, binary path and arguments) from a string that respects
+// the syntax of its quick pick.
 export function stringToLaunchConfiguration(str: string): LaunchConfiguration | undefined {
     let regexp: RegExp = /(.*)\>(.*)\((.*)\)/mg;
     let match: RegExpExecArray | null = regexp.exec(str);
@@ -249,15 +276,46 @@ export function setCurrentLaunchConfiguration(configuration: LaunchConfiguration
     statusBar.setLaunchConfiguration(launchConfigurationToString(currentLaunchConfiguration));
 }
 
-// Read the current launch configuration from settings storage, update status bar item
+function getLaunchConfiguration(name: string): LaunchConfiguration | undefined {
+    return launchConfigurations.find(k => {
+        if (launchConfigurationToString(k) === name) {
+            return { ...k, keep: true };
+        }
+    });
+}
+
+// Construct the current launch configuration object:
+// Read the identifier from workspace state storage, then find the corresponding object
+// in the launch configurations array from settings.
+// Also update the status bar item.
 function readCurrentLaunchConfiguration(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    currentLaunchConfiguration = workspaceConfiguration.get<LaunchConfiguration>("launchConfiguration");
+    readLaunchConfigurations();
+    let currentLaunchConfigurationName: string | undefined = extension.extension.extensionContext.workspaceState.get<string>("launchConfiguration");
+    if (currentLaunchConfigurationName) {
+        currentLaunchConfiguration = getLaunchConfiguration(currentLaunchConfigurationName);
+    }
+
     if (currentLaunchConfiguration) {
         statusBar.setLaunchConfiguration(launchConfigurationToString(currentLaunchConfiguration));
     } else {
         statusBar.setLaunchConfiguration("No launch configuration set");
     }
+}
+
+export interface DebugConfig {
+    miMode?: string;
+    miDebuggerPath?: string;
+    stopAtEntry?: boolean;
+    symbolSearchPath?: string;
+}
+
+let debugConfig: DebugConfig | undefined;
+export function getDebugConfig(): DebugConfig | undefined { return debugConfig; }
+// No setter needed. Currently only the user can define makefile.debugConfig
+
+export function readDebugConfig(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    debugConfig = workspaceConfiguration.get<DebugConfig>("debugConfig");
 }
 
 // Command name and args are used when building from within the VS Code Makefile Tools Extension,
@@ -388,10 +446,9 @@ let currentTarget: string | undefined;
 export function getCurrentTarget(): string | undefined { return currentTarget; }
 export function setCurrentTarget(target: string | undefined): void { currentTarget = target; }
 
-// Read current target from settings storage, update status bar item
+// Read current target from workspace state, update status bar item
 function readCurrentTarget(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    let buildTarget : string | undefined = workspaceConfiguration.get<string>("buildTarget");
+    let buildTarget : string | undefined = extension.extension.extensionContext.workspaceState.get<string>("buildTarget");
     if (!buildTarget) {
         logger.message("No target defined in the settings file. Assuming 'Default'.", "verbose");
         statusBar.setTarget("Default");
@@ -415,7 +472,7 @@ export function stopListeningToSettingsChanged(): void {
     ignoreSettingsChanged = true;
 }
 // Initialization from settings (or backup default rules), done at activation time
-export function initFromSettings(): void {
+export function initFromStateAndSettings(): void {
     readLoggingLevel();
     readExtensionLog();
     readMakePath();
@@ -426,41 +483,31 @@ export function initFromSettings(): void {
     readCurrentMakefileConfigurationCommand();
     readCurrentTarget();
     readCurrentLaunchConfiguration();
+    readDebugConfig();
 
     vscode.workspace.onDidChangeConfiguration(e => {
         if (vscode.workspace.workspaceFolders && !ignoreSettingsChanged &&
             e.affectsConfiguration('makefile', vscode.workspace.workspaceFolders[0].uri)) {
-            logger.message("Detected a change in settings");
             // We are interested in updating only some relevant properties.
             // A subset of these should also trigger an IntelliSense config provider update.
             // Avoid unnecessary updates (for example, when settings are modified via the extension quickPick).
             let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
             let updateConfigProvider: boolean = false; // to trigger IntelliSense config provider refresh
 
-            let updatedBuildConfiguration: string | undefined = workspaceConfiguration.get<string>("buildConfiguration");
-            if (updatedBuildConfiguration !== currentMakefileConfiguration &&
-                // Undefined or null build configuration results in "Default"
-                (updatedBuildConfiguration || currentMakefileConfiguration !== "Default")) {
-                logger.message("Make configuration setting changed.");
-                updateConfigProvider = true;
-                readCurrentMakefileConfiguration();
-            }
-
-            let updatedTarget : string | undefined = workspaceConfiguration.get<string>("buildTarget");
-            if (updatedTarget !== currentTarget &&
-                // Undefined or null target results in ""
-                (updatedTarget || currentTarget !== "")) {
-                updateConfigProvider = true;
-                logger.message("Target setting changed.");
-                readCurrentTarget();
-            }
-
-            let updatedLaunchConfiguration : string | undefined = workspaceConfiguration.get<string>("launchConfiguration");
-            if (!util.areEqual(updatedLaunchConfiguration, currentLaunchConfiguration)) {
+            let updatedLaunchConfigurations : LaunchConfiguration[] | undefined = workspaceConfiguration.get<LaunchConfiguration[]>("launchConfigurations");
+            if (!util.areEqual(updatedLaunchConfigurations, launchConfigurations)) {
                 // Changing a launch configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
-                logger.message("Launch configuration setting changed.");
+                logger.message("Launch configurations setting changed.");
                 readCurrentLaunchConfiguration();
+            }
+
+            let updatedDebugConfig : DebugConfig | undefined = workspaceConfiguration.get<DebugConfig>("debugConfig");
+            if (!util.areEqual(updatedDebugConfig, debugConfig)) {
+                // Changing a global debug configuration does not impact the make or compiler tools invocations,
+                // so no IntelliSense update is needed.
+                logger.message("makefile.debugConfig setting changed.");
+                readDebugConfig();
             }
 
             let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>("buildLog");
@@ -496,6 +543,8 @@ export function initFromSettings(): void {
 
             let updatedMakefileConfigurations : MakefileConfiguration[] | undefined = workspaceConfiguration.get<MakefileConfiguration[]>("configurations");
             if (!util.areEqual(updatedMakefileConfigurations, makefileConfigurations)) {
+                // todo: skip over updating the IntelliSense configuration provider if the current makefile configuration
+                // is not among the subobjects that suffered modifications.
                 logger.message("makefile.configurations setting changed.");
                 updateConfigProvider = true;
                 readMakefileConfigurations();
@@ -523,11 +572,9 @@ export function initFromSettings(): void {
       });
 }
 
-export /*async*/ function setConfigurationByName(configurationName: string): void {//Promise<void> {
-    currentMakefileConfiguration = configurationName;
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    workspaceConfiguration.update("buildConfiguration", currentMakefileConfiguration);
-    setCurrentMakefileConfiguration(currentMakefileConfiguration);
+export function setConfigurationByName(configurationName: string): void {
+    extension.extension.extensionContext.workspaceState.update("buildConfiguration", configurationName);
+    setCurrentMakefileConfiguration(configurationName);
     make.parseBuildOrDryRun();
 }
 
@@ -559,7 +606,7 @@ export async function setNewConfiguration(): Promise<void> {
     }
 }
 
-// Fill a drop-down with all the binaries, with their associated args and executin paths
+// Fill a drop-down with all the binaries, with their associated args and executing paths
 // as they are parsed from the dry-run output within the scope of
 // the current build configuration and the current target.
 // Persist the new launch configuration data after the user picks one.
@@ -713,12 +760,11 @@ export async function setNewTarget(): Promise<void> {
     }
 }
 
-export /*async*/ function setTargetByName(targetName: string) : void {//Promise<void> {
+export function setTargetByName(targetName: string) : void {
     currentTarget = targetName;
     statusBar.setTarget(currentTarget);
     logger.message("Setting target " + currentTarget);
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    workspaceConfiguration.update("buildTarget", currentTarget);
+    extension.extension.extensionContext.workspaceState.update("buildTarget", currentTarget);
     make.parseBuildOrDryRun();
 }
 
@@ -735,12 +781,38 @@ export async function selectTarget(makefileTargets: string[]): Promise<void> {
     }
 }
 
-export /*async*/ function setLaunchConfigurationByName (launchConfigurationName: string) : void {//Promise<void> {
-    statusBar.setLaunchConfiguration(launchConfigurationName);
-    currentLaunchConfiguration = stringToLaunchConfiguration(launchConfigurationName);
-    logger.message('Setting launch target "' + launchConfigurationName + '"');
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    workspaceConfiguration.update("launchConfiguration", currentLaunchConfiguration || undefined);
+// The 'name' of a launch configuration is a string following this syntax:
+//    [cwd]>[binaryPath](binaryArg1,binaryArg2,...)
+// These strings are found by the extension while parsing the output of the dry-run or build log,
+// which reflect possible different ways of running the binaries built by the makefile.
+// TODO: If we find that these strings are not unique (meaning the makefile may invoke
+// the given binary in the exact same way more than once), incorporate also the containing target
+// name in the syntax (or, since in theory one can write a makefile target to run the same binary
+// in the same way more than once, add some number suffix).
+export function setLaunchConfigurationByName (launchConfigurationName: string) : void {
+    // Find the matching entry in the array of launch configurations
+    // or generate a new entry in settings if none are found.
+    currentLaunchConfiguration = getLaunchConfiguration(launchConfigurationName);
+    if (!currentLaunchConfiguration) {
+        currentLaunchConfiguration = stringToLaunchConfiguration(launchConfigurationName);
+        if (currentLaunchConfiguration) {
+            launchConfigurations.push(currentLaunchConfiguration);
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+            workspaceConfiguration.update("launchConfigurations", launchConfigurations);
+            logger.message("Inserting a new entry for {0} in the array of makefile.launchConfigurations. " +
+                           "You may define any additional debug properties for it in settings.", launchConfigurationName);
+        }
+    }
+
+    if (currentLaunchConfiguration) {
+        logger.message('Setting current launch target "' + launchConfigurationName + '"');
+        extension.extension.extensionContext.workspaceState.update("launchConfiguration", launchConfigurationName);
+        statusBar.setLaunchConfiguration(launchConfigurationName);
+    } else {
+        logger.message("A problem occured while analyzing launch configuration name {0}. Current launch configuration is unset.", launchConfigurationName);
+        extension.extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
+        statusBar.setLaunchConfiguration("No launch configuration set");
+    }
 }
 
 // Fill a drop-down with all the launch configurations found for binaries built by the makefile

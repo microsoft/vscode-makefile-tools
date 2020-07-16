@@ -233,10 +233,15 @@ export function areEqual(setting1: any, setting2: any): boolean {
 
     for (let p: number = 0; p < properties1.length; p++) {
         let property: string = properties1[p];
+        let isEqual: boolean;
         if (typeof(setting1[property]) === 'object' && typeof(setting2[property]) === 'object') {
-            return areEqual(setting1[property], setting2[property]);
+            isEqual = areEqual(setting1[property], setting2[property]);
         } else {
-            return setting1[property] === setting2[property];
+            isEqual = (setting1[property] === setting2[property]);
+        }
+
+        if (!isEqual) {
+            return false;
         }
     }
 

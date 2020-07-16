@@ -15,7 +15,7 @@ import * as cpp from 'vscode-cpptools';
 let statusBar: ui.UI = ui.getUI();
 let launcher: launch.Launcher = launch.getLauncher();
 
-export let extension: MakefileToolsExtension | null = null;
+export let extension: MakefileToolsExtension;
 
 export class MakefileToolsExtension {
     private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
@@ -95,11 +95,9 @@ export class MakefileToolsExtension {
 // which produced a new output string to be parsed
 export async function updateProvider(dryRunOutputStr: string): Promise<void> {
     logger.message("Updating the CppTools IntelliSense Configuration Provider.");
-    if (extension) {
-        extension.emptyCustomConfigurationProvider();
-        extension.constructIntellisense(dryRunOutputStr);
-        extension.registerCppToolsProvider();
-    }
+    extension.emptyCustomConfigurationProvider();
+    extension.constructIntellisense(dryRunOutputStr);
+    extension.registerCppToolsProvider();
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -169,7 +167,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }
 
     // Read configuration info from settings
-    configuration.initFromSettings();
+    configuration.initFromStateAndSettings();
 
     // Generate the dry-run output used for parsing the info to be sent to CppTools
     make.parseBuildOrDryRun();

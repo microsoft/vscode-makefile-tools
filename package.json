@@ -121,47 +121,86 @@
                     },
                     "scope": "resource"
                 },
-                "makefile.buildConfiguration": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "default": null,
-                    "description": "The makefile current configuration",
-                    "scope": "resource"
-                },
-                "makefile.buildTarget": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "default": null,
-                    "description": "The current target to be run by make",
-                    "scope": "resource"
-                },
-                "makefile.launchConfiguration": {
+                "makefile.debugConfig": {
                     "type": [
                         "object",
                         null
                     ],
                     "default": null,
-                    "description": "The configuration to use when running or debugging a target",
+                    "description": "Various global debugger settings",
                     "properties": {
-                        "binary": {
+                        "MIMode": {
                             "type": "string",
-                            "description": "The full path to the binary to run or debug"
+                            "description": "The non VS debugger type: gdb or lldb",
+                            "enum": [
+                              "gdb",
+                              "lldb"
+                            ]
                         },
-                        "args": {
-                            "type": "array",
-                            "description": "Arguments to pass to program command line",
-                            "items": {
-                                "type": "string"
+                        "miDebuggerPath": {
+                            "type": "string",
+                            "description": "Path to the non VS debugger (gdb or lldb)"
+                        },
+                        "stopAtEntry": {
+                            "type": "boolean",
+                            "description": "Stop at the entry point of the target",
+                            "default": false
+                        },
+                        "symbolSearchPath": {
+                            "type": "string",
+                            "description": "The path to the symbols"
+                        }
+                    },
+                    "scope": "resource"
+                },
+                "makefile.launchConfigurations": {
+                    "type": [
+                        "array",
+                        null
+                    ],
+                    "default": [],
+                    "description": "The user defined launch (debug/run) configurations",
+                    "items": {
+                        "type": "object",
+                        "default": null,
+                        "properties": {
+                            "binaryPath": {
+                                "type": "string",
+                                "description": "The full path to the binary to run or debug"
                             },
-                            "default": []
-                        },
-                        "cwd": {
-                            "type": "string",
-                            "description": "Set the working directory for the program"
+                            "binaryArgs": {
+                                "type": "array",
+                                "description": "Arguments to pass to program command line",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
+                            "cwd": {
+                                "type": "string",
+                                "description": "Set the working directory for the program"
+                            },
+                            "MIMode": {
+                                "type": "string",
+                                "description": "The non VS debugger type: gdb or lldb",
+                                "enum": [
+                                  "gdb",
+                                  "lldb"
+                                ]
+                            },
+                            "miDebuggerPath": {
+                                "type": "string",
+                                "description": "Path to the non VS debugger (gdb or lldb)"
+                            },
+                            "stopAtEntry": {
+                                "type": "boolean",
+                                "description": "Stop at the entry point of the target",
+                                "default": false
+                            },
+                            "symbolSearchPath": {
+                                "type": "string",
+                                "description": "The path to the symbols"
+                            }
                         }
                     },
                     "scope": "resource"

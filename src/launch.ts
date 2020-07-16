@@ -6,7 +6,6 @@ import * as logger from './logger';
 import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
-import { debug } from 'util';
 
 let launcher: Launcher;
 
@@ -80,7 +79,8 @@ export class Launcher implements vscode.Disposable {
     // the right lldb-mi when miMode is lldb and miDebuggerPath is undefined.
     // Additionally, cppvsdbg ignores miMode and miDebuggerPath.
     public prepareDebugCurrentTarget(): vscode.DebugConfiguration | undefined {
-        if (!configuration.getCurrentLaunchConfiguration()) {
+        let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
+        if (!currentLaunchConfiguration) {
             vscode.window.showErrorMessage("Currently there is no launch configuration set.");
             logger.message("Cannot start debugging because there is no launch configuration set. " +
                 "Define one in the settings file or use the makefile.setLaunchConfiguration");
@@ -89,14 +89,14 @@ export class Launcher implements vscode.Disposable {
 
         let args: string[] = this.launchTargetArgs();
 
-        let compilerPath : string | undefined = extension.extension?.getCompilerFullPath();
+        let compilerPath : string | undefined = extension.extension.getCompilerFullPath();
         let parsedObjPath : path.ParsedPath | undefined = compilerPath ? path.parse(compilerPath) : undefined;
         let isClangCompiler : boolean | undefined = parsedObjPath?.name.startsWith("clang");
         let isMsvcCompiler : boolean | undefined = !isClangCompiler && parsedObjPath?.name.startsWith("cl");
         let dbg: string = (isMsvcCompiler) ? "cppvsdbg" : "cppdbg";
-        let miDebuggerPath : string | undefined = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : undefined;
 
         // Initial debugger guess
+        let miDebuggerPath : string | undefined = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : undefined;
         let miMode: string | undefined;
         if (parsedObjPath?.name.startsWith("clang")) {
             miMode = "lldb";
@@ -128,16 +128,19 @@ export class Launcher implements vscode.Disposable {
             }
         }
 
-        let debugConfig: vscode.DebugConfiguration;
-        debugConfig = {
+        // Properties defined by makefile.launchConfigurations override makefile.debugConfig.
+        let makeDebugConfig: configuration.DebugConfig | undefined = configuration.getDebugConfig();
+        let debugConfig: vscode.DebugConfiguration = {
             type: dbg,
             name: `Debug My Program`,
             request: 'launch',
             cwd: '${command:makefile.launchTargetDirectory}',
             args,
             program: '${command:makefile.launchTargetPath}',
-            miMode: miMode,
-            miDebuggerPath: miDebuggerPath
+            miMode: currentLaunchConfiguration.miMode || makeDebugConfig?.miMode || miMode,
+            miDebuggerPath: currentLaunchConfiguration.miDebuggerPath || makeDebugConfig?.miDebuggerPath || miDebuggerPath,
+            stopAtEntry: currentLaunchConfiguration.stopAtEntry || makeDebugConfig?.stopAtEntry,
+            symbolSearchPath: currentLaunchConfiguration.symbolSearchPath || makeDebugConfig?.symbolSearchPath
         };
 
         logger.message("Created the following debug config:\n   type = " + debugConfig.type +
