@@ -75,8 +75,10 @@ export class Launcher implements vscode.Disposable {
     //       because there is no gcc toolset installed).
     //       TODO: implement proper detection of aliases and their commands.
     // Exceptions for miDebuggerPath:
-    //    - intentionally do not provide a miDebuggerPath On MAC, because the debugger knows how to find automatically
-    // the right lldb-mi when miMode is lldb and miDebuggerPath is undefined.
+    //    - for MacOS, point to the lldb-mi debugger that is installed by CppTools
+    //    - if CppTools extension is not installed, intentionally do not provide a miDebuggerPath On MAC,
+    //      because the debugger knows how to find automatically the right lldb-mi when miMode is lldb and miDebuggerPath is undefined
+    //      (this is true for systems older than Catalina).
     // Additionally, cppvsdbg ignores miMode and miDebuggerPath.
     public prepareDebugCurrentTarget(): vscode.DebugConfiguration | undefined {
         let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
@@ -96,31 +98,38 @@ export class Launcher implements vscode.Disposable {
         let dbg: string = (isMsvcCompiler) ? "cppvsdbg" : "cppdbg";
 
         // Initial debugger guess
-        let miDebuggerPath : string | undefined = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : undefined;
-        let miMode: string | undefined;
+        let guessMiDebuggerPath : string | undefined = (!isMsvcCompiler && parsedObjPath) ? parsedObjPath.dir : undefined;
+        let guessMiMode: string | undefined;
         if (parsedObjPath?.name.startsWith("clang")) {
-            miMode = "lldb";
+            guessMiMode = "lldb";
         } else if (!parsedObjPath?.name.startsWith("cl")) {
-            miMode = "gdb";
+            guessMiMode = "gdb";
         }
 
         // If the first chosen debugger is not installed, try the other one.
-        if (miDebuggerPath && miMode) {
-            let debuggerPath: string = path.join(miDebuggerPath, miMode);
+        if (guessMiDebuggerPath && guessMiMode) {
+            let debuggerPath: string = path.join(guessMiDebuggerPath, guessMiMode);
             if (process.platform === "win32") {
                 // On mingw a file is not found if the extension is not part of the path
                 debuggerPath = debuggerPath + ".exe";
             }
 
             if (!util.checkFileExistsSync(debuggerPath)) {
-                miMode = (miMode === "gdb") ? "lldb" : "gdb";
+                guessMiMode = (guessMiMode === "gdb") ? "lldb" : "gdb";
             }
         }
 
-        // Exception for MAC-lldb, intentionally don't provide the debugger path,
-        // to allow the debugger extension to find it automatically
+        // Properties defined by makefile.launchConfigurations override makefile.debugConfig
+        // and they both override the guessed values.
+        let makeDebugConfig: configuration.DebugConfig | undefined = configuration.getDebugConfig();
+        let miMode: string | undefined = currentLaunchConfiguration.MIMode || makeDebugConfig?.MIMode || guessMiMode;
+        let miDebuggerPath: string | undefined = currentLaunchConfiguration.miDebuggerPath || makeDebugConfig?.miDebuggerPath || guessMiDebuggerPath;
+
+        // Exception for MAC-lldb, point to the lldb-mi installed by CppTools or set debugger path to undefined
+        // (more details in the comment at the beginning of this function).
         if (miMode === "lldb" && process.platform === "darwin") {
-            miDebuggerPath = undefined;
+            const cpptoolsExtension: vscode.Extension<any> | undefined = vscode.extensions.getExtension('ms-vscode.cpptools');
+            miDebuggerPath = cpptoolsExtension ? path.join(cpptoolsExtension.extensionPath, "debugAdapters", "lldb-mi", "bin", "lldb-mi") : undefined;
         } else if (miDebuggerPath && miMode) {
             miDebuggerPath = path.join(miDebuggerPath, miMode);
             if (process.platform === "win32") {
@@ -128,8 +137,6 @@ export class Launcher implements vscode.Disposable {
             }
         }
 
-        // Properties defined by makefile.launchConfigurations override makefile.debugConfig.
-        let makeDebugConfig: configuration.DebugConfig | undefined = configuration.getDebugConfig();
         let debugConfig: vscode.DebugConfiguration = {
             type: dbg,
             name: `Debug My Program`,
@@ -137,8 +144,8 @@ export class Launcher implements vscode.Disposable {
             cwd: '${command:makefile.launchTargetDirectory}',
             args,
             program: '${command:makefile.launchTargetPath}',
-            miMode: currentLaunchConfiguration.miMode || makeDebugConfig?.miMode || miMode,
-            miDebuggerPath: currentLaunchConfiguration.miDebuggerPath || makeDebugConfig?.miDebuggerPath || miDebuggerPath,
+            MIMode: miMode,
+            miDebuggerPath: miDebuggerPath,
             stopAtEntry: currentLaunchConfiguration.stopAtEntry || makeDebugConfig?.stopAtEntry,
             symbolSearchPath: currentLaunchConfiguration.symbolSearchPath || makeDebugConfig?.symbolSearchPath
         };

@@ -216,7 +216,7 @@ export interface LaunchConfiguration {
     cwd: string; // folder from where the binary is run
 
     // The following represent optional properties that can be additionally defined by the user in settings.
-    miMode?: string;
+    MIMode?: string;
     miDebuggerPath?: string;
     stopAtEntry?: boolean;
     symbolSearchPath?: string;
@@ -303,7 +303,7 @@ function readCurrentLaunchConfiguration(): void {
 }
 
 export interface DebugConfig {
-    miMode?: string;
+    MIMode?: string;
     miDebuggerPath?: string;
     stopAtEntry?: boolean;
     symbolSearchPath?: string;
