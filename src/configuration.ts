@@ -2,6 +2,7 @@
 
 import * as child_process from 'child_process';
 import * as extension from './extension';
+import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
 import * as parser from './parser';
@@ -132,18 +133,11 @@ export function setBuildLog(path: string): void { buildLog = path; }
 // identifying less possible binaries to debug or not providing any makefile targets (other than the 'all' default).
 function readBuildLog(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    buildLog = workspaceConfiguration.get<string>("buildLog");
-
-    if (buildLog) {
-        logger.message('Found build log path setting "' + buildLog + '"');
-        if (!path.isAbsolute(buildLog)) {
-            buildLog = path.join(vscode.workspace.rootPath || "", buildLog);
-            logger.message('Resolving build log path to  "' + buildLog + '"');
-        }
-
-        if (!util.checkFileExistsSync(buildLog)) {
-            logger.message("Build log not found. Remove the build log setting or provide a build log file on disk at the given location.");
-        }
+    // how to get default from package.json to avoid problem with 'undefined' type?
+    buildLog = util.resolvePathToRoot(workspaceConfiguration.get<string>("buildLog", "./build.log"));
+    logger.message('Build log defined at "' + buildLog + '"');
+    if (!util.checkFileExistsSync(buildLog)) {
+        logger.message("Build log not found on disk.");
     }
 }
 
@@ -161,8 +155,8 @@ export function readLoggingLevel(): void {
     }
 }
 
-let extensionLog: string | undefined;
-export function getExtensionLog(): string | undefined { return extensionLog; }
+let extensionLog: string;
+export function getExtensionLog(): string { return extensionLog; }
 export function setExtensionLog(path: string): void { extensionLog = path; }
 
 // Read from settings the path to a log file capturing all the "Makefile Tools" output channel content.
@@ -175,15 +169,23 @@ export function setExtensionLog(path: string): void { extensionLog = path; }
 // are going to be appended to this file.
 export function readExtensionLog(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    extensionLog = workspaceConfiguration.get<string>("extensionLog");
+    // how to get default from package.json to avoid problem with 'undefined' type?
+    extensionLog = util.resolvePathToRoot(workspaceConfiguration.get<string>("extensionLog", "./dryrun.log"));
+    logger.message('Writing extension log at {0}', extensionLog);
+}
 
-    if (extensionLog) {
-        logger.message('Found extension log path setting "' + extensionLog + '"');
-        if (!path.isAbsolute(extensionLog)) {
-            extensionLog = path.join(vscode.workspace.rootPath || "", extensionLog);
-            logger.message('Resolving extension log path to "' + extensionLog + '"');
-        }
-    }
+let dryrunCache: string;
+export function getDryrunCache(): string { return dryrunCache; }
+export function setDryrunCache(path: string): void { dryrunCache = path; }
+
+// Read from settings the path to a cache file containing the output of the last dry-run make command.
+// This file is recreated when opening a project, when changing the build configuration or the build target
+// and when the settings watcher detects a change of any properties that may impact the dryrun output.
+export function readDryrunCache(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    // how to get default from package.json to avoid problem with 'undefined' type?
+    dryrunCache = util.resolvePathToRoot(workspaceConfiguration.get<string>("dryrunCache", "./dryrunCache.log"));
+    logger.message("Dry-run output cached at {0}", dryrunCache);
 }
 
 let dryRunSwitches: string[] | undefined;
@@ -471,10 +473,17 @@ export function startListeningToSettingsChanged(): void {
 export function stopListeningToSettingsChanged(): void {
     ignoreSettingsChanged = true;
 }
+
+ // Triggers IntelliSense config provider updates after relevant changes
+ // are made in settings or in the makefiles.
+ // To avoid unnecessary dry-runs, these updates are not performed with every document save
+ // but after leaving the focus of the document.
+let configProviderDirty: boolean = false;
+
 // Initialization from settings (or backup default rules), done at activation time
 export function initFromStateAndSettings(): void {
     readLoggingLevel();
-    readExtensionLog();
+    readDryrunCache();
     readMakePath();
     readMakefilePath();
     readBuildLog();
@@ -485,6 +494,32 @@ export function initFromStateAndSettings(): void {
     readCurrentLaunchConfiguration();
     readDebugConfig();
 
+    // Verify the dirty state of the IntelliSense config provider and update accordingly.
+    // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
+    vscode.window.onDidChangeActiveTextEditor(e => {
+        if (configProviderDirty) {
+            logger.message("Updating the Intellisense config provider...");
+            getCommandForConfiguration(currentMakefileConfiguration);
+            getBuildLogForConfiguration(currentMakefileConfiguration);
+            make.parseBuildOrDryRun();
+
+            configProviderDirty = false;
+        }
+    });
+
+    // Modifying any makefile should trigger an IntelliSense config provider update,
+    // so make the dirty state true.
+    // TODO: limit to makefiles relevant to this project, instead of any random makefile anywhere.
+    //       We can't listen only to the makefile pointed to by makefile.makefilePath,
+    //       because that is only the entry point and can refer to other relevant makefiles.
+    // TODO: don't trigger an update for any dummy save, verify how the content changed.
+    vscode.workspace.onDidSaveTextDocument(e => {
+        if (e.uri.fsPath.toLowerCase().endsWith("makefile")) {
+            configProviderDirty = true;
+        }
+    });
+
+    // Watch for Makefile Tools setting updates that can change the IntelliSense config provider dirty state
     vscode.workspace.onDidChangeConfiguration(e => {
         if (vscode.workspace.workspaceFolders && !ignoreSettingsChanged &&
             e.affectsConfiguration('makefile', vscode.workspace.workspaceFolders[0].uri)) {
@@ -492,7 +527,6 @@ export function initFromStateAndSettings(): void {
             // A subset of these should also trigger an IntelliSense config provider update.
             // Avoid unnecessary updates (for example, when settings are modified via the extension quickPick).
             let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-            let updateConfigProvider: boolean = false; // to trigger IntelliSense config provider refresh
 
             let updatedLaunchConfigurations : LaunchConfiguration[] | undefined = workspaceConfiguration.get<LaunchConfiguration[]>("launchConfigurations");
             if (!util.areEqual(updatedLaunchConfigurations, launchConfigurations)) {
@@ -510,18 +544,25 @@ export function initFromStateAndSettings(): void {
                 readDebugConfig();
             }
 
-            let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>("buildLog");
-            if (updatedBuildLog !== buildLog) {
-                updateConfigProvider = true;
+            let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>("buildLog", "./build.log");
+            if (util.resolvePathToRoot(updatedBuildLog) !== buildLog) {
+                configProviderDirty = true;
                 logger.message("makefile.buildLog setting changed.");
                 readBuildLog();
             }
 
-            let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>("extensionLog");
-            if (updatedExtensionLog !== extensionLog) {
+            let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>("extensionLog", "./extension.log");
+            if (util.resolvePathToRoot(updatedExtensionLog) !== extensionLog) {
                 // No IntelliSense update needed.
                 logger.message("makefile.extensionLog setting changed.");
                 readExtensionLog();
+            }
+
+            let updatedDryrunCache : string | undefined = workspaceConfiguration.get<string>("dryrunCache", "./dryrunCache.log");
+            if (util.resolvePathToRoot(updatedDryrunCache) !== dryrunCache) {
+                configProviderDirty = true;
+                logger.message("makefile.dryrunCache setting changed.");
+                readDryrunCache();
             }
 
             let updatedMakePath : string | undefined = workspaceConfiguration.get<string>("makePath");
@@ -530,14 +571,14 @@ export function initFromStateAndSettings(): void {
                 // may produce a different dry-run output with potential impact on IntelliSense,
                 // so trigger an update.
                 logger.message("makefile.makePath setting changed.");
-                updateConfigProvider = true;
+                configProviderDirty = true;
                 readMakePath();
             }
 
             let updatedMakefilePath : string | undefined = workspaceConfiguration.get<string>("makefilePath");
             if (updatedMakefilePath !== makefilePath) {
                 logger.message("makefile.makefilePath setting changed.");
-                updateConfigProvider = true;
+                configProviderDirty = true;
                 readMakefilePath();
             }
 
@@ -546,7 +587,7 @@ export function initFromStateAndSettings(): void {
                 // todo: skip over updating the IntelliSense configuration provider if the current makefile configuration
                 // is not among the subobjects that suffered modifications.
                 logger.message("makefile.configurations setting changed.");
-                updateConfigProvider = true;
+                configProviderDirty = true;
                 readMakefileConfigurations();
             }
 
@@ -554,19 +595,9 @@ export function initFromStateAndSettings(): void {
             if (!util.areEqual(updatedDryRunSwitches, dryRunSwitches)) {
                 // A change in makefile.dryRunSwitches should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                updateConfigProvider = !buildLog || !util.checkFileExistsSync(buildLog);
+                configProviderDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.dryRunSwitches setting changed.");
                 readDryRunSwitches();
-            }
-
-            if (updateConfigProvider) {
-                // The source for the parsing process can either be a build log or the dry-run output of make tool,
-                // but there are some rules of defaults and/or overrides that may be impacted by any of the above settings,
-                // so recalculate.
-                logger.message("Some of the changes detected in settings are triggering udpates");
-                getCommandForConfiguration(currentMakefileConfiguration);
-                getBuildLogForConfiguration(currentMakefileConfiguration);
-                make.parseBuildOrDryRun();
             }
         }
       });
@@ -631,10 +662,18 @@ export function parseLaunchConfigurations(source: string): string[] {
 }
 
 export function parseLaunchConfigurationsFromBuildLog(): string[] | undefined {
-    let buildLogContent: string | undefined = configurationBuildLog ? util.readFile(configurationBuildLog) : undefined;
-    if (buildLogContent) {
-        logger.message('Parsing the provided build log "' + configurationBuildLog + '" for launch configurations...');
-        return parseLaunchConfigurations(buildLogContent);
+    // A build log has priority over a dry-run cache.
+    let content: string | undefined = configurationBuildLog ? util.readFile(configurationBuildLog) : undefined;
+    let file: string | undefined = configurationBuildLog;
+
+    if (!content) {
+        content = dryrunCache ? util.readFile(dryrunCache) : undefined;
+        file = dryrunCache;
+    }
+
+    if (content) {
+        logger.message(`Parsing launch configurations from: ${file}`);
+        return parseLaunchConfigurations(content);
     }
 
     return undefined;
@@ -674,12 +713,14 @@ export async function setNewLaunchConfiguration(): Promise<void> {
 
         let closing : any = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
-                logger.message("The verbose make dry-run command for parsing binaries launch configuration failed.");
+                logger.message("The make dry-run command failed. Launch configurations may be missing from the Quick Pick selection.");
                 logger.message(stderrStr);
+                util.reportDryRunError();
             }
 
             //logger.message("The dry-run output for parsing the binaries launch configuration");
             //logger.message(stdoutStr);
+            fs.writeFileSync(dryrunCache, stdoutStr);
             let launchConfigurationNames: string[] = parseLaunchConfigurations(stdoutStr);
             selectLaunchConfiguration(launchConfigurationNames);
         };
@@ -691,11 +732,19 @@ export async function setNewLaunchConfiguration(): Promise<void> {
     }
 }
 
-export function parseTargetsFromBuildLog(): string[] | undefined {
-    let buildLogContent: string | undefined = configurationBuildLog ? util.readFile(configurationBuildLog) : undefined;
-    if (buildLogContent) {
-        logger.message('Parsing the provided build log "' + configurationBuildLog + '" for targets...');
-        let makefileTargets: string[] = parser.parseTargets(buildLogContent);
+export function parseTargetsFromBuildLogOrCache(): string[] | undefined {
+    // A build log has priority over a dry-run cache.
+    let content: string | undefined = configurationBuildLog ? util.readFile(configurationBuildLog) : undefined;
+    let file: string | undefined = configurationBuildLog;
+
+    if (!content) {
+        content = dryrunCache ? util.readFile(dryrunCache) : undefined;
+        file = dryrunCache;
+    }
+
+    if (content) {
+        logger.message(`Parsing targets from: ${file}`);
+        let makefileTargets: string[] = parser.parseTargets(content);
         makefileTargets = makefileTargets.sort();
         return makefileTargets;
     }
@@ -707,7 +756,8 @@ export function parseTargetsFromBuildLog(): string[] | undefined {
 export async function setNewTarget(): Promise<void> {
     // If a build log is specified in makefile.configurations.buildLog or makefile.buildLog settings,
     // (and if it exists on disk) it must be parsed instead of invoking a dry-run make command.
-    let makefileTargets: string[] | undefined = parseTargetsFromBuildLog();
+    // Also, an existing dry-run cache should avoid calling make for this (finding all the existing targets).
+    let makefileTargets: string[] | undefined = parseTargetsFromBuildLogOrCache();
     if (makefileTargets) {
         selectTarget(makefileTargets);
         return;
@@ -743,11 +793,13 @@ export async function setNewTarget(): Promise<void> {
 
         let closing : any = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
-                logger.message("The verbose make dry-run command for parsing targets failed.");
+                logger.message("The make dry-run command failed. Makefile build targets may be missing from the Quick Pick selection.");
                 logger.message(stderrStr);
+                util.reportDryRunError();
             }
 
             // Don't log stdoutStr in this case, because -p output is too verbose to be useful in any logger area
+            fs.writeFileSync(dryrunCache, stdoutStr);
             makefileTargets = parser.parseTargets(stdoutStr);
             makefileTargets = makefileTargets.sort();
             selectTarget(makefileTargets);
@@ -809,7 +861,7 @@ export function setLaunchConfigurationByName (launchConfigurationName: string) :
         extension.extension.extensionContext.workspaceState.update("launchConfiguration", launchConfigurationName);
         statusBar.setLaunchConfiguration(launchConfigurationName);
     } else {
-        logger.message("A problem occured while analyzing launch configuration name {0}. Current launch configuration is unset.", launchConfigurationName);
+        logger.message(`A problem occured while analyzing launch configuration name ${launchConfigurationName}. Current launch configuration is unset.`);
         extension.extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
         statusBar.setLaunchConfiguration("No launch configuration set");
     }

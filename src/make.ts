@@ -2,6 +2,7 @@
 
 import * as configuration from './configuration';
 import * as ext from './extension';
+import * as fs from 'fs';
 import * as logger from './logger';
 import * as util from './util';
 import * as vscode from 'vscode';
@@ -100,12 +101,14 @@ export async function parseBuildOrDryRun(): Promise<void> {
         };
 
         let closing : any = (retCode: number, signal: string): void => {
+            let dryrunCache: string = configuration.getDryrunCache();
             if (retCode !== 0) {
-                logger.message("The make dry-run command failed.");
+                logger.message("The make dry-run command failed. IntelliSense may work only partially or not at all.");
                 logger.message(stderrStr);
+                util.reportDryRunError();
             }
 
-            console.log("Make dry-run output to parse is:\n" + stdoutStr);
+            fs.writeFileSync(dryrunCache, stdoutStr);
             ext.updateProvider(stdoutStr);
         };
 

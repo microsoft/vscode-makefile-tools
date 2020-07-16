@@ -2,7 +2,10 @@
 
 import * as fs from 'fs';
 import * as child_process from 'child_process';
+import * as configuration from './configuration';
+import * as logger from './logger';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
 // TODO: c++20, c++latest
 export type StandardVersion = 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | undefined;
@@ -246,4 +249,21 @@ export function areEqual(setting1: any, setting2: any): boolean {
     }
 
     return true;
+}
+
+export function reportDryRunError(): void {
+    logger.message(`You can see the detailed dry-run output at ${configuration.getDryrunCache()}`);
+    logger.message("Make sure that the extension is invoking the same make command as in your development prompt environment.");
+    logger.message("You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]");
+    logger.message("If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: "
+                   + "https://github.com/microsoft/vscode-makefile-tools/issues");
+}
+
+// Helper to make paths absolute until the extension handles variables expansion.
+export function resolvePathToRoot(relPath: string): string {
+    if (!path.isAbsolute(relPath)) {
+        return path.join(vscode.workspace.rootPath || "", relPath);
+    }
+
+    return relPath;
 }

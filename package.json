@@ -234,11 +234,19 @@
                 "makefile.buildLog": {
                     "type": "string",
                     "description": "The path to the build log that is read to bypass a dry-run",
+                    "default": "./build.log",
                     "scope": "resource"
                 },
                 "makefile.extensionLog": {
                     "type": "string",
                     "description": "The path to an output file storing all content from the Makefile output channel",
+                    "default": "./extension.log",
+                    "scope": "resource"
+                },
+                "makefile.dryrunCache": {
+                    "type": "string",
+                    "description": "The path to a cache file storing the output of the last dry-run make command",
+                    "default": "./dryrunCache.log",
                     "scope": "resource"
                 },
                 "makefile.dryRunSwitches": {

@@ -162,7 +162,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     // Delete the extension log file, if exists
     let extensionLog : string | undefined = configuration.getExtensionLog();
-    if (extensionLog) {
+    if (extensionLog && util.checkFileExistsSync(extensionLog)) {
         fs.unlinkSync(extensionLog);
     }
 
