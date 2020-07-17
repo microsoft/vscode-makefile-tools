@@ -157,6 +157,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return launcher.launchTargetArgsConcat();
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', () => {
+        make.parseBuildOrDryRun();
+    }));
+
     configuration.readLoggingLevel();
     configuration.readExtensionLog();
 
@@ -169,8 +173,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Read configuration info from settings
     configuration.initFromStateAndSettings();
 
-    // Generate the dry-run output used for parsing the info to be sent to CppTools
-    make.parseBuildOrDryRun();
+    // Generate the dry-run output used for parsing the info to be sent to CppTools,
+    // unless the user disabled automatic configure after opening.
+    if (configuration.getConfigureOnOpen()) {
+        make.parseBuildOrDryRun();
+    } else {
+        logger.message("makefile.configureOnOpen is set to false. The project will not configure automatically after opening.");
+        logger.message("For the extension to work properly, it is recommended that you run the command makefile.configure at your earliest convenience.");
+   }
 }
 
 export async function deactivate(): Promise<void> {

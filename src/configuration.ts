@@ -478,11 +478,38 @@ export function stopListeningToSettingsChanged(): void {
     ignoreSettingsChanged = true;
 }
 
+let configureOnOpen: boolean;
+export function getConfigureOnOpen(): boolean { return configureOnOpen; }
+export function setConfigureOnOpen(configure: boolean): void { configureOnOpen = configure; }
+export function readConfigureOnOpen(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    // how to get default from package.json to avoid problem with 'undefined' type?
+    configureOnOpen = workspaceConfiguration.get<boolean>("configureOnOpen", true);
+}
+
+let configureOnEdit: boolean;
+export function getConfigureOnEdit(): boolean { return configureOnEdit; }
+export function setConfigureOnEdit(configure: boolean): void { configureOnEdit = configure; }
+export function readConfigureOnEdit(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    // how to get default from package.json to avoid problem with 'undefined' type?
+    configureOnEdit = workspaceConfiguration.get<boolean>("configureOnEdit", true);
+}
+
+let configureAfterCommand: boolean;
+export function getConfigureAfterCommand(): boolean { return configureAfterCommand; }
+export function setConfigureAfterCommand(configure: boolean): void { configureAfterCommand = configure; }
+export function readConfigureAfterCommand(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    // how to get default from package.json to avoid problem with 'undefined' type?
+    configureAfterCommand = workspaceConfiguration.get<boolean>("configureAfterCommand", true);
+}
+
  // Triggers IntelliSense config provider updates after relevant changes
  // are made in settings or in the makefiles.
  // To avoid unnecessary dry-runs, these updates are not performed with every document save
  // but after leaving the focus of the document.
-let configProviderDirty: boolean = false;
+let updateConfigProviderAfterEdit: boolean = false;
 
 // Initialization from settings (or backup default rules), done at activation time
 export function initFromStateAndSettings(): void {
@@ -497,17 +524,30 @@ export function initFromStateAndSettings(): void {
     readCurrentTarget();
     readCurrentLaunchConfiguration();
     readDebugConfig();
+    readConfigureOnOpen();
+    readConfigureOnEdit();
+    readConfigureAfterCommand();
 
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
     vscode.window.onDidChangeActiveTextEditor(e => {
-        if (configProviderDirty) {
-            logger.message("Updating the Intellisense config provider...");
-            getCommandForConfiguration(currentMakefileConfiguration);
-            getBuildLogForConfiguration(currentMakefileConfiguration);
-            make.parseBuildOrDryRun();
+        if (updateConfigProviderAfterEdit) {
+            if (configureOnEdit) {
+                logger.message("Updating the Intellisense config provider...");
+                getCommandForConfiguration(currentMakefileConfiguration);
+                getBuildLogForConfiguration(currentMakefileConfiguration);
+                make.parseBuildOrDryRun();
+            } else {
+                logger.message("makefile.configureOnEdit is set to false. " +
+                    "The project will not configure automatically after edits on any of the makefiles or after settings changes.");
+                logger.message("In order to have an up to date IntelliSense after these edits, it is recommended that you run the command makefile.configure at your earliest convenience.");
+            }
 
-            configProviderDirty = false;
+            // updateConfigProviderAfterEdit needs to be set to false regardless of whether an update to the config provider
+            // has been triggered (when makefile.configureOnEdit would be true) because it causes the message to be displayed
+            // on each text editor focus change (until an eventual configure would set it to true).
+            // For now, this variable is not the usual 'dirty' state boolean.
+            updateConfigProviderAfterEdit = false;
         }
     });
 
@@ -519,7 +559,7 @@ export function initFromStateAndSettings(): void {
     // TODO: don't trigger an update for any dummy save, verify how the content changed.
     vscode.workspace.onDidSaveTextDocument(e => {
         if (e.uri.fsPath.toLowerCase().endsWith("makefile")) {
-            configProviderDirty = true;
+            updateConfigProviderAfterEdit = true;
         }
     });
 
@@ -550,7 +590,7 @@ export function initFromStateAndSettings(): void {
 
             let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>("buildLog", "./build.log");
             if (util.resolvePathToRoot(updatedBuildLog) !== buildLog) {
-                configProviderDirty = true;
+                updateConfigProviderAfterEdit = true;
                 logger.message("makefile.buildLog setting changed.");
                 readBuildLog();
             }
@@ -564,7 +604,7 @@ export function initFromStateAndSettings(): void {
 
             let updatedDryrunCache : string | undefined = workspaceConfiguration.get<string>("dryrunCache", "./dryrunCache.log");
             if (util.resolvePathToRoot(updatedDryrunCache) !== dryrunCache) {
-                configProviderDirty = true;
+                updateConfigProviderAfterEdit = true;
                 logger.message("makefile.dryrunCache setting changed.");
                 readDryrunCache();
             }
@@ -575,14 +615,14 @@ export function initFromStateAndSettings(): void {
                 // may produce a different dry-run output with potential impact on IntelliSense,
                 // so trigger an update.
                 logger.message("makefile.makePath setting changed.");
-                configProviderDirty = true;
+                updateConfigProviderAfterEdit = true;
                 readMakePath();
             }
 
             let updatedMakefilePath : string | undefined = workspaceConfiguration.get<string>("makefilePath");
             if (updatedMakefilePath !== makefilePath) {
                 logger.message("makefile.makefilePath setting changed.");
-                configProviderDirty = true;
+                updateConfigProviderAfterEdit = true;
                 readMakefilePath();
             }
 
@@ -591,7 +631,7 @@ export function initFromStateAndSettings(): void {
                 // todo: skip over updating the IntelliSense configuration provider if the current makefile configuration
                 // is not among the subobjects that suffered modifications.
                 logger.message("makefile.configurations setting changed.");
-                configProviderDirty = true;
+                updateConfigProviderAfterEdit = true;
                 readMakefileConfigurations();
             }
 
@@ -599,9 +639,27 @@ export function initFromStateAndSettings(): void {
             if (!util.areEqual(updatedDryRunSwitches, dryRunSwitches)) {
                 // A change in makefile.dryRunSwitches should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configProviderDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                updateConfigProviderAfterEdit = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.dryRunSwitches setting changed.");
                 readDryRunSwitches();
+            }
+
+            let updatedConfigureOnOpen : boolean | undefined = workspaceConfiguration.get<boolean>("configureOnOpen");
+            if (updatedConfigureOnOpen !== configureOnOpen) {
+                logger.message("makefile.configureOnOpen setting changed.");
+                readConfigureOnOpen();
+            }
+
+            let updatedConfigureOnEdit : boolean | undefined = workspaceConfiguration.get<boolean>("configureOnEdit");
+            if (updatedConfigureOnEdit !== configureOnEdit) {
+                logger.message("makefile.configureOnEdit setting changed.");
+                readConfigureOnEdit();
+            }
+
+            let updatedConfigureAfterCommand : boolean | undefined = workspaceConfiguration.get<boolean>("configureAfterCommand");
+            if (updatedConfigureAfterCommand !== configureAfterCommand) {
+                logger.message("makefile.configureAfterCommand setting changed.");
+                readConfigureAfterCommand();
             }
         }
       });
@@ -610,7 +668,13 @@ export function initFromStateAndSettings(): void {
 export function setConfigurationByName(configurationName: string): void {
     extension.extensionContext.workspaceState.update("buildConfiguration", configurationName);
     setCurrentMakefileConfiguration(configurationName);
-    make.parseBuildOrDryRun();
+    if (configureAfterCommand) {
+        make.parseBuildOrDryRun();
+    } else {
+        logger.message("makefile.configureAfterCommand is set to false. " +
+                       "The project will not configure automatically after this build configuration change.");
+        logger.message("In order to have an up to date IntelliSense, it is recommended that you run the command makefile.configure at your earliest convenience.");
+    }
 }
 
 export function prepareConfigurationsQuickPick(): string[] {
@@ -821,7 +885,13 @@ export function setTargetByName(targetName: string) : void {
     statusBar.setTarget(currentTarget);
     logger.message("Setting target " + currentTarget);
     extension.extensionContext.workspaceState.update("buildTarget", currentTarget);
-    make.parseBuildOrDryRun();
+    if (configureAfterCommand) {
+        make.parseBuildOrDryRun();
+    } else {
+        logger.message("makefile.configureAfterCommand is set to false. " +
+                       "The project will not configure automatically after this target change.");
+        logger.message("In order to have an up to date IntelliSense, it is recommended that you run the command makefile.configure at your earliest convenience.");
+    }
 }
 
 // Fill a drop-down with all the target names run by building the makefile for the current configuration

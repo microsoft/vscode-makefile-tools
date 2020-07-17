@@ -46,6 +46,7 @@
         "onCommand:makefile.setLaunchConfiguration",
         "onCommand:makefile.launchDebug",
         "onCommand:makefile.launchRun",
+        "onCommand:makefile.configure",
         "workspaceContains:makefile",
         "workspaceContains:Makefile"
     ],
@@ -75,6 +76,10 @@
             {
                 "command": "makefile.setLaunchConfiguration",
                 "title": "Makefile: Set the make launch configuration"
+            },
+            {
+                "command": "makefile.configure",
+                "title": "Makefile: Configure"
             }
         ],
         "configuration": {
@@ -256,6 +261,24 @@
                     "items": {
                         "type": "string"
                     },
+                    "scope": "resource"
+                },
+                "makefile.configureOnOpen": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically configure Makefile project directories when they are opened",
+                    "scope": "resource"
+                },
+                "makefile.configureOnEdit": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically configure Makefile project directories when any relevant makefiles and/or settings are changed",
+                    "scope": "resource"
+                },
+                "makefile.configureAfterCommand": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically configure Makefile project directories after relevant operations, like change build configuration or makefile target",
                     "scope": "resource"
                 }
             }
