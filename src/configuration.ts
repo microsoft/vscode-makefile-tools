@@ -1,7 +1,7 @@
 // Configuration support
 
 import * as child_process from 'child_process';
-import * as extension from './extension';
+import {extension} from './extension';
 import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
@@ -67,7 +67,7 @@ export function setCurrentMakefileConfiguration(configuration: string): void {
 
 // Read the current configuration from workspace state, update status bar item
 function readCurrentMakefileConfiguration(): void {
-    let buildConfiguration : string | undefined = extension.extension.extensionContext.workspaceState.get<string>("buildConfiguration");
+    let buildConfiguration : string | undefined = extension.extensionContext.workspaceState.get<string>("buildConfiguration");
     if (!buildConfiguration) {
         logger.message("No current configuration is defined in the settings file. Assuming 'Default'.", "verbose");
         currentMakefileConfiguration = "Default";
@@ -133,11 +133,13 @@ export function setBuildLog(path: string): void { buildLog = path; }
 // identifying less possible binaries to debug or not providing any makefile targets (other than the 'all' default).
 function readBuildLog(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    // how to get default from package.json to avoid problem with 'undefined' type?
-    buildLog = util.resolvePathToRoot(workspaceConfiguration.get<string>("buildLog", "./build.log"));
-    logger.message('Build log defined at "' + buildLog + '"');
-    if (!util.checkFileExistsSync(buildLog)) {
-        logger.message("Build log not found on disk.");
+    buildLog = workspaceConfiguration.get<string>("buildLog");
+    if (buildLog) {
+        buildLog = util.resolvePathToRoot(buildLog);
+        logger.message('Build log defined at "' + buildLog + '"');
+        if (!util.checkFileExistsSync(buildLog)) {
+            logger.message("Build log not found on disk.");
+        }
     }
 }
 
@@ -155,8 +157,8 @@ export function readLoggingLevel(): void {
     }
 }
 
-let extensionLog: string;
-export function getExtensionLog(): string { return extensionLog; }
+let extensionLog: string | undefined;
+export function getExtensionLog(): string | undefined { return extensionLog; }
 export function setExtensionLog(path: string): void { extensionLog = path; }
 
 // Read from settings the path to a log file capturing all the "Makefile Tools" output channel content.
@@ -169,9 +171,11 @@ export function setExtensionLog(path: string): void { extensionLog = path; }
 // are going to be appended to this file.
 export function readExtensionLog(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    // how to get default from package.json to avoid problem with 'undefined' type?
-    extensionLog = util.resolvePathToRoot(workspaceConfiguration.get<string>("extensionLog", "./dryrun.log"));
-    logger.message('Writing extension log at {0}', extensionLog);
+    extensionLog = workspaceConfiguration.get<string>("extensionLog");
+    if (extensionLog) {
+        extensionLog = util.resolvePathToRoot(extensionLog);
+        logger.message('Writing extension log at {0}', extensionLog);
+    }
 }
 
 let dryrunCache: string;
@@ -292,7 +296,7 @@ function getLaunchConfiguration(name: string): LaunchConfiguration | undefined {
 // Also update the status bar item.
 function readCurrentLaunchConfiguration(): void {
     readLaunchConfigurations();
-    let currentLaunchConfigurationName: string | undefined = extension.extension.extensionContext.workspaceState.get<string>("launchConfiguration");
+    let currentLaunchConfigurationName: string | undefined = extension.extensionContext.workspaceState.get<string>("launchConfiguration");
     if (currentLaunchConfigurationName) {
         currentLaunchConfiguration = getLaunchConfiguration(currentLaunchConfigurationName);
     }
@@ -450,7 +454,7 @@ export function setCurrentTarget(target: string | undefined): void { currentTarg
 
 // Read current target from workspace state, update status bar item
 function readCurrentTarget(): void {
-    let buildTarget : string | undefined = extension.extension.extensionContext.workspaceState.get<string>("buildTarget");
+    let buildTarget : string | undefined = extension.extensionContext.workspaceState.get<string>("buildTarget");
     if (!buildTarget) {
         logger.message("No target defined in the settings file. Assuming 'Default'.", "verbose");
         statusBar.setTarget("Default");
@@ -604,7 +608,7 @@ export function initFromStateAndSettings(): void {
 }
 
 export function setConfigurationByName(configurationName: string): void {
-    extension.extension.extensionContext.workspaceState.update("buildConfiguration", configurationName);
+    extension.extensionContext.workspaceState.update("buildConfiguration", configurationName);
     setCurrentMakefileConfiguration(configurationName);
     make.parseBuildOrDryRun();
 }
@@ -816,7 +820,7 @@ export function setTargetByName(targetName: string) : void {
     currentTarget = targetName;
     statusBar.setTarget(currentTarget);
     logger.message("Setting target " + currentTarget);
-    extension.extension.extensionContext.workspaceState.update("buildTarget", currentTarget);
+    extension.extensionContext.workspaceState.update("buildTarget", currentTarget);
     make.parseBuildOrDryRun();
 }
 
@@ -858,11 +862,11 @@ export function setLaunchConfigurationByName (launchConfigurationName: string) :
 
     if (currentLaunchConfiguration) {
         logger.message('Setting current launch target "' + launchConfigurationName + '"');
-        extension.extension.extensionContext.workspaceState.update("launchConfiguration", launchConfigurationName);
+        extension.extensionContext.workspaceState.update("launchConfiguration", launchConfigurationName);
         statusBar.setLaunchConfiguration(launchConfigurationName);
     } else {
         logger.message(`A problem occured while analyzing launch configuration name ${launchConfigurationName}. Current launch configuration is unset.`);
-        extension.extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
+        extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
         statusBar.setLaunchConfiguration("No launch configuration set");
     }
 }

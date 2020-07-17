@@ -85,7 +85,7 @@ export class Launcher implements vscode.Disposable {
         if (!currentLaunchConfiguration) {
             vscode.window.showErrorMessage("Currently there is no launch configuration set.");
             logger.message("Cannot start debugging because there is no launch configuration set. " +
-                "Define one in the settings file or use the makefile.setLaunchConfiguration");
+                "Define one in the settings file or use makefile.setLaunchConfiguration");
             return undefined;
         }
 
@@ -190,7 +190,7 @@ export class Launcher implements vscode.Disposable {
         if (!configuration.getCurrentLaunchConfiguration()) {
             vscode.window.showErrorMessage("Currently there is no launch configuration set.");
             logger.message("Cannot run binary because there is no launch configuration set. " +
-                "Define one in the settings file or use the makefile.setLaunchConfiguration");
+                "Define one in the settings file or use makefile.setLaunchConfiguration");
 
             return undefined;
         }
