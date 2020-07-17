@@ -178,6 +178,35 @@ export function readExtensionLog(): void {
     }
 }
 
+let preconfigureScript: string | undefined;
+export function getPreconfigureScript(): string | undefined { return preconfigureScript; }
+export function setPreconfigureScript(path: string): void { preconfigureScript = path; }
+
+// Read from settings the path to a script file that needs to have been run at least once
+// before a sucessful configure of this project.
+export function readPreconfigureScript(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    preconfigureScript = workspaceConfiguration.get<string>("preconfigureScript");
+    if (preconfigureScript) {
+        preconfigureScript = util.resolvePathToRoot(preconfigureScript);
+        logger.message('Found pre-configure script defined as {0}', preconfigureScript);
+        if (!util.checkFileExistsSync(preconfigureScript)) {
+            logger.message("Preconfigure script not found on disk.");
+        }
+    }
+}
+
+let alwaysPreconfigure: boolean;
+export function getAlwaysPreconfigure(): boolean { return alwaysPreconfigure; }
+export function setAlwaysPreconfigure(path: boolean): void { alwaysPreconfigure = path; }
+
+// Read from settings whether the preconfigure step is supposed to be executed
+// always before the configure operation.
+export function readAlwaysPreconfigure(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    alwaysPreconfigure = workspaceConfiguration.get<boolean>("alwaysPreconfigure", false);
+}
+
 let dryrunCache: string;
 export function getDryrunCache(): string { return dryrunCache; }
 export function setDryrunCache(path: string): void { dryrunCache = path; }
@@ -518,6 +547,8 @@ export function initFromStateAndSettings(): void {
     readMakePath();
     readMakefilePath();
     readBuildLog();
+    readPreconfigureScript();
+    readAlwaysPreconfigure();
     readDryRunSwitches();
     readCurrentMakefileConfiguration();
     readCurrentMakefileConfigurationCommand();
@@ -588,18 +619,41 @@ export function initFromStateAndSettings(): void {
                 readDebugConfig();
             }
 
-            let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>("buildLog", "./build.log");
-            if (util.resolvePathToRoot(updatedBuildLog) !== buildLog) {
+            let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>("buildLog");
+            if (updatedBuildLog) {
+                updatedBuildLog = util.resolvePathToRoot(updatedBuildLog);
+            }
+            if (updatedBuildLog !== buildLog) {
                 updateConfigProviderAfterEdit = true;
                 logger.message("makefile.buildLog setting changed.");
                 readBuildLog();
             }
 
-            let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>("extensionLog", "./extension.log");
-            if (util.resolvePathToRoot(updatedExtensionLog) !== extensionLog) {
+            let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>("extensionLog");
+            if (updatedExtensionLog) {
+                updatedExtensionLog = util.resolvePathToRoot(updatedExtensionLog);
+            }
+            if (updatedExtensionLog !== extensionLog) {
                 // No IntelliSense update needed.
                 logger.message("makefile.extensionLog setting changed.");
                 readExtensionLog();
+            }
+
+            let updatedPreconfigureScript : string | undefined = workspaceConfiguration.get<string>("preconfigureScript");
+            if (updatedPreconfigureScript) {
+                updatedPreconfigureScript = util.resolvePathToRoot(updatedPreconfigureScript);
+            }
+            if (updatedPreconfigureScript !== preconfigureScript) {
+                // No IntelliSense update needed.
+                logger.message("makefile.preconfigureScript setting changed.");
+                readPreconfigureScript();
+            }
+
+            let updatedAlwaysPreconfigure : boolean = workspaceConfiguration.get<boolean>("alwaysPreconfigure", false);
+            if (updatedAlwaysPreconfigure !== alwaysPreconfigure) {
+                // No IntelliSense update needed.
+                logger.message("makefile.alwaysPreconfigure setting changed.");
+                readAlwaysPreconfigure();
             }
 
             let updatedDryrunCache : string | undefined = workspaceConfiguration.get<string>("dryrunCache", "./dryrunCache.log");
@@ -796,7 +850,6 @@ export async function setNewLaunchConfiguration(): Promise<void> {
         await util.spawnChildProcess(configurationMakeCommand, makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
         logger.message(error);
-        return;
     }
 }
 
@@ -876,7 +929,6 @@ export async function setNewTarget(): Promise<void> {
         await util.spawnChildProcess(configurationMakeCommand, makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
         logger.message(error);
-        return;
     }
 }
 

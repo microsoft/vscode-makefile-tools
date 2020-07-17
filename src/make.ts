@@ -45,7 +45,6 @@ export async function buildCurrentTarget(): Promise<void> {
     } catch (error) {
         // No need for notification popup, since the build result is visible already in the output channel
         logger.message(error);
-        return;
     }
 }
 export function parseBuild(): boolean {
@@ -119,6 +118,52 @@ export async function parseBuildOrDryRun(): Promise<void> {
         await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
     } catch (error) {
         logger.message(error);
+    }
+}
+
+export async function runPreconfigureScript(): Promise<void> {
+    let script: string | undefined = configuration.getPreconfigureScript();
+    if (!script || !util.checkFileExistsSync(script)) {
+        vscode.window.showErrorMessage("Could not find pre-configure script.");
+        logger.message("Make sure a pre-configuration script path is defined with makefile.preconfigureScript and that it exists on disk.");
         return;
+    }
+
+    let scriptArgs: string[] = [];
+    let runCommand: string;
+    if (process.platform === 'win32') {
+        runCommand = "cmd";
+        scriptArgs.push("/c");
+        scriptArgs.push(script);
+    } else {
+        runCommand = "/bin/bash";
+        scriptArgs.push("-c");
+        scriptArgs.push(`"source ${script}"`);
+    }
+
+    try {
+        let stdoutStr: string = "";
+        let stderrStr: string = "";
+
+        let stdout : any = (result: string): void => {
+            stdoutStr += result;
+        };
+
+        let stderr : any = (result: string): void => {
+            stderrStr += result;
+        };
+
+        let closing : any = (retCode: number, signal: string): void => {
+            if (retCode === 0) {
+                logger.message("The preconfigure script run successfully.");
+            } else {
+                logger.message("The preconfigure script failed. This project may not configure successfully.");
+                logger.message(stderrStr);
+            }
+        };
+
+        await util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
+    } catch (error) {
+        logger.message(error);
     }
 }
