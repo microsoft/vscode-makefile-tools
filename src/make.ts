@@ -47,19 +47,43 @@ export async function buildCurrentTarget(): Promise<void> {
         logger.message(error);
     }
 }
+
+// Content to be parsed by various operations post configure (like finding all build/launch targets).
+// Represents the content of the provided makefile.buildLog or a fresh output of make --dry-run
+// (which is also written into makefile.configurationCache).
+let parseContent: string;
+export function getParseContent(): string { return parseContent; }
+export function setParseContent(content: string): void { parseContent = content; }
+
+// The source file of parseContent (build log or configuration dryrun cache).
+let parseFile: string;
+export function getParseFile(): string { return parseFile; }
+export function setParseFile(file: string): void { parseFile = file; }
+
 export function parseBuild(): boolean {
-    let buildLog : string | undefined = configuration.getConfigurationBuildLog();
-    let buildLogContent: string | undefined = buildLog ? util.readFile(buildLog) : undefined;
-    if (buildLogContent) {
-        logger.message('Parsing the provided build log "' + buildLog + '" for IntelliSense integration with CppTools...');
-        ext.updateProvider(buildLogContent);
-        return true;
+    let buildLog: string | undefined = configuration.getConfigurationBuildLog();
+    if (buildLog) {
+            parseContent = util.readFile(buildLog) || "";
+            parseFile = buildLog;
+            logger.message('Parsing the provided build log "' + buildLog + '" for IntelliSense integration with CppTools...');
+            ext.updateProvider(parseContent);
+            return true;
     }
 
     return false;
 }
 
 export async function parseBuildOrDryRun(): Promise<void> {
+    // This may be called by running the command makefile.configure or at project opening (unless makefile.configureOnOpen is false)
+    // or after the watchers detect a relevant change in settings or makefiles (unless makefile.configureOnEdit is false).
+    // This is the place to check for always pre-configure.
+    if (configuration.getAlwaysPreconfigure()) {
+        runPreconfigureScript();
+    }
+
+    // Reset the config provider update pending boolean
+    configuration.setConfigProviderUpdatePending(false);
+
     // If a build log is specified in makefile.configurations or makefile.buildLog
     // (and if it exists on disk) it must be parsed instead of invoking a dry-run make command.
     // If a dry-run cache is present, we don't parse from it here. This operation is performed
@@ -83,9 +107,9 @@ export async function parseBuildOrDryRun(): Promise<void> {
 
     // Append --dry-run switches
     makeArgs.push("--dry-run");
-    const dryRunSwitches: string[] | undefined = configuration.getDryRunSwitches();
-    if (dryRunSwitches) {
-        makeArgs = makeArgs.concat(dryRunSwitches);
+    const dryrunSwitches: string[] | undefined = configuration.getDryrunSwitches();
+    if (dryrunSwitches) {
+        makeArgs = makeArgs.concat(dryrunSwitches);
     }
 
     logger.message("Generating the make dry-run output for parsing IntelliSense information. Command: " +
@@ -104,14 +128,16 @@ export async function parseBuildOrDryRun(): Promise<void> {
         };
 
         let closing : any = (retCode: number, signal: string): void => {
-            let dryrunCache: string = configuration.getDryrunCache();
+            let configurationCache: string = configuration.getConfigurationCache();
             if (retCode !== 0) {
                 logger.message("The make dry-run command failed. IntelliSense may work only partially or not at all.");
                 logger.message(stderrStr);
                 util.reportDryRunError();
             }
 
-            fs.writeFileSync(dryrunCache, stdoutStr);
+            fs.writeFileSync(configurationCache, stdoutStr);
+            parseContent = stdoutStr;
+            parseFile = configurationCache;
             ext.updateProvider(stdoutStr);
         };
 

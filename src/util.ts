@@ -252,7 +252,7 @@ export function areEqual(setting1: any, setting2: any): boolean {
 }
 
 export function reportDryRunError(): void {
-    logger.message(`You can see the detailed dry-run output at ${configuration.getDryrunCache()}`);
+    logger.message(`You can see the detailed dry-run output at ${configuration.getConfigurationCache()}`);
     logger.message("Make sure that the extension is invoking the same make command as in your development prompt environment.");
     logger.message("You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]");
     logger.message("If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: "

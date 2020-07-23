@@ -119,11 +119,11 @@ export class Launcher implements vscode.Disposable {
             }
         }
 
-        // Properties defined by makefile.launchConfigurations override makefile.debugConfig
+        // Properties defined by makefile.launchConfigurations override makefile.defaultLaunchConfiguration
         // and they both override the guessed values.
-        let makeDebugConfig: configuration.DebugConfig | undefined = configuration.getDebugConfig();
-        let miMode: string | undefined = currentLaunchConfiguration.MIMode || makeDebugConfig?.MIMode || guessMiMode;
-        let miDebuggerPath: string | undefined = currentLaunchConfiguration.miDebuggerPath || makeDebugConfig?.miDebuggerPath || guessMiDebuggerPath;
+        let defaultLaunchConfiguration: configuration.DefaultLaunchConfiguration | undefined = configuration.getDefaultLaunchConfiguration();
+        let miMode: string | undefined = currentLaunchConfiguration.MIMode || defaultLaunchConfiguration?.MIMode || guessMiMode;
+        let miDebuggerPath: string | undefined = currentLaunchConfiguration.miDebuggerPath || defaultLaunchConfiguration?.miDebuggerPath || guessMiDebuggerPath;
 
         // Exception for MAC-lldb, point to the lldb-mi installed by CppTools or set debugger path to undefined
         // (more details in the comment at the beginning of this function).
@@ -146,8 +146,8 @@ export class Launcher implements vscode.Disposable {
             program: '${command:makefile.launchTargetPath}',
             MIMode: miMode,
             miDebuggerPath: miDebuggerPath,
-            stopAtEntry: currentLaunchConfiguration.stopAtEntry || makeDebugConfig?.stopAtEntry,
-            symbolSearchPath: currentLaunchConfiguration.symbolSearchPath || makeDebugConfig?.symbolSearchPath
+            stopAtEntry: currentLaunchConfiguration.stopAtEntry || defaultLaunchConfiguration?.stopAtEntry,
+            symbolSearchPath: currentLaunchConfiguration.symbolSearchPath || defaultLaunchConfiguration?.symbolSearchPath
         };
 
         logger.message("Created the following debug config:\n   type = " + debugConfig.type +

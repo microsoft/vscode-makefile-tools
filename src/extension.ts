@@ -158,9 +158,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', () => {
-        if (configuration.getAlwaysPreconfigure()) {
-            make.runPreconfigureScript();
-        }
         make.parseBuildOrDryRun();
     }));
 
@@ -184,9 +181,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // unless the user disabled automatic configure after opening.
     if (configuration.getConfigureOnOpen()) {
         make.parseBuildOrDryRun();
-    } else {
-        logger.message("makefile.configureOnOpen is set to false. The project will not configure automatically after opening.");
-        logger.message("For the extension to work properly, it is recommended that you run the command makefile.configure at your earliest convenience.");
    }
 }
 
