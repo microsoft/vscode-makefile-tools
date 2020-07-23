@@ -68,7 +68,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             /*await*/ configuration.parseTargetsFromBuildLogOrCache();
             /*await*/ configuration.setTargetByName("execute_Arch3");
 
-            make.prepareBuildCurrentTarget();
+            make.prepareBuildTarget("execute_Arch3");
 
             /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
             /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)");
@@ -127,7 +127,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             /*await*/ configuration.parseTargetsFromBuildLogOrCache();
             /*await*/ configuration.setTargetByName("all");
 
-            make.prepareBuildCurrentTarget();
+            make.prepareBuildTarget("all");
 
             /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
             /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
@@ -189,7 +189,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             /*await*/ configuration.parseTargetsFromBuildLogOrCache();
             /*await*/ configuration.setTargetByName("bin/foo.o");
 
-            make.prepareBuildCurrentTarget();
+            make.prepareBuildTarget("bin/foo.o");
 
             /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
             /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
@@ -251,7 +251,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             /*await*/ configuration.parseTargetsFromBuildLogOrCache();
             /*await*/ configuration.setTargetByName("tvmi");
 
-            make.prepareBuildCurrentTarget();
+            make.prepareBuildTarget("tvmi");
 
             /*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
             /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");

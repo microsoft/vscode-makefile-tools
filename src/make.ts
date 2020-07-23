@@ -7,12 +7,15 @@ import * as logger from './logger';
 import * as util from './util';
 import * as vscode from 'vscode';
 
-export function prepareBuildCurrentTarget(): string[] {
+export function prepareBuildTarget(target: string, clean: boolean = false): string[] {
     let makeArgs: string[] = [];
     // Prepend the target to the arguments given in the configurations json.
-    let currentTarget: string | undefined = configuration.getCurrentTarget();
-    if (currentTarget) {
-        makeArgs.push(currentTarget);
+    // If a clean build is desired, "clean" should precede the target.
+    if (clean) {
+        makeArgs.push("clean");
+    }
+    if (target) {
+        makeArgs.push(target);
     }
 
     makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
@@ -21,8 +24,21 @@ export function prepareBuildCurrentTarget(): string[] {
     return makeArgs;
 }
 
-export async function buildCurrentTarget(): Promise<void> {
-    let makeArgs: string[] = prepareBuildCurrentTarget();
+export async function buildTarget(target: string, clean: boolean = false): Promise<void> {
+    // Prepare a notification popup
+    let config : string | undefined = configuration.getCurrentMakefileConfiguration();
+    let configAndTarget : string = config;
+    if (target) {
+        target = target.trimLeft();
+        if (target !== "") {
+            configAndTarget += "/" + target;
+        }
+    }
+
+    configAndTarget = `"${configAndTarget}"`;
+    vscode.window.showInformationMessage('Building ' + (clean ? "clean " : "") + 'the current makefile configuration ' + configAndTarget);
+
+    let makeArgs: string[] = prepareBuildTarget(target, clean);
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
         let stdout : any = (result: string): void => {
@@ -35,9 +51,9 @@ export async function buildCurrentTarget(): Promise<void> {
 
         let closing : any = (retCode: number, signal: string): void => {
             if (retCode !== 0) {
-                logger.message("The current target failed to build.");
+                logger.message(`Target ${target} failed to build.`);
             } else {
-                logger.message("The current target built successfully.");
+                logger.message(`Target ${target} built successfully.`);
             }
         };
 

@@ -43,6 +43,9 @@
         "onCommand:makefile.setBuildConfiguration",
         "onCommand:makefile.setBuildTarget",
         "onCommand:makefile.buildTarget",
+        "onCommand:makefile.buildCleanTarget",
+        "onCommand:makefile.buildAll",
+        "onCommand:makefile.buildCleanAll",
         "onCommand:makefile.setLaunchConfiguration",
         "onCommand:makefile.launchDebug",
         "onCommand:makefile.launchRun",
@@ -56,7 +59,19 @@
         "commands": [
             {
                 "command": "makefile.buildTarget",
-                "title": "Makefile: Build the makefile target of the current build configuration"
+                "title": "Makefile: Build the current target"
+            },
+            {
+                "command": "makefile.buildCleanTarget",
+                "title": "Makefile: Build clean the current target"
+            },
+            {
+                "command": "makefile.buildAll",
+                "title": "Makefile: Build the target ALL"
+            },
+            {
+                "command": "makefile.buildCleanAll",
+                "title": "Makefile: Build clean the target ALL"
             },
             {
                 "command": "makefile.launchDebug",

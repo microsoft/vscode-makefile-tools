@@ -113,20 +113,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', () => {
-        let config : string | undefined = configuration.getCurrentMakefileConfiguration();
-        let target : string | undefined = configuration.getCurrentTarget();
-        let configAndTarget : string = '"' + config;
+        make.buildTarget(configuration.getCurrentTarget() || "", false);
+    }));
 
-        if (target) {
-            target = target.trimLeft();
-            if (target !== "") {
-                configAndTarget += "/" + target;
-            }
-        }
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanTarget', () => {
+        make.buildTarget(configuration.getCurrentTarget() || "", true);
+    }));
 
-        configAndTarget += '"';
-        vscode.window.showInformationMessage('Building current makefile configuration ' + configAndTarget);
-        make.buildCurrentTarget();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildAll', () => {
+        make.buildTarget("all", false);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanAll', () => {
+        make.buildTarget("all", true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfiguration', () => {
