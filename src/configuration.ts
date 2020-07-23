@@ -810,8 +810,8 @@ export function parseLaunchConfigurations(source: string): string[] {
 
 export function parseLaunchConfigurationsFromBuildLog(): string[] | undefined {
     let content: string = make.getParseContent();
-    let file: string = make.getParseFile();
     if (content) {
+        let file: string = make.getParseFile();
         logger.message(`Parsing launch configurations from: ${file}`);
         return parseLaunchConfigurations(content);
     }
@@ -873,8 +873,8 @@ export async function setNewLaunchConfiguration(): Promise<void> {
 
 export function parseTargetsFromBuildLogOrCache(): string[] | undefined {
     let content: string = make.getParseContent();
-    let file: string = make.getParseFile();
     if (content) {
+        let file: string = make.getParseFile();
         logger.message(`Parsing targets from: ${file}`);
         let makefileTargets: string[] = parser.parseTargets(content);
         makefileTargets = makefileTargets.sort();
