@@ -40,113 +40,278 @@
         "Snippets"
     ],
     "activationEvents": [
-        "onCommand:Makefile.setBuildConfiguration",
-        "onCommand:Makefile.setBuildTarget",
-        "onCommand:Makefile.buildTarget",
-        "onCommand:Makefile.setLaunchConfiguration",
-        "onCommand:Makefile.launchDebug",
-        "onCommand:Makefile.launchRun",
-        "workspaceContains:**/makefile",
-        "workspaceContains:**/Makefile"
+        "onCommand:makefile.setBuildConfiguration",
+        "onCommand:makefile.setBuildTarget",
+        "onCommand:makefile.buildTarget",
+        "onCommand:makefile.buildCleanTarget",
+        "onCommand:makefile.buildAll",
+        "onCommand:makefile.buildCleanAll",
+        "onCommand:makefile.setLaunchConfiguration",
+        "onCommand:makefile.launchDebug",
+        "onCommand:makefile.launchRun",
+        "onCommand:makefile.configure",
+        "onCommand:makefile.preConfigure",
+        "workspaceContains:makefile",
+        "workspaceContains:Makefile"
     ],
     "main": "./out/src/extension.js",
     "contributes": {
         "commands": [
             {
-                "command": "Makefile.buildTarget",
-                "title": "Make: Build the makefile target of the current build configuration"
+                "command": "makefile.buildTarget",
+                "title": "Makefile: Build the current target"
             },
             {
-                "command": "Makefile.launchDebug",
-                "title": "Make: Debug the selected binary target"
+                "command": "makefile.buildCleanTarget",
+                "title": "Makefile: Build clean the current target"
             },
             {
-                "command": "Makefile.launchRun",
-                "title": "Make: Run the selected binary target in the terminal"
+                "command": "makefile.buildAll",
+                "title": "Makefile: Build the target ALL"
             },
             {
-                "command": "Makefile.setBuildConfiguration",
-                "title": "Make: Set the current build configuration"
+                "command": "makefile.buildCleanAll",
+                "title": "Makefile: Build clean the target ALL"
             },
             {
-                "command": "Makefile.setBuildTarget",
-                "title": "Make: Set the target to be built by make"
+                "command": "makefile.launchDebug",
+                "title": "Makefile: Debug the selected binary target"
             },
             {
-                "command": "Makefile.setLaunchConfiguration",
-                "title": "Make: Set the make launch configuration"
+                "command": "makefile.launchRun",
+                "title": "Makefile: Run the selected binary target in the terminal"
+            },
+            {
+                "command": "makefile.setBuildConfiguration",
+                "title": "Makefile: Set the current build configuration"
+            },
+            {
+                "command": "makefile.setBuildTarget",
+                "title": "Makefile: Set the target to be built by make"
+            },
+            {
+                "command": "makefile.setLaunchConfiguration",
+                "title": "Makefile: Set the make launch configuration"
+            },
+            {
+                "command": "makefile.configure",
+                "title": "Makefile: Configure"
+            },
+            {
+                "command": "makefile.preConfigure",
+                "title": "Makefile: Preconfigure"
             }
         ],
         "configuration": {
             "type": "object",
-            "title": "Makefile",
+            "title": "makefile",
             "properties": {
-                "Makefile.buildConfiguration": {
+                "makefile.configurations": {
                     "type": [
-                        "string",
-                        "null"
+                        "array",
+                        null
                     ],
-                    "default": null,
-                    "description": "The makefile current configuration",
+                    "default": [],
+                    "description": "The user defined makefile configurations",
+                    "items": {
+                        "type": "object",
+                        "default": null,
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "The name of the makefile configuration"
+                            },
+                            "makefilePath": {
+                                "type": "string",
+                                "default": "makefile",
+                                "description": "File path to the makefile"
+                            },
+                            "makePath": {
+                                "type": "string",
+                                "description": "File path to the make command"
+                            },
+                            "makeArgs": {
+                                "type": "array",
+                                "description": "Arguments to pass to the make command",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
+                            "buildLog": {
+                                "type": "string",
+                                "description": "File path to the build log used instead of dry-run output"
+                            }
+                        }
+                    },
                     "scope": "resource"
                 },
-                "Makefile.buildTarget": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
-                    "default": null,
-                    "description": "The current target to be run by make",
-                    "scope": "resource"
-                },
-                "Makefile.launchConfiguration": {
+                "makefile.defaultLaunchConfiguration": {
                     "type": [
                         "object",
                         null
                     ],
                     "default": null,
-                    "description": "The configuration to use when running or debugging a target",
+                    "description": "Various global debugger settings",
                     "properties": {
-                        "binary": {
+                        "MIMode": {
                             "type": "string",
-                            "description": "The full path to the binary to run or debug"
+                            "description": "The non VS debugger type: gdb or lldb",
+                            "enum": [
+                              "gdb",
+                              "lldb"
+                            ]
                         },
-                        "args": {
-                            "type": "array",
-                            "description": "Arguments to pass to program command line",
-                            "items": {
-                                "type": "string"
-                            },
-                            "default": []
-                        },
-                        "cwd": {
+                        "miDebuggerPath": {
                             "type": "string",
-                            "description": "Set the working directory for the program"
+                            "description": "Path to the non VS debugger (gdb or lldb)"
+                        },
+                        "stopAtEntry": {
+                            "type": "boolean",
+                            "description": "Stop at the entry point of the target",
+                            "default": false
+                        },
+                        "symbolSearchPath": {
+                            "type": "string",
+                            "description": "The path to the symbols"
                         }
                     },
                     "scope": "resource"
                 },
-                "Makefile.loggingLevel": {
+                "makefile.launchConfigurations": {
+                    "type": [
+                        "array",
+                        null
+                    ],
+                    "default": [],
+                    "description": "The user defined launch (debug/run) configurations",
+                    "items": {
+                        "type": "object",
+                        "default": null,
+                        "properties": {
+                            "binaryPath": {
+                                "type": "string",
+                                "description": "The full path to the binary to run or debug"
+                            },
+                            "binaryArgs": {
+                                "type": "array",
+                                "description": "Arguments to pass to program command line",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": []
+                            },
+                            "cwd": {
+                                "type": "string",
+                                "description": "Set the working directory for the program"
+                            },
+                            "MIMode": {
+                                "type": "string",
+                                "description": "The non VS debugger type: gdb or lldb",
+                                "enum": [
+                                  "gdb",
+                                  "lldb"
+                                ]
+                            },
+                            "miDebuggerPath": {
+                                "type": "string",
+                                "description": "Path to the non VS debugger (gdb or lldb)"
+                            },
+                            "stopAtEntry": {
+                                "type": "boolean",
+                                "description": "Stop at the entry point of the target",
+                                "default": false
+                            },
+                            "symbolSearchPath": {
+                                "type": "string",
+                                "description": "The path to the symbols"
+                            }
+                        }
+                    },
+                    "scope": "resource"
+                },
+                "makefile.loggingLevel": {
                     "type": [
                         "string",
                         "null"
                     ],
                     "enum": [
                         "Normal",
-                        "Verbose"
+                        "Verbose",
+                        "Debug"
                     ],
                     "default": "Normal",
                     "description": "The logging level for the makefile tools extension",
                     "scope": "resource"
                 },
-                "Makefile.makePath": {
-                    "type": "string"
+                "makefile.makePath": {
+                    "type": "string",
+                    "default": "make",
+                    "description": "The path to the make tool",
+                    "scope": "resource"
                 },
-                "Makefile.buildLog": {
-                    "type": "string"
+                "makefile.makefilePath": {
+                    "type": "string",
+                    "default": "makefile",
+                    "description": "The path to the makefile of the project",
+                    "scope": "resource"
                 },
-                "Makefile.extensionLog": {
-                    "type": "string"
+                "makefile.buildLog": {
+                    "type": "string",
+                    "description": "The path to the build log that is read to bypass a dry-run",
+                    "default": null,
+                    "scope": "resource"
+                },
+                "makefile.extensionLog": {
+                    "type": "string",
+                    "description": "The path to an output file storing all content from the Makefile output channel",
+                    "default": null,
+                    "scope": "resource"
+                },
+                "makefile.configurationCache": {
+                    "type": "string",
+                    "description": "The path to a cache file storing the output of the last dry-run make command",
+                    "default": "./configurationCache.log",
+                    "scope": "resource"
+                },
+                "makefile.dryrunSwitches": {
+                    "type": "array",
+                    "default": ["--always-make", "--keep-going", "--print-data-base"],
+                    "description": "Arguments to pass to the dry-run make invocation",
+                    "items": {
+                        "type": "string"
+                    },
+                    "scope": "resource"
+                },
+                "makefile.configureOnOpen": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically configure Makefile project directories when they are opened",
+                    "scope": "resource"
+                },
+                "makefile.configureOnEdit": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically configure Makefile project directories when any relevant makefiles and/or settings are changed",
+                    "scope": "resource"
+                },
+                "makefile.configureAfterCommand": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Automatically configure Makefile project directories after relevant operations, like change build configuration or makefile target",
+                    "scope": "resource"
+                },
+                "makefile.preconfigureScript": {
+                    "type": "string",
+                    "description": "The path to the script that needs to be run at least once before configure",
+                    "default": null,
+                    "scope": "resource"
+                },
+                "makefile.alwaysPreconfigure": {
+                    "type": "boolean",
+                    "description": "Always run the preconfigure script before configure",
+                    "default": false,
+                    "scope": "resource"
                 }
             }
         }

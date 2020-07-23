@@ -2,7 +2,10 @@
 
 import * as fs from 'fs';
 import * as child_process from 'child_process';
+import * as configuration from './configuration';
+import * as logger from './logger';
 import * as path from 'path';
+import * as vscode from 'vscode';
 
 // TODO: c++20, c++latest
 export type StandardVersion = 'c89' | 'c99' | 'c11' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | undefined;
@@ -218,4 +221,49 @@ export function removeQuotes(str: string): string {
     }
 
     return str;
+}
+
+// Helper to evaluate whether two settings objects represent the same content.
+// It recursively analyzes any inner subobjects and is also not affected
+// by a different order of properties.
+export function areEqual(setting1: any, setting2: any): boolean {
+    let properties1: string[] = Object.getOwnPropertyNames(setting1);
+    let properties2: string[] = Object.getOwnPropertyNames(setting2);
+
+    if (properties1.length !== properties2.length) {
+        return false;
+    }
+
+    for (let p: number = 0; p < properties1.length; p++) {
+        let property: string = properties1[p];
+        let isEqual: boolean;
+        if (typeof(setting1[property]) === 'object' && typeof(setting2[property]) === 'object') {
+            isEqual = areEqual(setting1[property], setting2[property]);
+        } else {
+            isEqual = (setting1[property] === setting2[property]);
+        }
+
+        if (!isEqual) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function reportDryRunError(): void {
+    logger.message(`You can see the detailed dry-run output at ${configuration.getConfigurationCache()}`);
+    logger.message("Make sure that the extension is invoking the same make command as in your development prompt environment.");
+    logger.message("You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]");
+    logger.message("If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: "
+                   + "https://github.com/microsoft/vscode-makefile-tools/issues");
+}
+
+// Helper to make paths absolute until the extension handles variables expansion.
+export function resolvePathToRoot(relPath: string): string {
+    if (!path.isAbsolute(relPath)) {
+        return path.join(vscode.workspace.rootPath || "", relPath);
+    }
+
+    return relPath;
 }

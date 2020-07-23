@@ -9,6 +9,7 @@ let makeOutputChannel: vscode.OutputChannel | undefined;
 function getOutputChannel(): vscode.OutputChannel {
     if (!makeOutputChannel) {
         makeOutputChannel = vscode.window.createOutputChannel("Makefile tools");
+        makeOutputChannel.show();
     }
 
     return makeOutputChannel;
@@ -23,7 +24,6 @@ export function message(message: string, loggingLevel?: string): void {
     }
 
     let channel: vscode.OutputChannel = getOutputChannel();
-    channel.show();
     channel.appendLine(message);
 
     let extensionLog : string | undefined = configuration.getExtensionLog();
@@ -43,7 +43,6 @@ export function messageNoCR(message: string, loggingLevel?: string): void {
     }
 
     let channel: vscode.OutputChannel = getOutputChannel();
-    channel.show();
     channel.append(message);
 
     let extensionLog : string | undefined = configuration.getExtensionLog();

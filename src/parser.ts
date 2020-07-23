@@ -144,7 +144,7 @@ function preprocessDryRunOutput(dryRunOutputStr: string): string {
 }
 interface ToolInvocation {
     // how the makefile invokes the tool:
-    // relative path, full path, explicit current directory or no path
+    // relative -to the makefile location- path, full path, explicit current directory or no path
     // also including the file name, with or without extension
     pathInMakefile: string;
 
@@ -176,7 +176,7 @@ function parseLineAsTool(
     currentPath: string
 ): ToolInvocation | undefined {
     // - any spaces/tabs before the tool invocation
-    // - with or without path (relative or full)
+    // - with or without path (relative -to the makefile location- or full)
     // - with or without extension (windows only)
     // - with or without quotes
     // - must have at least one space or tab after the tool invocation
@@ -658,9 +658,9 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
             // in which case the execution path is defaulting to workspace root folder
             // and there are no args.
             let launchConfiguration: configuration.LaunchConfiguration = {
-                binary: targetBinary,
+                binaryPath: targetBinary,
                 cwd: vscode.workspace.rootPath || "",
-                args: []
+                binaryArgs: []
             };
 
             logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
@@ -723,10 +723,10 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
             let splitArgs: string[] = targetBinaryTool.arguments ? targetBinaryTool.arguments.split(" ") : [];
 
             let launchConfiguration: configuration.LaunchConfiguration = {
-                binary: targetBinaryTool.fullPath,
+                binaryPath: targetBinaryTool.fullPath,
                 cwd: currentPath,
                 // TODO: consider optionally quoted arguments
-                args: splitArgs
+                binaryArgs: splitArgs
             };
 
             logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");

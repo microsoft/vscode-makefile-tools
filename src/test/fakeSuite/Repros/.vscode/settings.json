@@ -1,6 +1,51 @@
 {
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
-    "Makefile.buildLog": "./dummy_dryrun.log",
-    "Makefile.extensionLog": "./MakefileTools.out",
-    "Makefile.makePath": "c:/some/other/fake/path"
+    "makefile.buildLog": "./dummy_dryrun.log",
+    "makefile.extensionLog": "./MakefileTools.out",
+    "makefile.makePath": "c:/some/other/fake/path",
+    "makefile.configurations": [
+        {
+            "name": "InterestingSmallMakefile_windows_configDebug",
+            "buildLog": "./InterestingSmallMakefile_windows_dryrunDebug.log"
+        },
+        {
+            "name": "InterestingSmallMakefile_windows_configRelSize",
+            "makePath": "make",
+            "makeArgs": ["OPT=RelSize"],
+            "buildLog": "./InterestingSmallMakefile_windows_dryrunRelSize.log"
+        },
+        {
+            "name": "InterestingSmallMakefile_windows_configRelSpeed",
+            "makePath": "c:/fake/path/make.exe",
+            "makeArgs": ["OPT=RelSpeed"]
+        },
+        {
+            "name": "8cc_linux",
+            "buildLog": "./8cc_linux_dryrun.log"
+        },
+        {
+            "name": "8cc_mingw",
+            "buildLog": "./8cc_mingw_dryrun.log"
+        },
+        {
+            "name": "Fido_linux",
+            "buildLog": "./Fido_linux_dryrun.log"
+        },
+        {
+            "name": "Fido_mingw",
+            "buildLog": "./Fido_mingw_dryrun.log"
+        },
+        {
+            "name": "tinyvm_linux_pedantic",
+            "buildLog": "./tinyvm_linux_dryrunPedantic.log",
+            "makePath": "make",
+            "makeArgs": ["PEDANTIC=yes"]
+        },
+        {
+            "name": "tinyvm_mingw_pedantic",
+            "buildLog": "./tinyvm_mingw_dryrunPedantic.log",
+            "makePath": "make",
+            "makeArgs": ["PEDANTIC=yes"]
+        }
+    ]
 }

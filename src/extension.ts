@@ -15,7 +15,7 @@ import * as cpp from 'vscode-cpptools';
 let statusBar: ui.UI = ui.getUI();
 let launcher: launch.Launcher = launch.getLauncher();
 
-export let extension: MakefileToolsExtension | null = null;
+export let extension: MakefileToolsExtension;
 
 export class MakefileToolsExtension {
     private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
@@ -95,70 +95,73 @@ export class MakefileToolsExtension {
 // which produced a new output string to be parsed
 export async function updateProvider(dryRunOutputStr: string): Promise<void> {
     logger.message("Updating the CppTools IntelliSense Configuration Provider.");
-    if (extension) {
-        extension.emptyCustomConfigurationProvider();
-        extension.constructIntellisense(dryRunOutputStr);
-        extension.registerCppToolsProvider();
-    }
+    extension.emptyCustomConfigurationProvider();
+    extension.constructIntellisense(dryRunOutputStr);
+    extension.registerCppToolsProvider();
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-    vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is now active');
-
     statusBar = ui.getUI();
     extension = new MakefileToolsExtension(context);
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setBuildConfiguration', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', () => {
         configuration.setNewConfiguration();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setBuildTarget', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildTarget', () => {
         configuration.setNewTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.buildTarget', () => {
-        let config : string | undefined = configuration.getCurrentMakeConfiguration();
-        let target : string | undefined = configuration.getCurrentTarget();
-        let configAndTarget : string = '"' + config;
-
-        if (target) {
-            target = target.trimLeft();
-            if (target !== "") {
-                configAndTarget += "/" + target;
-            }
-        }
-
-        configAndTarget += '"';
-        vscode.window.showInformationMessage('Building current makefile configuration ' + configAndTarget);
-        make.buildCurrentTarget();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', () => {
+        make.buildTarget(configuration.getCurrentTarget() || "", false);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.setLaunchConfiguration', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanTarget', () => {
+        make.buildTarget(configuration.getCurrentTarget() || "", true);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildAll', () => {
+        make.buildTarget("all", false);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanAll', () => {
+        make.buildTarget("all", true);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfiguration', () => {
         configuration.setNewLaunchConfiguration();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchDebug', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchDebug', () => {
         launcher.debugCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchRun', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchRun', () => {
         launcher.runCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetPath', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetPath', () => {
         return launcher.launchTargetPath();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchCurrentDir', () => {
-        return launcher.launchCurrentDir();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetDirectory', () => {
+        return launcher.launchTargetDirectory();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetArgs', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
         return launcher.launchTargetArgs();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Makefile.launchTargetArgsConcat', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgsConcat', () => {
         return launcher.launchTargetArgsConcat();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', () => {
+        make.parseBuildOrDryRun();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.preConfigure', () => {
+        make.runPreconfigureScript();
     }));
 
     configuration.readLoggingLevel();
@@ -166,15 +169,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     // Delete the extension log file, if exists
     let extensionLog : string | undefined = configuration.getExtensionLog();
-    if (extensionLog) {
+    if (extensionLog && util.checkFileExistsSync(extensionLog)) {
         fs.unlinkSync(extensionLog);
     }
 
     // Read configuration info from settings
-    configuration.initFromSettings();
+    configuration.initFromStateAndSettings();
 
-    // Generate the dry-run output used for parsing the info to be sent to CppTools
-    make.parseBuildOrDryRun();
+    // Generate the dry-run output used for parsing the info to be sent to CppTools,
+    // unless the user disabled automatic configure after opening.
+    if (configuration.getConfigureOnOpen()) {
+        make.parseBuildOrDryRun();
+   }
 }
 
 export async function deactivate(): Promise<void> {
