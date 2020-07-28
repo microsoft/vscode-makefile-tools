@@ -20,7 +20,6 @@ import * as vscode from 'vscode';
 // therefore wrongly skipping over compilation lines?
 const compilers: string[] = ["clang\\+\\+", "clang", "cl", "gcc", "cc", "icc", "icl", "g\\+\\+", "c\\+\\+"];
 const linkers: string[] = ["link", "ilink", "ld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
-// TODO: Objective C/C++
 const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 export function parseTargets(verboseLog: string): string[] {
@@ -924,7 +923,7 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
             if (verStr) {
                 const verNum: number = +verStr;
                 if (verNum <= 7) {
-                    return "arm";
+                    targetArch = "arm";
                 }
             }
         }

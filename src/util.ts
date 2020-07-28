@@ -20,7 +20,6 @@ export type IntelliSenseMode = "msvc-x64" | "msvc-x86" | "msvc-arm" | "msvc-arm6
                                "clang-x64" | "clang-x86" | "clang-arm" | "clang-arm64";
 
 // Language types
-// TODO: add Objective C/C++
 export type Language = "c" | "cpp" | undefined;
 
 export function checkFileExistsSync(filePath: string): boolean {

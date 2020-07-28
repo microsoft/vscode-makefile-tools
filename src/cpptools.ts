@@ -35,7 +35,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     }
 
     public async canProvideBrowseConfigurationsPerFolder(): Promise<boolean> {
-        return true; // try false
+        return false;
     }
 
     public async provideFolderBrowseConfiguration(_uri: vscode.Uri): Promise<cpp.WorkspaceBrowseConfiguration> {
@@ -98,7 +98,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         // of all the compiler invocations of the current configuration
         filesPaths.forEach(filePath => {
             this.fileIndex.set(path.normalize(filePath), {
-                uri: filePath,
+                uri: vscode.Uri.file(filePath),
                 configuration,
             });
 
