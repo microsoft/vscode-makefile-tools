@@ -531,7 +531,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             // Parse the IntelliSense mode
             // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
             let targetArchitecture: util.TargetArchitecture = getTargetArchitecture(compilerTool.arguments);
-            let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(cpp.Version.latest, compilerFullPath, targetArchitecture);
+            let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(cpp.Version.v4, compilerFullPath, targetArchitecture);
             logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
 
             // For windows, parse the sdk version
@@ -571,7 +571,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
                 // If the command is compiling the same extension or uses -TC/-TP, send all the source files in one batch.
             if (language) {
                 // More standard validation and defaults, in the context of the whole command.
-                let standard: util.StandardVersion = parseStandard(cpp.Version.latest, standardStr, language);
+                let standard: util.StandardVersion = parseStandard(cpp.Version.v4, standardStr, language);
                 logger.message("    Standard: " + standard, "Verbose");
 
                 if (ext.extension) {
