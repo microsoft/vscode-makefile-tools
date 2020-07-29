@@ -572,7 +572,10 @@ export function readConfigureAfterCommand(): void {
  // are made in settings or in the makefiles.
  // To avoid unnecessary dry-runs, these updates are not performed with every document save
  // but after leaving the focus of the document.
-let configProviderUpdatePending: boolean = false;
+ // Default to true so that we know if the project has never been configured
+ // because of various settings. Operations like build/launch targets quick picks need
+ // at least one configure to populate the data.
+let configProviderUpdatePending: boolean = true;
 export function getConfigProviderUpdatePending(): boolean { return configureAfterCommand; }
 export function setConfigProviderUpdatePending(configure: boolean): void { configureAfterCommand = configure; }
 
@@ -808,6 +811,11 @@ export function setTargetByName(targetName: string) : void {
 // Triggers a cpptools configuration provider update after selection.
 // TODO: change the UI list to multiple selections mode and store an array of current active targets
 export async function selectTarget(): Promise<void> {
+    // warn about an out of date configure state
+    if (configProviderUpdatePending) {
+        logger.message("The project needs a configure to populate the build targets correctly.");
+    }
+
     let options : vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
 
@@ -872,6 +880,11 @@ export function setLaunchConfigurationByName (launchConfigurationName: string) :
 // under the scope of the current build configuration and target
 // Selection updates current launch configuration that will be ready for the next debug/run operation
 export async function selectLaunchConfiguration(): Promise<void> {
+    // warn about an out of date configure state
+    if (configProviderUpdatePending) {
+        logger.message("The project needs a configure to populate the launch targets correctly.");
+    }
+
     // TODO: create a quick pick with description and details for items
     // to better view the long targets commands
 
