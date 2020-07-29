@@ -34,6 +34,18 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         return true;
     }
 
+    public async canProvideBrowseConfigurationsPerFolder(): Promise<boolean> {
+        return false;
+    }
+
+    public async provideFolderBrowseConfiguration(_uri: vscode.Uri): Promise<cpp.WorkspaceBrowseConfiguration> {
+        if (_uri.fsPath !== vscode.workspace.rootPath) {
+            logger.message("Makefile Tools supports single root for now.");
+        }
+
+        return this.workspaceBrowseConfiguration;
+    }
+
     public async provideBrowseConfiguration(): Promise<cpp.WorkspaceBrowseConfiguration> { return this.workspaceBrowseConfiguration; }
 
     public dispose(): void { }
@@ -86,7 +98,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         // of all the compiler invocations of the current configuration
         filesPaths.forEach(filePath => {
             this.fileIndex.set(path.normalize(filePath), {
-                uri: filePath,
+                uri: vscode.Uri.file(filePath),
                 configuration,
             });
 

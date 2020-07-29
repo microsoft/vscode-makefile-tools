@@ -1,9 +1,11 @@
+
 // TODO: support also the scenario of parsing a build log,
 // to overcome some of --dry-run limitations
 // (like some exceptions to the 'do not execute' rule
 // or dependencies on a real build)
 
 import * as configuration from './configuration';
+import * as cpp from 'vscode-cpptools';
 import * as cpptools from './cpptools';
 import * as ext from './extension';
 import * as logger from './logger';
@@ -243,22 +245,73 @@ function parseLineAsTool(
 // and returns an array of the values passed via that switch
 // todo: refactor common parts in parseMultipleSwitchFromToolArguments and parseSingleSwitchFromToolArguments
 function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[] {
-    // - or / as switch prefix
+    // - '-' or '/' or '--' as switch prefix
     // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
     //   to reject a case where a part of a path looks like a switch with its value
     // - can be wrapped by a pair of ', before the switch prefix and after the switch value
     // - the value can be wrapped by a pair of "
     // - one or none or more spaces/tabs between the switch and the value
-    let regexpStr: string = '(^|\\s+)\\\'?(\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*))(\\".*?\\"|[^\\\'\\s]+)\\\'?';
+    let regexpStr: string = '(^|\\s+)\\\'?(\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*))(\\".*?\\"|[^\\\'\\s]+)\\\'?';
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null;
     let results: string[] = [];
 
     match = regexp.exec(args);
     while (match) {
-        let result: string = match[5].trim();
-        result = result.replace(/"/g, "");
-        results.push(result);
+        let result: string = match[6];
+        if (result) {
+            result = result.trim();
+            result = result.replace(/"/g, "");
+            results.push(result);
+        }
+        match = regexp.exec(args);
+    }
+
+    return results;
+}
+
+// Helper that parses for any switch from a set that can occur one or more times
+// in the tool command line and returns an array of the values passed via all of the identified switches.
+// It is based on parseMultipleSwitchFromToolArguments (extends the regex for more switches
+// and also accepts a switch without a following value, like -m32 or -m64 are different from -arch:arm).
+// This is useful especially when we need the order of these different switches in the command line:
+// for example, when we want to know which switch wins (for cancelling pairs or for overriding switches).
+// Parsing the switches separately wouldn't give us the order information.
+// Also, we don't have yet a function to parse the whole string of arguments into individual arguments,
+// so that we anaylze each switch one by one, thus knowing the order.
+function parseMultipleSwitchesFromToolArguments(args: string, simpleSwitches: string[], valueSwitches: string[]): string[] {
+    // - '-' or '/' or '--' as switch prefix
+    // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
+    //   to reject a case where a part of a path looks like a switch with its value
+    // - can be wrapped by a pair of ', before the switch prefix and after the switch value
+    // - the value can be wrapped by a pair of "
+    // - one or none or more spaces/tabs between the switch and the value
+    let regexpStr: string = '(^|\\s+)\\\'?(';
+    valueSwitches.forEach(sw => {
+        regexpStr += '\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*)';
+        // Make sure we don't append '|' after the last extension value
+        if (sw !== valueSwitches[valueSwitches.length - 1]) {
+            regexpStr += '|';
+        }
+    });
+    regexpStr += ')(\\".*?\\"|[^\\\'\\s]+)';
+    regexpStr += '|((\\/|-|--)(' + simpleSwitches.join('|') + '))';
+    regexpStr += '\\\'?';
+
+    let regexp: RegExp = RegExp(regexpStr, "mg");
+    let match: RegExpExecArray | null;
+    let results: string[] = [];
+
+    match = regexp.exec(args);
+    while (match) {
+        // If the current match is a simple switch, find it at index 15, otherwise at 12.
+        // In each scenario, only one will have a value while the other is undefined.
+        let result: string = match[12] || match[15];
+        if (result) {
+            result = result.trim();
+            result = result.replace(/"/g, "");
+            results.push(result);
+        }
         match = regexp.exec(args);
     }
 
@@ -274,22 +327,25 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
 // Examples for compiler: -std:c++17, -Fotest.obj, -Fe test.exe
 // Example for linker: -out:test.exe versus -o a.out
 function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string | undefined {
-    // - or / as switch prefix
+    // - '-' or '/' or '--' as switch prefix
     // - before the switch, we allow only for one or more spaces/tabs OR begining of line,
     //   to reject a case where a part of a path looks like a switch with its value
     // - can be wrapped by a pair of ', before the switch prefix and after the switch value
     // - the value can be wrapped by a pair of "
     // -  ':' or '=' or one/none/more spaces/tabs between the switch and the value
-    let regexpStr: string = '(^|\\s+)\\\'?(\\/|-)(' + sw.join("|") + ')(:|=|\\s*)(\\".*?\\"|[^\\\'\\s]+)\\\'?';
+    let regexpStr: string = '(^|\\s+)\\\'?(\\/|-|--)(' + sw.join("|") + ')(:|=|\\s*)(\\".*?\\"|[^\\\'\\s]+)\\\'?';
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null;
     let results: string[] = [];
 
     match = regexp.exec(args);
     while (match) {
-        let result: string = match[5].trim();
-        result = result.replace(/"/g, "");
-        results.push(result);
+        let result: string = match[5];
+        if (result) {
+            result = result.trim();
+            result = result.replace(/"/g, "");
+            results.push(result);
+        }
         match = regexp.exec(args);
     }
 
@@ -307,9 +363,9 @@ function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string 
 // TODO: detect sets of switches that cancel each other to return a more
 // accurate result in case of override (example: /TC and /TP)
 function isSwitchPassedInArguments(args: string, sw: string[]): boolean {
-    // - or / as switch prefix
+    // - '-' or '/' or '--' as switch prefix
     // - one or more spaces/tabs after
-    let regexpStr: string = '((\\s+)|^)(\\/|-)(' + sw.join("|") + ')((\\s+)|$)';
+    let regexpStr: string = '((\\s+)|^)(\\/|-|--)(' + sw.join("|") + ')((\\s+)|$)';
     let regexp: RegExp = RegExp(regexpStr, "mg");
 
     if (regexp.exec(args)) {
@@ -346,9 +402,12 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 
     match = regexp.exec(args);
     while (match) {
-        let result: string = match[1].trim();
-        result = result.replace(/"/g, "");
-        files.push(result);
+        let result: string = match[1];
+        if (result) {
+            result = result.trim();
+            result = result.replace(/"/g, "");
+            files.push(result);
+        }
         match = regexp.exec(args);
     }
 
@@ -469,33 +528,10 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
             logger.message("    Defines: " + defines.join(";"), "Verbose");
 
-            // Parse the C/C++ standard
-            // TODO: implement default standard: c++11 for C and c++17 for C++
-            // TODO: c++20 & c++latest and more accurate setting logic (example: CMake Tools)
-            let standardStr: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["std"]);
-            let standard: util.StandardVersion = standardStr ? <util.StandardVersion>standardStr : undefined;
-            logger.message("    Standard: " + standard, "Verbose");
-
             // Parse the IntelliSense mode
-            // TODO: msvc-x86
             // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
-            let intelliSenseMode: util.IntelliSenseMode;
-            if (path.basename(compilerTool.fullPath).startsWith("clang")) {
-                intelliSenseMode = "clang-x64";
-            } else if (path.basename(compilerTool.fullPath).startsWith("cl")) {
-                intelliSenseMode = "msvc-x64";
-            } else if (path.basename(compilerTool.fullPath).startsWith("gcc") ||
-                path.basename(compilerTool.fullPath).startsWith("g++")) {
-                intelliSenseMode = "gcc-x64";
-            } else {
-                if (process.platform === "win32") {
-                    intelliSenseMode = "msvc-x64";
-                } else if (process.platform === "darwin") {
-                    intelliSenseMode = "clang-x64";
-                } else {
-                    intelliSenseMode = "gcc-x64";
-                }
-            }
+            let targetArchitecture: util.TargetArchitecture = getTargetArchitecture(compilerTool.arguments);
+            let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(cpp.Version.latest, compilerFullPath, targetArchitecture);
             logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
 
             // For windows, parse the sdk version
@@ -512,8 +548,53 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             files = util.makeFullPaths(files, currentPath);
             logger.message("    Source files: " + files.join(";"), "Verbose");
 
-            if (ext.extension) {
-                ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files, windowsSDKVersion);
+            // The language represented by this compilation command
+            let language: util.Language;
+            let hasC: boolean = files.filter(file => (file.endsWith(".c"))).length > 0;
+            let hasCpp: boolean = files.filter(file => (file.endsWith(".cpp"))).length > 0;
+            if (hasC && !hasCpp) {
+                language = "c";
+            } else if (hasCpp && !hasC) {
+                language = "cpp";
+            }
+
+            // /TP and /TC (for cl.exe only) overwrite the meaning of the source files extensions
+            if (isSwitchPassedInArguments(compilerTool.arguments, ['TP'])) {
+                language = "cpp";
+            } else if (isSwitchPassedInArguments(compilerTool.arguments, ['TC'])) {
+                language = "c";
+            }
+
+            // Parse the C/C++ standard as given in the compiler command line
+            let standardStr: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["std"]);
+
+                // If the command is compiling the same extension or uses -TC/-TP, send all the source files in one batch.
+            if (language) {
+                // More standard validation and defaults, in the context of the whole command.
+                let standard: util.StandardVersion = parseStandard(cpp.Version.latest, standardStr, language);
+                logger.message("    Standard: " + standard, "Verbose");
+
+                if (ext.extension) {
+                    ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files, windowsSDKVersion);
+                }
+            } else {
+                // If the compiler command is mixing c and c++ source files, send a custom configuration for each of the source files separately,
+                // to be able to accurately validate and calculate the standard based on the correct language.
+                files.forEach(file => {
+                    if (file.endsWith(".cpp")) {
+                        language = "cpp";
+                    } else if (file.endsWith(".c")) {
+                        language = "c";
+                    }
+
+                    // More standard validation and defaults, in the context of each source file.
+                    let standard: util.StandardVersion = parseStandard(cpp.Version.latest, standardStr, language);
+                    logger.message("    Standard: " + standard, "Verbose");
+
+                    if (ext.extension) {
+                        ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, [file], windowsSDKVersion);
+                    }
+                });
             }
         }
     });
@@ -746,3 +827,182 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
 
     return launchConfigurations;
 }
+
+/**
+ * Determine the IntelliSenseMode based on hints from compiler path
+ * and target architecture parsed from compiler flags.
+ */
+function getIntelliSenseMode(cppVersion: cpp.Version, compilerPath: string, targetArch: util.TargetArchitecture): util.IntelliSenseMode {
+    const canUseArm: boolean = (cppVersion >= cpp.Version.v4);
+    const compilerName: string = path.basename(compilerPath || "").toLocaleLowerCase();
+    if (compilerName === 'cl.exe') {
+        const clArch: string = path.basename(path.dirname(compilerPath)).toLocaleLowerCase();
+        switch (clArch) {
+            case 'arm64':
+                return canUseArm ? 'msvc-arm64' : 'msvc-x64';
+            case 'arm':
+                return canUseArm ? 'msvc-arm' : 'msvc-x86';
+            case 'x86':
+                return 'msvc-x86';
+            case 'x64':
+            default:
+                return 'msvc-x64';
+        }
+    } else if (compilerName.indexOf('armclang') >= 0) {
+        switch (targetArch) {
+            case 'arm64':
+                return canUseArm ? 'clang-arm64' : 'clang-x64';
+            case 'arm':
+            default:
+                return canUseArm ? 'clang-arm' : 'clang-x86';
+        }
+    } else if (compilerName.indexOf('clang') >= 0) {
+        switch (targetArch) {
+            case 'arm64':
+                return canUseArm ? 'clang-arm64' : 'clang-x64';
+            case 'arm':
+                return canUseArm ? 'clang-arm' : 'clang-x86';
+            case 'x86':
+                return 'clang-x86';
+            case 'x64':
+            default:
+                return 'clang-x64';
+        }
+    } else if (compilerName.indexOf('aarch64') >= 0) {
+        // Compiler with 'aarch64' in its name may also have 'arm', so check for
+        // aarch64 compilers before checking for ARM specific compilers.
+        return canUseArm ? 'gcc-arm64' : 'gcc-x64';
+    } else if (compilerName.indexOf('arm') >= 0) {
+        return canUseArm ? 'gcc-arm' : 'gcc-x86';
+    } else if (compilerName.indexOf('gcc') >= 0 || compilerName.indexOf('g++') >= 0) {
+        switch (targetArch) {
+            case 'x86':
+                return 'gcc-x86';
+            case 'x64':
+            default:
+                return 'gcc-x64';
+        }
+    } else {
+        // unknown compiler; pick platform defaults.
+        if (process.platform === 'win32') {
+            return 'msvc-x64';
+        } else if (process.platform === 'darwin') {
+            return 'clang-x64';
+        } else {
+            return 'gcc-x64';
+        }
+    }
+}
+
+/**
+ * Determine the target architecture from the compiler flags present in the given compilation command.
+ */
+function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
+    // Go through all the possible target architecture switches.
+    // For each switch, apply a set of rules to identify the target arch.
+    // The last switch wins.
+    let possibleArchs: string[] = parseMultipleSwitchesFromToolArguments(compilerArgs, ["m32", "m64"], ["arch", "march", "target"]);
+    let targetArch: util.TargetArchitecture; // this starts as undefined
+
+    possibleArchs.forEach(arch => {
+        if (arch === "m32") {
+            targetArch = "x86";
+        } else if (arch === "m64") {
+            targetArch = "x64";
+        } else if (arch === "i686") {
+            targetArch = "x86";
+        } else if (arch === "amd64" || arch === "x86_64") {
+            targetArch = "x64";
+        } else if (arch === "aarch64" || arch === "armv8-a" || arch === "armv8.") {
+            targetArch = "arm64";
+        } else if (arch === "arm" || arch === "armv8-r" || arch === "armv8-m") {
+            targetArch = "arm";
+        } else {
+            // Check if ARM version is 7 or earlier.
+            const verStr: string | undefined = arch?.substr(5, 1);
+            if (verStr) {
+                const verNum: number = +verStr;
+                if (verNum <= 7) {
+                    targetArch = "arm";
+                }
+            }
+        }
+    });
+
+    return targetArch;
+}
+
+function parseStandard(cppVersion: cpp.Version, std: string | undefined, language: util.Language): util.StandardVersion {
+    let canUseGnu: boolean = (cppVersion >= cpp.Version.v4);
+    let standard: util.StandardVersion;
+    if (!std) {
+        // Standard defaults when no std switch is given
+        if (language === "c") {
+            return "c11";
+        } else if (language === "cpp") {
+            return "c++17";
+        }
+    } else if (language === "cpp") {
+        standard = parseCppStandard(std, canUseGnu);
+        if (!standard) {
+            logger.message(`Unknown C++ standard control flag: ${std}`);
+        }
+    } else if (language === "c") {
+        standard = parseCStandard(std, canUseGnu);
+        if (!standard) {
+            logger.message(`Unknown C standard control flag: ${std}`);
+        }
+    } else if (language === undefined) {
+        standard = parseCppStandard(std, canUseGnu);
+        if (!standard) {
+            standard = parseCStandard(std, canUseGnu);
+        }
+        if (!standard) {
+            logger.message(`Unknown standard control flag: ${std}`);
+        }
+    } else {
+        logger.message("Unknown language");
+    }
+
+    return standard;
+}
+
+function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion {
+    const isGnu: boolean = canUseGnu && std.startsWith('gnu');
+    if (std.endsWith('++2a') || std.endsWith('++20') || std.endsWith('++latest')) {
+      return isGnu ? 'gnu++20' : 'c++20';
+    } else if (std.endsWith('++17') || std.endsWith('++1z')) {
+      return isGnu ? 'gnu++17' : 'c++17';
+    } else if (std.endsWith('++14') || std.endsWith('++1y')) {
+      return isGnu ? 'gnu++14' : 'c++14';
+    } else if (std.endsWith('++11') || std.endsWith('++0x')) {
+      return isGnu ? 'gnu++11' : 'c++11';
+    } else if (std.endsWith('++03')) {
+      return isGnu ? 'gnu++03' : 'c++03';
+    } else if (std.endsWith('++98')) {
+      return isGnu ? 'gnu++98' : 'c++98';
+    } else {
+      return undefined;
+    }
+  }
+
+  function parseCStandard(std: string, canUseGnu: boolean): util.StandardVersion {
+    // GNU options from: https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#C-Dialect-Options
+    const isGnu: boolean = canUseGnu && std.startsWith('gnu');
+    if (/(c|gnu)(90|89|iso9899:(1990|199409))/.test(std)) {
+      return isGnu ? 'gnu89' : 'c89';
+    } else if (/(c|gnu)(99|9x|iso9899:(1999|199x))/.test(std)) {
+      return isGnu ? 'gnu99' : 'c99';
+    } else if (/(c|gnu)(11|1x|iso9899:2011)/.test(std)) {
+      return isGnu ? 'gnu11' : 'c11';
+    } else if (/(c|gnu)(17|18|iso9899:(2017|2018))/.test(std)) {
+      if (canUseGnu) {
+        // cpptools supports 'c18' in same version it supports GNU std.
+        return isGnu ? 'gnu18' : 'c18';
+      } else {
+        return 'c11';
+      }
+    } else {
+      return undefined;
+    }
+  }
