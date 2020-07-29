@@ -109,7 +109,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildTarget', () => {
-        configuration.setNewTarget();
+        configuration.selectTarget();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', () => {
@@ -129,7 +129,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfiguration', () => {
-        configuration.setNewLaunchConfiguration();
+        configuration.selectLaunchConfiguration();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchDebug', () => {
@@ -157,7 +157,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', () => {
-        make.parseBuildOrDryRun();
+        make.configure();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.cleanConfigure', () => {
+        make.cleanConfigure();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.preConfigure', () => {
@@ -176,10 +180,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Read configuration info from settings
     configuration.initFromStateAndSettings();
 
-    // Generate the dry-run output used for parsing the info to be sent to CppTools,
-    // unless the user disabled automatic configure after opening.
+    // Let's do clean configure on load: meaning to invoke make dryrun
+    // instead of reading from the previously saved configuration cache.
+    // That is if the user didn't bypass the dryrun via makefile.buildLog.
     if (configuration.getConfigureOnOpen()) {
-        make.parseBuildOrDryRun();
+        make.cleanConfigure();
    }
 }
 

@@ -50,6 +50,7 @@
         "onCommand:makefile.launchDebug",
         "onCommand:makefile.launchRun",
         "onCommand:makefile.configure",
+        "onCommand:makefile.cleanConfigure",
         "onCommand:makefile.preConfigure",
         "workspaceContains:makefile",
         "workspaceContains:Makefile"
@@ -96,6 +97,10 @@
             {
                 "command": "makefile.configure",
                 "title": "Makefile: Configure"
+            },
+            {
+                "command": "makefile.cleanConfigure",
+                "title": "Makefile: Clean configure"
             },
             {
                 "command": "makefile.preConfigure",

@@ -239,6 +239,7 @@ export function readDryrunSwitches(): void {
 }
 
 // Currently, the makefile extension supports debugging only an executable.
+// TODO: Parse for symbol search paths
 // TODO: support dll debugging.
 export interface LaunchConfiguration {
     // The following properties constitute a minimal launch configuration object.
@@ -599,8 +600,9 @@ export function initFromStateAndSettings(): void {
     vscode.window.onDidChangeActiveTextEditor(e => {
         if (configProviderUpdatePending) {
             if (configureOnEdit) {
-                logger.message("Updating the Intellisense config provider...");
-                make.parseBuildOrDryRun(); // this sets configProviderUpdatePending back to false
+                // Normal configure doesn't have effect when the settings relevant for configProviderUpdatePending changed.
+                logger.message("Configuring clean after settings changes...");
+                make.cleanConfigure(); // this sets configProviderUpdatePending back to false
             }
         }
     });
@@ -679,9 +681,11 @@ export function initFromStateAndSettings(): void {
                 readAlwaysPreconfigure();
             }
 
-            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>("ConfigurationCache", "./ConfigurationCache.log");
+            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>("configurationCache", "./ConfigurationCache.log");
             if (util.resolvePathToRoot(updatedConfigurationCache) !== configurationCache) {
-                configProviderUpdatePending = true;
+                // A change in makefile.configurationCache should trigger an IntelliSense update
+                // only if the extension is not currently reading from a build log.
+                configProviderUpdatePending = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.ConfigurationCache setting changed.");
                 readConfigurationCache();
             }
@@ -692,14 +696,19 @@ export function initFromStateAndSettings(): void {
                 // may produce a different dry-run output with potential impact on IntelliSense,
                 // so trigger an update.
                 logger.message("makefile.makePath setting changed.");
-                configProviderUpdatePending = true;
+
+                // A change in makefile.makePath should trigger an IntelliSense update
+                // only if the extension is not currently reading from a build log.
+                configProviderUpdatePending = !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakePath();
             }
 
             let updatedMakefilePath : string | undefined = workspaceConfiguration.get<string>("makefilePath");
             if (updatedMakefilePath !== makefilePath) {
+                // A change in makefile.makefilePath should trigger an IntelliSense update
+                // only if the extension is not currently reading from a build log.
+                configProviderUpdatePending = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.makefilePath setting changed.");
-                configProviderUpdatePending = true;
                 readMakefilePath();
             }
 
@@ -752,7 +761,7 @@ export function setConfigurationByName(configurationName: string): void {
     extension.extensionContext.workspaceState.update("buildConfiguration", configurationName);
     setCurrentMakefileConfiguration(configurationName);
     if (configureAfterCommand) {
-        make.parseBuildOrDryRun();
+        make.cleanConfigure();
     }
 }
 
@@ -784,182 +793,41 @@ export async function setNewConfiguration(): Promise<void> {
     }
 }
 
-// Fill a drop-down with all the binaries, with their associated args and executing paths
-// as they are parsed from the dry-run output within the scope of
-// the current build configuration and the current target.
-// Persist the new launch configuration data after the user picks one.
-// TODO: deduce also symbol paths.
-// TODO: implement UI to collect this information.
-// TODO: refactor the dry-run part into make.ts
-export function parseLaunchConfigurations(source: string): string[] {
-        let binariesLaunchConfigurations: LaunchConfiguration[] = parser.parseForLaunchConfiguration(source);
-
-        let items: string[] = [];
-        binariesLaunchConfigurations.forEach(config => {
-            items.push(launchConfigurationToString(config));
-        });
-
-        items = items.sort().filter(function(elem, index, self) : boolean {
-            return index === self.indexOf(elem);
-        });
-
-        logger.message("Found the following launch targets defined in the makefile: " + items.join(";"));
-
-        return items;
-}
-
-export function parseLaunchConfigurationsFromBuildLog(): string[] | undefined {
-    let content: string = make.getParseContent();
-    if (content) {
-        let file: string = make.getParseFile();
-        logger.message(`Parsing launch configurations from: ${file}`);
-        return parseLaunchConfigurations(content);
-    }
-
-    return undefined;
-}
-
-export async function setNewLaunchConfiguration(): Promise<void> {
-    let binariesLaunchConfigurationNames: string[] | undefined = parseLaunchConfigurationsFromBuildLog();
-    if (binariesLaunchConfigurationNames) {
-        selectLaunchConfiguration(binariesLaunchConfigurationNames);
-        return;
-    }
-
-    // Construct the array of make arguments: configuration specific arguments + target + dry-run switches.
-    let makeArgs: string[] = [];
-    makeArgs = makeArgs.concat(configurationMakeArgs);
-    if (currentTarget) {
-        makeArgs.push(currentTarget);
-    }
-    makeArgs.push("--dry-run");
-    if (dryrunSwitches) {
-        makeArgs = makeArgs.concat(dryrunSwitches);
-    }
-
-    let stdoutStr: string = "";
-    let stderrStr: string = "";
-
-    logger.message("Generating the dry-run to parse launch configuration for the binaries built by the makefile. Command: " + configurationMakeCommand + " " + makeArgs.join(" "));
-
-    try {
-        let stdout : any = (result: string): void => {
-            stdoutStr += result;
-        };
-
-        let stderr : any = (result: string): void => {
-            stderrStr += result;
-        };
-
-        let closing : any = (retCode: number, signal: string): void => {
-            if (retCode !== 0) {
-                logger.message("The make dry-run command failed. Launch configurations may be missing from the Quick Pick selection.");
-                logger.message(stderrStr);
-                util.reportDryRunError();
-            }
-
-            //logger.message("The dry-run output for parsing the binaries launch configuration");
-            //logger.message(stdoutStr);
-            fs.writeFileSync(configurationCache, stdoutStr);
-            let launchConfigurationNames: string[] = parseLaunchConfigurations(stdoutStr);
-            selectLaunchConfiguration(launchConfigurationNames);
-        };
-
-        await util.spawnChildProcess(configurationMakeCommand, makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
-    } catch (error) {
-        logger.message(error);
-    }
-}
-
-export function parseTargetsFromBuildLogOrCache(): string[] | undefined {
-    let content: string = make.getParseContent();
-    if (content) {
-        let file: string = make.getParseFile();
-        logger.message(`Parsing targets from: ${file}`);
-        let makefileTargets: string[] = parser.parseTargets(content);
-        makefileTargets = makefileTargets.sort();
-        return makefileTargets;
-    }
-
-    return undefined;
-}
-
-// TODO: refactor the dry-run part into make.ts
-export async function setNewTarget(): Promise<void> {
-    // If a build log is specified in makefile.configurations.buildLog or makefile.buildLog settings,
-    // (and if it exists on disk) it must be parsed instead of invoking a dry-run make command.
-    // Also, an existing dry-run cache should avoid calling make for this (finding all the existing targets).
-    let makefileTargets: string[] | undefined = parseTargetsFromBuildLogOrCache();
-    if (makefileTargets) {
-        selectTarget(makefileTargets);
-        return;
-    }
-
-    let makeArgs: string[] = [];
-    // "all" must be the first argument passed to make, to ensure that all the targets are evaluated and not only a subset
-    makeArgs.push("all");
-
-    // Then include all the make arguments defined in makefile.configurations.makeArgs
-    makeArgs = makeArgs.concat(configurationMakeArgs);
-
-    // append dry-run switches at the end of the make command
-    makeArgs.push("--dry-run");
-    if (dryrunSwitches) {
-        makeArgs = makeArgs.concat(configurationMakeArgs, dryrunSwitches);
-    }
-
-    let stdoutStr: string = "";
-    let stderrStr: string = "";
-
-    logger.message("Parsing the targets in the makefile. Command: " + configurationMakeCommand + " " + makeArgs.join(" "));
-
-    let process: child_process.ChildProcess;
-    try {
-        let stdout : any = (result: string): void => {
-            stdoutStr += result;
-        };
-
-        let stderr : any = (result: string): void => {
-            stderrStr += result;
-        };
-
-        let closing : any = (retCode: number, signal: string): void => {
-            if (retCode !== 0) {
-                logger.message("The make dry-run command failed. Makefile build targets may be missing from the Quick Pick selection.");
-                logger.message(stderrStr);
-                util.reportDryRunError();
-            }
-
-            // Don't log stdoutStr in this case, because -p output is too verbose to be useful in any logger area
-            fs.writeFileSync(configurationCache, stdoutStr);
-            makefileTargets = parser.parseTargets(stdoutStr);
-            makefileTargets = makefileTargets.sort();
-            selectTarget(makefileTargets);
-        };
-
-        await util.spawnChildProcess(configurationMakeCommand, makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
-    } catch (error) {
-        logger.message(error);
-    }
-}
-
 export function setTargetByName(targetName: string) : void {
     currentTarget = targetName;
     statusBar.setTarget(currentTarget);
     logger.message("Setting target " + currentTarget);
     extension.extensionContext.workspaceState.update("buildTarget", currentTarget);
     if (configureAfterCommand) {
-        make.parseBuildOrDryRun();
+        // The set of build targets remains the same even if the current target has changed
+        make.cleanConfigure(false);
     }
 }
 
 // Fill a drop-down with all the target names run by building the makefile for the current configuration
 // Triggers a cpptools configuration provider update after selection.
 // TODO: change the UI list to multiple selections mode and store an array of current active targets
-export async function selectTarget(makefileTargets: string[]): Promise<void> {
+export async function selectTarget(): Promise<void> {
     let options : vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
-    const chosen: string | undefined = await vscode.window.showQuickPick(makefileTargets, options);
+
+    // Ensure "all" is always available as a target to select.
+    // There are scenarios when "all" might not be present in the list of available targets,
+    // for example when the extension is using a build log or dryrun cache of a previous state
+    // when a particular target was selected and a dryrun applied on that is producing a subset of targets,
+    // making it impossible to select "all" back again without resetting the Makefile Tools state
+    // or switching to a different makefile configuration or implementing an editable target quick pick.
+    // Another situation where "all" would inconveniently miss from the quick pick is when the user is
+    // providing a build log without the required verbosity for parsing targets (-p or --print-data-base switches).
+    // When the extension is not reading from build log or dryrun cache, we have logic to prevent
+    // "all" from getting lost: make sure the target is not appended to the make invocation
+    // whose output is used to parse the targets (as opposed to parsing for IntelliSense or launch targets
+    // when the current target must be appended to the make command).
+    if (!buildTargets.includes("all")) {
+        buildTargets.push("all");
+    }
+
+    const chosen: string | undefined = await vscode.window.showQuickPick(buildTargets, options);
 
     if (chosen) {
         setTargetByName(chosen);
@@ -1003,18 +871,26 @@ export function setLaunchConfigurationByName (launchConfigurationName: string) :
 // Fill a drop-down with all the launch configurations found for binaries built by the makefile
 // under the scope of the current build configuration and target
 // Selection updates current launch configuration that will be ready for the next debug/run operation
-export async function selectLaunchConfiguration(launchConfigurationsNames: string[]): Promise<void> {
+export async function selectLaunchConfiguration(): Promise<void> {
     // TODO: create a quick pick with description and details for items
     // to better view the long targets commands
 
     let options: vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
-    if (launchConfigurationsNames.length === 0) {
+    if (launchTargets.length === 0) {
         options.placeHolder = "No launch targets identified";
     }
-    const chosen: string | undefined = await vscode.window.showQuickPick(launchConfigurationsNames, options);
+    const chosen: string | undefined = await vscode.window.showQuickPick(launchTargets, options);
 
     if (chosen) {
         setLaunchConfigurationByName(chosen);
     }
 }
+
+let buildTargets: string[] = [];
+export function getBuildTargets(): string[] { return buildTargets; }
+export function setBuildTargets(targets: string[]): void { buildTargets = targets; }
+
+let launchTargets: string[] = [];
+export function getLaunchTargets(): string[] { return launchTargets; }
+export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
