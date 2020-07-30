@@ -184,7 +184,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // instead of reading from the previously saved configuration cache.
     // That is if the user didn't bypass the dryrun via makefile.buildLog.
     if (configuration.getConfigureOnOpen()) {
-        make.cleanConfigure();
+        await make.cleanConfigure();
    }
 }
 

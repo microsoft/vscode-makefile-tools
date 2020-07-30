@@ -1,4 +1,3 @@
-
 // TODO: support also the scenario of parsing a build log,
 // to overcome some of --dry-run limitations
 // (like some exceptions to the 'do not execute' rule
@@ -603,8 +602,6 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
 // Parse the output of the make dry-run command in order to provide VS Code debugger
 // with information about binaries, their execution paths and arguments
 export function parseForLaunchConfiguration(dryRunOutputStr: string): configuration.LaunchConfiguration[] {
-    logger.message('Parsing dry-run output for Launch (debug/run) configuration.');
-
     // Do some preprocessing on the dry-run output to make the RegExp parsing easier
     dryRunOutputStr = preprocessDryRunOutput(dryRunOutputStr);
 
