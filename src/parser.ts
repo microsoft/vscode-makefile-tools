@@ -54,12 +54,6 @@ export function parseTargets(verboseLog: string): string[] {
         result = regexpExtract.exec(verboseLog);
     }
 
-    if (matches) {
-        logger.message("Found the following build targets: " + matches.join(";"));
-    } else {
-        logger.message("No targets found");
-    }
-
     return matches;
 }
 

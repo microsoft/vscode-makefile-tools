@@ -9,6 +9,51 @@ import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
 
+let isBuilding: boolean = false;
+export function getIsBuilding(): boolean { return isBuilding; }
+export function setIsBuilding(building: boolean): void {
+    isBuilding = building;
+}
+
+let isConfiguring: boolean = false;
+export function getIsConfiguring(): boolean { return isConfiguring; }
+export function setIsConfiguring(configuring: boolean): void { isConfiguring = configuring; }
+
+let isPreConfiguring: boolean = false;
+export function getIsPreConfiguring(): boolean { return isPreConfiguring; }
+export function setIsPreConfiguring(preConfiguring: boolean): void { isPreConfiguring = preConfiguring; }
+
+// Identifies and logs whether an operation should be prevented from running.
+// So far, the only blocking scenarios are if an ongoing configure, pre-configure or build
+// is blocking other new similar operations and setter commands (selection of new configurations, targets, etc...)
+// Getter commands are not blocked, even if by the time the (pre-)configure or build operations are completed
+// they might be out of date.
+// For the moment, the status bar buttons don't change when an operation is blocked
+// and cancelling is done only via a button in the bottom right popup.
+// Clicking the status bar buttons attempts to run the corresponding operation,
+// which triggers a popup and returns early if it should be blocked. Same for pallette commands.
+// In future we may enable/disable or change text depending on the blocking state.
+export function blockOperation(): boolean {
+    let block: boolean = false;
+
+    if (getIsPreConfiguring()) {
+        vscode.window.showErrorMessage("This operation cannot be completed because the project is pre-configuring.");
+        block = true;
+    }
+
+    if (getIsConfiguring()) {
+        vscode.window.showErrorMessage("This operation cannot be completed because the project is configuring.");
+        block = true;
+    }
+
+    if (getIsBuilding()) {
+        vscode.window.showErrorMessage("This operation cannot be completed because the project is building.");
+        block = true;
+    }
+
+    return block;
+}
+
 export function prepareBuildTarget(target: string, clean: boolean = false): string[] {
     let makeArgs: string[] = [];
     // Prepend the target to the arguments given in the configurations json.
@@ -27,7 +72,13 @@ export function prepareBuildTarget(target: string, clean: boolean = false): stri
 }
 
 export async function buildTarget(target: string, clean: boolean = false): Promise<void> {
+    if (blockOperation()) {
+        return;
+    }
+
     return new Promise<void>(function (resolve, reject): void {
+        setIsBuilding(true);
+
         // Prepare a notification popup
         let config: string | undefined = configuration.getCurrentMakefileConfiguration();
         let configAndTarget: string = config;
@@ -59,6 +110,7 @@ export async function buildTarget(target: string, clean: boolean = false): Promi
                     logger.message(`Target ${target} built successfully.`);
                 }
 
+                setIsBuilding(false);
                 resolve();
             };
 
@@ -87,40 +139,38 @@ export function setParseFile(file: string): void { parseFile = file; }
 // a subset of all the targets involved in the makefile (only the ones triggered
 // by building the current target).
 export async function generateParseContent(forTargets: boolean = false): Promise<void> {
+    // Rules for parse content and file:
+    //     1. makefile.buildLog provided by the user in settings
+    //     2. configuration cache (the previous dryrun output): makefile.configurationCache
+    //     3. the make dryrun output if (2) is missing
+    let buildLog: string | undefined = configuration.getConfigurationBuildLog();
+    if (buildLog) {
+        parseContent = util.readFile(buildLog);
+        if (parseContent) {
+            parseFile = buildLog;
+            return;
+        }
+    }
+
+    let cache: string = configuration.getConfigurationCache();
+    if (cache) {
+        // We are looking at a different cache file for targets parsing,
+        // located in the same folder as makefile.configurationCache
+        // but with the file name configurationCache.log.
+        // The user doesn't need to know about this, so there's no setting.
+        if (forTargets) {
+            cache = path.parse(cache).dir;
+            cache = path.join(cache, "targetsCache.log");
+        }
+
+        parseContent = util.readFile(cache);
+        if (parseContent) {
+            parseFile = cache;
+            return;
+        }
+    }
+
     return new Promise<void>(function (resolve, reject): void {
-        // Rules for parse content and file:
-        //     1. makefile.buildLog provided by the user in settings
-        //     2. configuration cache (the previous dryrun output): makefile.configurationCache
-        //     3. the make dryrun output if (2) is missing
-        let buildLog: string | undefined = configuration.getConfigurationBuildLog();
-        if (buildLog) {
-            parseContent = util.readFile(buildLog);
-            if (parseContent) {
-                parseFile = buildLog;
-                resolve();
-                return;
-            }
-        }
-
-        let cache: string = configuration.getConfigurationCache();
-        if (cache) {
-            // We are looking at a different cache file for targets parsing,
-            // located in the same folder as makefile.configurationCache
-            // but with the file name configurationCache.log.
-            // The user doesn't need to know about this, so there's no setting.
-            if (forTargets) {
-                cache = path.parse(cache).dir;
-                cache = path.join(cache, "targetsCache.log");
-            }
-
-            parseContent = util.readFile(cache);
-            if (parseContent) {
-                parseFile = cache;
-                resolve();
-                return;
-            }
-        }
-
         // Continue with the make dryrun invocation
         let makeArgs: string[] = [];
 
@@ -191,25 +241,31 @@ export async function generateParseContent(forTargets: boolean = false): Promise
 }
 
 export async function runPreconfigureScript(): Promise<void> {
+    let scriptFile: string | undefined = configuration.getPreconfigureScript();
+    if (!scriptFile || !util.checkFileExistsSync(scriptFile)) {
+        vscode.window.showErrorMessage("Could not find pre-configure script.");
+        logger.message("Make sure a pre-configuration script path is defined with makefile.preconfigureScript and that it exists on disk.");
+        return;
+    }
+
+    if (blockOperation()) {
+        return;
+    }
+
     return new Promise<void>(function (resolve, reject): void {
-        let script: string | undefined = configuration.getPreconfigureScript();
-        if (!script || !util.checkFileExistsSync(script)) {
-            vscode.window.showErrorMessage("Could not find pre-configure script.");
-            logger.message("Make sure a pre-configuration script path is defined with makefile.preconfigureScript and that it exists on disk.");
-            resolve();
-            return;
-        }
+        logger.message(`Preconfiguring...\nScript: "${configuration.getPreconfigureScript()}"`);
+        setIsPreConfiguring(true);
 
         let scriptArgs: string[] = [];
         let runCommand: string;
         if (process.platform === 'win32') {
             runCommand = "cmd";
             scriptArgs.push("/c");
-            scriptArgs.push(script);
+            scriptArgs.push(`${scriptFile}`);
         } else {
             runCommand = "/bin/bash";
             scriptArgs.push("-c");
-            scriptArgs.push(`"source ${script}"`);
+            scriptArgs.push(`"source ${scriptFile}"`);
         }
 
         try {
@@ -232,6 +288,7 @@ export async function runPreconfigureScript(): Promise<void> {
                     logger.message(stderrStr);
                 }
 
+                setIsPreConfiguring(false);
                 resolve();
             };
 
@@ -249,11 +306,15 @@ export async function runPreconfigureScript(): Promise<void> {
 // This saves unnecessary parsing which may be signifficant for very big code bases.
 export async function configure(updateTargets: boolean = true): Promise<void> {
     if (configuration.getAlwaysPreconfigure()) {
-        logger.message(`Preconfiguring: ${configuration.getPreconfigureScript()}`);
         await runPreconfigureScript();
     }
 
+    if (blockOperation()) {
+        return;
+    }
+
     logger.message("Configuring...");
+    setIsConfiguring(true);
 
     // Reset the config provider update pending boolean
     configuration.setConfigProviderUpdatePending(false);
@@ -273,12 +334,18 @@ export async function configure(updateTargets: boolean = true): Promise<void> {
         launchConfigurations.push(configuration.launchConfigurationToString(config));
     });
 
-    launchConfigurations = launchConfigurations.sort().filter(function (elem, index, self): boolean {
-        return index === self.indexOf(elem);
-    });
+    if (launchConfigurations.length === 0) {
+        logger.message("No launch configurations have been detected.");
+    } else {
+        // Sort and remove duplicates (different targets may build into the same place,
+        // launching doesn't need to know which version of the binary that is).
+        launchConfigurations = launchConfigurations.sort().filter(function (elem, index, self): boolean {
+            return index === self.indexOf(elem);
+        });
 
-    logger.message("Found the following launch targets defined in the makefile: " + launchConfigurations.join(";"));
-    configuration.setLaunchTargets(launchConfigurations);
+        logger.message("Found the following launch targets defined in the makefile: " + launchConfigurations.join(";"));
+        configuration.setLaunchTargets(launchConfigurations);
+    }
 
     // Configure build targets only if necessary
     if (updateTargets) {
@@ -290,8 +357,16 @@ export async function configure(updateTargets: boolean = true): Promise<void> {
         }
 
         logger.message(`Parsing for build targets from: "${parseFile}"`);
-        configuration.setBuildTargets(parser.parseTargets(parseContent || "").sort());
+        let buildTargets: string[] = parser.parseTargets(parseContent || "");
+        if (buildTargets.length === 0) {
+            logger.message("No build targets have been detected.");
+        } else {
+            configuration.setBuildTargets(buildTargets.sort());
+            logger.message("Found the following build targets defined in the makefile: " + buildTargets.join(";"));
+        }
     }
+
+    setIsConfiguring(false);
 }
 
 // Delete the dryrun cache (including targets cache) and configure

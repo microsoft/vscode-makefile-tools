@@ -3,6 +3,7 @@
 import * as configuration from './configuration';
 import * as extension from './extension';
 import * as logger from './logger';
+import * as make from './make';
 import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
@@ -161,6 +162,11 @@ export class Launcher implements vscode.Disposable {
     }
 
     public async debugCurrentTarget(): Promise<vscode.DebugSession | undefined> {
+        // Cannot debug the project if it is currently building or (pre-)configuring.
+        if (make.blockOperation()) {
+            return;
+        }
+
         let debugConfig: vscode.DebugConfiguration | undefined = this.prepareDebugCurrentTarget();
         if (debugConfig) {
             let startFolder: vscode.WorkspaceFolder;
@@ -216,6 +222,11 @@ export class Launcher implements vscode.Disposable {
 
         if (!this.launchTerminal) {
             this.launchTerminal = vscode.window.createTerminal(terminalOptions);
+        }
+
+        // Cannot run the project if it is currently building or (pre-)configuring.
+        if (make.blockOperation()) {
+            return this.launchTerminal;
         }
 
         let terminalCommand: string | undefined = this.prepareRunCurrentTarget();

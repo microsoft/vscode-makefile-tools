@@ -69,9 +69,10 @@ export function setCurrentMakefileConfiguration(configuration: string): void {
 function readCurrentMakefileConfiguration(): void {
     let buildConfiguration : string | undefined = extension.extensionContext.workspaceState.get<string>("buildConfiguration");
     if (!buildConfiguration) {
-        logger.message("No current configuration is defined in the settings file. Assuming 'Default'.", "verbose");
+        logger.message("No current configuration is defined in the workspace state. Assuming 'Default'.");
         currentMakefileConfiguration = "Default";
     } else {
+        logger.message(`Reading current configuration "${buildConfiguration}" from the workspace state.`);
         currentMakefileConfiguration = buildConfiguration;
     }
 
@@ -89,7 +90,7 @@ function readMakePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makePath = workspaceConfiguration.get<string>("makePath");
     if (!makePath) {
-        logger.message("No path to the make tool is defined in the settings file", "verbose");
+        logger.message("No path to the make tool is defined in the settings file");
     }
 }
 
@@ -104,7 +105,7 @@ function readMakefilePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makefilePath = workspaceConfiguration.get<string>("makefilePath");
     if (!makefilePath) {
-        logger.message("No path to the make tool is defined in the settings file", "verbose");
+        logger.message("No path to the make tool is defined in the settings file");
     }
 }
 
@@ -155,6 +156,8 @@ export function readLoggingLevel(): void {
     if (!loggingLevel) {
         loggingLevel = "Normal";
     }
+
+    logger.message(`Logging level: ${loggingLevel}`);
 }
 
 let extensionLog: string | undefined;
@@ -205,6 +208,7 @@ export function setAlwaysPreconfigure(path: boolean): void { alwaysPreconfigure 
 export function readAlwaysPreconfigure(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     alwaysPreconfigure = workspaceConfiguration.get<boolean>("alwaysPreconfigure", false);
+    logger.message(`Always preconfigure: ${alwaysPreconfigure}`);
 }
 
 let configurationCache: string;
@@ -217,8 +221,8 @@ export function setConfigurationCache(path: string): void { configurationCache =
 export function readConfigurationCache(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configurationCache = util.resolvePathToRoot(workspaceConfiguration.get<string>("ConfigurationCache", "./ConfigurationCache.log"));
-    logger.message("Dry-run output cached at {0}", configurationCache);
+    configurationCache = util.resolvePathToRoot(workspaceConfiguration.get<string>("configurationCache", "./configurationCache.log"));
+    logger.message(`Dry-run output cached at ${configurationCache}`);
 }
 
 let dryrunSwitches: string[] | undefined;
@@ -236,6 +240,7 @@ export function setDryrunSwitches(switches: string[]): void { dryrunSwitches = s
 export function readDryrunSwitches(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     dryrunSwitches = workspaceConfiguration.get<string[]>("dryrunSwitches");
+    logger.message(`Dry-run switches: ${dryrunSwitches}`);
 }
 
 // Currently, the makefile extension supports debugging only an executable.
@@ -332,9 +337,11 @@ function readCurrentLaunchConfiguration(): void {
     }
 
     if (currentLaunchConfiguration) {
-        statusBar.setLaunchConfiguration(launchConfigurationToString(currentLaunchConfiguration));
+        let launchConfigStr: string = launchConfigurationToString(currentLaunchConfiguration);
+        logger.message(`Reading current launch configuration "${launchConfigStr}" from the workspace state.`);
+        statusBar.setLaunchConfiguration(launchConfigStr);
     } else {
-        statusBar.setLaunchConfiguration("No launch configuration set");
+        logger.message("No current launch configuration is set in the workspace state.");
     }
 }
 
@@ -352,6 +359,10 @@ export function getDefaultLaunchConfiguration(): DefaultLaunchConfiguration | un
 export function readDefaultLaunchConfiguration(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     defaultLaunchConfiguration = workspaceConfiguration.get<DefaultLaunchConfiguration>("defaultLaunchConfiguration");
+    logger.message(`Default launch configuration: MIMode = ${defaultLaunchConfiguration?.MIMode},
+                    miDebuggerPath = ${defaultLaunchConfiguration?.miDebuggerPath},
+                    stopAtEntry = ${defaultLaunchConfiguration?.stopAtEntry},
+                    symbolSearchPath = ${defaultLaunchConfiguration?.symbolSearchPath}`);
 }
 
 // Command name and args are used when building from within the VS Code Makefile Tools Extension,
@@ -423,7 +434,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     if (!buildLogContent) {
         if ((!makeParsedPathSettings || makeParsedPathSettings.name === "") &&
             (!makeParsedPathConfigurations || makeParsedPathConfigurations.name === "")) {
-            logger.message("Could not find any make tool file name in makefile.configurations.makePath, nor in makefile.makePath. Assuming make.", "verbose");
+            logger.message("Could not find any make tool file name in makefile.configurations.makePath, nor in makefile.makePath. Assuming make.");
         }
 
         if ((!makeParsedPathSettings || makeParsedPathSettings?.dir === "") &&
@@ -506,6 +517,16 @@ function readMakefileConfigurations(): void {
         logger.message("Updating makefile configurations in settings.");
         workspaceConfiguration.update("configurations", makefileConfigurations);
     }
+
+    // Log the updated list of configuration names
+    const makefileConfigurationNames: string[] = makefileConfigurations.map((k => {
+        return k.name;
+    }));
+
+    if (makefileConfigurationNames.length > 0) {
+        logger.message("Found the following configurations defined in makefile.configurations setting: " +
+                        makefileConfigurationNames.join(";"));
+    }
 }
 
 // Last target picked from the set of targets that are run by the makefiles
@@ -519,13 +540,14 @@ export function setCurrentTarget(target: string | undefined): void { currentTarg
 function readCurrentTarget(): void {
     let buildTarget : string | undefined = extension.extensionContext.workspaceState.get<string>("buildTarget");
     if (!buildTarget) {
-        logger.message("No target defined in the settings file. Assuming 'Default'.", "verbose");
+        logger.message("No target defined in the workspace state. Assuming 'Default'.");
         statusBar.setTarget("Default");
         // If no particular target is defined in settings, use 'Default' for the button
         // but keep the variable empty, to not append it to the make command.
         currentTarget = "";
     } else {
         currentTarget = buildTarget;
+        logger.message(`Reading current build target "${currentTarget}" from the workspace state.`);
         statusBar.setTarget(currentTarget);
     }
 }
@@ -548,6 +570,7 @@ export function readConfigureOnOpen(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
     configureOnOpen = workspaceConfiguration.get<boolean>("configureOnOpen", true);
+    logger.message(`Configure on open: ${configureOnOpen}`);
 }
 
 let configureOnEdit: boolean;
@@ -557,6 +580,7 @@ export function readConfigureOnEdit(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
     configureOnEdit = workspaceConfiguration.get<boolean>("configureOnEdit", true);
+    logger.message(`Configure on edit: ${configureOnEdit}`);
 }
 
 let configureAfterCommand: boolean;
@@ -566,6 +590,7 @@ export function readConfigureAfterCommand(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
     configureAfterCommand = workspaceConfiguration.get<boolean>("configureAfterCommand", true);
+    logger.message(`Configure after command: ${configureAfterCommand}`);
 }
 
  // Triggers IntelliSense config provider updates after relevant changes
@@ -576,12 +601,11 @@ export function readConfigureAfterCommand(): void {
  // because of various settings. Operations like build/launch targets quick picks need
  // at least one configure to populate the data.
 let configProviderUpdatePending: boolean = true;
-export function getConfigProviderUpdatePending(): boolean { return configureAfterCommand; }
-export function setConfigProviderUpdatePending(configure: boolean): void { configureAfterCommand = configure; }
+export function getConfigProviderUpdatePending(): boolean { return configProviderUpdatePending; }
+export function setConfigProviderUpdatePending(configure: boolean): void { configProviderUpdatePending = configure; }
 
 // Initialization from settings (or backup default rules), done at activation time
 export function initFromStateAndSettings(): void {
-    readLoggingLevel();
     readConfigurationCache();
     readMakePath();
     readMakefilePath();
@@ -604,7 +628,7 @@ export function initFromStateAndSettings(): void {
         if (configProviderUpdatePending) {
             if (configureOnEdit) {
                 // Normal configure doesn't have effect when the settings relevant for configProviderUpdatePending changed.
-                logger.message("Configuring clean after settings changes...");
+                logger.message("Configuring clean after settings or makefile changes...");
                 make.cleanConfigure(); // this sets configProviderUpdatePending back to false
             }
         }
@@ -684,12 +708,12 @@ export function initFromStateAndSettings(): void {
                 readAlwaysPreconfigure();
             }
 
-            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>("configurationCache", "./ConfigurationCache.log");
+            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>("configurationCache", "./configurationCache.log");
             if (util.resolvePathToRoot(updatedConfigurationCache) !== configurationCache) {
                 // A change in makefile.configurationCache should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
                 configProviderUpdatePending = !buildLog || !util.checkFileExistsSync(buildLog);
-                logger.message("makefile.ConfigurationCache setting changed.");
+                logger.message("makefile.configurationCache setting changed.");
                 readConfigurationCache();
             }
 
@@ -773,9 +797,7 @@ export function prepareConfigurationsQuickPick(): string[] {
         return k.name;
     }));
 
-    if (items.length > 0) {
-        logger.message("Found the following configurations defined in makefile.configurations setting: " + items.join(";"));
-    } else {
+    if (items.length === 0) {
         logger.message("No configurations defined in makefile.configurations setting.");
         items.push("Default");
     }
@@ -786,6 +808,11 @@ export function prepareConfigurationsQuickPick(): string[] {
 // Fill a drop-down with all the configuration names defined by the user in makefile.configurations setting.
 // Triggers a cpptools configuration provider update after selection.
 export async function setNewConfiguration(): Promise<void> {
+    // Cannot set a new makefile configuration if the project is currently building or (pre-)configuring.
+    if (make.blockOperation()) {
+        return;
+    }
+
     const items: string[] = prepareConfigurationsQuickPick();
 
     let options : vscode.QuickPickOptions = {};
@@ -811,6 +838,11 @@ export function setTargetByName(targetName: string) : void {
 // Triggers a cpptools configuration provider update after selection.
 // TODO: change the UI list to multiple selections mode and store an array of current active targets
 export async function selectTarget(): Promise<void> {
+    // Cannot select a new target if the project is currently building or (pre-)configuring.
+    if (make.blockOperation()) {
+        return;
+    }
+
     // warn about an out of date configure state
     if (configProviderUpdatePending) {
         logger.message("The project needs a configure to populate the build targets correctly.");
@@ -880,6 +912,11 @@ export function setLaunchConfigurationByName (launchConfigurationName: string) :
 // under the scope of the current build configuration and target
 // Selection updates current launch configuration that will be ready for the next debug/run operation
 export async function selectLaunchConfiguration(): Promise<void> {
+    // Cannot select a new launch configuration if the project is currently building or (pre-)configuring.
+    if (make.blockOperation()) {
+        return;
+    }
+
     // warn about an out of date configure state
     if (configProviderUpdatePending) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
