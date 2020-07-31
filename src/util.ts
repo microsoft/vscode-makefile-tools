@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as child_process from 'child_process';
 import * as configuration from './configuration';
 import * as logger from './logger';
+import * as make from './make';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
@@ -109,6 +110,50 @@ export function toolPathInEnv(name: string): string | undefined {
     });
 }
 
+export async function killTree(pid: number): Promise<void> {
+    if (process.platform !== 'win32') {
+        let children: number[] = [];
+        let stdoutStr: string = "";
+
+        let stdout: any = (result: string): void => {
+            stdoutStr += result;
+        };
+
+        let stderr: any = (result: string): void => {
+        };
+
+        let closing: any = (retCode: number, signal: string): void => {
+            if (!!stdout.length) {
+                children = stdout.split('\n').map((line: string) => Number.parseInt(line));
+            }
+
+            logger.message(`Found children subprocesses: ${children.join(";")}.`);
+            for (const other of children) {
+                if (other) {
+                    killTree(other);
+                }
+            }
+        };
+
+        logger.message(`Searching for children subprocesses of PID = ${pid}...`);
+        logger.message(`pgrep -P ${pid}`);
+
+        await spawnChildProcess('pgrep', ['-P', pid.toString()], vscode.workspace.rootPath || "", stdout, stderr, closing);
+
+        try {
+            logger.message(`Killing process PID = ${pid}`);
+            process.kill(pid, 'SIGINT');
+        } catch (e) {
+            if (e.code === 'ESRCH') {
+            } else {
+                throw e;
+            }
+        }
+    } else {
+        child_process.exec(`taskkill /pid ${pid} /T /F`);
+    }
+}
+
 // Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
 export function spawnChildProcess(process: string, args: string[], workingDirectory: string,
     stdoutCallback: (stdout: string) => void,
@@ -117,6 +162,7 @@ export function spawnChildProcess(process: string, args: string[], workingDirect
 
     return new Promise<void>(function (resolve, reject): void {
         const child: child_process.ChildProcess = child_process.spawn(process, args, { cwd: workingDirectory });
+        make.setCurPID(child.pid);
 
         child.stdout.on('data', (data) => {
             stdoutCallback(`${data}`);

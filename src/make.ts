@@ -71,32 +71,73 @@ export function prepareBuildTarget(target: string, clean: boolean = false): stri
     return makeArgs;
 }
 
-export async function buildTarget(target: string, clean: boolean = false): Promise<void> {
+// PID of the process that may be running currently.
+// At any moment, there is either no process or only one process running
+// (make for configure, make for build, preconfigure cmd/bash).
+// TODO: improve the code regarding curPID and how util.spawnChildProcess is setting it in make.ts unit.
+let curPID: number = -1;
+export function getCurPID(): number { return curPID; }
+export function setCurPID(pid: number): void { curPID = pid; }
+
+export async function buildTarget(target: string, clean: boolean = false): Promise<number> {
     if (blockOperation()) {
-        return;
+        return -1;
     }
 
-    return new Promise<void>(function (resolve, reject): void {
-        setIsBuilding(true);
-
-        // Prepare a notification popup
-        let config: string | undefined = configuration.getCurrentMakefileConfiguration();
-        let configAndTarget: string = config;
-        if (target) {
-            target = target.trimLeft();
-            if (target !== "") {
-                configAndTarget += "/" + target;
-            }
+    // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
+    if (configuration.getConfigProviderUpdatePending()) {
+        logger.message("The project needs to configure in order to build properly the current target.");
+        if (configuration.getConfigureAfterCommand()) {
+            await cleanConfigure();
         }
+    }
 
-        configAndTarget = `"${configAndTarget}"`;
-        vscode.window.showInformationMessage('Building ' + (clean ? "clean " : "") + 'the current makefile configuration ' + configAndTarget);
+    // Prepare a notification popup
+    let config: string | undefined = configuration.getCurrentMakefileConfiguration();
+    let configAndTarget: string = config;
+    if (target) {
+        target = target.trimLeft();
+        if (target !== "") {
+            configAndTarget += "/" + target;
+        }
+    }
 
+    configAndTarget = `"${configAndTarget}"`;
+    let popupStr: string = 'Building ' + (clean ? "clean " : "") + 'the current makefile configuration ' + configAndTarget;
+
+    try {
+        return await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: popupStr,
+                cancellable: true,
+            },
+            async (progress, cancel) => {
+                cancel.onCancellationRequested(() => {
+                    progress.report({increment: 1, message: "Cancelling..."});
+                    logger.message("The user is cancelling the build...");
+                    // Kill make and all its children subprocesses.
+                    logger.message(`Attempting to kill the make (PID = ${curPID}) and all its children subprocesses...`);
+                    util.killTree(curPID);
+                });
+
+                setIsBuilding(true);
+                return doBuildTarget(progress, target, clean);
+            },
+        );
+    } finally {
+        setIsBuilding(false);
+    }
+}
+
+export async function doBuildTarget(progress: vscode.Progress<{}>, target: string, clean: boolean = false): Promise<number> {
+    return new Promise<number>(function (resolve, reject): void {
         let makeArgs: string[] = prepareBuildTarget(target, clean);
         try {
             // Append without end of line since there is one already included in the stdout/stderr fragments
             let stdout: any = (result: string): void => {
                 logger.messageNoCR(result);
+                progress.report({increment: 1, message: "..."});
             };
 
             let stderr: any = (result: string): void => {
@@ -110,8 +151,7 @@ export async function buildTarget(target: string, clean: boolean = false): Promi
                     logger.message(`Target ${target} built successfully.`);
                 }
 
-                setIsBuilding(false);
-                resolve();
+                resolve(retCode);
             };
 
             util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
@@ -138,7 +178,7 @@ export function setParseFile(file: string): void { parseFile = file; }
 // (other than default empty "" or the standard "all"), otherwise it would produce
 // a subset of all the targets involved in the makefile (only the ones triggered
 // by building the current target).
-export async function generateParseContent(forTargets: boolean = false): Promise<void> {
+export async function generateParseContent(forTargets: boolean = false): Promise<number> {
     // Rules for parse content and file:
     //     1. makefile.buildLog provided by the user in settings
     //     2. configuration cache (the previous dryrun output): makefile.configurationCache
@@ -148,7 +188,7 @@ export async function generateParseContent(forTargets: boolean = false): Promise
         parseContent = util.readFile(buildLog);
         if (parseContent) {
             parseFile = buildLog;
-            return;
+            return 0;
         }
     }
 
@@ -166,11 +206,11 @@ export async function generateParseContent(forTargets: boolean = false): Promise
         parseContent = util.readFile(cache);
         if (parseContent) {
             parseFile = cache;
-            return;
+            return 0;
         }
     }
 
-    return new Promise<void>(function (resolve, reject): void {
+    return new Promise<number>(function (resolve, reject): void {
         // Continue with the make dryrun invocation
         let makeArgs: string[] = [];
 
@@ -230,11 +270,12 @@ export async function generateParseContent(forTargets: boolean = false): Promise
                 parseContent = stdoutStr;
                 parseFile = cache;
 
-                resolve();
+                resolve(retCode);
             };
 
             util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
         } catch (error) {
+            resolve(-1);
             logger.message(error);
         }
     });
@@ -282,7 +323,7 @@ export async function runPreconfigureScript(): Promise<void> {
 
             let closing: any = (retCode: number, signal: string): void => {
                 if (retCode === 0) {
-                    logger.message("The preconfigure script run successfully.");
+                    logger.message("The pre-configure succeeded.");
                 } else {
                     logger.message("The preconfigure script failed. This project may not configure successfully.");
                     logger.message(stderrStr);
@@ -320,7 +361,7 @@ export async function configure(updateTargets: boolean = true): Promise<void> {
     configuration.setConfigProviderUpdatePending(false);
 
     // This generates the dryrun output and caches it.
-    await generateParseContent();
+    let retc: number = await generateParseContent();
 
     // Configure IntelliSense
     logger.message(`Parsing for IntelliSense from: "${parseFile}"`);
@@ -364,6 +405,12 @@ export async function configure(updateTargets: boolean = true): Promise<void> {
             configuration.setBuildTargets(buildTargets.sort());
             logger.message("Found the following build targets defined in the makefile: " + buildTargets.join(";"));
         }
+    }
+
+    if (retc === 0) {
+        logger.message("Configure succeeded.");
+    } else {
+        logger.message("There were errors during the configure process.");
     }
 
     setIsConfiguring(false);

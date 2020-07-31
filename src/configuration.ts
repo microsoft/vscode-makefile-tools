@@ -597,10 +597,11 @@ export function readConfigureAfterCommand(): void {
  // are made in settings or in the makefiles.
  // To avoid unnecessary dry-runs, these updates are not performed with every document save
  // but after leaving the focus of the document.
- // Default to true so that we know if the project has never been configured
- // because of various settings. Operations like build/launch targets quick picks need
- // at least one configure to populate the data.
-let configProviderUpdatePending: boolean = true;
+ // This will also be set to true when makefile.configureOnOpen is false, to be able to
+ // warn appropriately later, if any commands are invoked without a previous configure.
+ // The global here needs to default to false, otherwise we have configure races
+ // when changing editors in vscode (see onDidChangeActiveTextEditor in initFromStateAndSettings).
+let configProviderUpdatePending: boolean = false;
 export function getConfigProviderUpdatePending(): boolean { return configProviderUpdatePending; }
 export function setConfigProviderUpdatePending(configure: boolean): void { configProviderUpdatePending = configure; }
 
@@ -843,12 +844,15 @@ export async function selectTarget(): Promise<void> {
         return;
     }
 
-    // warn about an out of date configure state
+    // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
     if (configProviderUpdatePending) {
         logger.message("The project needs a configure to populate the build targets correctly.");
+        if (configureAfterCommand) {
+            await make.cleanConfigure();
+        }
     }
 
-    let options : vscode.QuickPickOptions = {};
+    let options: vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
 
     // Ensure "all" is always available as a target to select.
@@ -917,9 +921,12 @@ export async function selectLaunchConfiguration(): Promise<void> {
         return;
     }
 
-    // warn about an out of date configure state
+    // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
     if (configProviderUpdatePending) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
+        if (configureAfterCommand) {
+            await make.cleanConfigure();
+        }
     }
 
     // TODO: create a quick pick with description and details for items

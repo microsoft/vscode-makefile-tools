@@ -185,7 +185,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // That is if the user didn't bypass the dryrun via makefile.buildLog.
     if (configuration.getConfigureOnOpen()) {
         await make.cleanConfigure();
-   }
+    } else {
+        configuration.setConfigProviderUpdatePending(true);
+    }
 }
 
 export async function deactivate(): Promise<void> {
