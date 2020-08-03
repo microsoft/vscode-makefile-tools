@@ -73,7 +73,7 @@ export function prepareBuildTarget(target: string, clean: boolean = false): stri
 
 // PID of the process that may be running currently.
 // At any moment, there is either no process or only one process running
-// (make for configure, make for build, preconfigure cmd/bash).
+// (make for configure, make for build or preconfigure cmd/bash).
 // TODO: improve the code regarding curPID and how util.spawnChildProcess is setting it in make.ts unit.
 let curPID: number = -1;
 export function getCurPID(): number { return curPID; }
@@ -117,7 +117,7 @@ export async function buildTarget(target: string, clean: boolean = false): Promi
                     progress.report({increment: 1, message: "Cancelling..."});
                     logger.message("The user is cancelling the build...");
                     // Kill make and all its children subprocesses.
-                    logger.message(`Attempting to kill the make (PID = ${curPID}) and all its children subprocesses...`);
+                    logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
                     util.killTree(curPID);
                 });
 
@@ -178,7 +178,7 @@ export function setParseFile(file: string): void { parseFile = file; }
 // (other than default empty "" or the standard "all"), otherwise it would produce
 // a subset of all the targets involved in the makefile (only the ones triggered
 // by building the current target).
-export async function generateParseContent(forTargets: boolean = false): Promise<number> {
+export async function generateParseContent(progress: vscode.Progress<{}>, forTargets: boolean = false): Promise<number> {
     // Rules for parse content and file:
     //     1. makefile.buildLog provided by the user in settings
     //     2. configuration cache (the previous dryrun output): makefile.configurationCache
@@ -247,6 +247,7 @@ export async function generateParseContent(forTargets: boolean = false): Promise
 
             let stdout: any = (result: string): void => {
                 stdoutStr += result;
+                progress.report({increment: 1, message: "..."});
             };
 
             let stderr: any = (result: string): void => {
@@ -271,6 +272,7 @@ export async function generateParseContent(forTargets: boolean = false): Promise
                 parseFile = cache;
 
                 resolve(retCode);
+                curPID = 0;
             };
 
             util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
@@ -281,21 +283,52 @@ export async function generateParseContent(forTargets: boolean = false): Promise
     });
 }
 
-export async function runPreconfigureScript(): Promise<void> {
-    let scriptFile: string | undefined = configuration.getPreconfigureScript();
-    if (!scriptFile || !util.checkFileExistsSync(scriptFile)) {
-        vscode.window.showErrorMessage("Could not find pre-configure script.");
-        logger.message("Make sure a pre-configuration script path is defined with makefile.preconfigureScript and that it exists on disk.");
-        return;
-    }
-
+export async function preConfigure(): Promise<number> {
     if (blockOperation()) {
-        return;
+        return -1;
     }
 
-    return new Promise<void>(function (resolve, reject): void {
+    let scriptFile: string | undefined = configuration.getPreconfigureScript();
+    if (!scriptFile) {
+        vscode.window.showErrorMessage("Preconfigure failed: no script provided.");
+        logger.message("No pre-configure script is set in settings. " +
+                       "Make sure a pre-configuration script path is defined with makefile.preconfigureScript.");
+        return -1;
+    }
+
+    if (!util.checkFileExistsSync(scriptFile)) {
+        vscode.window.showErrorMessage("Could not find pre-configure script.");
+        logger.message(`Could not find the given pre-configure script "${scriptFile}" on disk. `);
+        return -1;
+    }
+
+    try {
+        return await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: `Preconfiguring: ${scriptFile}`,
+                cancellable: true,
+            },
+            async (progress, cancel) => {
+                cancel.onCancellationRequested(() => {
+                    progress.report({increment: 1, message: "Cancelling..."});
+                    logger.message("The user is cancelling the preconfigure...");
+                    logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
+                    util.killTree(curPID);
+                });
+
+                setIsPreConfiguring(true);
+                return runPreconfigureScript(progress, scriptFile || ""); // get rid of || ""
+            },
+        );
+    } finally {
+        setIsPreConfiguring(false);
+    }
+}
+
+export async function runPreconfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
+    return new Promise<number>(function (resolve, reject): void {
         logger.message(`Preconfiguring...\nScript: "${configuration.getPreconfigureScript()}"`);
-        setIsPreConfiguring(true);
 
         let scriptArgs: string[] = [];
         let runCommand: string;
@@ -315,6 +348,7 @@ export async function runPreconfigureScript(): Promise<void> {
 
             let stdout: any = (result: string): void => {
                 stdoutStr += result;
+                progress.report({increment: 1, message: "..."});
             };
 
             let stderr: any = (result: string): void => {
@@ -329,8 +363,7 @@ export async function runPreconfigureScript(): Promise<void> {
                     logger.message(stderrStr);
                 }
 
-                setIsPreConfiguring(false);
-                resolve();
+                resolve(retCode);
             };
 
             util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
@@ -340,32 +373,89 @@ export async function runPreconfigureScript(): Promise<void> {
     });
 }
 
+export async function configure(updateTargets: boolean = true): Promise<number> {
+    if (blockOperation()) {
+        return -1;
+    }
+
+    let retc: number = 0;
+    if (configuration.getAlwaysPreconfigure()) {
+        retc = await preConfigure();
+        if (retc !== 0) {
+            //vscode.window.showErrorMessage("Preconfigure failed. Configure will still attempt to run but may fail.");
+            logger.message("Preconfigure failed. Configure will still attempt to run but may fail.");
+        }
+    }
+
+    try {
+        return await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: "Configuring...",
+                cancellable: true,
+            },
+            async (progress, cancel) => {
+                cancel.onCancellationRequested(() => {
+                    progress.report({increment: 1, message: "Cancelling..."});
+                    logger.message(`The user is cancelling the configure during phase "${configureSubPhase}".`);
+                    if (curPID !== 0) {
+                        logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
+                        util.killTree(curPID);
+                    } else {
+                        // The configure process may run make twice, with parsing in between and after.
+                        // There is also the CppTools IntelliSense custom provider updating awaited
+                        // in between the two make invocations.
+                        // It is possible that the cancellation may happen when there is no make running.
+                        logger.message("curPID is 0, we are in between make invocations.");
+                    }
+
+                    // We need this boolean so that doConfigure knows that it needs to stop.
+                    // Otherwise, it keeps going even if the make process is killed.
+                    // We can't rely on the return code of generateParseContent (which invokes make)
+                    // because cancellation may happen right at the end with a successful exit value.
+                    cancelConfigure = true;
+                });
+
+                setIsConfiguring(true);
+                return doConfigure(progress);
+            },
+        );
+    } finally {
+        setIsConfiguring(false);
+    }
+}
+
+let configureSubPhase: string = "not started";
+let cancelConfigure: boolean = false;
+
 // Update IntelliSense and launch targets with information parsed from a user given build log,
 // the dryrun cache or make dryrun output if the cache is not present.
 // Sometimes the targets do not need an update (for example, when there has been
 // a change in the current build target), as requested through the boolean.
 // This saves unnecessary parsing which may be signifficant for very big code bases.
-export async function configure(updateTargets: boolean = true): Promise<void> {
-    if (configuration.getAlwaysPreconfigure()) {
-        await runPreconfigureScript();
-    }
-
-    if (blockOperation()) {
-        return;
-    }
-
-    logger.message("Configuring...");
-    setIsConfiguring(true);
-
-    // Reset the config provider update pending boolean
-    configuration.setConfigProviderUpdatePending(false);
+export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: boolean = true): Promise<number> {
+    let retc: number = 0;
 
     // This generates the dryrun output and caches it.
-    let retc: number = await generateParseContent();
+    configureSubPhase = "Generating parse content for IntelliSense and launch targets.";
+    retc = await generateParseContent(progress);
+    if (cancelConfigure) {
+        cancelConfigure = false;
+        logger.message("Exiting early from the configure process.");
+
+        // It's possible that the cancel happen in "onClose"
+        // with an already successful return code,
+        // in which case make sure we don't return success
+        // if the process was cancelled.
+        return (retc !== 0) ? retc : -1;
+    }
 
     // Configure IntelliSense
+    configureSubPhase = "Updating CppTools custom IntelliSense provider.";
     logger.message(`Parsing for IntelliSense from: "${parseFile}"`);
     await ext.updateProvider(parseContent || "");
+
+    configureSubPhase = "Parsing launch targets.";
 
     // Configure launch targets as parsed from the makefile
     // (and not as read from settings via makefile.launchConfigurations).
@@ -394,9 +484,22 @@ export async function configure(updateTargets: boolean = true): Promise<void> {
         // we need to generate a different dryrun output
         let target: string | undefined = configuration.getCurrentTarget();
         if (target !== "" && target !== "all") {
-            await generateParseContent(true);
+            configureSubPhase = "Generating parse content for build targets.";
+            retc = await generateParseContent(progress, true);
+            if (cancelConfigure) {
+                cancelConfigure = false;
+                logger.message("Exiting early from the configure process.");
+
+                // It's possible that the cancel happen in "onClose"
+                // with an already successful return code,
+                // in which case make sure we don't return success
+                // if the process was cancelled.
+                return (retc !== 0) ? retc : -1;
+            }
+
         }
 
+        configureSubPhase = "Parsing build targets.";
         logger.message(`Parsing for build targets from: "${parseFile}"`);
         let buildTargets: string[] = parser.parseTargets(parseContent || "");
         if (buildTargets.length === 0) {
@@ -413,11 +516,19 @@ export async function configure(updateTargets: boolean = true): Promise<void> {
         logger.message("There were errors during the configure process.");
     }
 
-    setIsConfiguring(false);
+    configuration.setConfigProviderUpdatePending(false);
+    return retc;
 }
 
 // Delete the dryrun cache (including targets cache) and configure
 export async function cleanConfigure(updateTargets: boolean = true): Promise<void> {
+    // Even if the core configure process also checks for blocking operations,
+    // verify the same here as well, to make sure that we don't delete the caches
+    // only to return early from the core configure.
+    if (blockOperation()) {
+        return;
+    }
+
     let cache: string = configuration.getConfigurationCache();
     if (cache && util.checkFileExistsSync(cache)) {
         logger.message(`Deleting the configuration cache: ${cache}`);
@@ -425,7 +536,7 @@ export async function cleanConfigure(updateTargets: boolean = true): Promise<voi
     }
 
     cache = path.parse(cache).dir;
-    cache = path.join(cache, "targetsCache");
+    cache = path.join(cache, "targetsCache.log");
     if (cache && util.checkFileExistsSync(cache)) {
         logger.message(`Deleting the targets cache: ${cache}`);
         fs.unlinkSync(cache);

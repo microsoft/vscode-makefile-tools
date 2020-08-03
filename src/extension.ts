@@ -165,7 +165,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.preConfigure', () => {
-        make.runPreconfigureScript();
+        make.preConfigure();
     }));
 
     configuration.readLoggingLevel();
