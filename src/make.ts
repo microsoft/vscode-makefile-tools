@@ -24,7 +24,7 @@ export function getIsPreConfiguring(): boolean { return isPreConfiguring; }
 export function setIsPreConfiguring(preConfiguring: boolean): void { isPreConfiguring = preConfiguring; }
 
 // Leave positive error codes for make exit values
-enum ConfigureBuildReturnCodeTypes {
+export enum ConfigureBuildReturnCodeTypes {
     success = 0,
     blocked = -1,
     cancelled = -2,
@@ -429,7 +429,7 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
                 });
 
                 setIsConfiguring(true);
-                return doConfigure(progress);
+                return doConfigure(progress, updateTargets);
             },
         );
     } finally {
@@ -455,6 +455,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
     if (cancelConfigure) {
         cancelConfigure = false;
         logger.message("Exiting early from the configure process.");
+        configuration.setConfigureDirty(true);
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
 
@@ -475,6 +476,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
 
     if (launchConfigurations.length === 0) {
         logger.message("No launch configurations have been detected.");
+        configuration.setLaunchTargets([]);
     } else {
         // Sort and remove duplicates (different targets may build into the same place,
         // launching doesn't need to know which version of the binary that is).
@@ -484,6 +486,14 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
 
         logger.message("Found the following launch targets defined in the makefile: " + launchConfigurations.join(";"));
         configuration.setLaunchTargets(launchConfigurations);
+    }
+
+    // Verify if the current launch configuration is still part of the list and unset otherwise.
+    let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
+    let currentLaunchConfigurationStr: string | undefined = currentLaunchConfiguration ? configuration.launchConfigurationToString(currentLaunchConfiguration) : "";
+    if (currentLaunchConfigurationStr !== "" && !launchConfigurations.includes(currentLaunchConfigurationStr)) {
+        logger.message(`Current launch configuration ${currentLaunchConfigurationStr} is no longer present in the available list.`);
+        configuration.setLaunchConfigurationByName("");
     }
 
     // Configure build targets only if necessary
@@ -497,6 +507,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
             if (cancelConfigure) {
                 cancelConfigure = false;
                 logger.message("Exiting early from the configure process.");
+                configuration.setConfigureDirty(true);
                 return ConfigureBuildReturnCodeTypes.cancelled;
             }
 
@@ -506,16 +517,33 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
         logger.message(`Parsing for build targets from: "${parseFile}"`);
         let buildTargets: string[] = parser.parseTargets(parseContent || "");
         if (buildTargets.length === 0) {
+            configuration.setBuildTargets([]);
             logger.message("No build targets have been detected.");
         } else {
             configuration.setBuildTargets(buildTargets.sort());
             logger.message("Found the following build targets defined in the makefile: " + buildTargets.join(";"));
         }
+
+        // Verify if the current build target is still part of the list and unset otherwise.
+        let currentBuildTarget: string | undefined = configuration.getCurrentTarget();
+        if (currentBuildTarget && currentBuildTarget !== "" && !buildTargets.includes(currentBuildTarget)) {
+            logger.message(`Current build target ${currentBuildTarget} is no longer present in the available list.` +
+                ` Unsetting the current build target.`);
+
+            // This will trigger another configure, so cancel this one
+            // and make sure we don't get the "blocked by configure" popup unnecessarily.
+            configuration.setConfigureDirty(true);
+            setIsConfiguring(false);
+            await configuration.setTargetByName("");
+            return ConfigureBuildReturnCodeTypes.cancelled;
+        }
+
     }
 
     if (retc1 === ConfigureBuildReturnCodeTypes.success && retc2 === ConfigureBuildReturnCodeTypes.success) {
         logger.message("Configure succeeded.");
     } else {
+        // Do we want to remain dirty in case of failure?
         logger.message("There were errors during the configure process.");
     }
 

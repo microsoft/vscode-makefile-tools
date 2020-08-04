@@ -1,6 +1,5 @@
 // Configuration support
 
-import * as child_process from 'child_process';
 import {extension} from './extension';
 import * as fs from 'fs';
 import * as logger from './logger';
@@ -350,6 +349,7 @@ function readCurrentLaunchConfiguration(): void {
         statusBar.setLaunchConfiguration(launchConfigStr);
     } else {
         logger.message("No current launch configuration is set in the workspace state.");
+        statusBar.setLaunchConfiguration("No launch configuration set.");
     }
 }
 
@@ -390,8 +390,8 @@ export function setConfigurationBuildLog(name: string): void { configurationBuil
 
 // Read from settings storage, update status bar item
 // Current make configuration command = process name + arguments
-function readCurrentMakefileConfigurationCommand(): void {
-    readMakefileConfigurations();
+async function readCurrentMakefileConfigurationCommand(): Promise<void> {
+    await readMakefileConfigurations();
     getBuildLogForConfiguration(currentMakefileConfiguration);
     getCommandForConfiguration(currentMakefileConfiguration);
 }
@@ -454,24 +454,41 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         if (path.parse(configurationMakeCommand).dir !== "") {
             if (!util.checkFileExistsSync(configurationMakeCommand)) {
                 vscode.window.showErrorMessage("Make not found.");
-                telemetry.logEvent("makeNotFound");
                 logger.message("Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.");
+
+                // How often location settings don't work (maybe because not yet expanding variables)?
+                const telemetryProperties: telemetry.Properties = {
+                    reason: "not found at path given in settings"
+                };
+                telemetry.logEvent("makeNotFound", telemetryProperties);
             }
         } else {
             if (!util.toolPathInEnv(path.parse(configurationMakeCommand).name)) {
                 vscode.window.showErrorMessage("Make not found.");
-                telemetry.logEvent("makeNotFound");
                 logger.message("Make was not given any path in settings and is also not found on the environment path.");
+
+                // Do the users need an environmernt automatically set by the extension?
+                // With a kits feature or expanding on the pre-configure script.
+                const telemetryProperties: telemetry.Properties = {
+                    reason: "not found in environment path"
+                };
+                telemetry.logEvent("makeNotFound", telemetryProperties);
             }
         }
 
         // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
-        if (!util.checkFileExistsSync(makefileUsed || "makefile")) {
+        if (!util.checkFileExistsSync(makefileUsed || "./makefile")) {
             vscode.window.showErrorMessage("Makefile entry point not found.");
-            telemetry.logEvent("makefileNotFound");
             logger.message("The makefile entry point was not found. " +
                            "Make sure it exists at the location defined by makefile.makePath or makefile.configurations[].makePath " +
                            "or in the root of the workspace.");
+
+            const telemetryProperties: telemetry.Properties = {
+                reason: makefileUsed ?
+                        "not found at path given in settings" : // we may need more advanced ability to process settings
+                        "not found in workspace root" // insight into different project structures
+            };
+            telemetry.logEvent("makefileNotFound", telemetryProperties);
         }
     }
 }
@@ -509,7 +526,7 @@ export function getMakefileConfigurations(): MakefileConfiguration[] { return ma
 export function setMakefileConfigurations(configurations: MakefileConfiguration[]): void { makefileConfigurations = configurations; }
 
 // Read make configurations optionally defined by the user in settings: makefile.configurations.
-function readMakefileConfigurations(): void {
+async function readMakefileConfigurations(): Promise<void> {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makefileConfigurations = workspaceConfiguration.get<MakefileConfiguration[]>("configurations") || [];
     let detectedUnnamedConfigurations: boolean = false;
@@ -553,7 +570,14 @@ function readMakefileConfigurations(): void {
 
     if (makefileConfigurationNames.length > 0) {
         logger.message("Found the following configurations defined in makefile.configurations setting: " +
-                        makefileConfigurationNames.join(";"));
+            makefileConfigurationNames.join(";"));
+    }
+
+    // Verify if the current makefile configuration is still part of the list and unset otherwise.
+    if (!makefileConfigurationNames.includes(currentMakefileConfiguration)) {
+        logger.message(`Current makefile configuration ${currentMakefileConfiguration} is no longer present in the available list.` +
+            ` Re-setting the current makefile configuration to default.`);
+        await setConfigurationByName("Default");
     }
 }
 
@@ -634,7 +658,7 @@ export function getConfigureDirty(): boolean { return configureDirty; }
 export function setConfigureDirty(configure: boolean): void { configureDirty = configure; }
 
 // Initialization from settings (or backup default rules), done at activation time
-export function initFromStateAndSettings(): void {
+export async function initFromStateAndSettings(): Promise<void> {
     readConfigurationCache();
     readMakePath();
     readMakefilePath();
@@ -643,7 +667,7 @@ export function initFromStateAndSettings(): void {
     readAlwaysPreconfigure();
     readDryrunSwitches();
     readCurrentMakefileConfiguration();
-    readCurrentMakefileConfigurationCommand();
+    await readCurrentMakefileConfigurationCommand();
     readCurrentTarget();
     readCurrentLaunchConfiguration();
     readDefaultLaunchConfiguration();
@@ -676,7 +700,7 @@ export function initFromStateAndSettings(): void {
     });
 
     // Watch for Makefile Tools setting updates that can change the IntelliSense config provider dirty state
-    vscode.workspace.onDidChangeConfiguration(e => {
+    vscode.workspace.onDidChangeConfiguration(async e => {
         if (vscode.workspace.workspaceFolders && !ignoreSettingsChanged &&
             e.affectsConfiguration('makefile', vscode.workspace.workspaceFolders[0].uri)) {
             // We are interested in updating only some relevant properties.
@@ -783,7 +807,7 @@ export function initFromStateAndSettings(): void {
                 // is not among the subobjects that suffered modifications.
                 logger.message("makefile.configurations setting changed.");
                 configureDirty = true;
-                readMakefileConfigurations();
+                await readMakefileConfigurations();
             }
 
             let updatedDryrunSwitches : string[] | undefined = workspaceConfiguration.get<string[]>("dryrunSwitches");
@@ -822,11 +846,12 @@ export function initFromStateAndSettings(): void {
       });
 }
 
-export function setConfigurationByName(configurationName: string): void {
+export async function setConfigurationByName(configurationName: string): Promise<void> {
     extension.extensionContext.workspaceState.update("buildConfiguration", configurationName);
     setCurrentMakefileConfiguration(configurationName);
+
     if (configureAfterCommand) {
-        make.cleanConfigure();
+        await make.cleanConfigure();
     }
 }
 
@@ -857,18 +882,20 @@ export async function setNewConfiguration(): Promise<void> {
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
     const chosen: string | undefined = await vscode.window.showQuickPick(items, options);
     if (chosen) {
-        setConfigurationByName(chosen);
+        await setConfigurationByName(chosen);
     }
 }
 
-export function setTargetByName(targetName: string) : void {
+export async function setTargetByName(targetName: string) : Promise<void> {
     currentTarget = targetName;
-    statusBar.setTarget(currentTarget);
-    logger.message("Setting target " + currentTarget);
+    let displayTarget: string = targetName ? currentTarget : "Default";
+    statusBar.setTarget(displayTarget);
+    logger.message("Setting target " + displayTarget);
     extension.extensionContext.workspaceState.update("buildTarget", currentTarget);
+
     if (configureAfterCommand) {
         // The set of build targets remains the same even if the current target has changed
-        make.cleanConfigure(false);
+        await make.cleanConfigure(false);
     }
 }
 
@@ -885,7 +912,10 @@ export async function selectTarget(): Promise<void> {
     if (configureDirty) {
         logger.message("The project needs a configure to populate the build targets correctly.");
         if (configureAfterCommand) {
-            await make.cleanConfigure();
+            let retc: number = await make.cleanConfigure();
+            if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
+                logger.message("The build targets list may not be accurate because configure failed.");
+            }
         }
     }
 
@@ -911,7 +941,7 @@ export async function selectTarget(): Promise<void> {
     const chosen: string | undefined = await vscode.window.showQuickPick(buildTargets, options);
 
     if (chosen) {
-        setTargetByName(chosen);
+        await setTargetByName(chosen);
     }
 }
 
@@ -943,7 +973,11 @@ export function setLaunchConfigurationByName (launchConfigurationName: string) :
         extension.extensionContext.workspaceState.update("launchConfiguration", launchConfigurationName);
         statusBar.setLaunchConfiguration(launchConfigurationName);
     } else {
-        logger.message(`A problem occured while analyzing launch configuration name ${launchConfigurationName}. Current launch configuration is unset.`);
+        if (launchConfigurationName === "") {
+            logger.message("Unsetting the current launch configuration.");
+        } else {
+            logger.message(`A problem occured while analyzing launch configuration name ${launchConfigurationName}. Current launch configuration is unset.`);
+        }
         extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
         statusBar.setLaunchConfiguration("No launch configuration set");
     }
@@ -962,7 +996,10 @@ export async function selectLaunchConfiguration(): Promise<void> {
     if (configureDirty) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
         if (configureAfterCommand) {
-            await make.cleanConfigure();
+            let retc: number = await make.cleanConfigure();
+            if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
+                logger.message("The launch targets list may not be accurate because configure failed.");
+            }
         }
     }
 

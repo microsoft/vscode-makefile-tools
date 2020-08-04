@@ -48,7 +48,7 @@ suite('Fake dryrun parsing', /*async*/() => {
     // TODO: adapt the makefile on mac/linux/mingw and add new tests in this suite
     // to parse the dry-run logs obtained on those platforms.
     if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
-        test('Interesting small makefile - windows', /*async*/() => {
+        test('Interesting small makefile - windows', async() => {
             let extensionLogPath: string | undefined = configuration.getExtensionLog();
             // Cannot compare with a baseline if there is no extension log defined for this test
             // Use makefile.extensionLog in test workspace settings.
@@ -62,23 +62,25 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.startListeningToSettingsChanged();
 
-            /*await*/ configuration.prepareConfigurationsQuickPick();
-            /*await*/ configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
+            configuration.prepareConfigurationsQuickPick();
+            await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
 
-            /*await*/ configuration.setTargetByName("execute_Arch3");
+            await configuration.setTargetByName("execute_Arch3");
 
             make.prepareBuildTarget("execute_Arch3");
 
-            ///*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
-            /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)");
+            configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)");
 
-            launch.getLauncher().prepareDebugCurrentTarget();
-            launch.getLauncher().prepareRunCurrentTarget();
+            let launchConfiguration: configuration.LaunchConfiguration | undefined = await launch.getLauncher().getAndValidateLaunchConfiguration();
+            if (launchConfiguration) {
+                launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
+                launch.getLauncher().prepareRunCurrentTarget();
+            }
 
             // A bit more coverage, "RelSize" and "RelSpeed" are set up
             // to exercise different combinations of pre-created build log and/or make tools.
-            /*await*/ configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
-            /*await*/ configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
+            await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
+            await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
 
             // Settings reset for the next test run.
             configuration.stopListeningToSettingsChanged();
@@ -106,7 +108,7 @@ suite('Fake dryrun parsing', /*async*/() => {
     // dry-run logs for https://github.com/rui314/8cc.git
     if (process.platform === "linux" ||
         (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
-        test('8cc - linux - and mingw', /*async*/() => {
+        test('8cc - linux - and mingw', async() => {
             let extensionLogPath: string | undefined = configuration.getExtensionLog();
             // Cannot compare with a baseline if there is no extension log defined for this test
             // Use makefile.extensionLog in test workspace settings.
@@ -120,18 +122,20 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.startListeningToSettingsChanged();
 
-            /*await*/ configuration.prepareConfigurationsQuickPick();
-            /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
+            configuration.prepareConfigurationsQuickPick();
+            await configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
 
-            /*await*/ configuration.setTargetByName("all");
+            await configuration.setTargetByName("all");
 
             make.prepareBuildTarget("all");
 
-            ///*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
-            /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
+            configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
 
-            launch.getLauncher().prepareDebugCurrentTarget();
-            launch.getLauncher().prepareRunCurrentTarget();
+            let launchConfiguration: configuration.LaunchConfiguration | undefined = await launch.getLauncher().getAndValidateLaunchConfiguration();
+            if (launchConfiguration) {
+                launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
+                launch.getLauncher().prepareRunCurrentTarget();
+            }
 
             // Settings reset for the next test run.
             configuration.stopListeningToSettingsChanged();
@@ -159,7 +163,7 @@ suite('Fake dryrun parsing', /*async*/() => {
     // dry-run logs for https://github.com/FidoProject/Fido.git
     if (process.platform === "linux" ||
         (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
-        test('Fido - linux', /*async*/() => {
+        test('Fido - linux', async() => {
             let extensionLogPath: string | undefined = configuration.getExtensionLog();
             // Cannot compare with a baseline if there is no extension log defined for this test
             // Use makefile.extensionLog in test workspace settings.
@@ -181,18 +185,19 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // As long as all the 'fake sources/makefile' tests share the same makefile.configurations setting,
             // there is no need in running configuration.prepareConfigurationsQuickPick for each
-            ///*await*/ configuration.prepareConfigurationsQuickPick();
-            /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
+            await configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
 
-            /*await*/ configuration.setTargetByName("bin/foo.o");
+            await configuration.setTargetByName("bin/foo.o");
 
             make.prepareBuildTarget("bin/foo.o");
 
-            ///*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
-            /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
+            configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
 
-            launch.getLauncher().prepareDebugCurrentTarget();
-            launch.getLauncher().prepareRunCurrentTarget();
+            let launchConfiguration: configuration.LaunchConfiguration | undefined = await launch.getLauncher().getAndValidateLaunchConfiguration();
+            if (launchConfiguration) {
+                launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
+                launch.getLauncher().prepareRunCurrentTarget();
+            }
 
             // Settings reset for the next test run.
             configuration.stopListeningToSettingsChanged();
@@ -220,7 +225,7 @@ suite('Fake dryrun parsing', /*async*/() => {
     // dry-run logs for https://github.com/jakogut/tinyvm.git
     if (process.platform === "linux" ||
         (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
-        test('tinyvm - linux', /*async*/() => {
+        test('tinyvm - linux', async() => {
             let extensionLogPath: string | undefined = configuration.getExtensionLog();
             // Cannot compare with a baseline if there is no extension log defined for this test
             // Use makefile.extensionLog in test workspace settings.
@@ -242,18 +247,19 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // As long as all the 'fake sources/makefile' tests share the same makefile.configurations setting,
             // there is no need in running configuration.prepareConfigurationsQuickPick for each
-            // /*await*/ configuration.prepareConfigurationsQuickPick();
-            /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
+            await configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
 
-            /*await*/ configuration.setTargetByName("tvmi");
+            await configuration.setTargetByName("tvmi");
 
             make.prepareBuildTarget("tvmi");
 
-            ///*await*/ configuration.parseLaunchConfigurationsFromBuildLog();
-            /*await*/ configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");
+            configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");
 
-            launch.getLauncher().prepareDebugCurrentTarget();
-            launch.getLauncher().prepareRunCurrentTarget();
+            let launchConfiguration: configuration.LaunchConfiguration | undefined = await launch.getLauncher().getAndValidateLaunchConfiguration();
+            if (launchConfiguration) {
+                launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
+                launch.getLauncher().prepareRunCurrentTarget();
+            }
 
             // Settings reset for the next test run.
             configuration.stopListeningToSettingsChanged();

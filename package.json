@@ -52,6 +52,7 @@
         "onCommand:makefile.configure",
         "onCommand:makefile.cleanConfigure",
         "onCommand:makefile.preConfigure",
+        "onCommand:makefile.resetState",
         "workspaceContains:makefile",
         "workspaceContains:Makefile"
     ],
@@ -105,6 +106,10 @@
             {
                 "command": "makefile.preConfigure",
                 "title": "Makefile: Preconfigure"
+            },
+            {
+                "command": "makefile.resetState",
+                "title": "Makefile: resetState"
             }
         ],
         "configuration": {

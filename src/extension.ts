@@ -108,10 +108,10 @@ export class MakefileToolsExtension {
 // which produced a new output string to be parsed
 export async function updateProvider(dryRunOutputStr: string): Promise<void> {
     logger.message("Updating the CppTools IntelliSense Configuration Provider.");
-    extension.registerCppToolsProvider();
+    await extension.registerCppToolsProvider();
     extension.emptyCustomConfigurationProvider();
     extension.constructIntellisense(dryRunOutputStr);
-    extension.updateCppToolsProvider();
+    await extension.updateCppToolsProvider();
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
@@ -121,70 +121,92 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     telemetry.activate();
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', () => {
+        telemetry.logEvent("commandSetBuildConfiguration");
         configuration.setNewConfiguration();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildTarget', () => {
+        telemetry.logEvent("commandSetBuildTarget");
         configuration.selectTarget();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', () => {
+        telemetry.logEvent("commandBuildTarget");
         make.buildTarget(configuration.getCurrentTarget() || "", false);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanTarget', () => {
+        telemetry.logEvent("commandBuildCleanTarget");
         make.buildTarget(configuration.getCurrentTarget() || "", true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildAll', () => {
+        telemetry.logEvent("commandBuildAll");
         make.buildTarget("all", false);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanAll', () => {
+        telemetry.logEvent("commandBuildCleanAll");
         make.buildTarget("all", true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfiguration', () => {
+        telemetry.logEvent("commandSetLaunchConfiguration");
         configuration.selectLaunchConfiguration();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchDebug', () => {
+        telemetry.logEvent("commandLaunchDebug");
         launcher.debugCurrentTarget();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchRun', () => {
+        telemetry.logEvent("commandLaunchRun");
         launcher.runCurrentTarget();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetPath', () => {
+        telemetry.logEvent("commandLaunchTargetPath");
         return launcher.launchTargetPath();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetDirectory', () => {
+        telemetry.logEvent("commandLaunchTargetDirectory");
         return launcher.launchTargetDirectory();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
+        telemetry.logEvent("commandLaunchTargetArgs");
         return launcher.launchTargetArgs();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgsConcat', () => {
+        telemetry.logEvent("commandLaunchTargetArgsConcat");
         return launcher.launchTargetArgsConcat();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', () => {
-        configuration.setConfigureDirty(true);
+        telemetry.logEvent("commandConfigure");
         make.configure();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.cleanConfigure', () => {
-        configuration.setConfigureDirty(true);
+        telemetry.logEvent("commandCleanConfigure");
         make.cleanConfigure();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.preConfigure', () => {
-        configuration.setConfigureDirty(true);
+        telemetry.logEvent("commandPreConfigure");
         make.preConfigure();
+    }));
+
+    // Reset state - useful for troubleshooting.
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.resetState', () => {
+        telemetry.logEvent("commandResetState");
+        extension.extensionContext.workspaceState.update("buildConfiguration", undefined);
+        extension.extensionContext.workspaceState.update("buildTarget", undefined);
+        extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
     }));
 
     configuration.readLoggingLevel();
@@ -197,12 +219,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }
 
     // Read configuration info from settings
-    configuration.initFromStateAndSettings();
+    await configuration.initFromStateAndSettings();
 
     // Let's do clean configure on load: meaning to invoke make dryrun
     // instead of reading from the previously saved configuration cache.
     // That is if the user didn't bypass the dryrun via makefile.buildLog.
-    configuration.setConfigureDirty(true);
     if (configuration.getConfigureOnOpen()) {
         await make.cleanConfigure();
     }
