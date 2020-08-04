@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
 import * as parser from './parser';
+import * as telemetry from './telemetry';
 import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
@@ -43,8 +44,12 @@ export class MakefileToolsExtension {
 
     // Register this extension as a new provider or request an update
     public async registerCppToolsProvider(): Promise<void> {
-        this.cppConfigurationProvider.logConfigurationProvider();
         await this.ensureCppToolsProviderRegistered();
+    }
+
+    // Request a custom config provider update.
+    public async updateCppToolsProvider(): Promise<void> {
+        this.cppConfigurationProvider.logConfigurationProvider();
 
         if (this.cppToolsAPI) {
             if (this.cppToolsAPI.notifyReady) {
@@ -64,9 +69,17 @@ export class MakefileToolsExtension {
         return this.cppConfigurationProviderRegister;
     }
 
+    public getCppToolsVersion(): cpp.Version {
+        if (this.cppToolsAPI) {
+            return this.cppToolsAPI.getVersion();
+        }
+
+        return cpp.Version.latest;
+    }
+
     public async registerCppTools(): Promise<void> {
         if (!this.cppToolsAPI) {
-            this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v2);
+            this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v4);
         }
 
         if (this.cppToolsAPI) {
@@ -95,14 +108,17 @@ export class MakefileToolsExtension {
 // which produced a new output string to be parsed
 export async function updateProvider(dryRunOutputStr: string): Promise<void> {
     logger.message("Updating the CppTools IntelliSense Configuration Provider.");
+    extension.registerCppToolsProvider();
     extension.emptyCustomConfigurationProvider();
     extension.constructIntellisense(dryRunOutputStr);
-    extension.registerCppToolsProvider();
+    extension.updateCppToolsProvider();
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     statusBar = ui.getUI();
     extension = new MakefileToolsExtension(context);
+
+    telemetry.activate();
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', () => {
         configuration.setNewConfiguration();
@@ -157,14 +173,17 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', () => {
+        configuration.setConfigureDirty(true);
         make.configure();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.cleanConfigure', () => {
+        configuration.setConfigureDirty(true);
         make.cleanConfigure();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.preConfigure', () => {
+        configuration.setConfigureDirty(true);
         make.preConfigure();
     }));
 
@@ -183,15 +202,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Let's do clean configure on load: meaning to invoke make dryrun
     // instead of reading from the previously saved configuration cache.
     // That is if the user didn't bypass the dryrun via makefile.buildLog.
+    configuration.setConfigureDirty(true);
     if (configuration.getConfigureOnOpen()) {
         await make.cleanConfigure();
-    } else {
-        configuration.setConfigProviderUpdatePending(true);
     }
 }
 
 export async function deactivate(): Promise<void> {
     vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is de-activated');
+
+    telemetry.deactivate();
 
     const items : any = [
         extension,

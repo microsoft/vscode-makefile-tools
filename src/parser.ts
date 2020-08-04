@@ -524,7 +524,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             // Parse the IntelliSense mode
             // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
             let targetArchitecture: util.TargetArchitecture = getTargetArchitecture(compilerTool.arguments);
-            let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(cpp.Version.v4, compilerFullPath, targetArchitecture);
+            let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(ext.extension.getCppToolsVersion(), compilerFullPath, targetArchitecture);
             logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
 
             // For windows, parse the sdk version
@@ -564,7 +564,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
                 // If the command is compiling the same extension or uses -TC/-TP, send all the source files in one batch.
             if (language) {
                 // More standard validation and defaults, in the context of the whole command.
-                let standard: util.StandardVersion = parseStandard(cpp.Version.v4, standardStr, language);
+                let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
                 logger.message("    Standard: " + standard, "Verbose");
 
                 if (ext.extension) {
@@ -581,7 +581,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
                     }
 
                     // More standard validation and defaults, in the context of each source file.
-                    let standard: util.StandardVersion = parseStandard(cpp.Version.latest, standardStr, language);
+                    let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
                     logger.message("    Standard: " + standard, "Verbose");
 
                     if (ext.extension) {
@@ -824,7 +824,7 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
  * and target architecture parsed from compiler flags.
  */
 function getIntelliSenseMode(cppVersion: cpp.Version, compilerPath: string, targetArch: util.TargetArchitecture): util.IntelliSenseMode {
-    const canUseArm: boolean = (cppVersion >= cpp.Version.latest);
+    const canUseArm: boolean = (cppVersion >= cpp.Version.v4);
     const compilerName: string = path.basename(compilerPath || "").toLocaleLowerCase();
     if (compilerName === 'cl.exe') {
         const clArch: string = path.basename(path.dirname(compilerPath)).toLocaleLowerCase();
@@ -924,7 +924,7 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
 }
 
 function parseStandard(cppVersion: cpp.Version, std: string | undefined, language: util.Language): util.StandardVersion {
-    let canUseGnu: boolean = (cppVersion >= cpp.Version.latest);
+    let canUseGnu: boolean = (cppVersion >= cpp.Version.v4);
     let standard: util.StandardVersion;
     if (!std) {
         // Standard defaults when no std switch is given

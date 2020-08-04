@@ -5,11 +5,11 @@ import {extension} from './extension';
 import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
-import * as parser from './parser';
 import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as telemetry from './telemetry';
 
 let statusBar: ui.UI = ui.getUI();
 
@@ -61,8 +61,8 @@ export function setCurrentMakefileConfiguration(configuration: string): void {
     currentMakefileConfiguration = configuration;
     statusBar.setConfiguration(currentMakefileConfiguration);
     logger.message("Setting configuration - " + currentMakefileConfiguration);
-    getCommandForConfiguration(currentMakefileConfiguration);
     getBuildLogForConfiguration(currentMakefileConfiguration);
+    getCommandForConfiguration(currentMakefileConfiguration);
 }
 
 // Read the current configuration from workspace state, update status bar item
@@ -91,6 +91,8 @@ function readMakePath(): void {
     makePath = workspaceConfiguration.get<string>("makePath");
     if (!makePath) {
         logger.message("No path to the make tool is defined in the settings file");
+    } else {
+        makePath = util.resolvePathToRoot(makePath);
     }
 }
 
@@ -106,6 +108,8 @@ function readMakefilePath(): void {
     makefilePath = workspaceConfiguration.get<string>("makefilePath");
     if (!makefilePath) {
         logger.message("No path to the make tool is defined in the settings file");
+    } else {
+        makefilePath = util.resolvePathToRoot(makefilePath);
     }
 }
 
@@ -199,20 +203,20 @@ export function readPreconfigureScript(): void {
     }
 }
 
-let alwaysPreconfigure: boolean;
-export function getAlwaysPreconfigure(): boolean { return alwaysPreconfigure; }
+let alwaysPreconfigure: boolean | undefined;
+export function getAlwaysPreconfigure(): boolean | undefined { return alwaysPreconfigure; }
 export function setAlwaysPreconfigure(path: boolean): void { alwaysPreconfigure = path; }
 
 // Read from settings whether the preconfigure step is supposed to be executed
 // always before the configure operation.
 export function readAlwaysPreconfigure(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    alwaysPreconfigure = workspaceConfiguration.get<boolean>("alwaysPreconfigure", false);
+    alwaysPreconfigure = workspaceConfiguration.get<boolean>("alwaysPreconfigure");
     logger.message(`Always preconfigure: ${alwaysPreconfigure}`);
 }
 
-let configurationCache: string;
-export function getConfigurationCache(): string { return configurationCache; }
+let configurationCache: string | undefined;
+export function getConfigurationCache(): string | undefined { return configurationCache; }
 export function setConfigurationCache(path: string): void { configurationCache = path; }
 
 // Read from settings the path to a cache file containing the output of the last dry-run make command.
@@ -221,7 +225,11 @@ export function setConfigurationCache(path: string): void { configurationCache =
 export function readConfigurationCache(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configurationCache = util.resolvePathToRoot(workspaceConfiguration.get<string>("configurationCache", "./configurationCache.log"));
+    configurationCache = workspaceConfiguration.get<string>("configurationCache");
+    if (configurationCache) {
+        configurationCache = util.resolvePathToRoot(configurationCache);
+    }
+
     logger.message(`Dry-run output cached at ${configurationCache}`);
 }
 
@@ -384,8 +392,8 @@ export function setConfigurationBuildLog(name: string): void { configurationBuil
 // Current make configuration command = process name + arguments
 function readCurrentMakefileConfigurationCommand(): void {
     readMakefileConfigurations();
-    getCommandForConfiguration(currentMakefileConfiguration);
     getBuildLogForConfiguration(currentMakefileConfiguration);
+    getCommandForConfiguration(currentMakefileConfiguration);
 }
 
 // Helper to find in the array of MakefileConfiguration which command/args correspond to a configuration name.
@@ -414,6 +422,10 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     // Prepend the directory path, if defined in either makefile.configurations or makefile.makePath (first has priority).
     let configurationCommandPath: string = makeParsedPathConfigurations?.dir || makeParsedPathSettings?.dir || "";
     configurationMakeCommand = path.join(configurationCommandPath, configurationMakeCommand);
+    // Add the ".exe" extension on windows, otherwise the file search APIs don't find it.
+    if (process.platform === "win32") {
+        configurationMakeCommand += ".exe";
+    }
 
     // Add the makefile path via the -f make switch.
     // makefile.configurations.makefilePath overwrites makefile.makefilePath.
@@ -424,11 +436,11 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     }
 
     if (makefileConfiguration?.makePath) {
-        logger.message("Found command '" + configurationMakeCommand + " " + configurationMakeArgs.join(" ") + "' for configuration " + configuration);
+        logger.message("Deduced command '" + configurationMakeCommand + " " + configurationMakeArgs.join(" ") + "' for configuration " + configuration);
     }
 
-    // Some useful warnings about properly defining the makefile and make tool (file name, path and arguments),
-    // unless a build log is provided.
+    // Validation and warnings about properly defining the makefile and make tool.
+    // These are not needed if the current configuration reads from a build log instead of dry-run output.
     let buildLog: string | undefined = getConfigurationBuildLog();
     let buildLogContent: string | undefined = buildLog ? util.readFile(buildLog) : undefined;
     if (!buildLogContent) {
@@ -437,13 +449,29 @@ export function getCommandForConfiguration(configuration: string | undefined): v
             logger.message("Could not find any make tool file name in makefile.configurations.makePath, nor in makefile.makePath. Assuming make.");
         }
 
-        if ((!makeParsedPathSettings || makeParsedPathSettings?.dir === "") &&
-            (!makeParsedPathConfigurations || makeParsedPathConfigurations?.dir === "")) {
-            logger.message("For the extension to work, make must be on the path.");
+        // If configuration command has a path (absolute or relative), check if it exists on disk and error if not.
+        // If no path is given to the make tool, search all paths in the environment and error if make is not on the path.
+        if (path.parse(configurationMakeCommand).dir !== "") {
+            if (!util.checkFileExistsSync(configurationMakeCommand)) {
+                vscode.window.showErrorMessage("Make not found.");
+                telemetry.logEvent("makeNotFound");
+                logger.message("Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.");
+            }
+        } else {
+            if (!util.toolPathInEnv(path.parse(configurationMakeCommand).name)) {
+                vscode.window.showErrorMessage("Make not found.");
+                telemetry.logEvent("makeNotFound");
+                logger.message("Make was not given any path in settings and is also not found on the environment path.");
+            }
         }
 
-        if (!makeParsedPathSettings && !makeParsedPathConfigurations) {
-            logger.message("It is recommended to define the full path of the make tool in settings (via makefile.makePath OR makefile.configurations.makePath and makefile.makeArgs.");
+        // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
+        if (!util.checkFileExistsSync(makefileUsed || "makefile")) {
+            vscode.window.showErrorMessage("Makefile entry point not found.");
+            telemetry.logEvent("makefileNotFound");
+            logger.message("The makefile entry point was not found. " +
+                           "Make sure it exists at the location defined by makefile.makePath or makefile.configurations[].makePath " +
+                           "or in the root of the workspace.");
         }
     }
 }
@@ -471,7 +499,7 @@ export function getBuildLogForConfiguration(configuration: string | undefined): 
         }
     } else {
         // Default to an eventual build log defined in settings
-        // If that one is not found on disk, the setting getter already warned about it.
+        // If that one is not found on disk, the setting reader already warned about it.
         configurationBuildLog = buildLog;
     }
 }
@@ -563,33 +591,33 @@ export function stopListeningToSettingsChanged(): void {
     ignoreSettingsChanged = true;
 }
 
-let configureOnOpen: boolean;
-export function getConfigureOnOpen(): boolean { return configureOnOpen; }
+let configureOnOpen: boolean | undefined;
+export function getConfigureOnOpen(): boolean | undefined { return configureOnOpen; }
 export function setConfigureOnOpen(configure: boolean): void { configureOnOpen = configure; }
 export function readConfigureOnOpen(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configureOnOpen = workspaceConfiguration.get<boolean>("configureOnOpen", true);
+    configureOnOpen = workspaceConfiguration.get<boolean>("configureOnOpen");
     logger.message(`Configure on open: ${configureOnOpen}`);
 }
 
-let configureOnEdit: boolean;
-export function getConfigureOnEdit(): boolean { return configureOnEdit; }
+let configureOnEdit: boolean | undefined;
+export function getConfigureOnEdit(): boolean | undefined { return configureOnEdit; }
 export function setConfigureOnEdit(configure: boolean): void { configureOnEdit = configure; }
 export function readConfigureOnEdit(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configureOnEdit = workspaceConfiguration.get<boolean>("configureOnEdit", true);
+    configureOnEdit = workspaceConfiguration.get<boolean>("configureOnEdit");
     logger.message(`Configure on edit: ${configureOnEdit}`);
 }
 
-let configureAfterCommand: boolean;
-export function getConfigureAfterCommand(): boolean { return configureAfterCommand; }
+let configureAfterCommand: boolean | undefined;
+export function getConfigureAfterCommand(): boolean | undefined { return configureAfterCommand; }
 export function setConfigureAfterCommand(configure: boolean): void { configureAfterCommand = configure; }
 export function readConfigureAfterCommand(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configureAfterCommand = workspaceConfiguration.get<boolean>("configureAfterCommand", true);
+    configureAfterCommand = workspaceConfiguration.get<boolean>("configureAfterCommand");
     logger.message(`Configure after command: ${configureAfterCommand}`);
 }
 
@@ -601,9 +629,9 @@ export function readConfigureAfterCommand(): void {
  // warn appropriately later, if any commands are invoked without a previous configure.
  // The global here needs to default to false, otherwise we have configure races
  // when changing editors in vscode (see onDidChangeActiveTextEditor in initFromStateAndSettings).
-let configProviderUpdatePending: boolean = false;
-export function getConfigProviderUpdatePending(): boolean { return configProviderUpdatePending; }
-export function setConfigProviderUpdatePending(configure: boolean): void { configProviderUpdatePending = configure; }
+let configureDirty: boolean = false;
+export function getConfigureDirty(): boolean { return configureDirty; }
+export function setConfigureDirty(configure: boolean): void { configureDirty = configure; }
 
 // Initialization from settings (or backup default rules), done at activation time
 export function initFromStateAndSettings(): void {
@@ -626,11 +654,11 @@ export function initFromStateAndSettings(): void {
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
     vscode.window.onDidChangeActiveTextEditor(e => {
-        if (configProviderUpdatePending) {
+        if (configureDirty) {
             if (configureOnEdit) {
-                // Normal configure doesn't have effect when the settings relevant for configProviderUpdatePending changed.
+                // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
                 logger.message("Configuring clean after settings or makefile changes...");
-                make.cleanConfigure(); // this sets configProviderUpdatePending back to false
+                make.cleanConfigure(); // this sets configureDirty back to false if it succeeds
             }
         }
     });
@@ -643,7 +671,7 @@ export function initFromStateAndSettings(): void {
     // TODO: don't trigger an update for any dummy save, verify how the content changed.
     vscode.workspace.onDidSaveTextDocument(e => {
         if (e.uri.fsPath.toLowerCase().endsWith("makefile")) {
-            configProviderUpdatePending = true;
+            configureDirty = true;
         }
     });
 
@@ -677,7 +705,7 @@ export function initFromStateAndSettings(): void {
                 updatedBuildLog = util.resolvePathToRoot(updatedBuildLog);
             }
             if (updatedBuildLog !== buildLog) {
-                configProviderUpdatePending = true;
+                configureDirty = true;
                 logger.message("makefile.buildLog setting changed.");
                 readBuildLog();
             }
@@ -702,23 +730,29 @@ export function initFromStateAndSettings(): void {
                 readPreconfigureScript();
             }
 
-            let updatedAlwaysPreconfigure : boolean = workspaceConfiguration.get<boolean>("alwaysPreconfigure", false);
+            let updatedAlwaysPreconfigure : boolean | undefined = workspaceConfiguration.get<boolean>("alwaysPreconfigure");
             if (updatedAlwaysPreconfigure !== alwaysPreconfigure) {
                 // No IntelliSense update needed.
                 logger.message("makefile.alwaysPreconfigure setting changed.");
                 readAlwaysPreconfigure();
             }
 
-            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>("configurationCache", "./configurationCache.log");
-            if (util.resolvePathToRoot(updatedConfigurationCache) !== configurationCache) {
+            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>("configurationCache");
+            if (updatedConfigurationCache) {
+                updatedConfigurationCache = util.resolvePathToRoot(updatedConfigurationCache);
+            }
+            if (updatedConfigurationCache !== configurationCache) {
                 // A change in makefile.configurationCache should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configProviderUpdatePending = !buildLog || !util.checkFileExistsSync(buildLog);
+                configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.configurationCache setting changed.");
                 readConfigurationCache();
             }
 
             let updatedMakePath : string | undefined = workspaceConfiguration.get<string>("makePath");
+            if (updatedMakePath) {
+                updatedMakePath = util.resolvePathToRoot(updatedMakePath);
+            }
             if (updatedMakePath !== makePath) {
                 // Not very likely, but it is safe to consider that a different make tool
                 // may produce a different dry-run output with potential impact on IntelliSense,
@@ -727,15 +761,18 @@ export function initFromStateAndSettings(): void {
 
                 // A change in makefile.makePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configProviderUpdatePending = !buildLog || !util.checkFileExistsSync(buildLog);
+                configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakePath();
             }
 
             let updatedMakefilePath : string | undefined = workspaceConfiguration.get<string>("makefilePath");
+            if (updatedMakefilePath) {
+                updatedMakefilePath = util.resolvePathToRoot(updatedMakefilePath);
+            }
             if (updatedMakefilePath !== makefilePath) {
                 // A change in makefile.makefilePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configProviderUpdatePending = !buildLog || !util.checkFileExistsSync(buildLog);
+                configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.makefilePath setting changed.");
                 readMakefilePath();
             }
@@ -745,7 +782,7 @@ export function initFromStateAndSettings(): void {
                 // todo: skip over updating the IntelliSense configuration provider if the current makefile configuration
                 // is not among the subobjects that suffered modifications.
                 logger.message("makefile.configurations setting changed.");
-                configProviderUpdatePending = true;
+                configureDirty = true;
                 readMakefileConfigurations();
             }
 
@@ -753,7 +790,7 @@ export function initFromStateAndSettings(): void {
             if (!util.areEqual(updatedDryrunSwitches, dryrunSwitches)) {
                 // A change in makefile.dryrunSwitches should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configProviderUpdatePending = !buildLog || !util.checkFileExistsSync(buildLog);
+                configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.dryrunSwitches setting changed.");
                 readDryrunSwitches();
             }
@@ -777,9 +814,9 @@ export function initFromStateAndSettings(): void {
             }
 
             // Final updates in some constructs that depend on more than one of the above settings.
-            if (configProviderUpdatePending) {
-                getCommandForConfiguration(currentMakefileConfiguration);
+            if (configureDirty) {
                 getBuildLogForConfiguration(currentMakefileConfiguration);
+                getCommandForConfiguration(currentMakefileConfiguration);
             }
         }
       });
@@ -845,7 +882,7 @@ export async function selectTarget(): Promise<void> {
     }
 
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
-    if (configProviderUpdatePending) {
+    if (configureDirty) {
         logger.message("The project needs a configure to populate the build targets correctly.");
         if (configureAfterCommand) {
             await make.cleanConfigure();
@@ -922,7 +959,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
     }
 
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
-    if (configProviderUpdatePending) {
+    if (configureDirty) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
         if (configureAfterCommand) {
             await make.cleanConfigure();

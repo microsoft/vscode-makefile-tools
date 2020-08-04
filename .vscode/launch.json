@@ -17,6 +17,9 @@
             "outFiles": [
                 "${workspaceFolder}/out/src/test/**/*.js"
             ],
+            "env": {
+                "MAKEFILE_TOOLS_TESTING": "1"
+            },
             "preLaunchTask": "mycompile",
         },
         {
@@ -32,6 +35,9 @@
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
+            "env": {
+                "MAKEFILE_TOOLS_TESTING": "1"
+            },
             "preLaunchTask": "mycompile",
         },
         {

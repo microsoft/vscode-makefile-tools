@@ -23,6 +23,15 @@ let isPreConfiguring: boolean = false;
 export function getIsPreConfiguring(): boolean { return isPreConfiguring; }
 export function setIsPreConfiguring(preConfiguring: boolean): void { isPreConfiguring = preConfiguring; }
 
+// Leave positive error codes for make exit values
+enum ConfigureBuildReturnCodeTypes {
+    success = 0,
+    blocked = -1,
+    cancelled = -2,
+    notFound = -3,
+    mixedErr = -4
+}
+
 // Identifies and logs whether an operation should be prevented from running.
 // So far, the only blocking scenarios are if an ongoing configure, pre-configure or build
 // is blocking other new similar operations and setter commands (selection of new configurations, targets, etc...)
@@ -81,14 +90,17 @@ export function setCurPID(pid: number): void { curPID = pid; }
 
 export async function buildTarget(target: string, clean: boolean = false): Promise<number> {
     if (blockOperation()) {
-        return -1;
+        return ConfigureBuildReturnCodeTypes.blocked;
     }
 
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
-    if (configuration.getConfigProviderUpdatePending()) {
+    if (configuration.getConfigureDirty()) {
         logger.message("The project needs to configure in order to build properly the current target.");
         if (configuration.getConfigureAfterCommand()) {
-            await cleanConfigure();
+            let retc: number = await cleanConfigure();
+            if (retc !== ConfigureBuildReturnCodeTypes.success) {
+                logger.message("Attempting to run build after a failed configure.");
+            }
         }
     }
 
@@ -106,8 +118,7 @@ export async function buildTarget(target: string, clean: boolean = false): Promi
     let popupStr: string = 'Building ' + (clean ? "clean " : "") + 'the current makefile configuration ' + configAndTarget;
 
     try {
-        return await vscode.window.withProgress(
-            {
+        return await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: popupStr,
                 cancellable: true,
@@ -145,7 +156,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
             };
 
             let closing: any = (retCode: number, signal: string): void => {
-                if (retCode !== 0) {
+                if (retCode !== ConfigureBuildReturnCodeTypes.success) {
                     logger.message(`Target ${target} failed to build.`);
                 } else {
                     logger.message(`Target ${target} built successfully.`);
@@ -158,6 +169,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         } catch (error) {
             // No need for notification popup, since the build result is visible already in the output channel
             logger.message(error);
+            resolve(ConfigureBuildReturnCodeTypes.notFound);
         }
     });
 }
@@ -192,7 +204,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
         }
     }
 
-    let cache: string = configuration.getConfigurationCache();
+    let cache: string | undefined = configuration.getConfigurationCache();
     if (cache) {
         // We are looking at a different cache file for targets parsing,
         // located in the same folder as makefile.configurationCache
@@ -255,7 +267,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
             };
 
             let closing: any = (retCode: number, signal: string): void => {
-                if (retCode !== 0) {
+                if (retCode !== ConfigureBuildReturnCodeTypes.success) {
                     logger.message("The make dry-run command failed.");
                     if (forTargets) {
                         logger.message("We may parse an incomplete set of build targets.");
@@ -266,18 +278,20 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
                     util.reportDryRunError();
                 }
 
-                logger.message(`Writing the configuration cache: ${cache}`);
-                fs.writeFileSync(cache, stdoutStr);
+                if (cache) {
+                    logger.message(`Writing the configuration cache: ${cache}`);
+                    fs.writeFileSync(cache, stdoutStr);
+                    parseFile = cache;
+                }
                 parseContent = stdoutStr;
-                parseFile = cache;
 
                 resolve(retCode);
-                curPID = 0;
+                curPID = -1;
             };
 
             util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
         } catch (error) {
-            resolve(-1);
+            resolve(ConfigureBuildReturnCodeTypes.notFound);
             logger.message(error);
         }
     });
@@ -285,7 +299,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
 
 export async function preConfigure(): Promise<number> {
     if (blockOperation()) {
-        return -1;
+        return ConfigureBuildReturnCodeTypes.blocked;
     }
 
     let scriptFile: string | undefined = configuration.getPreconfigureScript();
@@ -293,18 +307,17 @@ export async function preConfigure(): Promise<number> {
         vscode.window.showErrorMessage("Preconfigure failed: no script provided.");
         logger.message("No pre-configure script is set in settings. " +
                        "Make sure a pre-configuration script path is defined with makefile.preconfigureScript.");
-        return -1;
+        return ConfigureBuildReturnCodeTypes.notFound;
     }
 
     if (!util.checkFileExistsSync(scriptFile)) {
         vscode.window.showErrorMessage("Could not find pre-configure script.");
         logger.message(`Could not find the given pre-configure script "${scriptFile}" on disk. `);
-        return -1;
+        return ConfigureBuildReturnCodeTypes.notFound;
     }
 
     try {
-        return await vscode.window.withProgress(
-            {
+        return await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: `Preconfiguring: ${scriptFile}`,
                 cancellable: true,
@@ -356,7 +369,7 @@ export async function runPreconfigureScript(progress: vscode.Progress<{}>, scrip
             };
 
             let closing: any = (retCode: number, signal: string): void => {
-                if (retCode === 0) {
+                if (retCode === ConfigureBuildReturnCodeTypes.success) {
                     logger.message("The pre-configure succeeded.");
                 } else {
                     logger.message("The preconfigure script failed. This project may not configure successfully.");
@@ -369,27 +382,26 @@ export async function runPreconfigureScript(progress: vscode.Progress<{}>, scrip
             util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
         } catch (error) {
             logger.message(error);
+            resolve(ConfigureBuildReturnCodeTypes.notFound);
         }
     });
 }
 
 export async function configure(updateTargets: boolean = true): Promise<number> {
     if (blockOperation()) {
-        return -1;
+        return ConfigureBuildReturnCodeTypes.blocked;
     }
 
     let retc: number = 0;
     if (configuration.getAlwaysPreconfigure()) {
         retc = await preConfigure();
-        if (retc !== 0) {
-            //vscode.window.showErrorMessage("Preconfigure failed. Configure will still attempt to run but may fail.");
-            logger.message("Preconfigure failed. Configure will still attempt to run but may fail.");
+        if (retc !== ConfigureBuildReturnCodeTypes.success) {
+            logger.message("Attempting to run configure after a failed preconfigure.");
         }
     }
 
     try {
-        return await vscode.window.withProgress(
-            {
+        return await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: "Configuring...",
                 cancellable: true,
@@ -434,20 +446,16 @@ let cancelConfigure: boolean = false;
 // a change in the current build target), as requested through the boolean.
 // This saves unnecessary parsing which may be signifficant for very big code bases.
 export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: boolean = true): Promise<number> {
-    let retc: number = 0;
+    let retc1: number = 0;
+    let retc2: number = 0;
 
     // This generates the dryrun output and caches it.
     configureSubPhase = "Generating parse content for IntelliSense and launch targets.";
-    retc = await generateParseContent(progress);
+    retc1 = await generateParseContent(progress);
     if (cancelConfigure) {
         cancelConfigure = false;
         logger.message("Exiting early from the configure process.");
-
-        // It's possible that the cancel happen in "onClose"
-        // with an already successful return code,
-        // in which case make sure we don't return success
-        // if the process was cancelled.
-        return (retc !== 0) ? retc : -1;
+        return ConfigureBuildReturnCodeTypes.cancelled;
     }
 
     // Configure IntelliSense
@@ -485,16 +493,11 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
         let target: string | undefined = configuration.getCurrentTarget();
         if (target !== "" && target !== "all") {
             configureSubPhase = "Generating parse content for build targets.";
-            retc = await generateParseContent(progress, true);
+            retc2 = await generateParseContent(progress, true);
             if (cancelConfigure) {
                 cancelConfigure = false;
                 logger.message("Exiting early from the configure process.");
-
-                // It's possible that the cancel happen in "onClose"
-                // with an already successful return code,
-                // in which case make sure we don't return success
-                // if the process was cancelled.
-                return (retc !== 0) ? retc : -1;
+                return ConfigureBuildReturnCodeTypes.cancelled;
             }
 
         }
@@ -510,37 +513,43 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
         }
     }
 
-    if (retc === 0) {
+    if (retc1 === ConfigureBuildReturnCodeTypes.success && retc2 === ConfigureBuildReturnCodeTypes.success) {
         logger.message("Configure succeeded.");
     } else {
         logger.message("There were errors during the configure process.");
     }
 
-    configuration.setConfigProviderUpdatePending(false);
-    return retc;
+    configuration.setConfigureDirty(false);
+
+    // Very unlikely to have different return codes for the two make dryrun invocations,
+    // since the only diffence is that the last one ensures the target is 'all'
+    // instead of a smaller scope target.
+    return (retc1 === retc2) ? retc1 : ConfigureBuildReturnCodeTypes.mixedErr;
 }
 
 // Delete the dryrun cache (including targets cache) and configure
-export async function cleanConfigure(updateTargets: boolean = true): Promise<void> {
+export async function cleanConfigure(updateTargets: boolean = true): Promise<number> {
     // Even if the core configure process also checks for blocking operations,
     // verify the same here as well, to make sure that we don't delete the caches
     // only to return early from the core configure.
     if (blockOperation()) {
-        return;
+        return ConfigureBuildReturnCodeTypes.blocked;
     }
 
-    let cache: string = configuration.getConfigurationCache();
-    if (cache && util.checkFileExistsSync(cache)) {
-        logger.message(`Deleting the configuration cache: ${cache}`);
-        fs.unlinkSync(cache);
+    let cache: string | undefined = configuration.getConfigurationCache();
+    if (cache) {
+        if (util.checkFileExistsSync(cache)) {
+            logger.message(`Deleting the configuration cache: ${cache}`);
+            fs.unlinkSync(cache);
+        }
+
+        cache = path.parse(cache).dir;
+        cache = path.join(cache, "targetsCache.log");
+        if (util.checkFileExistsSync(cache)) {
+            logger.message(`Deleting the targets cache: ${cache}`);
+            fs.unlinkSync(cache);
+        }
     }
 
-    cache = path.parse(cache).dir;
-    cache = path.join(cache, "targetsCache.log");
-    if (cache && util.checkFileExistsSync(cache)) {
-        logger.message(`Deleting the targets cache: ${cache}`);
-        fs.unlinkSync(cache);
-    }
-
-    await configure(updateTargets);
+    return configure(updateTargets);
 }

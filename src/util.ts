@@ -325,3 +325,29 @@ export function resolvePathToRoot(relPath: string): string {
 
     return relPath;
 }
+
+export function thisExtension(): vscode.Extension<any> {
+    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('ms-vscode.cmake-tools');
+    if (!ext) {
+      throw new Error("Our own extension is null.");
+    }
+
+    return ext;
+}
+
+export interface PackageJSON {
+    name: string;
+    publisher: string;
+    version: string;
+}
+
+export function thisExtensionPackage(): PackageJSON {
+    const pkg: PackageJSON = thisExtension().packageJSON as PackageJSON;
+    return {
+      name: pkg.name,
+      publisher: pkg.publisher,
+      version: pkg.version,
+    };
+}
+
+export function thisExtensionPath(): string { return thisExtension().extensionPath; }

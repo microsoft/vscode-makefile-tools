@@ -65,7 +65,6 @@ suite('Fake dryrun parsing', /*async*/() => {
             /*await*/ configuration.prepareConfigurationsQuickPick();
             /*await*/ configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
 
-            ///*await*/ configuration.parseTargetsFromBuildLogOrCache();
             /*await*/ configuration.setTargetByName("execute_Arch3");
 
             make.prepareBuildTarget("execute_Arch3");
@@ -124,7 +123,6 @@ suite('Fake dryrun parsing', /*async*/() => {
             /*await*/ configuration.prepareConfigurationsQuickPick();
             /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
 
-            ///*await*/ configuration.parseTargetsFromBuildLogOrCache();
             /*await*/ configuration.setTargetByName("all");
 
             make.prepareBuildTarget("all");
@@ -186,7 +184,6 @@ suite('Fake dryrun parsing', /*async*/() => {
             ///*await*/ configuration.prepareConfigurationsQuickPick();
             /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
 
-            ///*await*/ configuration.parseTargetsFromBuildLogOrCache();
             /*await*/ configuration.setTargetByName("bin/foo.o");
 
             make.prepareBuildTarget("bin/foo.o");
@@ -248,7 +245,6 @@ suite('Fake dryrun parsing', /*async*/() => {
             // /*await*/ configuration.prepareConfigurationsQuickPick();
             /*await*/ configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
 
-            ///*await*/ configuration.parseTargetsFromBuildLogOrCache();
             /*await*/ configuration.setTargetByName("tvmi");
 
             make.prepareBuildTarget("tvmi");
