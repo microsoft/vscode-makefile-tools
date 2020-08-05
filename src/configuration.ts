@@ -577,7 +577,7 @@ async function readMakefileConfigurations(): Promise<void> {
     if (!makefileConfigurationNames.includes(currentMakefileConfiguration)) {
         logger.message(`Current makefile configuration ${currentMakefileConfiguration} is no longer present in the available list.` +
             ` Re-setting the current makefile configuration to default.`);
-        await setConfigurationByName("Default");
+        setConfigurationByName("Default");
     }
 }
 
@@ -601,6 +601,20 @@ function readCurrentTarget(): void {
         currentTarget = buildTarget;
         logger.message(`Reading current build target "${currentTarget}" from the workspace state.`);
         statusBar.setTarget(currentTarget);
+    }
+
+    // Track what standard makefile targets are used for building:
+    // for now, the special values list is empty string ""
+    // (which defaults to "all") and "all" given explicitly.
+    // "Clean" is also included, although it shouldn't be a necessity,
+    // but it would signal an eventual problem with the clean build commands
+    // that would cause the users to repeatedly change the build target
+    // from the desired value to clean and then back.
+    if (currentTarget === "" || currentTarget === "all" || currentTarget === "clean") {
+        const telemetryProperties: telemetry.Properties = {
+            target: currentTarget
+        };
+        telemetry.logEvent("buildTargetUsed", telemetryProperties);
     }
 }
 
@@ -846,13 +860,9 @@ export async function initFromStateAndSettings(): Promise<void> {
       });
 }
 
-export async function setConfigurationByName(configurationName: string): Promise<void> {
+export function setConfigurationByName(configurationName: string): void {
     extension.extensionContext.workspaceState.update("buildConfiguration", configurationName);
     setCurrentMakefileConfiguration(configurationName);
-
-    if (configureAfterCommand) {
-        await make.cleanConfigure();
-    }
 }
 
 export function prepareConfigurationsQuickPick(): string[] {
@@ -872,7 +882,7 @@ export function prepareConfigurationsQuickPick(): string[] {
 // Triggers a cpptools configuration provider update after selection.
 export async function setNewConfiguration(): Promise<void> {
     // Cannot set a new makefile configuration if the project is currently building or (pre-)configuring.
-    if (make.blockOperation()) {
+    if (make.blockOperation(make.Operations.changeConfiguration)) {
         return;
     }
 
@@ -882,21 +892,28 @@ export async function setNewConfiguration(): Promise<void> {
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
     const chosen: string | undefined = await vscode.window.showQuickPick(items, options);
     if (chosen) {
-        await setConfigurationByName(chosen);
+        if (chosen !== getCurrentMakefileConfiguration()) {
+            const telemetryProperties: telemetry.Properties = {
+                var: "makefileConfiguration"
+            };
+            telemetry.logEvent("stateChanged", telemetryProperties);
+        }
+
+        setConfigurationByName(chosen);
+
+        if (configureAfterCommand) {
+            logger.message("Automatically reconfiguring the project after a makefile configuration change.");
+            await make.cleanConfigure();
+        }
     }
 }
 
-export async function setTargetByName(targetName: string) : Promise<void> {
+export function setTargetByName(targetName: string) : void {
     currentTarget = targetName;
     let displayTarget: string = targetName ? currentTarget : "Default";
     statusBar.setTarget(displayTarget);
     logger.message("Setting target " + displayTarget);
     extension.extensionContext.workspaceState.update("buildTarget", currentTarget);
-
-    if (configureAfterCommand) {
-        // The set of build targets remains the same even if the current target has changed
-        await make.cleanConfigure(false);
-    }
 }
 
 // Fill a drop-down with all the target names run by building the makefile for the current configuration
@@ -904,7 +921,7 @@ export async function setTargetByName(targetName: string) : Promise<void> {
 // TODO: change the UI list to multiple selections mode and store an array of current active targets
 export async function selectTarget(): Promise<void> {
     // Cannot select a new target if the project is currently building or (pre-)configuring.
-    if (make.blockOperation()) {
+    if (make.blockOperation(make.Operations.changeBuildTarget)) {
         return;
     }
 
@@ -941,7 +958,20 @@ export async function selectTarget(): Promise<void> {
     const chosen: string | undefined = await vscode.window.showQuickPick(buildTargets, options);
 
     if (chosen) {
-        await setTargetByName(chosen);
+        if (chosen !== getCurrentMakefileConfiguration()) {
+            const telemetryProperties: telemetry.Properties = {
+                var: "buildTarget"
+            };
+            telemetry.logEvent("stateChanged", telemetryProperties);
+        }
+
+        setTargetByName(chosen);
+
+        if (configureAfterCommand) {
+            // The set of build targets remains the same even if the current target has changed
+            logger.message("Automatically reconfiguring the project after a build target change.");
+            await make.cleanConfigure(false);
+        }
     }
 }
 
@@ -953,7 +983,7 @@ export async function selectTarget(): Promise<void> {
 // the given binary in the exact same way more than once), incorporate also the containing target
 // name in the syntax (or, since in theory one can write a makefile target to run the same binary
 // in the same way more than once, add some number suffix).
-export function setLaunchConfigurationByName (launchConfigurationName: string) : void {
+export function setLaunchConfigurationByName(launchConfigurationName: string) : void {
     // Find the matching entry in the array of launch configurations
     // or generate a new entry in settings if none are found.
     currentLaunchConfiguration = getLaunchConfiguration(launchConfigurationName);
@@ -988,7 +1018,7 @@ export function setLaunchConfigurationByName (launchConfigurationName: string) :
 // Selection updates current launch configuration that will be ready for the next debug/run operation
 export async function selectLaunchConfiguration(): Promise<void> {
     // Cannot select a new launch configuration if the project is currently building or (pre-)configuring.
-    if (make.blockOperation()) {
+    if (make.blockOperation(make.Operations.changeLaunchTarget)) {
         return;
     }
 
@@ -1014,6 +1044,13 @@ export async function selectLaunchConfiguration(): Promise<void> {
     const chosen: string | undefined = await vscode.window.showQuickPick(launchTargets, options);
 
     if (chosen) {
+        if (chosen !== getCurrentMakefileConfiguration()) {
+            const telemetryProperties: telemetry.Properties = {
+                var: "launchConfiguration"
+            };
+            telemetry.logEvent("stateChanged", telemetryProperties);
+        }
+
         setLaunchConfigurationByName(chosen);
     }
 }

@@ -63,9 +63,9 @@ suite('Fake dryrun parsing', /*async*/() => {
             configuration.startListeningToSettingsChanged();
 
             configuration.prepareConfigurationsQuickPick();
-            await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
+            configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
 
-            await configuration.setTargetByName("execute_Arch3");
+            configuration.setTargetByName("execute_Arch3");
 
             make.prepareBuildTarget("execute_Arch3");
 
@@ -79,8 +79,8 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // A bit more coverage, "RelSize" and "RelSpeed" are set up
             // to exercise different combinations of pre-created build log and/or make tools.
-            await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
-            await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
+            configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
+            configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
 
             // Settings reset for the next test run.
             configuration.stopListeningToSettingsChanged();
@@ -123,9 +123,9 @@ suite('Fake dryrun parsing', /*async*/() => {
             configuration.startListeningToSettingsChanged();
 
             configuration.prepareConfigurationsQuickPick();
-            await configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
+            configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
 
-            await configuration.setTargetByName("all");
+            configuration.setTargetByName("all");
 
             make.prepareBuildTarget("all");
 
@@ -185,9 +185,9 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // As long as all the 'fake sources/makefile' tests share the same makefile.configurations setting,
             // there is no need in running configuration.prepareConfigurationsQuickPick for each
-            await configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
+            configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
 
-            await configuration.setTargetByName("bin/foo.o");
+            configuration.setTargetByName("bin/foo.o");
 
             make.prepareBuildTarget("bin/foo.o");
 
@@ -247,9 +247,9 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // As long as all the 'fake sources/makefile' tests share the same makefile.configurations setting,
             // there is no need in running configuration.prepareConfigurationsQuickPick for each
-            await configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
+            configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
 
-            await configuration.setTargetByName("tvmi");
+            configuration.setTargetByName("tvmi");
 
             make.prepareBuildTarget("tvmi");
 

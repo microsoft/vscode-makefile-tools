@@ -156,7 +156,7 @@ export class Launcher implements vscode.Disposable {
 
     async getAndValidateLaunchConfiguration(): Promise<configuration.LaunchConfiguration | undefined> {
         // Cannot debug the project if it is currently building or (pre-)configuring.
-        if (make.blockOperation()) {
+        if (make.blockOperation(make.Operations.launch)) {
             let telemetryProperties: telemetry.Properties = {
                 reason: "blocked by (pre)configure or build."
             };
