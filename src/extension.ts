@@ -206,6 +206,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         extension.extensionContext.workspaceState.update("buildConfiguration", undefined);
         extension.extensionContext.workspaceState.update("buildTarget", undefined);
         extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
+        extension.extensionContext.workspaceState.update("ranConfigureBefore", undefined);
         vscode.commands.executeCommand('workbench.action.reloadWindow');
     }));
 

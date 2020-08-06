@@ -109,7 +109,7 @@
             },
             {
                 "command": "makefile.resetState",
-                "title": "Makefile: resetState"
+                "title": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)"
             }
         ],
         "configuration": {

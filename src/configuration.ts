@@ -1055,10 +1055,32 @@ export async function selectLaunchConfiguration(): Promise<void> {
     }
 }
 
+// List of targets defined in the makefile project.
+// Parsed from the build log, configuration cache or live dry-run output at configure time.
+// Currently, this list contains any abstract intermediate target
+// (like any object produced by the compiler from a source code file).
+// TODO: filter only the relevant targets (binaries, libraries, etc...) from this list.
 let buildTargets: string[] = [];
 export function getBuildTargets(): string[] { return buildTargets; }
 export function setBuildTargets(targets: string[]): void { buildTargets = targets; }
 
+// List of all the binaries built by the current project and all the ways
+// they may be invoked (from what cwd, with what arguments).
+// This is parsed from the build log, configuration cache or live dry-run output at configure time.
+// This is what populates the 'launch targets' quick pick and is different than the
+// launch configurations defined in settings.
+// A launch configuration extends a launch target with various debugger settings.
+// Each launch configuration entry is written in settings by the extension
+// when the user actively selects any launch target from the quick pick.
+// Then the user can add any of the provided extra attributes (miMode, miDebuggerPath, etc...)
+// under that entry. It is possible that not all launch targets have a launch configuration counterpart,
+// but if they do it is only one. Technically, we can imagine one launch target may have
+// more than one launch configurations defined in settings (same binary, location and arguments debugged
+// with different scenarios)) but this is not yet supported because currently the launch configurations
+// are uniquely referenced by a string formed by cwd, binary and args (which form a launch target).
+// The quick pick is not populated by the launch configurations list because its entries may be
+// out of date and most importantly a subset. We want the quick pick to reflect all the possibilities
+// that are found available with the current configuration of the project.
 let launchTargets: string[] = [];
 export function getLaunchTargets(): string[] { return launchTargets; }
 export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }

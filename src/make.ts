@@ -288,7 +288,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
 
             let stdout: any = (result: string): void => {
                 stdoutStr += result;
-                progress.report({increment: 1, message: "..."});
+                progress.report({increment: 1, message: configureSubPhase});
             };
 
             let stderr: any = (result: string): void => {
@@ -441,7 +441,7 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
     let preconfigureStatus: string = "not run"; // used for telemetry
     if (configuration.getAlwaysPreconfigure()) {
         retc = await preConfigure();
-        preconfigureStatus = retc.toString();
+        preconfigureStatus = `exit code: ${retc}`;
         if (retc !== ConfigureBuildReturnCodeTypes.success) {
             logger.message("Attempting to run configure after a failed preconfigure.");
         }
@@ -476,7 +476,7 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
 
                     let subphase: string = configureSubPhase;
                     if (recursiveDoConfigure) {
-                        subphase += " (reconfigure after automatic reset of build target";
+                        subphase += " (reconfigure after automatic reset of build target)";
                     }
                     const telemetryProperties: telemetry.Properties = {
                         phase: subphase
@@ -518,16 +518,16 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
                 retc = await doConfigure(progress, updateTargets);
 
                 let configureEndTime: number = Date.now();
-                let configureElapsedTime: number = configureEndTime - configureStartTime;
+                let configureElapsedTime: number = (configureEndTime - configureStartTime) / 1000;
                 const telemetryMeasures: telemetry.Measures = {
                     numberBuildTargets: configuration.getBuildTargets().length,
-                    numberLaunchTargets: configuration.getLaunchConfigurations().length,
+                    numberLaunchTargets: configuration.getLaunchTargets().length,
                     numberMakefileConfigurations: configuration.getMakefileConfigurations().length
                 };
                 const telemetryProperties: telemetry.Properties = {
                     exitCode: retc.toString(),
                     firstTime: (!ranConfigureBefore).toString(),
-                    elapsedTime: configureElapsedTime.toString(),
+                    elapsedTime: `${configureElapsedTime} (sec)`,
                     ranMake: ranMake.toString(),
                     preconfigure: preconfigureStatus,
                     processTargetsSeparately: processTargetsSeparately.toString(),
@@ -657,6 +657,10 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
             configuration.setTargetByName("");
             logger.message("Automatically reconfiguring the project after a build target change.");
             recursiveDoConfigure = true;
+
+            // Ensure the cache is cleaned at this point. Even if the original configure operation
+            // was explicitly not clean, resetting the build target requires a clean configure.
+            cleanCache();
             retc3 = await doConfigure(progress, updateTargets);
         }
     }
@@ -678,22 +682,15 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
     recursiveDoConfigure = false;
 
     // If we have a retc3 result, it doesn't matter what retc1 and retc2 are.
-    return retc3 ||
+    return (retc3 !== undefined) ? retc3 :
         // Very unlikely to have different return codes for the two make dryrun invocations,
         // since the only diffence is that the last one ensures the target is 'all'
         // instead of a smaller scope target.
-        ((retc1 === retc2 || (retc2 === undefined)) ? retc1 : ConfigureBuildReturnCodeTypes.mixedErr);
+        ((retc1 === retc2 || retc2 === undefined) ? retc1 : ConfigureBuildReturnCodeTypes.mixedErr);
 }
 
 // Delete the dryrun cache (including targets cache) and configure
-export async function cleanConfigure(updateTargets: boolean = true): Promise<number> {
-    // Even if the core configure process also checks for blocking operations,
-    // verify the same here as well, to make sure that we don't delete the caches
-    // only to return early from the core configure.
-    if (blockOperation(Operations.configure)) {
-        return ConfigureBuildReturnCodeTypes.blocked;
-    }
-
+function cleanCache(): void {
     let cache: string | undefined = configuration.getConfigurationCache();
     if (cache) {
         if (util.checkFileExistsSync(cache)) {
@@ -708,6 +705,18 @@ export async function cleanConfigure(updateTargets: boolean = true): Promise<num
             fs.unlinkSync(cache);
         }
     }
+}
+
+// Configure after cleaning the cache
+export async function cleanConfigure(updateTargets: boolean = true): Promise<number> {
+    // Even if the core configure process also checks for blocking operations,
+    // verify the same here as well, to make sure that we don't delete the caches
+    // only to return early from the core configure.
+    if (blockOperation(Operations.configure)) {
+        return ConfigureBuildReturnCodeTypes.blocked;
+    }
+
+    cleanCache();
 
     return configure(updateTargets);
 }
