@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
 import * as parser from './parser';
+import * as state from './state';
 import * as telemetry from './telemetry';
 import * as ui from './ui';
 import * as util from './util';
@@ -20,12 +21,15 @@ export let extension: MakefileToolsExtension;
 
 export class MakefileToolsExtension {
     private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
+    private mementoState = new state.StateManager(this.extensionContext);
     private cppToolsAPI?: cpp.CppToolsApi;
     private cppConfigurationProviderRegister?: Promise<void>;
     private compilerFullPath ?: string;
 
     public constructor(public readonly extensionContext: vscode.ExtensionContext) {
     }
+
+    public getState(): state.StateManager { return this.mementoState; }
 
     // Parse the dry-run output and populate data for cpptools
     public constructIntellisense(dryRunOutputStr: string): void {
@@ -203,11 +207,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Reset state - useful for troubleshooting.
     context.subscriptions.push(vscode.commands.registerCommand('makefile.resetState', () => {
         telemetry.logEvent("commandResetState");
-        extension.extensionContext.workspaceState.update("buildConfiguration", undefined);
-        extension.extensionContext.workspaceState.update("buildTarget", undefined);
-        extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
-        extension.extensionContext.workspaceState.update("ranConfigureBefore", undefined);
-        vscode.commands.executeCommand('workbench.action.reloadWindow');
+        extension.getState().reset();
     }));
 
     configuration.readLoggingLevel();

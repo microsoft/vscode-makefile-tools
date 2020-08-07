@@ -60,13 +60,12 @@ export function setCurrentMakefileConfiguration(configuration: string): void {
     currentMakefileConfiguration = configuration;
     statusBar.setConfiguration(currentMakefileConfiguration);
     logger.message("Setting configuration - " + currentMakefileConfiguration);
-    getBuildLogForConfiguration(currentMakefileConfiguration);
-    getCommandForConfiguration(currentMakefileConfiguration);
+    analyzeConfigureParams();
 }
 
 // Read the current configuration from workspace state, update status bar item
 function readCurrentMakefileConfiguration(): void {
-    let buildConfiguration : string | undefined = extension.extensionContext.workspaceState.get<string>("buildConfiguration");
+    let buildConfiguration : string | undefined = extension.getState().buildConfiguration;
     if (!buildConfiguration) {
         logger.message("No current configuration is defined in the workspace state. Assuming 'Default'.");
         currentMakefileConfiguration = "Default";
@@ -184,34 +183,34 @@ export function readExtensionLog(): void {
     }
 }
 
-let preconfigureScript: string | undefined;
-export function getPreconfigureScript(): string | undefined { return preconfigureScript; }
-export function setPreconfigureScript(path: string): void { preconfigureScript = path; }
+let preConfigureScript: string | undefined;
+export function getPreConfigureScript(): string | undefined { return preConfigureScript; }
+export function setPreConfigureScript(path: string): void { preConfigureScript = path; }
 
 // Read from settings the path to a script file that needs to have been run at least once
 // before a sucessful configure of this project.
-export function readPreconfigureScript(): void {
+export function readPreConfigureScript(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    preconfigureScript = workspaceConfiguration.get<string>("preconfigureScript");
-    if (preconfigureScript) {
-        preconfigureScript = util.resolvePathToRoot(preconfigureScript);
-        logger.message('Found pre-configure script defined as {0}', preconfigureScript);
-        if (!util.checkFileExistsSync(preconfigureScript)) {
-            logger.message("Preconfigure script not found on disk.");
+    preConfigureScript = workspaceConfiguration.get<string>("preConfigureScript");
+    if (preConfigureScript) {
+        preConfigureScript = util.resolvePathToRoot(preConfigureScript);
+        logger.message('Found pre-configure script defined as {0}', preConfigureScript);
+        if (!util.checkFileExistsSync(preConfigureScript)) {
+            logger.message("Pre-configure script not found on disk.");
         }
     }
 }
 
-let alwaysPreconfigure: boolean | undefined;
-export function getAlwaysPreconfigure(): boolean | undefined { return alwaysPreconfigure; }
-export function setAlwaysPreconfigure(path: boolean): void { alwaysPreconfigure = path; }
+let alwaysPreConfigure: boolean | undefined;
+export function getAlwaysPreConfigure(): boolean | undefined { return alwaysPreConfigure; }
+export function setAlwaysPreConfigure(path: boolean): void { alwaysPreConfigure = path; }
 
-// Read from settings whether the preconfigure step is supposed to be executed
+// Read from settings whether the pre-configure step is supposed to be executed
 // always before the configure operation.
-export function readAlwaysPreconfigure(): void {
+export function readAlwaysPreConfigure(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    alwaysPreconfigure = workspaceConfiguration.get<boolean>("alwaysPreconfigure");
-    logger.message(`Always preconfigure: ${alwaysPreconfigure}`);
+    alwaysPreConfigure = workspaceConfiguration.get<boolean>("alwaysPreConfigure");
+    logger.message(`Always pre-configure: ${alwaysPreConfigure}`);
 }
 
 let configurationCache: string | undefined;
@@ -338,7 +337,7 @@ function getLaunchConfiguration(name: string): LaunchConfiguration | undefined {
 // Also update the status bar item.
 function readCurrentLaunchConfiguration(): void {
     readLaunchConfigurations();
-    let currentLaunchConfigurationName: string | undefined = extension.extensionContext.workspaceState.get<string>("launchConfiguration");
+    let currentLaunchConfigurationName: string | undefined = extension.getState().launchConfiguration;
     if (currentLaunchConfigurationName) {
         currentLaunchConfiguration = getLaunchConfiguration(currentLaunchConfigurationName);
     }
@@ -388,10 +387,10 @@ let configurationBuildLog: string | undefined;
 export function getConfigurationBuildLog(): string | undefined { return configurationBuildLog; }
 export function setConfigurationBuildLog(name: string): void { configurationBuildLog = name; }
 
-// Read from settings storage, update status bar item
-// Current make configuration command = process name + arguments
-async function readCurrentMakefileConfigurationCommand(): Promise<void> {
-    await readMakefileConfigurations();
+// Analyze the settings of the current makefile configuration and the global workspace settings,
+// according to various merging rules and decide what make command and build log
+// apply to the current makefile configuration.
+function analyzeConfigureParams(): void {
     getBuildLogForConfiguration(currentMakefileConfiguration);
     getCommandForConfiguration(currentMakefileConfiguration);
 }
@@ -467,7 +466,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
                 vscode.window.showErrorMessage("Make not found.");
                 logger.message("Make was not given any path in settings and is also not found on the environment path.");
 
-                // Do the users need an environmernt automatically set by the extension?
+                // Do the users need an environment automatically set by the extension?
                 // With a kits feature or expanding on the pre-configure script.
                 const telemetryProperties: telemetry.Properties = {
                     reason: "not found in environment path"
@@ -526,7 +525,7 @@ export function getMakefileConfigurations(): MakefileConfiguration[] { return ma
 export function setMakefileConfigurations(configurations: MakefileConfiguration[]): void { makefileConfigurations = configurations; }
 
 // Read make configurations optionally defined by the user in settings: makefile.configurations.
-async function readMakefileConfigurations(): Promise<void> {
+function readMakefileConfigurations(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makefileConfigurations = workspaceConfiguration.get<MakefileConfiguration[]>("configurations") || [];
     let detectedUnnamedConfigurations: boolean = false;
@@ -590,7 +589,7 @@ export function setCurrentTarget(target: string | undefined): void { currentTarg
 
 // Read current target from workspace state, update status bar item
 function readCurrentTarget(): void {
-    let buildTarget : string | undefined = extension.extensionContext.workspaceState.get<string>("buildTarget");
+    let buildTarget : string | undefined = extension.getState().buildTarget;
     if (!buildTarget) {
         logger.message("No target defined in the workspace state. Assuming 'Default'.");
         statusBar.setTarget("Default");
@@ -602,31 +601,6 @@ function readCurrentTarget(): void {
         logger.message(`Reading current build target "${currentTarget}" from the workspace state.`);
         statusBar.setTarget(currentTarget);
     }
-
-    // Track what standard makefile targets are used for building:
-    // for now, the special values list is empty string ""
-    // (which defaults to "all") and "all" given explicitly.
-    // "Clean" is also included, although it shouldn't be a necessity,
-    // but it would signal an eventual problem with the clean build commands
-    // that would cause the users to repeatedly change the build target
-    // from the desired value to clean and then back.
-    if (currentTarget === "" || currentTarget === "all" || currentTarget === "clean") {
-        const telemetryProperties: telemetry.Properties = {
-            target: currentTarget
-        };
-        telemetry.logEvent("buildTargetUsed", telemetryProperties);
-    }
-}
-
-// There are situations when the extension should ignore the settings changes
-// and not trigger re-read and updates.
-// Example: cleanup phase of extension tests, which removes settings.
-let ignoreSettingsChanged: boolean = false;
-export function startListeningToSettingsChanged(): void {
-    ignoreSettingsChanged = false;
-}
-export function stopListeningToSettingsChanged(): void {
-    ignoreSettingsChanged = true;
 }
 
 let configureOnOpen: boolean | undefined;
@@ -677,17 +651,19 @@ export async function initFromStateAndSettings(): Promise<void> {
     readMakePath();
     readMakefilePath();
     readBuildLog();
-    readPreconfigureScript();
-    readAlwaysPreconfigure();
+    readPreConfigureScript();
+    readAlwaysPreConfigure();
     readDryrunSwitches();
+    readMakefileConfigurations();
     readCurrentMakefileConfiguration();
-    await readCurrentMakefileConfigurationCommand();
     readCurrentTarget();
     readCurrentLaunchConfiguration();
     readDefaultLaunchConfiguration();
     readConfigureOnOpen();
     readConfigureOnEdit();
     readConfigureAfterCommand();
+
+    analyzeConfigureParams();
 
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
@@ -715,7 +691,7 @@ export async function initFromStateAndSettings(): Promise<void> {
 
     // Watch for Makefile Tools setting updates that can change the IntelliSense config provider dirty state
     vscode.workspace.onDidChangeConfiguration(async e => {
-        if (vscode.workspace.workspaceFolders && !ignoreSettingsChanged &&
+        if (vscode.workspace.workspaceFolders &&
             e.affectsConfiguration('makefile', vscode.workspace.workspaceFolders[0].uri)) {
             // We are interested in updating only some relevant properties.
             // A subset of these should also trigger an IntelliSense config provider update.
@@ -758,21 +734,21 @@ export async function initFromStateAndSettings(): Promise<void> {
                 readExtensionLog();
             }
 
-            let updatedPreconfigureScript : string | undefined = workspaceConfiguration.get<string>("preconfigureScript");
-            if (updatedPreconfigureScript) {
-                updatedPreconfigureScript = util.resolvePathToRoot(updatedPreconfigureScript);
+            let updatedPreConfigureScript : string | undefined = workspaceConfiguration.get<string>("preConfigureScript");
+            if (updatedPreConfigureScript) {
+                updatedPreConfigureScript = util.resolvePathToRoot(updatedPreConfigureScript);
             }
-            if (updatedPreconfigureScript !== preconfigureScript) {
+            if (updatedPreConfigureScript !== preConfigureScript) {
                 // No IntelliSense update needed.
-                logger.message("makefile.preconfigureScript setting changed.");
-                readPreconfigureScript();
+                logger.message("makefile.preConfigureScript setting changed.");
+                readPreConfigureScript();
             }
 
-            let updatedAlwaysPreconfigure : boolean | undefined = workspaceConfiguration.get<boolean>("alwaysPreconfigure");
-            if (updatedAlwaysPreconfigure !== alwaysPreconfigure) {
+            let updatedAlwaysPreConfigure : boolean | undefined = workspaceConfiguration.get<boolean>("alwaysPreConfigure");
+            if (updatedAlwaysPreConfigure !== alwaysPreConfigure) {
                 // No IntelliSense update needed.
-                logger.message("makefile.alwaysPreconfigure setting changed.");
-                readAlwaysPreconfigure();
+                logger.message("makefile.alwaysPreConfigure setting changed.");
+                readAlwaysPreConfigure();
             }
 
             let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>("configurationCache");
@@ -821,7 +797,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // is not among the subobjects that suffered modifications.
                 logger.message("makefile.configurations setting changed.");
                 configureDirty = true;
-                await readMakefileConfigurations();
+                readMakefileConfigurations();
             }
 
             let updatedDryrunSwitches : string[] | undefined = workspaceConfiguration.get<string[]>("dryrunSwitches");
@@ -853,15 +829,14 @@ export async function initFromStateAndSettings(): Promise<void> {
 
             // Final updates in some constructs that depend on more than one of the above settings.
             if (configureDirty) {
-                getBuildLogForConfiguration(currentMakefileConfiguration);
-                getCommandForConfiguration(currentMakefileConfiguration);
+                analyzeConfigureParams();
             }
         }
       });
 }
 
 export function setConfigurationByName(configurationName: string): void {
-    extension.extensionContext.workspaceState.update("buildConfiguration", configurationName);
+    extension.getState().buildConfiguration = configurationName;
     setCurrentMakefileConfiguration(configurationName);
 }
 
@@ -913,7 +888,7 @@ export function setTargetByName(targetName: string) : void {
     let displayTarget: string = targetName ? currentTarget : "Default";
     statusBar.setTarget(displayTarget);
     logger.message("Setting target " + displayTarget);
-    extension.extensionContext.workspaceState.update("buildTarget", currentTarget);
+    extension.getState().buildTarget = currentTarget;
 }
 
 // Fill a drop-down with all the target names run by building the makefile for the current configuration
@@ -1000,7 +975,7 @@ export function setLaunchConfigurationByName(launchConfigurationName: string) : 
 
     if (currentLaunchConfiguration) {
         logger.message('Setting current launch target "' + launchConfigurationName + '"');
-        extension.extensionContext.workspaceState.update("launchConfiguration", launchConfigurationName);
+        extension.getState().launchConfiguration = launchConfigurationName;
         statusBar.setLaunchConfiguration(launchConfigurationName);
     } else {
         if (launchConfigurationName === "") {
@@ -1008,7 +983,7 @@ export function setLaunchConfigurationByName(launchConfigurationName: string) : 
         } else {
             logger.message(`A problem occured while analyzing launch configuration name ${launchConfigurationName}. Current launch configuration is unset.`);
         }
-        extension.extensionContext.workspaceState.update("launchConfiguration", undefined);
+        extension.getState().launchConfiguration = undefined;
         statusBar.setLaunchConfiguration("No launch configuration set");
     }
 }

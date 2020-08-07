@@ -105,7 +105,7 @@
             },
             {
                 "command": "makefile.preConfigure",
-                "title": "Makefile: Preconfigure"
+                "title": "Makefile: Pre-Configure"
             },
             {
                 "command": "makefile.resetState",
@@ -311,15 +311,15 @@
                     "description": "Automatically configure Makefile project directories after relevant operations, like change build configuration or makefile target",
                     "scope": "resource"
                 },
-                "makefile.preconfigureScript": {
+                "makefile.preConfigureScript": {
                     "type": "string",
                     "description": "The path to the script that needs to be run at least once before configure",
                     "default": null,
                     "scope": "resource"
                 },
-                "makefile.alwaysPreconfigure": {
+                "makefile.alwaysPreConfigure": {
                     "type": "boolean",
-                    "description": "Always run the preconfigure script before configure",
+                    "description": "Always run the pre-configure script before configure",
                     "default": false,
                     "scope": "resource"
                 }

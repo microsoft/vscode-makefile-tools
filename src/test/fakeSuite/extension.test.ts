@@ -32,6 +32,7 @@ import * as util from '../../util';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { extension } from '../../extension';
 
 // TODO: refactor initialization and cleanup of each test
 suite('Fake dryrun parsing', /*async*/() => {
@@ -60,8 +61,6 @@ suite('Fake dryrun parsing', /*async*/() => {
                 return; // no need to run the remaining of the test
             }
 
-            configuration.startListeningToSettingsChanged();
-
             configuration.prepareConfigurationsQuickPick();
             configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
 
@@ -83,11 +82,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
 
             // Settings reset for the next test run.
-            configuration.stopListeningToSettingsChanged();
-            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-            workspaceConfiguration.update("buildConfiguration", undefined);
-            workspaceConfiguration.update("buildTarget", undefined);
-            workspaceConfiguration.update("launchConfiguration", undefined);
+            extension.getState().reset();
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
@@ -120,8 +115,6 @@ suite('Fake dryrun parsing', /*async*/() => {
                 return; // no need to run the remaining of the test
             }
 
-            configuration.startListeningToSettingsChanged();
-
             configuration.prepareConfigurationsQuickPick();
             configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
 
@@ -138,11 +131,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             }
 
             // Settings reset for the next test run.
-            configuration.stopListeningToSettingsChanged();
-            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-            workspaceConfiguration.update("buildConfiguration", undefined);
-            workspaceConfiguration.update("buildTarget", undefined);
-            workspaceConfiguration.update("launchConfiguration", undefined);
+            extension.getState().reset();
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
@@ -181,8 +170,6 @@ suite('Fake dryrun parsing', /*async*/() => {
             // since the extension clears it only in the beginning of activation.
             fs.unlinkSync(extensionLogPath);
 
-            configuration.startListeningToSettingsChanged();
-
             // As long as all the 'fake sources/makefile' tests share the same makefile.configurations setting,
             // there is no need in running configuration.prepareConfigurationsQuickPick for each
             configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
@@ -200,11 +187,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             }
 
             // Settings reset for the next test run.
-            configuration.stopListeningToSettingsChanged();
-            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-            workspaceConfiguration.update("buildConfiguration", undefined);
-            workspaceConfiguration.update("buildTarget", undefined);
-            workspaceConfiguration.update("launchConfiguration", undefined);
+            extension.getState().reset();
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
@@ -243,8 +226,6 @@ suite('Fake dryrun parsing', /*async*/() => {
             // since the extension clears it only in the beginning of activation.
             fs.unlinkSync(extensionLogPath);
 
-            configuration.startListeningToSettingsChanged();
-
             // As long as all the 'fake sources/makefile' tests share the same makefile.configurations setting,
             // there is no need in running configuration.prepareConfigurationsQuickPick for each
             configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
@@ -262,11 +243,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             }
 
             // Settings reset for the next test run.
-            configuration.stopListeningToSettingsChanged();
-            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-            workspaceConfiguration.update("buildConfiguration", undefined);
-            workspaceConfiguration.update("buildTarget", undefined);
-            workspaceConfiguration.update("launchConfiguration", undefined);
+            extension.getState().reset();
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
