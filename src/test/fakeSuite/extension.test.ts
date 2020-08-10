@@ -70,7 +70,12 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)");
 
-            let launchConfiguration: configuration.LaunchConfiguration | undefined = await launch.getLauncher().getAndValidateLaunchConfiguration();
+            let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+            let launchConfiguration: configuration.LaunchConfiguration | undefined;
+            if (status === launch.LaunchStatuses.success) {
+                launchConfiguration = configuration.getCurrentLaunchConfiguration();
+            }
+
             if (launchConfiguration) {
                 launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
                 launch.getLauncher().prepareRunCurrentTarget();
@@ -124,7 +129,12 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
 
-            let launchConfiguration: configuration.LaunchConfiguration | undefined = await launch.getLauncher().getAndValidateLaunchConfiguration();
+            let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+            let launchConfiguration: configuration.LaunchConfiguration | undefined;
+            if (status === launch.LaunchStatuses.success) {
+                launchConfiguration = configuration.getCurrentLaunchConfiguration();
+            }
+
             if (launchConfiguration) {
                 launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
                 launch.getLauncher().prepareRunCurrentTarget();
@@ -180,7 +190,12 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
 
-            let launchConfiguration: configuration.LaunchConfiguration | undefined = await launch.getLauncher().getAndValidateLaunchConfiguration();
+            let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+            let launchConfiguration: configuration.LaunchConfiguration | undefined;
+            if (status === launch.LaunchStatuses.success) {
+                launchConfiguration = configuration.getCurrentLaunchConfiguration();
+            }
+
             if (launchConfiguration) {
                 launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
                 launch.getLauncher().prepareRunCurrentTarget();
@@ -236,7 +251,12 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");
 
-            let launchConfiguration: configuration.LaunchConfiguration | undefined = await launch.getLauncher().getAndValidateLaunchConfiguration();
+            let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+            let launchConfiguration: configuration.LaunchConfiguration | undefined;
+            if (status === launch.LaunchStatuses.success) {
+                launchConfiguration = configuration.getCurrentLaunchConfiguration();
+            }
+
             if (launchConfiguration) {
                 launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
                 launch.getLauncher().prepareRunCurrentTarget();

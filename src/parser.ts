@@ -823,8 +823,8 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
  * Determine the IntelliSenseMode based on hints from compiler path
  * and target architecture parsed from compiler flags.
  */
-function getIntelliSenseMode(cppVersion: cpp.Version, compilerPath: string, targetArch: util.TargetArchitecture): util.IntelliSenseMode {
-    const canUseArm: boolean = (cppVersion >= cpp.Version.v4);
+function getIntelliSenseMode(cppVersion: cpp.Version | undefined, compilerPath: string, targetArch: util.TargetArchitecture): util.IntelliSenseMode {
+    const canUseArm: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v4);
     const compilerName: string = path.basename(compilerPath || "").toLocaleLowerCase();
     if (compilerName === 'cl.exe') {
         const clArch: string = path.basename(path.dirname(compilerPath)).toLocaleLowerCase();
@@ -923,8 +923,8 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
     return targetArch;
 }
 
-function parseStandard(cppVersion: cpp.Version, std: string | undefined, language: util.Language): util.StandardVersion {
-    let canUseGnu: boolean = (cppVersion >= cpp.Version.v4);
+function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefined, language: util.Language): util.StandardVersion {
+    let canUseGnu: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v4);
     let standard: util.StandardVersion;
     if (!std) {
         // Standard defaults when no std switch is given

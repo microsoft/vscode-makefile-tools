@@ -40,7 +40,8 @@ export enum Operations {
     changeConfiguration = "change makefile configuration",
     changeBuildTarget = "change build target",
     changeLaunchTarget = "change launch target",
-    launch = "debug/run"
+    debug = "debug",
+    run = "run"
 }
 
 // Identifies and logs whether an operation should be prevented from running.
@@ -101,6 +102,17 @@ export function prepareBuildTarget(target: string, clean: boolean = false): stri
     return makeArgs;
 }
 
+// Build targets allow list for telemetry
+function processTargetForTelemetry(target: string | undefined): string {
+    if (!target || target === "") {
+        return "(unset)";
+    } else if (target === "all" || target === "clean") {
+        return target;
+    }
+
+    return "private info";
+}
+
 // PID of the process that may be running currently.
 // At any moment, there is either no process or only one process running
 // (make for configure, make for build or pre-configure cmd/bash).
@@ -109,9 +121,7 @@ let curPID: number = -1;
 export function getCurPID(): number { return curPID; }
 export function setCurPID(pid: number): void { curPID = pid; }
 
-let cancelBuild: boolean = false; // when the build was cancelled by the user
-
-export async function buildTarget(target: string, clean: boolean = false): Promise<number> {
+export async function buildTarget(cause: string, target: string, clean: boolean = false): Promise<number> {
     if (blockOperation(Operations.build)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
@@ -122,10 +132,10 @@ export async function buildTarget(target: string, clean: boolean = false): Promi
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
     let configureExitCode: number | undefined; // used for telemetry
     let configureElapsedTime: number | undefined; // used for telemetry
-    if (configuration.getConfigureDirty()) {
+    if (ext.extension.getState().configureDirty) {
         logger.message("The project needs to configure in order to build properly the current target.");
         if (configuration.getConfigureAfterCommand()) {
-            configureExitCode = await cleanConfigure();
+            configureExitCode = await cleanConfigure("configure dirty and makefile.configureAfterCommand on build target");
             if (configureExitCode !== ConfigureBuildReturnCodeTypes.success) {
                 logger.message("Attempting to run build after a failed configure.");
             }
@@ -147,6 +157,8 @@ export async function buildTarget(target: string, clean: boolean = false): Promi
 
     configAndTarget = `"${configAndTarget}"`;
     let popupStr: string = 'Building ' + (clean ? "clean " : "") + 'the current makefile configuration ' + configAndTarget;
+
+    let cancelBuild: boolean = false; // when the build was cancelled by the user
 
     try {
         return await vscode.window.withProgress({
@@ -178,16 +190,22 @@ export async function buildTarget(target: string, clean: boolean = false): Promi
                 let buildElapsedTime: number = (buildEndTime - buildStartTime) / 1000;
                 const telemetryProperties: telemetry.Properties = {
                     exitCode: retc.toString(),
-                    buildTotalElapsedTime: `${buildElapsedTime} (sec)`
+                    target: processTargetForTelemetry(target),
+                    cause: cause
+                };
+                const telemetryMeasures: telemetry.Measures = {
+                    buildTotalElapsedTime: buildElapsedTime
                 };
 
                 // Report if this build ran also a configure and how long it took.
                 if (configureExitCode !== undefined) {
                     telemetryProperties.configureExitCode = configureExitCode.toString();
-                    telemetryProperties.configureElapsedTime =  `${configureElapsedTime} (sec)`;
+                }
+                if (configureElapsedTime !== undefined) {
+                    telemetryMeasures.configureElapsedTime =  configureElapsedTime;
                 }
 
-                telemetry.logEvent("build", telemetryProperties);
+                telemetry.logEvent("build", telemetryProperties, telemetryMeasures);
 
                 cancelBuild = false;
                 return retc;
@@ -242,6 +260,10 @@ export function setParseContent(content: string): void { parseContent = content;
 let parseFile: string | undefined;
 export function getParseFile(): string | undefined { return parseFile; }
 export function setParseFile(file: string): void { parseFile = file; }
+
+// Globals (for now) useful in logging and telemetry of cancelled configure
+let configureSubPhase: string = "not started"; // where a cancel happened in the workflow
+let cancelConfigure: boolean = false; // when to return early from the configure workflow
 
 // Targets need to parse a dryrun make invocation that does not include a target name
 // (other than default empty "" or the standard "all"), otherwise it would produce
@@ -354,9 +376,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
     });
 }
 
-let cancelPreConfigure: boolean = false; // when the pre-configure was cancelled by the user
-
-export async function preConfigure(): Promise<number> {
+export async function preConfigure(cause: string): Promise<number> {
     if (blockOperation(Operations.preConfigure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
@@ -376,6 +396,8 @@ export async function preConfigure(): Promise<number> {
         logger.message(`Could not find the given pre-configure script "${scriptFile}" on disk. `);
         return ConfigureBuildReturnCodeTypes.notFound;
     }
+
+    let cancelPreConfigure: boolean = false; // when the pre-configure was cancelled by the user
 
     try {
         return await vscode.window.withProgress({
@@ -404,11 +426,14 @@ export async function preConfigure(): Promise<number> {
 
                 let preConfigureEndTime: number = Date.now();
                 let preConfigureElapsedTime: number = (preConfigureEndTime - preConfigureStartTime) / 1000;
+                const telemetryMeasures: telemetry.Measures = {
+                    preConfigureElapsedTime: preConfigureElapsedTime
+                };
                 const telemetryProperties: telemetry.Properties = {
                     exitCode: retc.toString(),
-                    preConfigureElapsedTime: `${preConfigureElapsedTime} (sec)`
+                    cause: cause
                 };
-                telemetry.logEvent("preConfigure", telemetryProperties);
+                telemetry.logEvent("preConfigure", telemetryProperties, telemetryMeasures);
 
                 cancelPreConfigure = false;
                 return retc;
@@ -467,13 +492,11 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     });
 }
 
-let configureCancelledInSubPhase: string | undefined; // used for telemetry
-
-export async function configure(updateTargets: boolean = true): Promise<number> {
+export async function configure(cause: string, updateTargets: boolean = true): Promise<number> {
     // Mark that this workspace had at least one attempt at configuring, before any chance of early return,
     // to accurately identify whether this project configured successfully out of the box or not.
-    let ranConfigureBefore: boolean = ext.extension.getState().ranConfigureBefore || false;
-    ext.extension.getState().ranConfigureBefore = true;
+    let ranConfigureInCodebaseLifetime: boolean = ext.extension.getState().ranConfigureInCodebaseLifetime || false;
+    ext.extension.getState().ranConfigureInCodebaseLifetime = true;
 
     if (blockOperation(Operations.configure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
@@ -485,7 +508,7 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
     let preConfigureExitCode: number | undefined; // used for telemetry
     let preConfigureElapsedTime: number | undefined; // used for telemetry
     if (configuration.getAlwaysPreConfigure()) {
-        preConfigureExitCode = await preConfigure();
+        preConfigureExitCode = await preConfigure("makefile.alwaysPreconfigure");
         if (preConfigureExitCode !== ConfigureBuildReturnCodeTypes.success) {
             logger.message("Attempting to run configure after a failed pre-configure.");
         }
@@ -493,6 +516,8 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
         let preConfigureEndTime: number = Date.now();
         preConfigureElapsedTime = (preConfigureEndTime - configureStartTime) / 1000;
     }
+
+    let configureCancelledInSubPhase: string | undefined; // used for telemetry
 
     try {
         return await vscode.window.withProgress({
@@ -570,21 +595,24 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
                 const telemetryMeasures: telemetry.Measures = {
                     numberBuildTargets: configuration.getBuildTargets().length,
                     numberLaunchTargets: configuration.getLaunchTargets().length,
-                    numberMakefileConfigurations: configuration.getMakefileConfigurations().length
+                    numberMakefileConfigurations: configuration.getMakefileConfigurations().length,
+                    totalElapsedTime: configureElapsedTime
                 };
                 const telemetryProperties: telemetry.Properties = {
                     exitCode: retc.toString(),
-                    firstTime: (!ranConfigureBefore).toString(),
-                    totalElapsedTime: `${configureElapsedTime} (sec)`,
+                    firstTime: (!ranConfigureInCodebaseLifetime).toString(),
                     ranMake: ranMake.toString(),
                     processTargetsSeparately: processTargetsSeparately.toString(),
                     resetBuildTarget: (oldBuildTarget !== newBuildTarget).toString(),
+                    cause: cause
                 };
 
                 // Report if this configure ran also a pre-configure and how long it took.
                 if (preConfigureExitCode !== undefined) {
                     telemetryProperties.preConfigureExitCode = preConfigureExitCode.toString();
-                    telemetryProperties.preConfigureElapsedTime =  `${preConfigureElapsedTime} (sec)`;
+                }
+                if (preConfigureElapsedTime !== undefined) {
+                    telemetryMeasures.preConfigureElapsedTime =  preConfigureElapsedTime;
                 }
 
                 // If this configure was cancelled, report in what sub-phase
@@ -592,19 +620,7 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
                     telemetryProperties.cancelledInSubPhase = configureCancelledInSubPhase;
                 }
 
-                // Track what standard makefile targets are used for building:
-                // for now, the special values list is empty string ""
-                // (which defaults to "all") and "all" given explicitly.
-                // "Clean" is also included, although it shouldn't be a necessity,
-                // but it would signal an eventual problem with the clean build commands
-                // that would cause the users to repeatedly change the build target
-                // from the desired value to clean and then back.
-                if (!newBuildTarget || newBuildTarget === "") {
-                    telemetryProperties.buildTarget = "(unset)";
-                } else if (newBuildTarget === "all" || newBuildTarget === "clean") {
-                    telemetryProperties.buildTarget = newBuildTarget;
-                }
-
+                telemetryProperties.buildTarget = processTargetForTelemetry(newBuildTarget);
                 telemetry.logEvent("configure", telemetryProperties, telemetryMeasures);
 
                 configureCancelledInSubPhase = undefined;
@@ -616,12 +632,7 @@ export async function configure(updateTargets: boolean = true): Promise<number> 
     }
 }
 
-// Globals (for now) useful in logging and telemetry of cancelled configure
-let configureSubPhase: string = "not started"; // where a cancel happened in the workflow
-let cancelConfigure: boolean = false; // when to return early from the configure workflow
-let recursiveDoConfigure: boolean = false; // if the current configure is caused by an automatic build target reset
-
-function determineConfigureSubPhase(subPhase: string) : string {
+function determineConfigureSubPhase(subPhase: string, recursiveDoConfigure: boolean) : string {
     return subPhase + (recursiveDoConfigure ? " (reconfigure after automatic reset of build target)" : "");
 }
 
@@ -630,27 +641,27 @@ function determineConfigureSubPhase(subPhase: string) : string {
 // Sometimes the targets do not need an update (for example, when there has been
 // a change in the current build target), as requested through the boolean.
 // This saves unnecessary parsing which may be signifficant for very big code bases.
-export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: boolean = true): Promise<number> {
+export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: boolean = true, recursiveDoConfigure: boolean = false): Promise<number> {
     let retc1: number;
     let retc2: number | undefined;
     let retc3: number | undefined;
 
     // This generates the dryrun output and caches it.
-    configureSubPhase = determineConfigureSubPhase("Generating parse content for IntelliSense and launch targets.");
+    configureSubPhase = determineConfigureSubPhase("Generating parse content for IntelliSense and launch targets.", recursiveDoConfigure);
     retc1 = await generateParseContent(progress);
     if (cancelConfigure) {
         cancelConfigure = false;
         logger.message("Exiting early from the configure process.");
-        configuration.setConfigureDirty(true);
+        ext.extension.getState().configureDirty = true;
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
 
     // Configure IntelliSense
-    configureSubPhase = determineConfigureSubPhase("Updating CppTools custom IntelliSense provider.");
+    configureSubPhase = determineConfigureSubPhase("Updating CppTools custom IntelliSense provider.", recursiveDoConfigure);
     logger.message(`Parsing for IntelliSense from: "${parseFile}"`);
     await ext.updateProvider(parseContent || "");
 
-    configureSubPhase = determineConfigureSubPhase("Parsing launch targets.");
+    configureSubPhase = determineConfigureSubPhase("Parsing launch targets.", recursiveDoConfigure);
 
     // Configure launch targets as parsed from the makefile
     // (and not as read from settings via makefile.launchConfigurations).
@@ -688,18 +699,18 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
         // we need to generate a different dryrun output
         let target: string | undefined = configuration.getCurrentTarget();
         if (target !== "" && target !== "all") {
-            configureSubPhase = determineConfigureSubPhase("Generating parse content for build targets.");
+            configureSubPhase = determineConfigureSubPhase("Generating parse content for build targets.", recursiveDoConfigure);
             retc2 = await generateParseContent(progress, true);
             if (cancelConfigure) {
                 cancelConfigure = false;
                 logger.message("Exiting early from the configure process.");
-                configuration.setConfigureDirty(true);
+                ext.extension.getState().configureDirty = true;
                 return ConfigureBuildReturnCodeTypes.cancelled;
             }
 
         }
 
-        configureSubPhase = determineConfigureSubPhase("Parsing build targets.");
+        configureSubPhase = determineConfigureSubPhase("Parsing build targets.", recursiveDoConfigure);
         logger.message(`Parsing for build targets from: "${parseFile}"`);
         let buildTargets: string[] = parser.parseTargets(parseContent || "");
         if (buildTargets.length === 0) {
@@ -738,7 +749,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
             // Ensure the cache is cleaned at this point. Even if the original configure operation
             // was explicitly not clean, resetting the build target requires a clean configure.
             cleanCache();
-            retc3 = await doConfigure(progress, updateTargets);
+            retc3 = await doConfigure(progress, updateTargets, true);
         }
     }
 
@@ -754,9 +765,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
         }
     }
 
-    configuration.setConfigureDirty(false);
+    ext.extension.getState().configureDirty = false;
     configureSubPhase = "not started";
-    recursiveDoConfigure = false;
 
     // If we have a retc3 result, it doesn't matter what retc1 and retc2 are.
     return (retc3 !== undefined) ? retc3 :
@@ -785,7 +795,7 @@ function cleanCache(): void {
 }
 
 // Configure after cleaning the cache
-export async function cleanConfigure(updateTargets: boolean = true): Promise<number> {
+export async function cleanConfigure(cause: string, updateTargets: boolean = true): Promise<number> {
     // Even if the core configure process also checks for blocking operations,
     // verify the same here as well, to make sure that we don't delete the caches
     // only to return early from the core configure.
@@ -795,5 +805,5 @@ export async function cleanConfigure(updateTargets: boolean = true): Promise<num
 
     cleanCache();
 
-    return configure(updateTargets);
+    return configure(cause, updateTargets);
 }

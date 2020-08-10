@@ -44,11 +44,22 @@ export class StateManager {
   // (it didn't have to succeed or even complete).
   // Sent as telemetry information and useful to know
   // how many projects are able to configure out of the box.
-  get ranConfigureBefore(): boolean | undefined {
-    return this._get<boolean>('ranConfigureBefore');
+  get ranConfigureInCodebaseLifetime(): boolean | undefined {
+    return this._get<boolean>('ranConfigureInCodebaseLifetime');
   }
-  set ranConfigureBefore(v: boolean | undefined) {
-    this._update('ranConfigureBefore', v);
+  set ranConfigureInCodebaseLifetime(v: boolean | undefined) {
+    this._update('ranConfigureInCodebaseLifetime', v);
+  }
+
+  // If the project needs a clean configure as a result
+  // of an operation that alters the configure state
+  // (makefile configuration change, build target change,
+  // settings or makefiles edits)
+  get configureDirty(): boolean | undefined {
+    return this._get<boolean>('configureDirty');
+  }
+  set configureDirty(v: boolean | undefined) {
+    this._update('configureDirty', v);
   }
 
   // Reset all the variables saved in the workspace state.
@@ -56,7 +67,8 @@ export class StateManager {
     this.buildConfiguration = undefined;
     this.buildTarget = undefined;
     this.launchConfiguration = undefined;
-    this.ranConfigureBefore = false;
+    this.ranConfigureInCodebaseLifetime = false;
+    this.configureDirty = false;
 
     vscode.commands.executeCommand('workbench.action.reloadWindow');
   }

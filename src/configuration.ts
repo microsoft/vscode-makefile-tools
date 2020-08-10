@@ -633,18 +633,6 @@ export function readConfigureAfterCommand(): void {
     logger.message(`Configure after command: ${configureAfterCommand}`);
 }
 
- // Triggers IntelliSense config provider updates after relevant changes
- // are made in settings or in the makefiles.
- // To avoid unnecessary dry-runs, these updates are not performed with every document save
- // but after leaving the focus of the document.
- // This will also be set to true when makefile.configureOnOpen is false, to be able to
- // warn appropriately later, if any commands are invoked without a previous configure.
- // The global here needs to default to false, otherwise we have configure races
- // when changing editors in vscode (see onDidChangeActiveTextEditor in initFromStateAndSettings).
-let configureDirty: boolean = false;
-export function getConfigureDirty(): boolean { return configureDirty; }
-export function setConfigureDirty(configure: boolean): void { configureDirty = configure; }
-
 // Initialization from settings (or backup default rules), done at activation time
 export async function initFromStateAndSettings(): Promise<void> {
     readConfigurationCache();
@@ -667,12 +655,17 @@ export async function initFromStateAndSettings(): Promise<void> {
 
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
-    vscode.window.onDidChangeActiveTextEditor(e => {
-        if (configureDirty) {
-            if (configureOnEdit) {
+ vscode.window.onDidChangeActiveTextEditor(e => {
+        // If configureDirty is already set from a previous VSCode instance,
+        // at workspace load this event (onDidChangeActiveTextEditor) is triggered automatically
+        // and if makefile.configureOnOpen is true, there is a race between two configure operations,
+        // one of which being unnecessary. Ignore the cleanConfigure call here
+        // only when makefile.configureOnOpen is true and we know we didn't complete a first configure yet.
+        if (extension.getState().configureDirty && configureOnEdit) {
+            if (getConfigureOnOpen() === false || extension.getRanConfigureInInstance()) {
                 // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
                 logger.message("Configuring clean after settings or makefile changes...");
-                make.cleanConfigure(); // this sets configureDirty back to false if it succeeds
+                make.cleanConfigure("configure dirty and makefile.configureOnEdit=true on change of editor"); // this sets configureDirty back to false if it succeeds
             }
         }
     });
@@ -685,7 +678,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     // TODO: don't trigger an update for any dummy save, verify how the content changed.
     vscode.workspace.onDidSaveTextDocument(e => {
         if (e.uri.fsPath.toLowerCase().endsWith("makefile")) {
-            configureDirty = true;
+            extension.getState().configureDirty = true;
         }
     });
 
@@ -719,7 +712,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                 updatedBuildLog = util.resolvePathToRoot(updatedBuildLog);
             }
             if (updatedBuildLog !== buildLog) {
-                configureDirty = true;
+                extension.getState().configureDirty = true;
                 logger.message("makefile.buildLog setting changed.");
                 readBuildLog();
             }
@@ -758,7 +751,7 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (updatedConfigurationCache !== configurationCache) {
                 // A change in makefile.configurationCache should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.configurationCache setting changed.");
                 readConfigurationCache();
             }
@@ -775,7 +768,7 @@ export async function initFromStateAndSettings(): Promise<void> {
 
                 // A change in makefile.makePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakePath();
             }
 
@@ -786,7 +779,7 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (updatedMakefilePath !== makefilePath) {
                 // A change in makefile.makefilePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.makefilePath setting changed.");
                 readMakefilePath();
             }
@@ -796,7 +789,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // todo: skip over updating the IntelliSense configuration provider if the current makefile configuration
                 // is not among the subobjects that suffered modifications.
                 logger.message("makefile.configurations setting changed.");
-                configureDirty = true;
+                extension.getState().configureDirty = true;
                 readMakefileConfigurations();
             }
 
@@ -804,7 +797,7 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (!util.areEqual(updatedDryrunSwitches, dryrunSwitches)) {
                 // A change in makefile.dryrunSwitches should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 logger.message("makefile.dryrunSwitches setting changed.");
                 readDryrunSwitches();
             }
@@ -828,7 +821,7 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
 
             // Final updates in some constructs that depend on more than one of the above settings.
-            if (configureDirty) {
+            if (extension.getState().configureDirty) {
                 analyzeConfigureParams();
             }
         }
@@ -869,7 +862,7 @@ export async function setNewConfiguration(): Promise<void> {
     if (chosen) {
         if (chosen !== getCurrentMakefileConfiguration()) {
             const telemetryProperties: telemetry.Properties = {
-                var: "makefileConfiguration"
+                state: "makefileConfiguration"
             };
             telemetry.logEvent("stateChanged", telemetryProperties);
         }
@@ -878,7 +871,7 @@ export async function setNewConfiguration(): Promise<void> {
 
         if (configureAfterCommand) {
             logger.message("Automatically reconfiguring the project after a makefile configuration change.");
-            await make.cleanConfigure();
+            await make.cleanConfigure("makefile configuration change and makefile.configureAfterCommand");
         }
     }
 }
@@ -901,10 +894,10 @@ export async function selectTarget(): Promise<void> {
     }
 
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
-    if (configureDirty) {
+    if (extension.getState().configureDirty) {
         logger.message("The project needs a configure to populate the build targets correctly.");
         if (configureAfterCommand) {
-            let retc: number = await make.cleanConfigure();
+            let retc: number = await make.cleanConfigure("configure dirty and makefile.configureAfterCommand on select new build target");
             if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
                 logger.message("The build targets list may not be accurate because configure failed.");
             }
@@ -935,7 +928,7 @@ export async function selectTarget(): Promise<void> {
     if (chosen) {
         if (chosen !== getCurrentMakefileConfiguration()) {
             const telemetryProperties: telemetry.Properties = {
-                var: "buildTarget"
+                state: "buildTarget"
             };
             telemetry.logEvent("stateChanged", telemetryProperties);
         }
@@ -945,7 +938,7 @@ export async function selectTarget(): Promise<void> {
         if (configureAfterCommand) {
             // The set of build targets remains the same even if the current target has changed
             logger.message("Automatically reconfiguring the project after a build target change.");
-            await make.cleanConfigure(false);
+            await make.cleanConfigure("change of build target and makefile.configureAfterCommand", false);
         }
     }
 }
@@ -998,10 +991,10 @@ export async function selectLaunchConfiguration(): Promise<void> {
     }
 
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
-    if (configureDirty) {
+    if (extension.getState().configureDirty) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
         if (configureAfterCommand) {
-            let retc: number = await make.cleanConfigure();
+            let retc: number = await make.cleanConfigure("configureDirty and makefile.configureAfterCommand on select new launch target");
             if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
                 logger.message("The launch targets list may not be accurate because configure failed.");
             }
@@ -1021,7 +1014,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
     if (chosen) {
         if (chosen !== getCurrentMakefileConfiguration()) {
             const telemetryProperties: telemetry.Properties = {
-                var: "launchConfiguration"
+                state: "launchConfiguration"
             };
             telemetry.logEvent("stateChanged", telemetryProperties);
         }
