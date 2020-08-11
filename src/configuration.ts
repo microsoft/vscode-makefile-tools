@@ -850,7 +850,7 @@ export function prepareConfigurationsQuickPick(): string[] {
 // Triggers a cpptools configuration provider update after selection.
 export async function setNewConfiguration(): Promise<void> {
     // Cannot set a new makefile configuration if the project is currently building or (pre-)configuring.
-    if (make.blockOperation(make.Operations.changeConfiguration)) {
+    if (make.blockedByOp(make.Operations.changeConfiguration)) {
         return;
     }
 
@@ -889,7 +889,7 @@ export function setTargetByName(targetName: string) : void {
 // TODO: change the UI list to multiple selections mode and store an array of current active targets
 export async function selectTarget(): Promise<void> {
     // Cannot select a new target if the project is currently building or (pre-)configuring.
-    if (make.blockOperation(make.Operations.changeBuildTarget)) {
+    if (make.blockedByOp(make.Operations.changeBuildTarget)) {
         return;
     }
 
@@ -986,7 +986,7 @@ export function setLaunchConfigurationByName(launchConfigurationName: string) : 
 // Selection updates current launch configuration that will be ready for the next debug/run operation
 export async function selectLaunchConfiguration(): Promise<void> {
     // Cannot select a new launch configuration if the project is currently building or (pre-)configuring.
-    if (make.blockOperation(make.Operations.changeLaunchTarget)) {
+    if (make.blockedByOp(make.Operations.changeLaunchTarget)) {
         return;
     }
 

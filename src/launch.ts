@@ -163,7 +163,7 @@ export class Launcher implements vscode.Disposable {
 
     async validateLaunchConfiguration(op: make.Operations): Promise<string> {
         // Cannot debug the project if it is currently building or (pre-)configuring.
-        if (make.blockOperation(op)) {
+        if (make.blockedByOp(op)) {
             return LaunchStatuses.blocked;
         }
 

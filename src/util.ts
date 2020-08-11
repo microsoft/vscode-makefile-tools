@@ -57,6 +57,24 @@ export function readFile(filePath: string): string | undefined {
     return undefined;
 }
 
+export function writeFile(filePath: string, content: string): string | undefined {
+    try {
+        fs.writeFileSync(filePath, content);
+    } catch (e) {
+    }
+
+    return undefined;
+}
+
+// Get the platform-specific temporary directory
+export function tmpDir(): string {
+    if (process.platform === 'win32') {
+        return process.env['TEMP'] || "";
+    } else {
+        return '/tmp';
+    }
+}
+
 // Evaluate whether a string looks like a path or not,
 // without using fs.stat, since dry-run may output tools
 // that are not found yet at certain locations,

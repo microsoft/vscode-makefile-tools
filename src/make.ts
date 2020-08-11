@@ -54,35 +54,26 @@ export enum Operations {
 // Clicking the status bar buttons attempts to run the corresponding operation,
 // which triggers a popup and returns early if it should be blocked. Same for pallette commands.
 // In future we may enable/disable or change text depending on the blocking state.
-export function blockOperation(op: Operations): boolean {
-    let block: boolean = false;
-    let reason: string = "unknown";
+export function blockedByOp(op: Operations): string | undefined {
+    let blocker: string | undefined;
 
     if (getIsPreConfiguring()) {
-        reason = "the project is pre-configuring";
-        block = true;
+        blocker = "pre-configure";
     }
 
     if (getIsConfiguring()) {
-        reason = "the project is configuring";
-        block = true;
+        blocker = "configure";
     }
 
     if (getIsBuilding()) {
-        reason = "the project is building";
-        block = true;
+        blocker = "build";
     }
 
-    if (block) {
-        vscode.window.showErrorMessage(`Operation "${op}" cannot be completed because ${reason}.`);
-        const telemetryProperties: telemetry.Properties = {
-            operationName: op.toString(),
-            reason: reason
-        };
-        telemetry.logEvent("operationBlocked", telemetryProperties);
+    if (blocker) {
+        vscode.window.showErrorMessage(`Operation "${op}" cannot be completed because the project is running ${blocker}.`);
     }
 
-    return block;
+    return blocker;
 }
 
 export function prepareBuildTarget(target: string, clean: boolean = false): string[] {
@@ -122,7 +113,7 @@ export function getCurPID(): number { return curPID; }
 export function setCurPID(pid: number): void { curPID = pid; }
 
 export async function buildTarget(cause: string, target: string, clean: boolean = false): Promise<number> {
-    if (blockOperation(Operations.build)) {
+    if (blockedByOp(Operations.build)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
@@ -377,7 +368,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
 }
 
 export async function preConfigure(cause: string): Promise<number> {
-    if (blockOperation(Operations.preConfigure)) {
+    if (blockedByOp(Operations.preConfigure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
@@ -444,20 +435,50 @@ export async function preConfigure(cause: string): Promise<number> {
     }
 }
 
+// Applies to the current process all the environment variables that resulted from the pre-configure step.
+// The input 'content' represents the output of a command that lists all the environment variables:
+// set on windows or printenv on linux/mac.
+async function applyEnvironment(content: string | undefined) : Promise<void> {
+    let lines: string[] = content?.split((process.platform === "win32") ? "\r\n" : "\n") || [];
+    lines.forEach(line => {
+        let eqPos: number = line.search("=");
+        let envVarName: string = line.substring(0, eqPos);
+        let envVarValue: string = line.substring(eqPos + 1, line.length);
+        process.env[envVarName] = envVarValue;
+    });
+}
+
 export async function runPreConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
     return new Promise<number>(function (resolve, reject): void {
         logger.message(`Pre-configuring...\nScript: "${configuration.getPreConfigureScript()}"`);
+
+        // Create a temporary wrapper for the user pre-configure script so that we collect
+        // in another temporary output file the environrment variables that were produced.
+        let wrapScriptFile: string = path.join(util.tmpDir(), "wrapPreconfigureScript");
+        let wrapScriptOutFile: string = wrapScriptFile + ".out";
+        let wrapScriptContent: string;
+        if (process.platform === "win32") {
+            wrapScriptContent = `call ${scriptFile}\r\n`;
+            wrapScriptContent += `set > ${wrapScriptOutFile}`;
+            wrapScriptFile += ".bat";
+        } else {
+            wrapScriptContent = `source ${scriptFile}\n`;
+            wrapScriptContent += `printenv > ${wrapScriptFile}.out`;
+            wrapScriptFile += ".sh";
+        }
+
+        util.writeFile(wrapScriptFile, wrapScriptContent);
 
         let scriptArgs: string[] = [];
         let runCommand: string;
         if (process.platform === 'win32') {
             runCommand = "cmd";
             scriptArgs.push("/c");
-            scriptArgs.push(`${scriptFile}`);
+            scriptArgs.push(wrapScriptFile);
         } else {
             runCommand = "/bin/bash";
             scriptArgs.push("-c");
-            scriptArgs.push(`"source ${scriptFile}"`);
+            scriptArgs.push(`"source ${wrapScriptFile}"`);
         }
 
         try {
@@ -481,6 +502,9 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
                     logger.message(stderrStr);
                 }
 
+                // Apply the environment produced by running the pre-configure script.
+                applyEnvironment(util.readFile(wrapScriptOutFile));
+
                 resolve(retCode);
             };
 
@@ -498,7 +522,7 @@ export async function configure(cause: string, updateTargets: boolean = true): P
     let ranConfigureInCodebaseLifetime: boolean = ext.extension.getState().ranConfigureInCodebaseLifetime || false;
     ext.extension.getState().ranConfigureInCodebaseLifetime = true;
 
-    if (blockOperation(Operations.configure)) {
+    if (blockedByOp(Operations.configure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
@@ -799,7 +823,7 @@ export async function cleanConfigure(cause: string, updateTargets: boolean = tru
     // Even if the core configure process also checks for blocking operations,
     // verify the same here as well, to make sure that we don't delete the caches
     // only to return early from the core configure.
-    if (blockOperation(Operations.configure)) {
+    if (blockedByOp(Operations.configure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
