@@ -400,7 +400,7 @@ function analyzeConfigureParams(): void {
 export function getCommandForConfiguration(configuration: string | undefined): void {
     let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
         if (k.name === configuration) {
-            return { ...k, keep: true };
+            return k;
         }
     });
 
@@ -476,7 +476,11 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         }
 
         // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
-        if (!util.checkFileExistsSync(makefileUsed || "./makefile")) {
+        if (!makefileUsed) {
+            makefileUsed = "./makefile";
+        }
+        makefileUsed = util.resolvePathToRoot(makefileUsed);
+        if (!util.checkFileExistsSync(makefileUsed)) {
             vscode.window.showErrorMessage("Makefile entry point not found.");
             logger.message("The makefile entry point was not found. " +
                            "Make sure it exists at the location defined by makefile.makePath or makefile.configurations[].makePath " +
@@ -642,8 +646,8 @@ export async function initFromStateAndSettings(): Promise<void> {
     readPreConfigureScript();
     readAlwaysPreConfigure();
     readDryrunSwitches();
-    readMakefileConfigurations();
     readCurrentMakefileConfiguration();
+    readMakefileConfigurations();
     readCurrentTarget();
     readCurrentLaunchConfiguration();
     readDefaultLaunchConfiguration();
@@ -689,62 +693,80 @@ export async function initFromStateAndSettings(): Promise<void> {
             // We are interested in updating only some relevant properties.
             // A subset of these should also trigger an IntelliSense config provider update.
             // Avoid unnecessary updates (for example, when settings are modified via the extension quickPick).
-            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+            let telemetryProperties: telemetry.Properties | null = {};
+            let updatedSettingsSubkeys: string[] = [];
+            let keyRoot: string = "makefile";
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(keyRoot);
 
-            let updatedLaunchConfigurations : LaunchConfiguration[] | undefined = workspaceConfiguration.get<LaunchConfiguration[]>("launchConfigurations");
+            let subKey: string = "launchConfigurations";
+            let updatedLaunchConfigurations : LaunchConfiguration[] | undefined = workspaceConfiguration.get<LaunchConfiguration[]>(subKey);
             if (!util.areEqual(updatedLaunchConfigurations, launchConfigurations)) {
                 // Changing a launch configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
-                logger.message("Launch configurations setting changed.");
-                readCurrentLaunchConfiguration();
+                readCurrentLaunchConfiguration(); // this gets a refreshed view of all launch configurations
+                                                  // and also updates the current one in case it was affected
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedDefaultLaunchConfiguration : DefaultLaunchConfiguration | undefined = workspaceConfiguration.get<DefaultLaunchConfiguration>("defaultLaunchConfiguration");
+            subKey = "defaultLaunchConfiguration";
+            let updatedDefaultLaunchConfiguration : DefaultLaunchConfiguration | undefined = workspaceConfiguration.get<DefaultLaunchConfiguration>(subKey);
             if (!util.areEqual(updatedDefaultLaunchConfiguration, defaultLaunchConfiguration)) {
                 // Changing a global debug configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
-                logger.message("makefile.defaultLaunchConfiguration setting changed.");
                 readDefaultLaunchConfiguration();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>("buildLog");
+            subKey = "loggingLevel";
+            let updatedLoggingLevel : string | undefined = workspaceConfiguration.get<string>(subKey);
+            if (updatedLoggingLevel !== loggingLevel) {
+                readLoggingLevel();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "buildLog";
+            let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedBuildLog) {
                 updatedBuildLog = util.resolvePathToRoot(updatedBuildLog);
             }
             if (updatedBuildLog !== buildLog) {
                 extension.getState().configureDirty = true;
-                logger.message("makefile.buildLog setting changed.");
                 readBuildLog();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>("extensionLog");
+            subKey = "extensionLog";
+            let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedExtensionLog) {
                 updatedExtensionLog = util.resolvePathToRoot(updatedExtensionLog);
             }
             if (updatedExtensionLog !== extensionLog) {
                 // No IntelliSense update needed.
-                logger.message("makefile.extensionLog setting changed.");
                 readExtensionLog();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedPreConfigureScript : string | undefined = workspaceConfiguration.get<string>("preConfigureScript");
+            subKey = "preConfigureScript";
+            let updatedPreConfigureScript : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedPreConfigureScript) {
                 updatedPreConfigureScript = util.resolvePathToRoot(updatedPreConfigureScript);
             }
             if (updatedPreConfigureScript !== preConfigureScript) {
                 // No IntelliSense update needed.
-                logger.message("makefile.preConfigureScript setting changed.");
                 readPreConfigureScript();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedAlwaysPreConfigure : boolean | undefined = workspaceConfiguration.get<boolean>("alwaysPreConfigure");
+            subKey = "alwaysPreConfigure";
+            let updatedAlwaysPreConfigure : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedAlwaysPreConfigure !== alwaysPreConfigure) {
                 // No IntelliSense update needed.
-                logger.message("makefile.alwaysPreConfigure setting changed.");
                 readAlwaysPreConfigure();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>("configurationCache");
+            subKey = "configurationCache";
+            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedConfigurationCache) {
                 updatedConfigurationCache = util.resolvePathToRoot(updatedConfigurationCache);
             }
@@ -752,27 +774,26 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // A change in makefile.configurationCache should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
-                logger.message("makefile.configurationCache setting changed.");
                 readConfigurationCache();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedMakePath : string | undefined = workspaceConfiguration.get<string>("makePath");
+            subKey = "makePath";
+            let updatedMakePath : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedMakePath) {
                 updatedMakePath = util.resolvePathToRoot(updatedMakePath);
             }
             if (updatedMakePath !== makePath) {
                 // Not very likely, but it is safe to consider that a different make tool
                 // may produce a different dry-run output with potential impact on IntelliSense,
-                // so trigger an update.
-                logger.message("makefile.makePath setting changed.");
-
-                // A change in makefile.makePath should trigger an IntelliSense update
-                // only if the extension is not currently reading from a build log.
+                // so trigger an update (unless we read from a build log).
                 extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakePath();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedMakefilePath : string | undefined = workspaceConfiguration.get<string>("makefilePath");
+            subKey = "makefilePath";
+            let updatedMakefilePath : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedMakefilePath) {
                 updatedMakefilePath = util.resolvePathToRoot(updatedMakefilePath);
             }
@@ -780,49 +801,75 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // A change in makefile.makefilePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
-                logger.message("makefile.makefilePath setting changed.");
                 readMakefilePath();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedMakefileConfigurations : MakefileConfiguration[] | undefined = workspaceConfiguration.get<MakefileConfiguration[]>("configurations");
+            subKey = "configurations";
+            let updatedMakefileConfigurations : MakefileConfiguration[] | undefined = workspaceConfiguration.get<MakefileConfiguration[]>(subKey);
             if (!util.areEqual(updatedMakefileConfigurations, makefileConfigurations)) {
                 // todo: skip over updating the IntelliSense configuration provider if the current makefile configuration
                 // is not among the subobjects that suffered modifications.
-                logger.message("makefile.configurations setting changed.");
                 extension.getState().configureDirty = true;
                 readMakefileConfigurations();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedDryrunSwitches : string[] | undefined = workspaceConfiguration.get<string[]>("dryrunSwitches");
+            subKey = "dryrunSwitches";
+            let updatedDryrunSwitches : string[] | undefined = workspaceConfiguration.get<string[]>(subKey);
             if (!util.areEqual(updatedDryrunSwitches, dryrunSwitches)) {
                 // A change in makefile.dryrunSwitches should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
-                logger.message("makefile.dryrunSwitches setting changed.");
                 readDryrunSwitches();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedConfigureOnOpen : boolean | undefined = workspaceConfiguration.get<boolean>("configureOnOpen");
+            subKey = "configureOnOpen";
+            let updatedConfigureOnOpen : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedConfigureOnOpen !== configureOnOpen) {
-                logger.message("makefile.configureOnOpen setting changed.");
                 readConfigureOnOpen();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedConfigureOnEdit : boolean | undefined = workspaceConfiguration.get<boolean>("configureOnEdit");
+            subKey = "configureOnEdit";
+            let updatedConfigureOnEdit : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedConfigureOnEdit !== configureOnEdit) {
-                logger.message("makefile.configureOnEdit setting changed.");
                 readConfigureOnEdit();
+                updatedSettingsSubkeys.push(subKey);
             }
 
-            let updatedConfigureAfterCommand : boolean | undefined = workspaceConfiguration.get<boolean>("configureAfterCommand");
+            subKey = "configureAfterCommand";
+            let updatedConfigureAfterCommand : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedConfigureAfterCommand !== configureAfterCommand) {
-                logger.message("makefile.configureAfterCommand setting changed.");
                 readConfigureAfterCommand();
+                updatedSettingsSubkeys.push(subKey);
             }
 
             // Final updates in some constructs that depend on more than one of the above settings.
             if (extension.getState().configureDirty) {
                 analyzeConfigureParams();
+            }
+
+            // Report all the settings changes detected by now.
+            // TODO: to avoid unnecessary telemetry processing, evaluate whether the changes done
+            // in the object makefile.launchConfigurations and makefile.configurations
+            // apply exactly to the current launch configuration, since we don't collect and aggregate
+            // information from all the array yet.
+            updatedSettingsSubkeys.forEach(subKey => {
+                let key: string = keyRoot + "." + subKey;
+                logger.message(`${key} setting changed.`);
+                try {
+                    telemetryProperties = telemetry.analyzeSettings(workspaceConfiguration[subKey], key,
+                    util.thisExtensionPackage().contributes.configuration.properties[key],
+                    telemetryProperties);
+                } catch (e) {
+                    logger.message(e.message);
+                }
+            });
+
+            if (telemetryProperties && util.hasProperties(telemetryProperties)) {
+                telemetry.logEvent("settingsChanged", telemetryProperties);
             }
         }
       });
@@ -856,22 +903,49 @@ export async function setNewConfiguration(): Promise<void> {
 
     const items: string[] = prepareConfigurationsQuickPick();
 
-    let options : vscode.QuickPickOptions = {};
+    let options: vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
     const chosen: string | undefined = await vscode.window.showQuickPick(items, options);
-    if (chosen) {
-        if (chosen !== getCurrentMakefileConfiguration()) {
-            const telemetryProperties: telemetry.Properties = {
-                state: "makefileConfiguration"
-            };
-            telemetry.logEvent("stateChanged", telemetryProperties);
-        }
+    if (chosen && chosen !== getCurrentMakefileConfiguration()) {
+        let telemetryProperties: telemetry.Properties | null = {
+            state: "makefileConfiguration"
+        };
+        telemetry.logEvent("stateChanged", telemetryProperties);
 
         setConfigurationByName(chosen);
 
         if (configureAfterCommand) {
             logger.message("Automatically reconfiguring the project after a makefile configuration change.");
             await make.cleanConfigure("makefile configuration change and makefile.configureAfterCommand");
+        }
+
+        // Refresh telemetry for this new makefile configuration
+        // (this will find the corresponding item in the makefile.configurations array
+        // and report all the relevant settings of that object).
+        // Because of this, the event name is still "settingsChanged", even if
+        // we're doing a state change now.
+        let keyRoot: string = "makefile";
+        let subKey: string = "configurations";
+        let key: string = keyRoot + "." + subKey;
+        let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(keyRoot);
+        telemetryProperties = {};
+
+        // We should have at least one item in the configurations array
+        // if the extension changes state for launch configuration,
+        // but guard just in case.
+        let makefileonfigurationSetting: any = workspaceConfiguration[subKey];
+        if (makefileonfigurationSetting) {
+            try {
+                telemetryProperties = telemetry.analyzeSettings(makefileonfigurationSetting, key,
+                util.thisExtensionPackage().contributes.configuration.properties[key],
+                telemetryProperties);
+            } catch (e) {
+                logger.message(e.message);
+            }
+
+            if (telemetryProperties && util.hasProperties(telemetryProperties)) {
+                telemetry.logEvent("settingsChanged", telemetryProperties);
+            }
         }
     }
 }
@@ -925,13 +999,11 @@ export async function selectTarget(): Promise<void> {
 
     const chosen: string | undefined = await vscode.window.showQuickPick(buildTargets, options);
 
-    if (chosen) {
-        if (chosen !== getCurrentMakefileConfiguration()) {
-            const telemetryProperties: telemetry.Properties = {
-                state: "buildTarget"
-            };
-            telemetry.logEvent("stateChanged", telemetryProperties);
-        }
+    if (chosen && chosen !== getCurrentTarget()) {
+        const telemetryProperties: telemetry.Properties = {
+            state: "buildTarget"
+        };
+        telemetry.logEvent("stateChanged", telemetryProperties);
 
         setTargetByName(chosen);
 
@@ -1012,14 +1084,44 @@ export async function selectLaunchConfiguration(): Promise<void> {
     const chosen: string | undefined = await vscode.window.showQuickPick(launchTargets, options);
 
     if (chosen) {
-        if (chosen !== getCurrentMakefileConfiguration()) {
-            const telemetryProperties: telemetry.Properties = {
+        let currentLaunchConfiguration: LaunchConfiguration | undefined = getCurrentLaunchConfiguration();
+        if (!currentLaunchConfiguration || chosen !== launchConfigurationToString(currentLaunchConfiguration)) {
+            let telemetryProperties: telemetry.Properties | null = {
                 state: "launchConfiguration"
             };
             telemetry.logEvent("stateChanged", telemetryProperties);
-        }
 
-        setLaunchConfigurationByName(chosen);
+            setLaunchConfigurationByName(chosen);
+
+            // Refresh telemetry for this new launch configuration
+            // (this will find the corresponding item in the makefile.launchConfigurations array
+            // and report all the relevant settings of that object).
+            // Because of this, the event name is still "settingsChanged", even if
+            // we're doing a state change now.
+            let keyRoot: string = "makefile";
+            let subKey: string = "launchConfigurations";
+            let key: string = keyRoot + "." + subKey;
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(keyRoot);
+            telemetryProperties = {};
+
+            // We should have at least one item in the launchConfigurations array
+            // if the extension changes state for launch configuration,
+            // but guard just in case.
+            let launchConfigurationSetting: any = workspaceConfiguration[subKey];
+            if (launchConfigurationSetting) {
+                try {
+                    telemetryProperties = telemetry.analyzeSettings(launchConfigurationSetting, key,
+                    util.thisExtensionPackage().contributes.configuration.properties[key],
+                    telemetryProperties);
+                } catch (e) {
+                    logger.message(e.message);
+                }
+
+                if (telemetryProperties && util.hasProperties(telemetryProperties)) {
+                    telemetry.logEvent("settingsChanged", telemetryProperties);
+                }
+            }
+        }
     }
 }
 

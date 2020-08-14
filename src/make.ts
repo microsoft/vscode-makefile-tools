@@ -1,7 +1,7 @@
 // Support for make operations
 
 import * as configuration from './configuration';
-import * as ext from './extension';
+import {extension, updateProvider} from './extension';
 import * as fs from 'fs';
 import * as logger from './logger';
 import * as parser from './parser';
@@ -101,7 +101,7 @@ function processTargetForTelemetry(target: string | undefined): string {
         return target;
     }
 
-    return "private info";
+    return "..."; // private undisclosed info
 }
 
 // PID of the process that may be running currently.
@@ -123,7 +123,7 @@ export async function buildTarget(cause: string, target: string, clean: boolean 
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
     let configureExitCode: number | undefined; // used for telemetry
     let configureElapsedTime: number | undefined; // used for telemetry
-    if (ext.extension.getState().configureDirty) {
+    if (extension.getState().configureDirty) {
         logger.message("The project needs to configure in order to build properly the current target.");
         if (configuration.getConfigureAfterCommand()) {
             configureExitCode = await cleanConfigure("configure dirty and makefile.configureAfterCommand on build target");
@@ -519,8 +519,8 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
 export async function configure(cause: string, updateTargets: boolean = true): Promise<number> {
     // Mark that this workspace had at least one attempt at configuring, before any chance of early return,
     // to accurately identify whether this project configured successfully out of the box or not.
-    let ranConfigureInCodebaseLifetime: boolean = ext.extension.getState().ranConfigureInCodebaseLifetime || false;
-    ext.extension.getState().ranConfigureInCodebaseLifetime = true;
+    let ranConfigureInCodebaseLifetime: boolean = extension.getState().ranConfigureInCodebaseLifetime || false;
+    extension.getState().ranConfigureInCodebaseLifetime = true;
 
     if (blockedByOp(Operations.configure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
@@ -676,14 +676,14 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
     if (cancelConfigure) {
         cancelConfigure = false;
         logger.message("Exiting early from the configure process.");
-        ext.extension.getState().configureDirty = true;
+        extension.getState().configureDirty = true;
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
 
     // Configure IntelliSense
     configureSubPhase = determineConfigureSubPhase("Updating CppTools custom IntelliSense provider.", recursiveDoConfigure);
     logger.message(`Parsing for IntelliSense from: "${parseFile}"`);
-    await ext.updateProvider(parseContent || "");
+    await updateProvider(parseContent || "");
 
     configureSubPhase = determineConfigureSubPhase("Parsing launch targets.", recursiveDoConfigure);
 
@@ -728,7 +728,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
             if (cancelConfigure) {
                 cancelConfigure = false;
                 logger.message("Exiting early from the configure process.");
-                ext.extension.getState().configureDirty = true;
+                extension.getState().configureDirty = true;
                 return ConfigureBuildReturnCodeTypes.cancelled;
             }
 
@@ -789,7 +789,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
         }
     }
 
-    ext.extension.getState().configureDirty = false;
+    extension.getState().configureDirty = false;
     configureSubPhase = "not started";
 
     // If we have a retc3 result, it doesn't matter what retc1 and retc2 are.

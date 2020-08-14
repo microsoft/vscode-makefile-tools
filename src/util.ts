@@ -298,10 +298,21 @@ export function removeQuotes(str: string): string {
     return str;
 }
 
-// Helper to evaluate whether two settings objects represent the same content.
+// Helper to evaluate whether two settings (objects or simple types) represent the same content.
 // It recursively analyzes any inner subobjects and is also not affected
 // by a different order of properties.
 export function areEqual(setting1: any, setting2: any): boolean {
+    if (setting1 === null || setting1 === undefined ||
+        setting2 === null || setting2 === undefined) {
+        return setting1 === setting2;
+    }
+
+    // This is simply type
+    if (typeof (setting1) !== "function" && typeof (setting1) !== "object" &&
+        typeof (setting2) !== "function" && typeof (setting2) !== "object") {
+        return setting1 === setting2;
+    }
+
     let properties1: string[] = Object.getOwnPropertyNames(setting1);
     let properties2: string[] = Object.getOwnPropertyNames(setting2);
 
@@ -326,6 +337,35 @@ export function areEqual(setting1: any, setting2: any): boolean {
     return true;
 }
 
+// Answers whether the given object has at least one property.
+export function hasProperties(obj: any): boolean {
+    if (obj === null || obj === undefined) {
+        return false;
+    }
+
+    let props: string[] = Object.getOwnPropertyNames(obj);
+    return props && props.length > 0;
+}
+
+// Apply any properties from source to destination, logging for overwrite.
+// To make things simpler for the caller, create a valid dst if given null or undefined.
+export function mergeProperties(dst: any, src: any): any {
+    let props: string[] = src ? Object.getOwnPropertyNames(src) : [];
+    props.forEach(prop => {
+        if (!dst) {
+            dst = {};
+        }
+
+        if (dst[prop] !== undefined) {
+            logger.message(`Destination object already has property ${prop} set to ${dst[prop]}. Overwriting from source with ${src[prop]}`);
+        }
+
+        dst[prop] = src[prop];
+    });
+
+    return dst;
+}
+
 export function reportDryRunError(): void {
     logger.message(`You can see the detailed dry-run output at ${configuration.getConfigurationCache()}`);
     logger.message("Make sure that the extension is invoking the same make command as in your development prompt environment.");
@@ -345,7 +385,7 @@ export function resolvePathToRoot(relPath: string): string {
 }
 
 export function thisExtension(): vscode.Extension<any> {
-    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('ms-vscode.cmake-tools');
+    const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('ms-vscode.makefile-tools');
     if (!ext) {
       throw new Error("Our own extension is null.");
     }
@@ -357,14 +397,17 @@ export interface PackageJSON {
     name: string;
     publisher: string;
     version: string;
+    contributes: any;
 }
 
 export function thisExtensionPackage(): PackageJSON {
     const pkg: PackageJSON = thisExtension().packageJSON as PackageJSON;
+
     return {
       name: pkg.name,
       publisher: pkg.publisher,
       version: pkg.version,
+      contributes: pkg.contributes
     };
 }
 

@@ -117,10 +117,7 @@
             "title": "makefile",
             "properties": {
                 "makefile.configurations": {
-                    "type": [
-                        "array",
-                        null
-                    ],
+                    "type": "array",
                     "default": [],
                     "description": "The user defined makefile configurations",
                     "items": {
@@ -157,10 +154,7 @@
                     "scope": "resource"
                 },
                 "makefile.defaultLaunchConfiguration": {
-                    "type": [
-                        "object",
-                        null
-                    ],
+                    "type": "object",
                     "default": null,
                     "description": "Various global debugger settings",
                     "properties": {
@@ -189,10 +183,7 @@
                     "scope": "resource"
                 },
                 "makefile.launchConfigurations": {
-                    "type": [
-                        "array",
-                        null
-                    ],
+                    "type": "array",
                     "default": [],
                     "description": "The user defined launch (debug/run) configurations",
                     "items": {
@@ -241,10 +232,7 @@
                     "scope": "resource"
                 },
                 "makefile.loggingLevel": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": "string",
                     "enum": [
                         "Normal",
                         "Verbose",

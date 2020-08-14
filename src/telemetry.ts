@@ -1,5 +1,6 @@
 // Telemetry.ts
 
+import * as configuration from './configuration';
 import * as logger from './logger';
 import * as util from './util';
 import TelemetryReporter from 'vscode-extension-telemetry';
@@ -48,6 +49,208 @@ export function logEvent(eventName: string, properties?: Properties, measures?: 
             logger.message(`measures: ${Object.getOwnPropertyNames(measures).map(k => `${k} = "${measures[k]}"`).concat()}`);
         }
     }
+}
+
+// Allow-lists for various settings.
+// Setting: represents the property value. Even if right now is not needed,
+// it may be needed in future for other settings, when the value is part of the decision
+// to report the information as telemetry or hide it.
+// Key: represents the property name
+function settingAllowed(setting: string, key: string) : boolean {
+    if (key === "makefile.dryrunSwitches") {
+        return true;
+    }
+
+    return false;
+}
+
+// Detect which item from the given array setting is relevant for telemetry.
+// Return the index in the array or -1 if we don't find a match.
+// The telemetry is not yet collecting settings information from all items of an array.
+// Until this will be needed, we pick the item in the array that corresponds
+// to some current state value.
+// Example: don't report telemetry for all launch configurations but only for
+// the current launch configuration.
+function activeArrayItem(setting: string, key: string): number {
+    if (key === "makefile.configurations") {
+        let makefileConfigurations: configuration.MakefileConfiguration[] = configuration.getMakefileConfigurations();
+        let currentMakefileConfigurationName: string | undefined = configuration.getCurrentMakefileConfiguration();
+        if (!currentMakefileConfigurationName) {
+            return -1;
+        }
+
+        let currentMakefileConfiguration: configuration.MakefileConfiguration | undefined = makefileConfigurations.find(config => {
+            if (config.name === currentMakefileConfigurationName) {
+                return config;
+            }
+        });
+
+        return currentMakefileConfiguration ? makefileConfigurations.indexOf(currentMakefileConfiguration) : -1;
+    }
+
+    if (key === "makefile.launchConfigurations") {
+        let launchConfigurations: configuration.LaunchConfiguration[] = configuration.getLaunchConfigurations();
+        let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = launchConfigurations.find(config => {
+            if (util.areEqual(config, configuration.getCurrentLaunchConfiguration())) {
+                return config;
+            }
+        });
+
+        return currentLaunchConfiguration ? launchConfigurations.indexOf(currentLaunchConfiguration) : -1;
+    }
+
+    return -1;
+}
+
+// Filter the array item indexes from the key since for now, when we analyze an array,
+// we pick one item that corresponds to a current state of the project.
+// Example: makefile.configurations.0.name ==> makefile.configurations.name
+// The extension currently has a settings structure with only one level of objects arrays
+// (makefile.configurations and makefile.launchConfigurations).
+// Other arrays are of simple type (like make or executable arguments, dryrun switches)
+// and don't create a key that would have 2 numerical properties
+// (there is no makefile.configurations.1.makeArgs.2.something).
+// So, eliminate only one numerical (if exists) before the last dot in this key string.
+// We still need the complete key for anything else than the telemetry properties
+// (example: validation errors are more clear when an array item is highlighted).
+// This helper should be called when a property is ready to be collected for telemetry.
+// Calling this earlier would result in different dot patterns.
+function filterKey(key: string): string {
+    let filteredKey: string = key;
+    let lastDot: number = key.lastIndexOf(".");
+    let beforeLastDot: number = key.lastIndexOf(".", lastDot - 1);
+    if (lastDot !== -1 && beforeLastDot !== -1) {
+        let lastProp: any = key.substring(beforeLastDot + 1, lastDot);
+        let numericalProp: number = Number.parseInt(lastProp);
+        if (!Number.isNaN(numericalProp)) {
+            filteredKey = filteredKey.replace(`${numericalProp}.`, "");
+        }
+    }
+
+    return filteredKey;
+}
+
+// Analyze recursively all the settings for telemetry and type validation.
+// Return all the telemetry properties that have been collected throughout this recursive process.
+// If telemetryProperties is null, this function performs only type validation.
+// If analyzeSettings gets called before a configure (or after an unsuccesful one), it is possible to have
+// inaccurate or incomplete telemetry information for makefile and launch configurations.
+// This is not very critical since any of their state changes will update telemetry for them.
+export function analyzeSettings(setting: any, key: string, propJson: any, telemetryProperties: Properties | null): Properties | null {
+    let type : string = typeof (setting);
+    let jsonType : string | undefined = propJson.type ? propJson.type : undefined;
+
+    // Skip anything else if the current setting represents a function.
+    if (type === "function") {
+        return telemetryProperties;
+    }
+
+    // Interested to continue only for properties that are different than their defaults.
+    if (util.areEqual(propJson.default, setting)) {
+        return telemetryProperties;
+    }
+
+    // The type "array" defined in package.json is seen as object by the workspace setting type.
+    // Not all package.json constructs have a type (example: configuration properties list)
+    // but the workspace setting type sees them as object.
+    if (jsonType !== type && jsonType !== undefined && (type !== "object" || jsonType !== "array")) {
+        logger.message(`Settings versus package.json type mismatch for "${key}".`);
+    }
+
+    // Enum values always safe to report.
+    let enumValues: any[] = propJson.enum;
+    if (enumValues && enumValues.length > 0) {
+        if (!enumValues.includes(setting)) {
+            logger.message(`Invalid value "${setting}" for enum "${key}". Only "${enumValues.join(";")}" values are allowed."`);
+            if (telemetryProperties) {
+                telemetryProperties[filterKey(key)] = "invalid";
+            }
+        } else if (telemetryProperties) {
+            telemetryProperties[filterKey(key)] = setting;
+        }
+
+        return telemetryProperties;
+    }
+
+    // When propJson does not have a type defined (for example at the root scope)
+    // use the setting type. We use the setting type second because it sees array as object.
+    switch (jsonType || type) {
+        // Report numbers and booleans since there is no private information in such types.
+        case "boolean": /* falls through */
+        case "number":
+            if (telemetryProperties) {
+                telemetryProperties[filterKey(key)] = setting;
+            }
+            break;
+
+        // Apply allow-lists for strings.
+        case "string":
+            if (telemetryProperties) {
+                telemetryProperties[filterKey(key)] = settingAllowed(setting, key) ? setting : "...";
+            }
+            break;
+
+        case "array":
+            // We are interested in logging arrays of basic types
+            if (telemetryProperties && propJson.items.type !== "object" && propJson.items.type !== "array") {
+                telemetryProperties[filterKey(key)] = settingAllowed(setting, key) ? setting.join(";") : "...";
+                break;
+            }
+            /* falls through */
+
+        case "object":
+            let settingsProps: string[] = Object.getOwnPropertyNames(setting);
+            let index: number = -1;
+            let active: number = 0;
+            if (jsonType === "array") {
+                active = activeArrayItem(setting, key);
+            }
+
+            settingsProps.forEach(prop => {
+                index++;
+                let jsonProps: any;
+                if (jsonType === "array") {
+                    jsonProps = propJson.items.properties || propJson.items;
+                } else {
+                    let newProp: string = (key === "makefile") ? `${key}.` + prop : prop;
+                    if (propJson.properties) {
+                        jsonProps = Object.getOwnPropertyNames(propJson.properties).includes(newProp) ?
+                                    propJson.properties[newProp] : undefined;
+                    } else {
+                        jsonProps = Object.getOwnPropertyNames(propJson).includes(newProp) ?
+                                    propJson[newProp] : undefined;
+                    }
+                }
+
+                // The user defined a setting property wrong (example miMode instead of MIMode).
+                // Exceptions are 'has', 'get', 'update' and 'inspect' for the makefile root.
+                // They are functions and we can use this type to make the exclusion..
+                if (jsonProps === undefined) {
+                    if (typeof (setting[prop]) !== "function") {
+                        logger.message(`Schema mismatch between settings and package.json for property "${key}.${prop}"`);
+                    }
+                } else {
+                    // Skip if the analyzed prop is a function or if it's the length of an array.
+                    if (type !== "function" /*&& jsonType !== undefined*/ &&
+                        (jsonType !== "array" || prop !== "length")) {
+                        let newTelemetryProperties: Properties | null = {};
+                        newTelemetryProperties = analyzeSettings(setting[prop], key + "." + prop, jsonProps,
+                            ((jsonType !== "array" || index === active)) ? newTelemetryProperties : null);
+
+                        // If telemetryProperties is null, it means we're not interested in reporting any telemetry for this subtree
+                        if (telemetryProperties) {
+                            telemetryProperties = util.mergeProperties(telemetryProperties, newTelemetryProperties);
+                        }
+                    }
+                }
+            });
+            break;
+
+        default:
+            break;
+    }
+
+    return telemetryProperties;
 }
 
 function createReporter(): TelemetryReporter | null {

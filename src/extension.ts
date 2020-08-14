@@ -218,6 +218,21 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             await make.configure("makefile.configureOnOpen");
         }
     }
+
+    // Analyze settings for type validation and telemetry
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    let telemetryProperties: telemetry.Properties | null = {};
+    try {
+        telemetryProperties = telemetry.analyzeSettings(workspaceConfiguration, "makefile",
+        util.thisExtensionPackage().contributes.configuration.properties,
+        telemetryProperties);
+    } catch (e) {
+        logger.message(e.message);
+    }
+
+    if (telemetryProperties && util.hasProperties(telemetryProperties)) {
+        telemetry.logEvent("settings", telemetryProperties);
+    }
 }
 
 export async function deactivate(): Promise<void> {
