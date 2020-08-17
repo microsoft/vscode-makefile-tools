@@ -36,17 +36,20 @@ export function deactivate(): void {
 
 export function logEvent(eventName: string, properties?: Properties, measures?: Measures): void {
     if (telemetryReporter) {
-        // Log instead of sending real telemetry, until we stabilize a bit this feature of Makefile Tools extension
-        //telemetryReporter.sendTelemetryEvent(eventName, properties, measures);
+        try {
+            telemetryReporter.sendTelemetryEvent(eventName, properties, measures);
+        } catch (e) {
+            logger.message(e.message);
+        }
 
-        logger.message(`Sending telemetry: eventName = ${eventName}`);
+        logger.message(`Sending telemetry: eventName = ${eventName}`, "Debug");
 
         if (properties) {
-            logger.message(`properties: ${Object.getOwnPropertyNames(properties).map(k => `${k} = "${properties[k]}"`).concat()}`);
+            logger.message(`properties: ${Object.getOwnPropertyNames(properties).map(k => `${k} = "${properties[k]}"`).concat()}`, "Debug");
         }
 
         if (measures) {
-            logger.message(`measures: ${Object.getOwnPropertyNames(measures).map(k => `${k} = "${measures[k]}"`).concat()}`);
+            logger.message(`measures: ${Object.getOwnPropertyNames(measures).map(k => `${k} = "${measures[k]}"`).concat()}`, "Debug");
         }
     }
 }
