@@ -50,7 +50,9 @@
         "onCommand:makefile.launchDebug",
         "onCommand:makefile.launchRun",
         "onCommand:makefile.configure",
+        "onCommand:makefile.cleanConfigure",
         "onCommand:makefile.preConfigure",
+        "onCommand:makefile.resetState",
         "workspaceContains:makefile",
         "workspaceContains:Makefile"
     ],
@@ -98,8 +100,16 @@
                 "title": "Makefile: Configure"
             },
             {
+                "command": "makefile.cleanConfigure",
+                "title": "Makefile: Clean configure"
+            },
+            {
                 "command": "makefile.preConfigure",
-                "title": "Makefile: Preconfigure"
+                "title": "Makefile: Pre-Configure"
+            },
+            {
+                "command": "makefile.resetState",
+                "title": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)"
             }
         ],
         "configuration": {
@@ -107,10 +117,7 @@
             "title": "makefile",
             "properties": {
                 "makefile.configurations": {
-                    "type": [
-                        "array",
-                        null
-                    ],
+                    "type": "array",
                     "default": [],
                     "description": "The user defined makefile configurations",
                     "items": {
@@ -147,10 +154,7 @@
                     "scope": "resource"
                 },
                 "makefile.defaultLaunchConfiguration": {
-                    "type": [
-                        "object",
-                        null
-                    ],
+                    "type": "object",
                     "default": null,
                     "description": "Various global debugger settings",
                     "properties": {
@@ -179,10 +183,7 @@
                     "scope": "resource"
                 },
                 "makefile.launchConfigurations": {
-                    "type": [
-                        "array",
-                        null
-                    ],
+                    "type": "array",
                     "default": [],
                     "description": "The user defined launch (debug/run) configurations",
                     "items": {
@@ -231,10 +232,7 @@
                     "scope": "resource"
                 },
                 "makefile.loggingLevel": {
-                    "type": [
-                        "string",
-                        "null"
-                    ],
+                    "type": "string",
                     "enum": [
                         "Normal",
                         "Verbose",
@@ -276,7 +274,7 @@
                 },
                 "makefile.dryrunSwitches": {
                     "type": "array",
-                    "default": ["--always-make", "--keep-going", "--print-data-base"],
+                    "default": ["--always-make", "--keep-going", "--print-data-base", "--print-directory"],
                     "description": "Arguments to pass to the dry-run make invocation",
                     "items": {
                         "type": "string"
@@ -301,15 +299,15 @@
                     "description": "Automatically configure Makefile project directories after relevant operations, like change build configuration or makefile target",
                     "scope": "resource"
                 },
-                "makefile.preconfigureScript": {
+                "makefile.preConfigureScript": {
                     "type": "string",
                     "description": "The path to the script that needs to be run at least once before configure",
                     "default": null,
                     "scope": "resource"
                 },
-                "makefile.alwaysPreconfigure": {
+                "makefile.alwaysPreConfigure": {
                     "type": "boolean",
-                    "description": "Always run the preconfigure script before configure",
+                    "description": "Always run the pre-configure script before configure",
                     "default": false,
                     "scope": "resource"
                 }
@@ -339,6 +337,7 @@
         "glob": "^7.1.6",
         "module-alias": "^2.2.2",
         "vscode-cpptools": "^4.0.1",
+        "vscode-extension-telemetry": "^0.1.2",
         "vscode-jsonrpc": "^3.6.2"
     }
 }

@@ -3,9 +3,18 @@
 import * as configuration from './configuration';
 import * as extension from './extension';
 import * as logger from './logger';
+import * as make from './make';
 import * as path from 'path';
+import * as telemetry from './telemetry';
 import * as util from './util';
 import * as vscode from 'vscode';
+
+export enum LaunchStatuses {
+    success = "success",
+    blocked = "blocked by (pre)configure or build",
+    noLaunchConfigurationSet = "no launch configuration set by the user",
+    launchTargetsListEmpty = "launch targets list empty"
+}
 
 let launcher: Launcher;
 
@@ -80,15 +89,7 @@ export class Launcher implements vscode.Disposable {
     //      because the debugger knows how to find automatically the right lldb-mi when miMode is lldb and miDebuggerPath is undefined
     //      (this is true for systems older than Catalina).
     // Additionally, cppvsdbg ignores miMode and miDebuggerPath.
-    public prepareDebugCurrentTarget(): vscode.DebugConfiguration | undefined {
-        let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
-        if (!currentLaunchConfiguration) {
-            vscode.window.showErrorMessage("Currently there is no launch configuration set.");
-            logger.message("Cannot start debugging because there is no launch configuration set. " +
-                "Define one in the settings file or use makefile.setLaunchConfiguration");
-            return undefined;
-        }
-
+    public prepareDebugCurrentTarget(currentLaunchConfiguration: configuration.LaunchConfiguration): vscode.DebugConfiguration {
         let args: string[] = this.launchTargetArgs();
 
         let compilerPath : string | undefined = extension.extension.getCompilerFullPath();
@@ -160,9 +161,46 @@ export class Launcher implements vscode.Disposable {
         return debugConfig;
     }
 
+    async validateLaunchConfiguration(op: make.Operations): Promise<string> {
+        // Cannot debug the project if it is currently building or (pre-)configuring.
+        if (make.blockedByOp(op)) {
+            return LaunchStatuses.blocked;
+        }
+
+        let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
+        if (!currentLaunchConfiguration) {
+            // If no launch configuration is set, give the user a chance to select one now from the quick pick
+            // (unless we know it's going to be empty).
+            if (configuration.getLaunchTargets().length === 0) {
+                vscode.window.showErrorMessage(`Cannot ${op} because there is no launch configuration set` +
+                    " and the list of launch targets is empty. Double check the makefile configuration and the build target.");
+                return LaunchStatuses.launchTargetsListEmpty;
+            } else {
+                vscode.window.showErrorMessage(`Cannot ${op} because there is no launch configuration set. Choose one from the quick pick.`);
+                await configuration.selectLaunchConfiguration();
+
+                // Read again the current launch configuration. If a current launch configuration is stil not set
+                // (the user cancelled the quick pick or the parser found zero launch targets) message and fail.
+                currentLaunchConfiguration = configuration.getCurrentLaunchConfiguration();
+                if (!currentLaunchConfiguration) {
+                    vscode.window.showErrorMessage(`Cannot ${op} until you select an active launch configuration.`);
+                    return LaunchStatuses.noLaunchConfigurationSet;
+                }
+            }
+        }
+
+        return LaunchStatuses.success;
+    }
+
     public async debugCurrentTarget(): Promise<vscode.DebugSession | undefined> {
-        let debugConfig: vscode.DebugConfiguration | undefined = this.prepareDebugCurrentTarget();
-        if (debugConfig) {
+        let status: string = await this.validateLaunchConfiguration(make.Operations.debug);
+        let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined;
+        if (status === LaunchStatuses.success) {
+            currentLaunchConfiguration = configuration.getCurrentLaunchConfiguration();
+        }
+
+        if (currentLaunchConfiguration) {
+            let debugConfig: vscode.DebugConfiguration = this.prepareDebugCurrentTarget(currentLaunchConfiguration);
             let startFolder: vscode.WorkspaceFolder;
             if (vscode.workspace.workspaceFolders) {
                 startFolder = vscode.workspace.workspaceFolders[0];
@@ -171,8 +209,17 @@ export class Launcher implements vscode.Disposable {
                 await vscode.debug.startDebugging(undefined, debugConfig);
             }
 
-            return vscode.debug.activeDebugSession;
+            if (!vscode.debug.activeDebugSession) {
+                status = "failed";
+            }
         }
+
+        let telemetryProperties: telemetry.Properties = {
+            status: status
+        };
+        telemetry.logEvent("debug", telemetryProperties);
+
+        return vscode.debug.activeDebugSession;
     }
 
     private launchTerminal: vscode.Terminal | undefined;
@@ -186,15 +233,7 @@ export class Launcher implements vscode.Disposable {
 
     // Invoke a VS Code running terminal passing it all the information
     // from the current launch configuration
-    public prepareRunCurrentTarget(): string | undefined {
-        if (!configuration.getCurrentLaunchConfiguration()) {
-            vscode.window.showErrorMessage("Currently there is no launch configuration set.");
-            logger.message("Cannot run binary because there is no launch configuration set. " +
-                "Define one in the settings file or use makefile.setLaunchConfiguration");
-
-            return undefined;
-        }
-
+    public prepareRunCurrentTarget(): string {
         // Add a pair of quotes just in case there is a space in the binary path
         let terminalCommand: string = '"' + this.launchTargetPath() + '" ';
         terminalCommand += this.launchTargetArgs().join(" ");
@@ -218,11 +257,22 @@ export class Launcher implements vscode.Disposable {
             this.launchTerminal = vscode.window.createTerminal(terminalOptions);
         }
 
-        let terminalCommand: string | undefined = this.prepareRunCurrentTarget();
-        if (terminalCommand) {
+        let status: string = await this.validateLaunchConfiguration(make.Operations.run);
+        let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined;
+        if (status === LaunchStatuses.success) {
+            currentLaunchConfiguration = configuration.getCurrentLaunchConfiguration();
+        }
+
+        if (currentLaunchConfiguration) {
+            let terminalCommand: string = this.prepareRunCurrentTarget();
             this.launchTerminal.sendText(terminalCommand);
             this.launchTerminal.show();
         }
+
+        let telemetryProperties: telemetry.Properties = {
+            status: status
+        };
+        telemetry.logEvent("run", telemetryProperties);
 
         return this.launchTerminal;
     }

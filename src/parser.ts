@@ -1,4 +1,3 @@
-
 // TODO: support also the scenario of parsing a build log,
 // to overcome some of --dry-run limitations
 // (like some exceptions to the 'do not execute' rule
@@ -53,12 +52,6 @@ export function parseTargets(verboseLog: string): string[] {
         }
 
         result = regexpExtract.exec(verboseLog);
-    }
-
-    if (matches) {
-        logger.message("Found the following build targets: " + matches.join(";"));
-    } else {
-        logger.message("No targets found");
     }
 
     return matches;
@@ -531,7 +524,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
             // Parse the IntelliSense mode
             // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
             let targetArchitecture: util.TargetArchitecture = getTargetArchitecture(compilerTool.arguments);
-            let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(cpp.Version.latest, compilerFullPath, targetArchitecture);
+            let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(ext.extension.getCppToolsVersion(), compilerFullPath, targetArchitecture);
             logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
 
             // For windows, parse the sdk version
@@ -571,7 +564,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
                 // If the command is compiling the same extension or uses -TC/-TP, send all the source files in one batch.
             if (language) {
                 // More standard validation and defaults, in the context of the whole command.
-                let standard: util.StandardVersion = parseStandard(cpp.Version.latest, standardStr, language);
+                let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
                 logger.message("    Standard: " + standard, "Verbose");
 
                 if (ext.extension) {
@@ -588,7 +581,7 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
                     }
 
                     // More standard validation and defaults, in the context of each source file.
-                    let standard: util.StandardVersion = parseStandard(cpp.Version.latest, standardStr, language);
+                    let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
                     logger.message("    Standard: " + standard, "Verbose");
 
                     if (ext.extension) {
@@ -603,8 +596,6 @@ export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): v
 // Parse the output of the make dry-run command in order to provide VS Code debugger
 // with information about binaries, their execution paths and arguments
 export function parseForLaunchConfiguration(dryRunOutputStr: string): configuration.LaunchConfiguration[] {
-    logger.message('Parsing dry-run output for Launch (debug/run) configuration.');
-
     // Do some preprocessing on the dry-run output to make the RegExp parsing easier
     dryRunOutputStr = preprocessDryRunOutput(dryRunOutputStr);
 
@@ -832,8 +823,8 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
  * Determine the IntelliSenseMode based on hints from compiler path
  * and target architecture parsed from compiler flags.
  */
-function getIntelliSenseMode(cppVersion: cpp.Version, compilerPath: string, targetArch: util.TargetArchitecture): util.IntelliSenseMode {
-    const canUseArm: boolean = (cppVersion >= cpp.Version.v4);
+function getIntelliSenseMode(cppVersion: cpp.Version | undefined, compilerPath: string, targetArch: util.TargetArchitecture): util.IntelliSenseMode {
+    const canUseArm: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v4);
     const compilerName: string = path.basename(compilerPath || "").toLocaleLowerCase();
     if (compilerName === 'cl.exe') {
         const clArch: string = path.basename(path.dirname(compilerPath)).toLocaleLowerCase();
@@ -932,8 +923,8 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
     return targetArch;
 }
 
-function parseStandard(cppVersion: cpp.Version, std: string | undefined, language: util.Language): util.StandardVersion {
-    let canUseGnu: boolean = (cppVersion >= cpp.Version.v4);
+function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefined, language: util.Language): util.StandardVersion {
+    let canUseGnu: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v4);
     let standard: util.StandardVersion;
     if (!std) {
         // Standard defaults when no std switch is given
