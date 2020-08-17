@@ -51,18 +51,18 @@ export class MakefileToolsExtension {
         await this.ensureCppToolsProviderRegistered();
     }
 
-    // Similar to state.ranConfigureInCodebaseLifetime, but within the scope of a VSCode instance.
-    private ranConfigureInInstance: boolean = false;
-    public getRanConfigureInInstance() : boolean { return this.ranConfigureInInstance; }
+    // Similar to state.ranConfigureInCodebaseLifetime, but within the scope of a VSCode session.
+    private ranConfigureInSession: boolean = false;
+    public getRanConfigureInSession() : boolean { return this.ranConfigureInSession; }
 
     // Request a custom config provider update.
     public async updateCppToolsProvider(): Promise<void> {
         this.cppConfigurationProvider.logConfigurationProvider();
 
         if (this.cppToolsAPI) {
-            if (!this.ranConfigureInInstance && this.cppToolsAPI.notifyReady) {
+            if (!this.ranConfigureInSession && this.cppToolsAPI.notifyReady) {
                 this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
-                this.ranConfigureInInstance = true;
+                this.ranConfigureInSession = true;
             } else {
                 this.cppToolsAPI.didChangeCustomConfiguration(this.cppConfigurationProvider);
             }
@@ -134,19 +134,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', () => {
-        make.buildTarget("command pallette: buildTarget", configuration.getCurrentTarget() || "", false);
+        make.buildTarget(make.TriggeredBy.buildTarget, configuration.getCurrentTarget() || "", false);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanTarget', () => {
-        make.buildTarget("command pallette: buildCleanTarget", configuration.getCurrentTarget() || "", true);
+        make.buildTarget(make.TriggeredBy.buildCleanTarget, configuration.getCurrentTarget() || "", true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildAll', () => {
-        make.buildTarget("command pallette: buildAll", "all", false);
+        make.buildTarget(make.TriggeredBy.buildAll, "all", false);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanAll', () => {
-        make.buildTarget("command pallette: buildCleanAll", "all", true);
+        make.buildTarget(make.TriggeredBy.buildCleanAll, "all", true);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfiguration', () => {
@@ -182,15 +182,15 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', () => {
-        make.configure("command pallette: configure");
+        make.configure(make.TriggeredBy.configure);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.cleanConfigure', () => {
-        make.cleanConfigure("command pallette: cleanConfigure");
+        make.cleanConfigure(make.TriggeredBy.cleanConfigure);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.preConfigure', () => {
-        make.preConfigure("command pallette: preConfigure");
+        make.preConfigure(make.TriggeredBy.preconfigure);
     }));
 
     // Reset state - useful for troubleshooting.
@@ -213,9 +213,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     if (configuration.getConfigureOnOpen()) {
         if (extension.getState().configureDirty) {
-            await make.cleanConfigure("makefile.configureOnOpen and configureDirty");
+            await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
         } else {
-            await make.configure("makefile.configureOnOpen");
+            await make.configure(make.TriggeredBy.configureOnOpen);
         }
     }
 
@@ -224,8 +224,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     let telemetryProperties: telemetry.Properties | null = {};
     try {
         telemetryProperties = telemetry.analyzeSettings(workspaceConfiguration, "makefile",
-        util.thisExtensionPackage().contributes.configuration.properties,
-        telemetryProperties);
+            util.thisExtensionPackage().contributes.configuration.properties,
+            true, telemetryProperties);
     } catch (e) {
         logger.message(e.message);
     }

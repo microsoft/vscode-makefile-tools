@@ -44,6 +44,25 @@ export enum Operations {
     run = "run"
 }
 
+export enum TriggeredBy {
+    buildTarget = "command pallette (buildTarget)",
+    buildCleanTarget = "command pallette (buildCleanTarget)",
+    buildAll = "command pallette (buildAll)",
+    buildCleanAll = "command pallette (buildCleanAll)",
+    preconfigure = "command pallette (preConfigure)",
+    alwaysPreconfigure = "settings (alwaysPreConfigure)",
+    configure = "command pallette (configure)",
+    configureOnOpen = "settings (configureOnOpen)",
+    cleanConfigureOnOpen = "configure dirty (on open), settings (configureOnOpen)",
+    cleanConfigure = "command pallette (clean configure)",
+    configureBeforeBuild = "configure dirty (before build), settings (configureAfterCommand)",
+    configureAfterConfigurationChange = "settings (configureAfterCommand), command pallette (setBuildConfiguration)",
+    configureAfterEditorFocusChange = "configure dirty (editor focus change), settings (configureOnEdit)",
+    configureBeforeTargetChange = "configure dirty (before target change), settings (configureAfterCommand)",
+    configureAfterTargetChange = "settings (configureAfterCommand), command pallette (setBuildTarget)",
+    configureBeforeLaunchTargetChange = "configureDirty (before launch target change), settings (configureAfterCommand)",
+}
+
 // Identifies and logs whether an operation should be prevented from running.
 // So far, the only blocking scenarios are if an ongoing configure, pre-configure or build
 // is blocking other new similar operations and setter commands (selection of new configurations, targets, etc...)
@@ -54,23 +73,23 @@ export enum Operations {
 // Clicking the status bar buttons attempts to run the corresponding operation,
 // which triggers a popup and returns early if it should be blocked. Same for pallette commands.
 // In future we may enable/disable or change text depending on the blocking state.
-export function blockedByOp(op: Operations): string | undefined {
-    let blocker: string | undefined;
+export function blockedByOp(op: Operations): Operations | undefined {
+    let blocker: Operations | undefined;
 
     if (getIsPreConfiguring()) {
-        blocker = "pre-configure";
+        blocker = Operations.preConfigure;
     }
 
     if (getIsConfiguring()) {
-        blocker = "configure";
+        blocker = Operations.configure;
     }
 
     if (getIsBuilding()) {
-        blocker = "build";
+        blocker = Operations.build;
     }
 
     if (blocker) {
-        vscode.window.showErrorMessage(`Operation "${op}" cannot be completed because the project is running ${blocker}.`);
+        vscode.window.showErrorMessage(`Cannot "${op}" because the project is already doing a ${blocker}.`);
     }
 
     return blocker;
@@ -112,7 +131,7 @@ let curPID: number = -1;
 export function getCurPID(): number { return curPID; }
 export function setCurPID(pid: number): void { curPID = pid; }
 
-export async function buildTarget(cause: string, target: string, clean: boolean = false): Promise<number> {
+export async function buildTarget(triggeredBy: TriggeredBy, target: string, clean: boolean = false): Promise<number> {
     if (blockedByOp(Operations.build)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
@@ -126,7 +145,7 @@ export async function buildTarget(cause: string, target: string, clean: boolean 
     if (extension.getState().configureDirty) {
         logger.message("The project needs to configure in order to build properly the current target.");
         if (configuration.getConfigureAfterCommand()) {
-            configureExitCode = await cleanConfigure("configure dirty and makefile.configureAfterCommand on build target");
+            configureExitCode = await cleanConfigure(TriggeredBy.configureBeforeBuild);
             if (configureExitCode !== ConfigureBuildReturnCodeTypes.success) {
                 logger.message("Attempting to run build after a failed configure.");
             }
@@ -182,7 +201,7 @@ export async function buildTarget(cause: string, target: string, clean: boolean 
                 const telemetryProperties: telemetry.Properties = {
                     exitCode: retc.toString(),
                     target: processTargetForTelemetry(target),
-                    cause: cause
+                    triggeredBy: triggeredBy
                 };
                 const telemetryMeasures: telemetry.Measures = {
                     buildTotalElapsedTime: buildElapsedTime
@@ -367,7 +386,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
     });
 }
 
-export async function preConfigure(cause: string): Promise<number> {
+export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
     if (blockedByOp(Operations.preConfigure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
@@ -422,7 +441,7 @@ export async function preConfigure(cause: string): Promise<number> {
                 };
                 const telemetryProperties: telemetry.Properties = {
                     exitCode: retc.toString(),
-                    cause: cause
+                    triggeredBy: triggeredBy
                 };
                 telemetry.logEvent("preConfigure", telemetryProperties, telemetryMeasures);
 
@@ -439,7 +458,7 @@ export async function preConfigure(cause: string): Promise<number> {
 // The input 'content' represents the output of a command that lists all the environment variables:
 // set on windows or printenv on linux/mac.
 async function applyEnvironment(content: string | undefined) : Promise<void> {
-    let lines: string[] = content?.split((process.platform === "win32") ? "\r\n" : "\n") || [];
+    let lines: string[] = content?.split(/\r?\n/) || [];
     lines.forEach(line => {
         let eqPos: number = line.search("=");
         let envVarName: string = line.substring(0, eqPos);
@@ -463,7 +482,7 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
             wrapScriptFile += ".bat";
         } else {
             wrapScriptContent = `source ${scriptFile}\n`;
-            wrapScriptContent += `printenv > ${wrapScriptFile}.out`;
+            wrapScriptContent += `printenv > ${wrapScriptOutFile}`;
             wrapScriptFile += ".sh";
         }
 
@@ -516,10 +535,10 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     });
 }
 
-export async function configure(cause: string, updateTargets: boolean = true): Promise<number> {
+export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean = true): Promise<number> {
     // Mark that this workspace had at least one attempt at configuring, before any chance of early return,
     // to accurately identify whether this project configured successfully out of the box or not.
-    let ranConfigureInCodebaseLifetime: boolean = extension.getState().ranConfigureInCodebaseLifetime || false;
+    let ranConfigureInCodebaseLifetime: boolean = extension.getState().ranConfigureInCodebaseLifetime;
     extension.getState().ranConfigureInCodebaseLifetime = true;
 
     if (blockedByOp(Operations.configure)) {
@@ -532,7 +551,7 @@ export async function configure(cause: string, updateTargets: boolean = true): P
     let preConfigureExitCode: number | undefined; // used for telemetry
     let preConfigureElapsedTime: number | undefined; // used for telemetry
     if (configuration.getAlwaysPreConfigure()) {
-        preConfigureExitCode = await preConfigure("makefile.alwaysPreconfigure");
+        preConfigureExitCode = await preConfigure(TriggeredBy.alwaysPreconfigure);
         if (preConfigureExitCode !== ConfigureBuildReturnCodeTypes.success) {
             logger.message("Attempting to run configure after a failed pre-configure.");
         }
@@ -628,7 +647,7 @@ export async function configure(cause: string, updateTargets: boolean = true): P
                     ranMake: ranMake.toString(),
                     processTargetsSeparately: processTargetsSeparately.toString(),
                     resetBuildTarget: (oldBuildTarget !== newBuildTarget).toString(),
-                    cause: cause
+                    triggeredBy: triggeredBy
                 };
 
                 // Report if this configure ran also a pre-configure and how long it took.
@@ -819,7 +838,7 @@ function cleanCache(): void {
 }
 
 // Configure after cleaning the cache
-export async function cleanConfigure(cause: string, updateTargets: boolean = true): Promise<number> {
+export async function cleanConfigure(triggeredBy: TriggeredBy, updateTargets: boolean = true): Promise<number> {
     // Even if the core configure process also checks for blocking operations,
     // verify the same here as well, to make sure that we don't delete the caches
     // only to return early from the core configure.
@@ -829,5 +848,5 @@ export async function cleanConfigure(cause: string, updateTargets: boolean = tru
 
     cleanCache();
 
-    return configure(cause, updateTargets);
+    return configure(triggeredBy, updateTargets);
 }

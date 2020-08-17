@@ -52,16 +52,37 @@ export function logEvent(eventName: string, properties?: Properties, measures?: 
 }
 
 // Allow-lists for various settings.
-// Setting: represents the property value. Even if right now is not needed,
-// it may be needed in future for other settings, when the value is part of the decision
-// to report the information as telemetry or hide it.
-// Key: represents the property name
-function settingAllowed(setting: string, key: string) : boolean {
+function filterSetting(value: any, key: string) : any {
     if (key === "makefile.dryrunSwitches") {
-        return true;
+        let dryrunSwitches: string[] = value;
+        let filteredSwitches: string[] | undefined = dryrunSwitches.map(sw => {
+            switch (sw) {
+                case "--dry-run":
+                case "-n":
+                case "--just-print":
+                case "--recon":
+
+                case "--keep-going":
+                case "-k":
+
+                case "--always-make":
+                case "-B":
+
+                case "--print-data-base":
+                case "-p":
+
+                case "--print-directory":
+                case "-w":
+                    return sw;
+                default:
+                    return "...";
+            }
+        });
+
+        return filteredSwitches;
     }
 
-    return false;
+    return "...";
 }
 
 // Detect which item from the given array setting is relevant for telemetry.
@@ -136,17 +157,19 @@ function filterKey(key: string): string {
 // If analyzeSettings gets called before a configure (or after an unsuccesful one), it is possible to have
 // inaccurate or incomplete telemetry information for makefile and launch configurations.
 // This is not very critical since any of their state changes will update telemetry for them.
-export function analyzeSettings(setting: any, key: string, propJson: any, telemetryProperties: Properties | null): Properties | null {
+export function analyzeSettings(setting: any, key: string, propSchema: any, ignoreDefault: boolean, telemetryProperties: Properties | null): Properties | null {
     let type : string = typeof (setting);
-    let jsonType : string | undefined = propJson.type ? propJson.type : undefined;
+    let jsonType : string | undefined = propSchema.type ? propSchema.type : undefined;
 
     // Skip anything else if the current setting represents a function.
     if (type === "function") {
         return telemetryProperties;
     }
 
-    // Interested to continue only for properties that are different than their defaults.
-    if (util.areEqual(propJson.default, setting)) {
+    // Interested to continue only for properties that are different than their defaults,
+    // unless ignoreDefault requests we report those too (useful when the user is changing
+    // from a non default value back to default, usually via removing/undefining a setting).
+    if (util.areEqual(propSchema.default, setting) && ignoreDefault) {
         return telemetryProperties;
     }
 
@@ -158,7 +181,7 @@ export function analyzeSettings(setting: any, key: string, propJson: any, teleme
     }
 
     // Enum values always safe to report.
-    let enumValues: any[] = propJson.enum;
+    let enumValues: any[] = propSchema.enum;
     if (enumValues && enumValues.length > 0) {
         if (!enumValues.includes(setting)) {
             logger.message(`Invalid value "${setting}" for enum "${key}". Only "${enumValues.join(";")}" values are allowed."`);
@@ -172,7 +195,7 @@ export function analyzeSettings(setting: any, key: string, propJson: any, teleme
         return telemetryProperties;
     }
 
-    // When propJson does not have a type defined (for example at the root scope)
+    // When propSchema does not have a type defined (for example at the root scope)
     // use the setting type. We use the setting type second because it sees array as object.
     switch (jsonType || type) {
         // Report numbers and booleans since there is no private information in such types.
@@ -186,14 +209,14 @@ export function analyzeSettings(setting: any, key: string, propJson: any, teleme
         // Apply allow-lists for strings.
         case "string":
             if (telemetryProperties) {
-                telemetryProperties[filterKey(key)] = settingAllowed(setting, key) ? setting : "...";
+                telemetryProperties[filterKey(key)] = filterSetting(setting, key);
             }
             break;
 
         case "array":
             // We are interested in logging arrays of basic types
-            if (telemetryProperties && propJson.items.type !== "object" && propJson.items.type !== "array") {
-                telemetryProperties[filterKey(key)] = settingAllowed(setting, key) ? setting.join(";") : "...";
+            if (telemetryProperties && propSchema.items.type !== "object" && propSchema.items.type !== "array") {
+                telemetryProperties[filterKey(key)] = filterSetting(setting, key);
                 break;
             }
             /* falls through */
@@ -210,15 +233,15 @@ export function analyzeSettings(setting: any, key: string, propJson: any, teleme
                 index++;
                 let jsonProps: any;
                 if (jsonType === "array") {
-                    jsonProps = propJson.items.properties || propJson.items;
+                    jsonProps = propSchema.items.properties || propSchema.items;
                 } else {
                     let newProp: string = (key === "makefile") ? `${key}.` + prop : prop;
-                    if (propJson.properties) {
-                        jsonProps = Object.getOwnPropertyNames(propJson.properties).includes(newProp) ?
-                                    propJson.properties[newProp] : undefined;
+                    if (propSchema.properties) {
+                        jsonProps = Object.getOwnPropertyNames(propSchema.properties).includes(newProp) ?
+                                    propSchema.properties[newProp] : undefined;
                     } else {
-                        jsonProps = Object.getOwnPropertyNames(propJson).includes(newProp) ?
-                                    propJson[newProp] : undefined;
+                        jsonProps = Object.getOwnPropertyNames(propSchema).includes(newProp) ?
+                                    propSchema[newProp] : undefined;
                     }
                 }
 
@@ -234,7 +257,7 @@ export function analyzeSettings(setting: any, key: string, propJson: any, teleme
                     if (type !== "function" /*&& jsonType !== undefined*/ &&
                         (jsonType !== "array" || prop !== "length")) {
                         let newTelemetryProperties: Properties | null = {};
-                        newTelemetryProperties = analyzeSettings(setting[prop], key + "." + prop, jsonProps,
+                        newTelemetryProperties = analyzeSettings(setting[prop], key + "." + prop, jsonProps, ignoreDefault,
                             ((jsonType !== "array" || index === active)) ? newTelemetryProperties : null);
 
                         // If telemetryProperties is null, it means we're not interested in reporting any telemetry for this subtree
@@ -266,6 +289,6 @@ function getPackageInfo(): IPackageInfo {
     return {
         name: `${packageJSON.publisher}.${packageJSON.name}`,
         version: packageJSON.version,
-        aiKey: "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217" // ???
+        aiKey: "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217"
     };
 }

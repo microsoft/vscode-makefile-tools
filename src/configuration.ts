@@ -660,16 +660,16 @@ export async function initFromStateAndSettings(): Promise<void> {
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
  vscode.window.onDidChangeActiveTextEditor(e => {
-        // If configureDirty is already set from a previous VSCode instance,
+        // If configureDirty is already set from a previous VSCode session,
         // at workspace load this event (onDidChangeActiveTextEditor) is triggered automatically
         // and if makefile.configureOnOpen is true, there is a race between two configure operations,
         // one of which being unnecessary. Ignore the cleanConfigure call here
         // only when makefile.configureOnOpen is true and we know we didn't complete a first configure yet.
         if (extension.getState().configureDirty && configureOnEdit) {
-            if (getConfigureOnOpen() === false || extension.getRanConfigureInInstance()) {
+            if (getConfigureOnOpen() === false || extension.getRanConfigureInSession()) {
                 // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
                 logger.message("Configuring clean after settings or makefile changes...");
-                make.cleanConfigure("configure dirty and makefile.configureOnEdit=true on change of editor"); // this sets configureDirty back to false if it succeeds
+                make.cleanConfigure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
             }
         }
     });
@@ -858,11 +858,11 @@ export async function initFromStateAndSettings(): Promise<void> {
             // information from all the array yet.
             updatedSettingsSubkeys.forEach(subKey => {
                 let key: string = keyRoot + "." + subKey;
-                logger.message(`${key} setting changed.`);
+                logger.message(`${key} setting changed.`, "Verbose");
                 try {
                     telemetryProperties = telemetry.analyzeSettings(workspaceConfiguration[subKey], key,
-                    util.thisExtensionPackage().contributes.configuration.properties[key],
-                    telemetryProperties);
+                        util.thisExtensionPackage().contributes.configuration.properties[key],
+                        false, telemetryProperties);
                 } catch (e) {
                     logger.message(e.message);
                 }
@@ -916,7 +916,7 @@ export async function setNewConfiguration(): Promise<void> {
 
         if (configureAfterCommand) {
             logger.message("Automatically reconfiguring the project after a makefile configuration change.");
-            await make.cleanConfigure("makefile configuration change and makefile.configureAfterCommand");
+            await make.cleanConfigure(make.TriggeredBy.configureAfterConfigurationChange);
         }
 
         // Refresh telemetry for this new makefile configuration
@@ -937,8 +937,8 @@ export async function setNewConfiguration(): Promise<void> {
         if (makefileonfigurationSetting) {
             try {
                 telemetryProperties = telemetry.analyzeSettings(makefileonfigurationSetting, key,
-                util.thisExtensionPackage().contributes.configuration.properties[key],
-                telemetryProperties);
+                    util.thisExtensionPackage().contributes.configuration.properties[key],
+                    true, telemetryProperties);
             } catch (e) {
                 logger.message(e.message);
             }
@@ -971,7 +971,7 @@ export async function selectTarget(): Promise<void> {
     if (extension.getState().configureDirty) {
         logger.message("The project needs a configure to populate the build targets correctly.");
         if (configureAfterCommand) {
-            let retc: number = await make.cleanConfigure("configure dirty and makefile.configureAfterCommand on select new build target");
+            let retc: number = await make.cleanConfigure(make.TriggeredBy.configureBeforeTargetChange);
             if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
                 logger.message("The build targets list may not be accurate because configure failed.");
             }
@@ -1010,7 +1010,7 @@ export async function selectTarget(): Promise<void> {
         if (configureAfterCommand) {
             // The set of build targets remains the same even if the current target has changed
             logger.message("Automatically reconfiguring the project after a build target change.");
-            await make.cleanConfigure("change of build target and makefile.configureAfterCommand", false);
+            await make.cleanConfigure(make.TriggeredBy.configureAfterTargetChange, false);
         }
     }
 }
@@ -1066,7 +1066,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
     if (extension.getState().configureDirty) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
         if (configureAfterCommand) {
-            let retc: number = await make.cleanConfigure("configureDirty and makefile.configureAfterCommand on select new launch target");
+            let retc: number = await make.cleanConfigure(make.TriggeredBy.configureBeforeLaunchTargetChange);
             if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
                 logger.message("The launch targets list may not be accurate because configure failed.");
             }
@@ -1111,8 +1111,8 @@ export async function selectLaunchConfiguration(): Promise<void> {
             if (launchConfigurationSetting) {
                 try {
                     telemetryProperties = telemetry.analyzeSettings(launchConfigurationSetting, key,
-                    util.thisExtensionPackage().contributes.configuration.properties[key],
-                    telemetryProperties);
+                        util.thisExtensionPackage().contributes.configuration.properties[key],
+                        true, telemetryProperties);
                 } catch (e) {
                     logger.message(e.message);
                 }

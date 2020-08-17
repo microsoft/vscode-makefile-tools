@@ -357,7 +357,7 @@ export function mergeProperties(dst: any, src: any): any {
         }
 
         if (dst[prop] !== undefined) {
-            logger.message(`Destination object already has property ${prop} set to ${dst[prop]}. Overwriting from source with ${src[prop]}`);
+            logger.message(`Destination object already has property ${prop} set to ${dst[prop]}. Overwriting from source with ${src[prop]}`, "Verbose");
         }
 
         dst[prop] = src[prop];

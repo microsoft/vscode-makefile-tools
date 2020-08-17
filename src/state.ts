@@ -44,10 +44,10 @@ export class StateManager {
   // (it didn't have to succeed or even complete).
   // Sent as telemetry information and useful to know
   // how many projects are able to configure out of the box.
-  get ranConfigureInCodebaseLifetime(): boolean | undefined {
-    return this._get<boolean>('ranConfigureInCodebaseLifetime');
+  get ranConfigureInCodebaseLifetime(): boolean {
+    return this._get<boolean>('ranConfigureInCodebaseLifetime') || false;
   }
-  set ranConfigureInCodebaseLifetime(v: boolean | undefined) {
+  set ranConfigureInCodebaseLifetime(v: boolean) {
     this._update('ranConfigureInCodebaseLifetime', v);
   }
 
@@ -55,10 +55,10 @@ export class StateManager {
   // of an operation that alters the configure state
   // (makefile configuration change, build target change,
   // settings or makefiles edits)
-  get configureDirty(): boolean | undefined {
-    return this._get<boolean>('configureDirty');
+  get configureDirty(): boolean {
+    return this._get<boolean>('configureDirty') || true;
   }
-  set configureDirty(v: boolean | undefined) {
+  set configureDirty(v: boolean) {
     this._update('configureDirty', v);
   }
 
