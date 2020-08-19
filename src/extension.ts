@@ -52,8 +52,17 @@ export class MakefileToolsExtension {
     }
 
     // Similar to state.ranConfigureInCodebaseLifetime, but within the scope of a VSCode session.
+    // It is used for calling cppToolsAPI.notifyReady only once in a VSCode session.
+    // It means that a configure was started within the scope of this VSCode session
+    // but it doesn't mean that the configure process is completed already.
     private ranConfigureInSession: boolean = false;
     public getRanConfigureInSession() : boolean { return this.ranConfigureInSession; }
+
+    // Similar to ranConfigureInSession, but becomes true at the end of a configure process,
+    // regardless of the success status.
+    private completedConfigureInSession: boolean = false;
+    public getCompletedConfigureInSession() : boolean { return this.completedConfigureInSession; }
+    public setCompletedConfigureInSession(completed: boolean) : void { this.completedConfigureInSession = completed; }
 
     // Request a custom config provider update.
     public async updateCppToolsProvider(): Promise<void> {

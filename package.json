@@ -130,7 +130,6 @@
                             },
                             "makefilePath": {
                                 "type": "string",
-                                "default": "makefile",
                                 "description": "File path to the makefile"
                             },
                             "makePath": {
@@ -244,13 +243,11 @@
                 },
                 "makefile.makePath": {
                     "type": "string",
-                    "default": "make",
                     "description": "The path to the make tool",
                     "scope": "resource"
                 },
                 "makefile.makefilePath": {
                     "type": "string",
-                    "default": "makefile",
                     "description": "The path to the makefile of the project",
                     "scope": "resource"
                 },

@@ -810,6 +810,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
 
     extension.getState().configureDirty = false;
     configureSubPhase = "not started";
+    extension.setCompletedConfigureInSession(true);
 
     // If we have a retc3 result, it doesn't matter what retc1 and retc2 are.
     return (retc3 !== undefined) ? retc3 :

@@ -434,7 +434,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         configurationMakeArgs.push(makefileUsed);
     }
 
-    if (makefileConfiguration?.makePath) {
+    if (configurationMakeCommand) {
         logger.message("Deduced command '" + configurationMakeCommand + " " + configurationMakeArgs.join(" ") + "' for configuration " + configuration);
     }
 
@@ -450,7 +450,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
         // If configuration command has a path (absolute or relative), check if it exists on disk and error if not.
         // If no path is given to the make tool, search all paths in the environment and error if make is not on the path.
-        if (path.parse(configurationMakeCommand).dir !== "") {
+        if (configurationCommandPath  !== "") {
             if (!util.checkFileExistsSync(configurationMakeCommand)) {
                 vscode.window.showErrorMessage("Make not found.");
                 logger.message("Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.");
@@ -477,7 +477,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
         // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
         if (!makefileUsed) {
-            makefileUsed = "./makefile";
+            makefileUsed = (process.platform === "win32") ? "./makefile" : "./Makefile";
         }
         makefileUsed = util.resolvePathToRoot(makefileUsed);
         if (!util.checkFileExistsSync(makefileUsed)) {
@@ -665,8 +665,16 @@ export async function initFromStateAndSettings(): Promise<void> {
         // and if makefile.configureOnOpen is true, there is a race between two configure operations,
         // one of which being unnecessary. Ignore the cleanConfigure call here
         // only when makefile.configureOnOpen is true and we know we didn't complete a first configure yet.
+        // Additionally, if anything dirtied the configure state during a (pre)configure or build,
+        // skip this clean configure, to avoid annoying "blocked operation" notifications.
+        // The configure state remains dirty and a new configure will be triggered eventually:
+        // (selecting a new configuration, target or launch, build, editor focus change).
+        // Guarding only for not being blocked is not enough. For example,
+        // in the first scenario explained above, the race happens when nothing looks blocked
+        // here, but leading to a block notification soon.
         if (extension.getState().configureDirty && configureOnEdit) {
-            if (getConfigureOnOpen() === false || extension.getRanConfigureInSession()) {
+            if ((getConfigureOnOpen() === false || extension.getCompletedConfigureInSession())
+            && !make.blockedByOp(make.Operations.configure)) {
                 // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
                 logger.message("Configuring clean after settings or makefile changes...");
                 make.cleanConfigure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
