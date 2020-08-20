@@ -659,26 +659,49 @@ export async function initFromStateAndSettings(): Promise<void> {
 
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
- vscode.window.onDidChangeActiveTextEditor(e => {
-        // If configureDirty is already set from a previous VSCode session,
-        // at workspace load this event (onDidChangeActiveTextEditor) is triggered automatically
-        // and if makefile.configureOnOpen is true, there is a race between two configure operations,
-        // one of which being unnecessary. Ignore the cleanConfigure call here
-        // only when makefile.configureOnOpen is true and we know we didn't complete a first configure yet.
-        // Additionally, if anything dirtied the configure state during a (pre)configure or build,
-        // skip this clean configure, to avoid annoying "blocked operation" notifications.
-        // The configure state remains dirty and a new configure will be triggered eventually:
-        // (selecting a new configuration, target or launch, build, editor focus change).
-        // Guarding only for not being blocked is not enough. For example,
-        // in the first scenario explained above, the race happens when nothing looks blocked
-        // here, but leading to a block notification soon.
-        if (extension.getState().configureDirty && configureOnEdit) {
-            if ((getConfigureOnOpen() === false || extension.getCompletedConfigureInSession())
-            && !make.blockedByOp(make.Operations.configure)) {
-                // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
-                logger.message("Configuring clean after settings or makefile changes...");
-                make.cleanConfigure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
-            }
+    vscode.window.onDidChangeActiveTextEditor(e => {
+        let documentFileExtension: string | undefined;
+        if (e) {
+            documentFileExtension = path.parse(e.document.uri.fsPath).ext;
+        }
+
+        // It is too annoying to generate a configure on any kind of editor focus change
+        // (for example even searching in the logging window generates this event).
+        // Since all the operations are guarded by the configureDirty state,
+        // the only "operation" left that we need to make sure it's up to date
+        // is IntelliSense, so trigger a configure when we switch editor focus
+        // into C/C++ source code.
+        switch (documentFileExtension) {
+            case "c":
+            case "cpp":
+            case "cxx":
+            case "h":
+            case "hpp":
+                // If configureDirty is already set from a previous VSCode session,
+                // at workspace load this event (onDidChangeActiveTextEditor) is triggered automatically
+                // and if makefile.configureOnOpen is true, there is a race between two configure operations,
+                // one of which being unnecessary. Ignore the cleanConfigure call here
+                // only when makefile.configureOnOpen is true and we know we didn't complete a first configure yet.
+                // Additionally, if anything dirtied the configure state during a (pre)configure or build,
+                // skip this clean configure, to avoid annoying "blocked operation" notifications.
+                // The configure state remains dirty and a new configure will be triggered eventually:
+                // (selecting a new configuration, target or launch, build, editor focus change).
+                // Guarding only for not being blocked is not enough. For example,
+                // in the first scenario explained above, the race happens when nothing looks blocked
+                // here, but leading to a block notification soon.
+                if (extension.getState().configureDirty && configureOnEdit) {
+                    if ((getConfigureOnOpen() === false || extension.getCompletedConfigureInSession())
+                        && !make.blockedByOp(make.Operations.configure)) {
+                        // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
+                        logger.message("Configuring clean after settings or makefile changes...");
+                        make.cleanConfigure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
+                    }
+                }
+
+                break;
+
+            default:
+                break;
         }
     });
 
@@ -712,7 +735,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // Changing a launch configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
                 readCurrentLaunchConfiguration(); // this gets a refreshed view of all launch configurations
-                                                  // and also updates the current one in case it was affected
+                // and also updates the current one in case it was affected
                 updatedSettingsSubkeys.push(subKey);
             }
 

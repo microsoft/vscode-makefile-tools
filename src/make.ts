@@ -273,7 +273,10 @@ export function setParseFile(file: string): void { parseFile = file; }
 
 // Globals (for now) useful in logging and telemetry of cancelled configure
 let configureSubPhase: string = "not started"; // where a cancel happened in the workflow
+
 let cancelConfigure: boolean = false; // when to return early from the configure workflow
+export function getCancelConfigure(): boolean { return cancelConfigure; }
+export function setCancelConfigure(cancel: boolean): void { cancelConfigure = cancel; }
 
 // Targets need to parse a dryrun make invocation that does not include a target name
 // (other than default empty "" or the standard "all"), otherwise it would produce
@@ -364,7 +367,12 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
                         logger.message("IntelliSense may work only partially or not at all.");
                     }
                     logger.message(stderrStr);
-                    util.reportDryRunError();
+
+                    // Report the standard dry-run error and guide only when
+                    // the configure was not cancelled by the user.
+                    if (retCode !== ConfigureBuildReturnCodeTypes.cancelled) {
+                        util.reportDryRunError();
+                    }
                 }
 
                 if (cache) {
@@ -624,6 +632,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
                 }
 
                 setIsConfiguring(true);
+                progress.report({increment: 1, message: "Test test test..."});
                 let retc: number = await doConfigure(progress, updateTargets);
 
                 // We need to know whether this configure was cancelled by the user
@@ -679,6 +688,15 @@ function determineConfigureSubPhase(subPhase: string, recursiveDoConfigure: bool
     return subPhase + (recursiveDoConfigure ? " (reconfigure after automatic reset of build target)" : "");
 }
 
+function configureCancelCleanup() {
+    cancelConfigure = false;
+    logger.message("Exiting early from the configure process.");
+    extension.getState().configureDirty = true;
+    configuration.setMakefileConfigurations([]);
+    configuration.setBuildTargets([]);
+    configuration.setLaunchTargets([]);
+}
+
 // Update IntelliSense and launch targets with information parsed from a user given build log,
 // the dryrun cache or make dryrun output if the cache is not present.
 // Sometimes the targets do not need an update (for example, when there has been
@@ -693,16 +711,14 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
     configureSubPhase = determineConfigureSubPhase("Generating parse content for IntelliSense and launch targets.", recursiveDoConfigure);
     retc1 = await generateParseContent(progress);
     if (cancelConfigure) {
-        cancelConfigure = false;
-        logger.message("Exiting early from the configure process.");
-        extension.getState().configureDirty = true;
+        configureCancelCleanup();
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
 
     // Configure IntelliSense
     configureSubPhase = determineConfigureSubPhase("Updating CppTools custom IntelliSense provider.", recursiveDoConfigure);
     logger.message(`Parsing for IntelliSense from: "${parseFile}"`);
-    await updateProvider(parseContent || "");
+    await updateProvider(progress, parseContent || "");
 
     configureSubPhase = determineConfigureSubPhase("Parsing launch targets.", recursiveDoConfigure);
 
@@ -710,7 +726,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
     // (and not as read from settings via makefile.launchConfigurations).
     logger.message(`Parsing for launch targets from: "${parseFile}"`);
     let launchConfigurations: string[] = [];
-    parser.parseForLaunchConfiguration(parseContent || "").forEach(config => {
+    parser.parseForLaunchConfiguration(progress, parseContent || "").forEach(config => {
         launchConfigurations.push(configuration.launchConfigurationToString(config));
     });
 
@@ -745,9 +761,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
             configureSubPhase = determineConfigureSubPhase("Generating parse content for build targets.", recursiveDoConfigure);
             retc2 = await generateParseContent(progress, true);
             if (cancelConfigure) {
-                cancelConfigure = false;
-                logger.message("Exiting early from the configure process.");
-                extension.getState().configureDirty = true;
+                configureCancelCleanup();
                 return ConfigureBuildReturnCodeTypes.cancelled;
             }
 
@@ -755,7 +769,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, updateTargets: 
 
         configureSubPhase = determineConfigureSubPhase("Parsing build targets.", recursiveDoConfigure);
         logger.message(`Parsing for build targets from: "${parseFile}"`);
-        let buildTargets: string[] = parser.parseTargets(parseContent || "");
+        let buildTargets: string[] = parser.parseTargets(progress, parseContent || "");
         if (buildTargets.length === 0) {
             configuration.setBuildTargets([]);
             logger.message("No build targets have been detected.");

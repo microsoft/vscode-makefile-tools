@@ -32,8 +32,8 @@ export class MakefileToolsExtension {
     public getState(): state.StateManager { return this.mementoState; }
 
     // Parse the dry-run output and populate data for cpptools
-    public constructIntellisense(dryRunOutputStr: string): void {
-        parser.parseForCppToolsCustomConfigProvider(dryRunOutputStr);
+    public async constructIntellisense(progress: vscode.Progress<{}>, dryRunOutputStr: string): Promise<void> {
+        return await parser.parseForCppToolsCustomConfigProvider(progress, dryRunOutputStr);
     }
 
     public emptyCustomConfigurationProvider() : void {
@@ -120,12 +120,15 @@ export class MakefileToolsExtension {
 
 // A change of target or configuration triggered a new dry-run,
 // which produced a new output string to be parsed
-export async function updateProvider(dryRunOutputStr: string): Promise<void> {
-    logger.message("Updating the CppTools IntelliSense Configuration Provider.");
-    await extension.registerCppToolsProvider();
-    extension.emptyCustomConfigurationProvider();
-    extension.constructIntellisense(dryRunOutputStr);
-    await extension.updateCppToolsProvider();
+export async function updateProvider(progress: vscode.Progress<{}>, dryRunOutputStr: string): Promise<number> {
+    return new Promise<number>(function (resolve, reject): void /*Promise<void>*/ {
+        logger.message("Updating the CppTools IntelliSense Configuration Provider.");
+        /*await*/ extension.registerCppToolsProvider();
+        extension.emptyCustomConfigurationProvider();
+        /*await*/ extension.constructIntellisense(progress, dryRunOutputStr);
+        /*await*/ extension.updateCppToolsProvider();
+        resolve(0);
+    });
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {

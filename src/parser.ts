@@ -8,6 +8,7 @@ import * as cpp from 'vscode-cpptools';
 import * as cpptools from './cpptools';
 import * as ext from './extension';
 import * as logger from './logger';
+import * as make from './make';
 import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
@@ -21,7 +22,7 @@ const compilers: string[] = ["clang\\+\\+", "clang", "cl", "gcc", "cc", "icc", "
 const linkers: string[] = ["link", "ilink", "ld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
 const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
-export function parseTargets(verboseLog: string): string[] {
+export function parseTargets(progress: vscode.Progress<{}>, verboseLog: string): string[] {
     // Extract the text between "# Files" and "# Finished Make data base" lines
     // There can be more than one matching section.
     let regexpExtract: RegExp = /(# Files\n*)([\s\S]*?)(# Finished Make data base)/mg;
@@ -38,8 +39,14 @@ export function parseTargets(verboseLog: string): string[] {
         // skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target
         let regexpTarget: RegExp = /^(?!\n?[#\.])(?<!^\n?# Not a target:\s*)\s*(\S+):\s+/mg;
 
+        progress.report({increment: 1, message: "Parsing build targets..."});
         match = regexpTarget.exec(extractedLog);
         while (match) {
+            // Stop parsing if the user cancelled the current configure.
+            if (make.getCancelConfigure()) {
+                break;
+            };
+
             // Make sure we don't insert duplicates.
             // They can be caused by the makefile syntax of defining variables for a target.
             // That creates multiple lines with the same target name followed by :,
@@ -48,6 +55,7 @@ export function parseTargets(verboseLog: string): string[] {
                 matches.push(match[1]);
             }
 
+            progress.report({increment: 1, message: "Parsing build targets..."});
             match = regexpTarget.exec(extractedLog);
         }
 
@@ -59,8 +67,9 @@ export function parseTargets(verboseLog: string): string[] {
 
 // Make various preprocessing transformations on the dry-run output
 // TODO: "cmd -c", "start cmd", "exit"
-function preprocessDryRunOutput(dryRunOutputStr: string): string {
+function preprocessDryRunOutput(progress: vscode.Progress<{}>, dryRunOutputStr: string): string {
     let preprocessedDryRunOutputStr: string = dryRunOutputStr;
+    progress.report({increment: 1, message: "Preprocessing the dry-run output..."});
 
     // Expand {REPO:VSCODE-MAKEFILE-TOOLS} to the full path of the root of the extension
     // This is used for the pre-created dry-run logs consumed by the tests,
@@ -80,6 +89,7 @@ function preprocessDryRunOutput(dryRunOutputStr: string): string {
     let regexp : RegExp = /\s+\\$/mg;
     let match: RegExpExecArray | null = regexp.exec(preprocessedDryRunOutputStr);
     while (match) {
+        progress.report({increment: 1, message: "Preprocessing the dry-run output..."});
         let result: string = match[0];
         result = result.concat("\n");
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(result, " ");
@@ -89,6 +99,12 @@ function preprocessDryRunOutput(dryRunOutputStr: string): string {
     // Process some more makefile output weirdness
     let preprocessedDryRunOutputLines : string[] = [];
     preprocessedDryRunOutputStr.split("\n").forEach(line => {
+        // Stop parsing if the user cancelled the current configure.
+        if (make.getCancelConfigure()) {
+            return;
+        };
+
+        progress.report({increment: 1, message: "Preprocessing the dry-run output..."});
         let strC: string = "--mode=compile";
         let idxC: number = line.indexOf(strC);
         if (idxC >= 0) {
@@ -475,129 +491,140 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
 // Parse the output of the make dry-run command in order to provide CppTools
 // with information about includes, defines, compiler path....etc...
 // as needed by CustomConfigurationProvider
-export function parseForCppToolsCustomConfigProvider(dryRunOutputStr: string): void {
+export async function parseForCppToolsCustomConfigProvider(progress: vscode.Progress<{}>, dryRunOutputStr: string): Promise<void> {
     logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.');
 
-    // Do some preprocessing on the dry-run output to make the RegExp parsing easier
-    dryRunOutputStr = preprocessDryRunOutput(dryRunOutputStr);
+    return new Promise<void>(function (resolve, reject): void {
+        // Do some preprocessing on the dry-run output to make the RegExp parsing easier
+        dryRunOutputStr = preprocessDryRunOutput(progress, dryRunOutputStr);
 
-    // Empty the cummulative browse path built during the previous dry-run parsing
-    cpptools.clearCummulativeBrowsePath();
+        // Empty the cummulative browse path built during the previous dry-run parsing
+        cpptools.clearCummulativeBrowsePath();
 
-    // Current path starts with workspace root and can be modified
-    // with prompt commands like cd, cd-, pushd/popd or with -C make switch
-    let currentPath: string = vscode.workspace.rootPath || "";
-    let currentPathHistory: string[] = [currentPath];
+        // Current path starts with workspace root and can be modified
+        // with prompt commands like cd, cd-, pushd/popd or with -C make switch
+        let currentPath: string = vscode.workspace.rootPath || "";
+        let currentPathHistory: string[] = [currentPath];
 
-    // Read the dry-run output line by line, searching for compilers and directory changing commands
-    // to construct information for the CppTools custom configuration
-    let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
-    dryRunOutputLines.forEach(line => {
-        currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
-        currentPath = currentPathHistory[currentPathHistory.length - 1];
+        // Read the dry-run output line by line, searching for compilers and directory changing commands
+        // to construct information for the CppTools custom configuration
+        let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
+        dryRunOutputLines.forEach(line => {
+            // Stop parsing if the user cancelled the current configure.
+            if (make.getCancelConfigure()) {
+                reject();
+                return;
+            };
 
-        let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
-        if (compilerTool) {
-            logger.message("Found compiler command: " + line, "Verbose");
+            progress.report({ increment: 1, message: "Parsing for InteliSense..." });
+            currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
+            currentPath = currentPathHistory[currentPathHistory.length - 1];
 
-            // Compiler path is either what the makefile provides or found in the PATH environment variable or empty
-            let compilerFullPath: string = compilerTool.fullPath || "";
-            if (!compilerTool.found) {
-                let toolBaseName: string = path.basename(compilerFullPath);
-                compilerFullPath = path.join(util.toolPathInEnv(toolBaseName) || "", toolBaseName);
-            }
-            logger.message("    Compiler path: " + compilerFullPath, "Verbose");
+            let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
+            if (compilerTool) {
+                logger.message("Found compiler command: " + line, "Verbose");
 
-            // Parse and log the includes, forced includes and the defines
-            let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
-            includes = util.makeFullPaths(includes, currentPath);
-            logger.message("    Includes: " + includes.join(";"), "Verbose");
-            let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
-            forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
-            logger.message("    Forced includes: " + forcedIncludes.join(";"), "Verbose");
-
-            // TODO-BUG: fix regexp for parseMultipleSwitchFromToolArguments
-            // Include dirs not detected properly in 8cc (because of '" "')
-            let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
-            logger.message("    Defines: " + defines.join(";"), "Verbose");
-
-            // Parse the IntelliSense mode
-            // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
-            let targetArchitecture: util.TargetArchitecture = getTargetArchitecture(compilerTool.arguments);
-            let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(ext.extension.getCppToolsVersion(), compilerFullPath, targetArchitecture);
-            logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
-
-            // For windows, parse the sdk version
-            let windowsSDKVersion: string | undefined = "";
-            if (process.platform === "win32") {
-                windowsSDKVersion = process.env["WindowsSDKVersion"];
-                if (windowsSDKVersion) {
-                    logger.message('Windows SDK Version: ' + windowsSDKVersion, "Verbose");
+                // Compiler path is either what the makefile provides or found in the PATH environment variable or empty
+                let compilerFullPath: string = compilerTool.fullPath || "";
+                if (!compilerTool.found) {
+                    let toolBaseName: string = path.basename(compilerFullPath);
+                    compilerFullPath = path.join(util.toolPathInEnv(toolBaseName) || "", toolBaseName);
                 }
-            }
+                logger.message("    Compiler path: " + compilerFullPath, "Verbose");
 
-            // Parse the source files
-            let files: string[] = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
-            files = util.makeFullPaths(files, currentPath);
-            logger.message("    Source files: " + files.join(";"), "Verbose");
+                // Parse and log the includes, forced includes and the defines
+                let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
+                includes = util.makeFullPaths(includes, currentPath);
+                logger.message("    Includes: " + includes.join(";"), "Verbose");
+                let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
+                forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
+                logger.message("    Forced includes: " + forcedIncludes.join(";"), "Verbose");
 
-            // The language represented by this compilation command
-            let language: util.Language;
-            let hasC: boolean = files.filter(file => (file.endsWith(".c"))).length > 0;
-            let hasCpp: boolean = files.filter(file => (file.endsWith(".cpp"))).length > 0;
-            if (hasC && !hasCpp) {
-                language = "c";
-            } else if (hasCpp && !hasC) {
-                language = "cpp";
-            }
+                // TODO-BUG: fix regexp for parseMultipleSwitchFromToolArguments
+                // Include dirs not detected properly in 8cc (because of '" "')
+                let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
+                logger.message("    Defines: " + defines.join(";"), "Verbose");
 
-            // /TP and /TC (for cl.exe only) overwrite the meaning of the source files extensions
-            if (isSwitchPassedInArguments(compilerTool.arguments, ['TP'])) {
-                language = "cpp";
-            } else if (isSwitchPassedInArguments(compilerTool.arguments, ['TC'])) {
-                language = "c";
-            }
+                // Parse the IntelliSense mode
+                // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
+                let targetArchitecture: util.TargetArchitecture = getTargetArchitecture(compilerTool.arguments);
+                let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(ext.extension.getCppToolsVersion(), compilerFullPath, targetArchitecture);
+                logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
 
-            // Parse the C/C++ standard as given in the compiler command line
-            let standardStr: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["std"]);
+                // For windows, parse the sdk version
+                let windowsSDKVersion: string | undefined = "";
+                if (process.platform === "win32") {
+                    windowsSDKVersion = process.env["WindowsSDKVersion"];
+                    if (windowsSDKVersion) {
+                        logger.message('Windows SDK Version: ' + windowsSDKVersion, "Verbose");
+                    }
+                }
+
+                // Parse the source files
+                let files: string[] = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
+                files = util.makeFullPaths(files, currentPath);
+                logger.message("    Source files: " + files.join(";"), "Verbose");
+
+                // The language represented by this compilation command
+                let language: util.Language;
+                let hasC: boolean = files.filter(file => (file.endsWith(".c"))).length > 0;
+                let hasCpp: boolean = files.filter(file => (file.endsWith(".cpp"))).length > 0;
+                if (hasC && !hasCpp) {
+                    language = "c";
+                } else if (hasCpp && !hasC) {
+                    language = "cpp";
+                }
+
+                // /TP and /TC (for cl.exe only) overwrite the meaning of the source files extensions
+                if (isSwitchPassedInArguments(compilerTool.arguments, ['TP'])) {
+                    language = "cpp";
+                } else if (isSwitchPassedInArguments(compilerTool.arguments, ['TC'])) {
+                    language = "c";
+                }
+
+                // Parse the C/C++ standard as given in the compiler command line
+                let standardStr: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["std"]);
 
                 // If the command is compiling the same extension or uses -TC/-TP, send all the source files in one batch.
-            if (language) {
-                // More standard validation and defaults, in the context of the whole command.
-                let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
-                logger.message("    Standard: " + standard, "Verbose");
-
-                if (ext.extension) {
-                    ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files, windowsSDKVersion);
-                }
-            } else {
-                // If the compiler command is mixing c and c++ source files, send a custom configuration for each of the source files separately,
-                // to be able to accurately validate and calculate the standard based on the correct language.
-                files.forEach(file => {
-                    if (file.endsWith(".cpp")) {
-                        language = "cpp";
-                    } else if (file.endsWith(".c")) {
-                        language = "c";
-                    }
-
-                    // More standard validation and defaults, in the context of each source file.
+                if (language) {
+                    // More standard validation and defaults, in the context of the whole command.
                     let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
                     logger.message("    Standard: " + standard, "Verbose");
 
                     if (ext.extension) {
-                        ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, [file], windowsSDKVersion);
+                        ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files, windowsSDKVersion);
                     }
-                });
-            }
-        }
-    });
+                } else {
+                    // If the compiler command is mixing c and c++ source files, send a custom configuration for each of the source files separately,
+                    // to be able to accurately validate and calculate the standard based on the correct language.
+                    files.forEach(file => {
+                        if (file.endsWith(".cpp")) {
+                            language = "cpp";
+                        } else if (file.endsWith(".c")) {
+                            language = "c";
+                        }
+
+                        // More standard validation and defaults, in the context of each source file.
+                        let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
+                        logger.message("    Standard: " + standard, "Verbose");
+
+                        if (ext.extension) {
+                            ext.extension.buildCustomConfigurationProvider(defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, [file], windowsSDKVersion);
+                        }
+                    });
+                }
+            } // if (compilerTool) {
+        }); // foreach line
+
+        resolve();
+    }); // promise
 }
 
 // Parse the output of the make dry-run command in order to provide VS Code debugger
 // with information about binaries, their execution paths and arguments
-export function parseForLaunchConfiguration(dryRunOutputStr: string): configuration.LaunchConfiguration[] {
+export function parseForLaunchConfiguration(progress: vscode.Progress<{}>, dryRunOutputStr: string): configuration.LaunchConfiguration[] {
     // Do some preprocessing on the dry-run output to make the RegExp parsing easier
-    dryRunOutputStr = preprocessDryRunOutput(dryRunOutputStr);
+    dryRunOutputStr = preprocessDryRunOutput(progress, dryRunOutputStr);
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -614,6 +641,12 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
     // to construct information for the launch configuration
     let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
     dryRunOutputLines.forEach(line => {
+        // Stop parsing if the user cancelled the current configure.
+        if (make.getCancelConfigure()) {
+            return;
+        };
+
+        progress.report({increment: 1, message: "Parsing for launch targets..."});
         currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
         currentPath = currentPathHistory[currentPathHistory.length - 1];
 
@@ -773,6 +806,12 @@ export function parseForLaunchConfiguration(dryRunOutputStr: string): configurat
     });
 
     dryRunOutputLines.forEach(line => {
+        // Stop parsing if the user cancelled the current configure.
+        if (make.getCancelConfigure()) {
+            return;
+        };
+
+        progress.report({increment: 1, message: "Parsing for launch targets..."});
         currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
         currentPath = currentPathHistory[currentPathHistory.length - 1];
 
