@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "publisher": "ms-vscode",
     "preview": true,
-    "icon": "MakefileTools.png",
+    "icon": "res/makefile-logo.png",
     "readme": "README.md",
     "author": {
         "name": "Microsoft Corporation"
@@ -34,10 +34,7 @@
     "categories": [
         "Programming Languages",
         "Debuggers",
-        "Formatters",
-        "Linters",
-        "Other",
-        "Snippets"
+        "Other"
     ],
     "activationEvents": [
         "onCommand:makefile.setBuildConfiguration",
