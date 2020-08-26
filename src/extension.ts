@@ -31,11 +31,6 @@ export class MakefileToolsExtension {
 
     public getState(): state.StateManager { return this.mementoState; }
 
-    // Parse the dry-run output and populate data for cpptools
-    public async constructIntellisense(progress: vscode.Progress<{}>, dryRunOutputStr: string): Promise<void> {
-        return await parser.parseForCppToolsCustomConfigProvider(progress, dryRunOutputStr);
-    }
-
     public emptyCustomConfigurationProvider() : void {
         this.cppConfigurationProvider.empty();
     }
@@ -65,7 +60,7 @@ export class MakefileToolsExtension {
     public setCompletedConfigureInSession(completed: boolean) : void { this.completedConfigureInSession = completed; }
 
     // Request a custom config provider update.
-    public async updateCppToolsProvider(): Promise<void> {
+    public updateCppToolsProvider(): void {
         this.cppConfigurationProvider.logConfigurationProvider();
 
         if (this.cppToolsAPI) {
@@ -101,34 +96,12 @@ export class MakefileToolsExtension {
         }
     }
 
-    public buildCustomConfigurationProvider(
-        defines: string[],
-        includePath: string[],
-        forcedInclude: string[],
-        standard: util.StandardVersion,
-        intelliSenseMode: util.IntelliSenseMode,
-        compilerPath: string,
-        filesPaths: string[],
-        windowsSdkVersion?: string
-    ): void {
-        this.compilerFullPath = compilerPath;
-        this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard, intelliSenseMode, compilerPath, filesPaths, windowsSdkVersion);
+    public buildCustomConfigurationProvider(customConfigProviderItem: parser.CustomConfigProviderItem): void {
+        this.compilerFullPath = customConfigProviderItem.compilerFullPath;
+        this.cppConfigurationProvider.buildCustomConfigurationProvider(customConfigProviderItem);
     }
 
     public getCompilerFullPath() : string | undefined { return this.compilerFullPath; }
-}
-
-// A change of target or configuration triggered a new dry-run,
-// which produced a new output string to be parsed
-export async function updateProvider(progress: vscode.Progress<{}>, dryRunOutputStr: string): Promise<number> {
-    return new Promise<number>(function (resolve, reject): void /*Promise<void>*/ {
-        logger.message("Updating the CppTools IntelliSense Configuration Provider.");
-        /*await*/ extension.registerCppToolsProvider();
-        extension.emptyCustomConfigurationProvider();
-        /*await*/ extension.constructIntellisense(progress, dryRunOutputStr);
-        /*await*/ extension.updateCppToolsProvider();
-        resolve(0);
-    });
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {

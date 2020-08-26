@@ -312,10 +312,10 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run mycompile",
+        "vscode:prepublish": "yarn mycompile",
         "mycompile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "pretest": "npm run mycompile",
+        "pretest": "yarn mycompile",
         "test": "node ./out/src/test/runTest.js"
     },
     "devDependencies": {
