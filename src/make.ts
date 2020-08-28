@@ -74,7 +74,7 @@ export enum TriggeredBy {
 // Clicking the status bar buttons attempts to run the corresponding operation,
 // which triggers a popup and returns early if it should be blocked. Same for pallette commands.
 // In future we may enable/disable or change text depending on the blocking state.
-export function blockedByOp(op: Operations): Operations | undefined {
+export function blockedByOp(op: Operations, showPopup: boolean = true): Operations | undefined {
     let blocker: Operations | undefined;
 
     if (getIsPreConfiguring()) {
@@ -89,7 +89,7 @@ export function blockedByOp(op: Operations): Operations | undefined {
         blocker = Operations.build;
     }
 
-    if (blocker) {
+    if (blocker && showPopup) {
         vscode.window.showErrorMessage(`Cannot "${op}" because the project is already doing a ${blocker}.`);
     }
 
@@ -178,15 +178,22 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                 cancellable: true,
             },
             async (progress, cancel) => {
-                cancel.onCancellationRequested(() => {
+                cancel.onCancellationRequested(async () => {
                     progress.report({increment: 1, message: "Cancelling..."});
                     logger.message("The user is cancelling the build...");
                     cancelBuild = true;
 
                     // Kill make and all its children subprocesses.
                     logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
-                    util.killTree(curPID);
-                });
+                    await vscode.window.withProgress({
+                        location: vscode.ProgressLocation.Notification,
+                        title: "Cancelling build...",
+                        cancellable: false,
+                    },
+                    async (progress) => {
+                        await util.killTree(progress, curPID);
+                    });
+            });
 
                 setIsBuilding(true);
                 let retc: number = await doBuildTarget(progress, target, clean);
@@ -276,7 +283,23 @@ export function setParseFile(file: string): void { parseFile = file; }
 // (other than default empty "" or the standard "all"), otherwise it would produce
 // a subset of all the targets involved in the makefile (only the ones triggered
 // by building the current target).
-export async function generateParseContent(progress: vscode.Progress<{}>, forTargets: boolean = false): Promise<number> {
+export async function generateParseContent(progress: vscode.Progress<{}>,
+                                           cancel: vscode.CancellationToken,
+                                           forTargets: boolean = false,
+                                           recursive: boolean = false): Promise<number> {
+    // If the cancel was requested during this phase, the configuration cache may exist
+    // and be incomplete, which will cause a future non clean configure to pass but
+    // produce no useful information for the extension.
+    // It's better to delete the cache on these cancel notifications.
+    // These will never run both, either one of them, depending how early
+    // the cancel button click is processed.
+    if (cancel.isCancellationRequested) {
+        cleanCache();
+    }
+    cancel.onCancellationRequested(() => {
+        cleanCache();
+    });
+
     // Rules for parse content and file:
     //     1. makefile.buildLog provided by the user in settings
     //     2. configuration cache (the previous dryrun output): makefile.configurationCache
@@ -345,7 +368,9 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
 
             let stdout: any = (result: string): void => {
                 stdoutStr += result;
-                progress.report({increment: 1, message: "Generating dry-run output..."});
+                progress.report({increment: 1, message: "Generating dry-run output..." +
+                                                        ((recursive) ? "(recursive)" : "") +
+                                                        ((forTargets) ? "(for targets specifically)" : "")});
             };
 
             let stderr: any = (result: string): void => {
@@ -362,19 +387,26 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
                     }
                     logger.message(stderrStr);
 
-                    // Report the standard dry-run error and guide only when
-                    // the configure was not cancelled by the user (which causes retCode to be null).
+                    // Report the standard dry-run error & guide only when the configure was not cancelled
+                    // by the user (which causes retCode to be null).
+                    // Also don't write the cache if this operation was cancelled
+                    // because it may be incomplete and affect a future non clean configure.
                     if (retCode !== null) {
                         util.reportDryRunError();
                     }
                 }
 
-                if (cache) {
-                    logger.message(`Writing the configuration cache: ${cache}`);
-                    fs.writeFileSync(cache, stdoutStr);
-                    parseFile = cache;
+                // Don't write the cache if this operation was cancelled because stdoutStr
+                // may be incomplete and affect a future non clean configure.
+                if (retCode !== null) {
+                    if (cache) {
+                        logger.message(`Writing the configuration cache: ${cache}`);
+                        fs.writeFileSync(cache, stdoutStr);
+                        parseFile = cache;
+                    }
+
+                    parseContent = stdoutStr;
                 }
-                parseContent = stdoutStr;
 
                 resolve(retCode);
                 curPID = -1;
@@ -384,31 +416,6 @@ export async function generateParseContent(progress: vscode.Progress<{}>, forTar
         } catch (error) {
             resolve(ConfigureBuildReturnCodeTypes.notFound);
             logger.message(error);
-        }
-    });
-}
-
-export async function dummy(progress: vscode.Progress<{}>, message: string): Promise<number> {
-    return new Promise<number>(function (resolve, reject): void {
-        // Continue with the make dryrun invocation
-        let makeArgs: string[] = ["--help"];
-
-        try {
-            let stdout: any = (result: string): void => {
-                progress.report({increment: 1, message: message});
-            };
-
-            let stderr: any = (result: string): void => {
-            };
-
-            let closing: any = (retCode: number, signal: string): void => {
-                resolve(retCode);
-            };
-
-            util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
-        } catch (error) {
-            logger.message(error);
-            reject();
         }
     });
 }
@@ -443,14 +450,21 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
                 cancellable: true,
             },
             async (progress, cancel) => {
-                cancel.onCancellationRequested(() => {
+                cancel.onCancellationRequested(async () => {
                     progress.report({increment: 1, message: "Cancelling..."});
                     cancelPreConfigure = true;
 
                     logger.message("The user is cancelling the pre-configure...");
                     logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
-                    util.killTree(curPID);
-                });
+                    await vscode.window.withProgress({
+                        location: vscode.ProgressLocation.Notification,
+                        title: "Cancelling pre-configure...",
+                        cancellable: false,
+                    },
+                    async (progress) => {
+                        await util.killTree(progress, curPID);
+                    });
+            });
 
                 setIsPreConfiguring(true);
                 let retc: number = await runPreConfigureScript(progress, scriptFile || ""); // get rid of || ""
@@ -587,6 +601,37 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         preConfigureElapsedTime = (preConfigureEndTime - configureStartTime) / 1000;
     }
 
+    // Identify for telemetry whether this configure will invoke make or will read from a build log or a cache:
+    let ranMake: boolean = true;
+    let buildLog: string | undefined = configuration.getBuildLog();
+    // If build log is set and exists, we are sure make is not getting invoked
+    if (buildLog && util.checkFileExistsSync(buildLog)) {
+        ranMake = false;
+    } else {
+        // If this is a clean configure and a configuration cache was previously created,
+        // cleanConfigure already deleted it and it will get recreated by doConfigure below,
+        // so checking now on the existence of the configuration cache is a good indication
+        // whether make is going to be invoked or not.
+        let configurationCache: string | undefined = configuration.getConfigurationCache();
+        if (configurationCache && util.checkFileExistsSync(configurationCache)) {
+            ranMake = false;
+        }
+    }
+
+    // Identify for telemetry whether:
+    //   - this configure will need to double the workload, if it needs to analyze the build targets separately.
+    //   - this configure will need to reset the build target to the default, which will need a reconfigure.
+    let processTargetsSeparately: boolean = false;
+    let currentBuildTarget: string | undefined = configuration.getCurrentTarget();
+    let oldBuildTarget: string | undefined = currentBuildTarget;
+    if (!currentBuildTarget || currentBuildTarget === "") {
+        currentBuildTarget = "all";
+    }
+    if (updateTargets && currentBuildTarget !== "all") {
+        processTargetsSeparately = true;
+    }
+
+    let retc: number = ConfigureBuildReturnCodeTypes.mixedErr;
     try {
         return await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
@@ -594,12 +639,17 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
                 cancellable: true,
             },
             async (progress, cancel) => {
-                cancel.onCancellationRequested(() => {
-                    progress.report({increment: 1, message: "Cancelling..."});
-
+                cancel.onCancellationRequested(async () => {
                     if (curPID !== -1) {
                         logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
-                        util.killTree(curPID);
+                        await vscode.window.withProgress({
+                            location: vscode.ProgressLocation.Notification,
+                            title: "Cancelling configure...",
+                            cancellable: false,
+                        },
+                        async (progress) => {
+                            return await util.killTree(progress, curPID);
+                        });
                     } else {
                         // The configure process may run make twice (or three times if the build target is reset),
                         // with parsing in between and after. There is also the CppTools IntelliSense custom provider update
@@ -609,95 +659,59 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
                     logger.message("Exiting early from the configure process.");
 
-                    configuration.setBuildTargets([]);
-                    configuration.setLaunchTargets([]);
+                    // We want a successful configure as soon as possible.
+                    // The dirty state can help with that by triggering a new configure
+                    // when the next relevant command occurs.
                     extension.getState().configureDirty = true;
 
-                    // doesn't reach finally anymore??? set isConfiguring false here as well
+                    retc = ConfigureBuildReturnCodeTypes.cancelled;
                     setIsConfiguring(false);
-
-                    // doesn't reach after await doConfigure()
-                    // todo: implement telemetry here as well
                 });
-
-                // Identify for telemetry whether this configure will invoke make or will read from a build log or a cache:
-                let ranMake: boolean = true;
-                let buildLog: string | undefined = configuration.getBuildLog();
-                // If build log is set and exists, we are sure make is not getting invoked
-                if (buildLog && util.checkFileExistsSync(buildLog)) {
-                    ranMake = false;
-                } else {
-                    // If this is a clean configure and a configuration cache was previously created,
-                    // cleanConfigure already deleted it and it will get recreated by doConfigure below,
-                    // so checking now on the existence of the configuration cache is a good indication
-                    // whether make is going to be invoked or not.
-                    let configurationCache: string | undefined = configuration.getConfigurationCache();
-                    if (configurationCache && util.checkFileExistsSync(configurationCache)) {
-                        ranMake = false;
-                    }
-                }
-
-                // Identify for telemetry whether:
-                //   - this configure will need to double the workload, if it needs to analyze the build targets separately.
-                //   - this configure will need to reset the build target to the default, which will need a reconfigure.
-                let processTargetsSeparately: boolean = false;
-                let currentBuildTarget: string | undefined = configuration.getCurrentTarget();
-                let oldBuildTarget: string | undefined = currentBuildTarget;
-                if (!currentBuildTarget || currentBuildTarget === "") {
-                    currentBuildTarget = "all";
-                }
-                if (updateTargets && currentBuildTarget !== "all") {
-                    processTargetsSeparately = true;
-                }
 
                 setIsConfiguring(true);
 
-                let retc: number = await doConfigure(progress, cancel, updateTargets);
-
-                let configureEndTime: number = Date.now();
-                let configureElapsedTime: number = (configureEndTime - configureStartTime) / 1000;
-                let newBuildTarget: string | undefined = configuration.getCurrentTarget();
-                const telemetryMeasures: telemetry.Measures = {
-                    numberBuildTargets: configuration.getBuildTargets().length,
-                    numberLaunchTargets: configuration.getLaunchTargets().length,
-                    numberMakefileConfigurations: configuration.getMakefileConfigurations().length,
-                    totalElapsedTime: configureElapsedTime
-                };
-                const telemetryProperties: telemetry.Properties = {
-                    exitCode: retc.toString(),
-                    firstTime: (!ranConfigureInCodebaseLifetime).toString(),
-                    ranMake: ranMake.toString(),
-                    processTargetsSeparately: processTargetsSeparately.toString(),
-                    resetBuildTarget: (oldBuildTarget !== newBuildTarget).toString(),
-                    triggeredBy: triggeredBy
-                };
-
-                // Report if this configure ran also a pre-configure and how long it took.
-                if (preConfigureExitCode !== undefined) {
-                    telemetryProperties.preConfigureExitCode = preConfigureExitCode.toString();
-                }
-                if (preConfigureElapsedTime !== undefined) {
-                    telemetryMeasures.preConfigureElapsedTime =  preConfigureElapsedTime;
-                }
-
-                telemetryProperties.buildTarget = processTargetForTelemetry(newBuildTarget);
-                telemetry.logEvent("configure", telemetryProperties, telemetryMeasures);
-
-                return retc;
+                return await doConfigure(progress, cancel, updateTargets);
             },
         );
     } catch (e) {
         logger.message(e.message);
-        return ConfigureBuildReturnCodeTypes.mixedErr;
+        return retc;
     } finally {
+        let configureEndTime: number = Date.now();
+        let configureElapsedTime: number = (configureEndTime - configureStartTime) / 1000;
+        let newBuildTarget: string | undefined = configuration.getCurrentTarget();
+        const telemetryMeasures: telemetry.Measures = {
+            numberBuildTargets: configuration.getBuildTargets().length,
+            numberLaunchTargets: configuration.getLaunchTargets().length,
+            numberMakefileConfigurations: configuration.getMakefileConfigurations().length,
+            totalElapsedTime: configureElapsedTime
+        };
+        const telemetryProperties: telemetry.Properties = {
+            exitCode: retc.toString(),
+            firstTime: (!ranConfigureInCodebaseLifetime).toString(),
+            ranMake: ranMake.toString(),
+            processTargetsSeparately: processTargetsSeparately.toString(),
+            resetBuildTarget: (oldBuildTarget !== newBuildTarget).toString(),
+            triggeredBy: triggeredBy
+        };
+
+        // Report if this configure ran also a pre-configure and how long it took.
+        if (preConfigureExitCode !== undefined) {
+            telemetryProperties.preConfigureExitCode = preConfigureExitCode.toString();
+        }
+        if (preConfigureElapsedTime !== undefined) {
+            telemetryMeasures.preConfigureElapsedTime =  preConfigureElapsedTime;
+        }
+
+        telemetryProperties.buildTarget = processTargetForTelemetry(newBuildTarget);
+        telemetry.logEvent("configure", telemetryProperties, telemetryMeasures);
+
         setIsConfiguring(false);
     }
 }
 
 async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
                                          dryRunOutput: string, recursive: boolean = false): Promise<number> {
-    await dummy(progress, "Parsing launch configurations..." + ((recursive) ? "(recursive)" : ""));
-
     return new Promise<number>(async function (resolve, reject): Promise<void> {
         let launchConfigurations: configuration.LaunchConfiguration[] = [];
 
@@ -722,8 +736,13 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
                     logger.message("No launch configurations have been detected.");
                     configuration.setLaunchTargets([]);
                 } else {
-                    // Sort and remove duplicates (different targets may build into the same place,
-                    // launching doesn't need to know which version of the binary that is).
+                    // Sort and remove duplicates that can be created in the following scenarios:
+                    //    - the same target binary invoked several times with the same arguments and from the same path
+                    //    - a target binary invoked once with no parameters is still a duplicate
+                    //      of the entry generated by the linker command which produced the binary
+                    //    - sometimes the same binary is linked more than once in the same location
+                    //      (example: instrumentation) but the launch configurations list need only one entry,
+                    //      corresponding to the final binary, not the intermediate ones.
                     launchConfigurationsStr = launchConfigurationsStr.sort().filter(function (elem, index, self): boolean {
                         return index === self.indexOf(elem);
                     });
@@ -732,18 +751,19 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
                     configuration.setLaunchTargets(launchConfigurationsStr);
                 }
             } else {
-                reject(retc);
+                // There might be already a few valid launch targets identified,
+                // but since they might not be all reset to empty.
+                configuration.setLaunchTargets([]);
+                reject(new Error(`Parsing launch targets returned error code ${retc}.`));
             }
         }
 
-        parser.parseLaunchConfigurations(cancel, dryRunOutput, onStatus, onFoundLaunchConfiguration, onEnd);
+        setTimeout(parser.parseLaunchConfigurations, 0, cancel, dryRunOutput, onStatus, onFoundLaunchConfiguration, onEnd);
     });
 }
 
 async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
     dryRunOutput: string, recursive: boolean = false): Promise<number> {
-    await dummy(progress, "Parsing build targets..." + ((recursive) ? "(recursive)" : ""));
-
     return new Promise<number>(async function (resolve, reject): Promise<void> {
         let targets: string[] = [];
 
@@ -767,11 +787,14 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
                     logger.message("Found the following build targets defined in the makefile: " + targets.join(";"));
                 }
             } else {
-                reject(retc);
+                // There might be already a few valid build targets identified,
+                // but since they might not be all reset to empty.
+                configuration.setBuildTargets([]);
+                reject(new Error(`Parsing build targets returned error code ${retc}.`));
             }
         }
 
-        parser.parseTargets(cancel, dryRunOutput, onStatus, onFoundTarget, onEnd);
+        setTimeout(parser.parseTargets, 0, cancel, dryRunOutput, onStatus, onFoundTarget, onEnd);
     });
 }
 
@@ -780,8 +803,6 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
     logger.message("Updating the CppTools IntelliSense Configuration Provider." + ((recursive) ? "(recursive)" : ""));
     await extension.registerCppToolsProvider();
     extension.emptyCustomConfigurationProvider();
-
-    await dummy(progress, "Parsing IntelliSense..." + ((recursive) ? "(recursive)" : ""));
 
     return new Promise<number>(async function (resolve, reject): Promise<void> {
         let onStatus: any = (status: string): void => {
@@ -797,32 +818,33 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
                 resolve(retc);
                 extension.updateCppToolsProvider();
             } else {
-                reject(retc);
+                // IntelliSense may be valid if cancelling happened later
+                // but because it is most likely incomplete reset to nothing.
+                extension.emptyCustomConfigurationProvider();
+                reject(new Error(`Parsing IntelliSense returned error code ${retc}.`));
             }
         }
 
-        parser.parseCustomConfigProvider(cancel, dryRunOutput, onStatus, onFoundCustomConfigProviderItem, onEnd);
+        setTimeout(parser.parseCustomConfigProvider, 0, cancel, dryRunOutput, onStatus, onFoundCustomConfigProviderItem, onEnd);
     });
 }
 
 export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
-                                       dryrunOutput: string, recursive: boolean = false): Promise<string> {
-    await dummy(progress, "Preprocessing the dry-run output..." + ((recursive) ? "(recursive)" : ""));
-
-    return new Promise<string>(async function (resolve, reject): Promise<void> {
+                                       dryrunOutput: string, recursive: boolean = false): Promise<string | null> {
+    return new Promise<string | null>(async function (resolve, reject): Promise<void> {
         let onStatus: any = (status: string): void => {
             progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
         };
 
-        let onEnd: any = (retc: number, result: string): void => {
+        let onEnd: any = (retc: number, result: string | null): void => {
             if (retc === ConfigureBuildReturnCodeTypes.success) {
                 resolve(result);
             } else {
-                reject();
+                reject(new Error(`Pre-processing dry-run output returned error code ${retc}.`));
             }
         };
 
-        parser.preprocessDryRunOutput(cancel, dryrunOutput, onStatus, onEnd);
+        setTimeout(parser.preprocessDryRunOutput, 0, cancel, dryrunOutput, onStatus, onEnd);
     });
 }
 
@@ -838,14 +860,14 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     let retc3: number | undefined;
 
     // This generates the dryrun output and caches it.
-    retc1 = await generateParseContent(progress);
+    retc1 = await generateParseContent(progress, cancel, false, recursiveDoConfigure);
     if (retc1 === ConfigureBuildReturnCodeTypes.cancelled) {
         return retc1;
     }
 
     // Some initial preprocessing required before any parsing is done.
     logger.message(`Preprocessing dryrun output read from: "${parseFile}"`);
-    let preprocessedDryrunOutput: string = await preprocessDryRun(progress, cancel, parseContent || "", recursiveDoConfigure);
+    let preprocessedDryrunOutput: string | null = await preprocessDryRun(progress, cancel, parseContent || "", recursiveDoConfigure);
     if (!preprocessedDryrunOutput) {
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
@@ -875,15 +897,20 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         configuration.setLaunchConfigurationByName("");
     }
 
-    // Configure build targets only if necessary
-    if (updateTargets) {
+    // Configure build targets only if necessary:
+    // if the caller considers we need a build target update
+    // or if the build target array hasn't been populated by now
+    // or if it contains only 'all' which we push automatically.
+    let buildTargets: string[] = configuration.getBuildTargets();
+    if (updateTargets || buildTargets.length === 0 ||
+        (buildTargets.length === 1 && buildTargets[0] === "all")) {
         // If the current target is other than default (empty "") or "all",
         // we need to generate a different dryrun output.
         // No preprocessing is needed to parse the targets.
         let target: string | undefined = configuration.getCurrentTarget();
         if (target !== "" && target !== "all") {
             logger.message("Generating parse content for build targets.");
-            retc2 = await generateParseContent(progress, true);
+            retc2 = await generateParseContent(progress, cancel, true, recursiveDoConfigure);
             if (retc2 === ConfigureBuildReturnCodeTypes.cancelled) {
                 return retc2;
             }
@@ -891,11 +918,15 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         }
 
         logger.message(`Parsing for build targets from: "${parseFile}"`);
-        await parseTargets(progress, cancel, parseContent || "", recursiveDoConfigure);
+        if (await parseTargets(progress, cancel, parseContent || "", recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
+            return ConfigureBuildReturnCodeTypes.cancelled;
+        }
 
         // Verify if the current build target is still part of the list and unset otherwise.
+        buildTargets = configuration.getBuildTargets();
         let currentBuildTarget: string | undefined = configuration.getCurrentTarget();
-        if (currentBuildTarget && currentBuildTarget !== "" && !configuration.getBuildTargets().includes(currentBuildTarget)) {
+        if (currentBuildTarget && currentBuildTarget !== "" && currentBuildTarget !== "all" &&
+            !buildTargets.includes(currentBuildTarget)) {
             logger.message(`Current build target ${currentBuildTarget} is no longer present in the available list.` +
                 ` Unsetting the current build target.`);
 
