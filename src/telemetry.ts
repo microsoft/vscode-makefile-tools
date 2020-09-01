@@ -82,7 +82,7 @@ function filterSetting(value: any, key: string) : any {
             }
         });
 
-        return filteredSwitches;
+        return filteredSwitches.join(";");
     }
 
     return "...";

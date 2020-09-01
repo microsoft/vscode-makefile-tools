@@ -1,4 +1,6 @@
-// UI support for this extension: buttons and quickpicks.
+// Deprecated UI support for buttons and quickpicks.
+// Replaced by makefile.outline view in the left side bar.
+// To be removed, hidden for now.
 
 import * as vscode from 'vscode';
 
@@ -35,35 +37,35 @@ export class UI {
         this.configurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.6);
         this.configurationButton.command = "makefile.setBuildConfiguration";
         this.configurationButton.tooltip = "Click to select the workspace make configuration";
-        this.configurationButton.show();
+        this.configurationButton.hide();
 
         this.targetButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.5);
         this.targetButton.command = "makefile.setBuildTarget";
         this.targetButton.tooltip = "Click to select the target to be run by make";
-        this.targetButton.show();
+        this.targetButton.hide();
 
         this.buildButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.4);
         this.buildButton.command = "makefile.buildTarget";
         this.buildButton.tooltip = "Click to build the selected target";
         this.buildButton.text = "$(gear) Build";
-        this.buildButton.show();
+        this.buildButton.hide();
 
         this.launchConfigurationButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.3);
         this.launchConfigurationButton.command = "makefile.setLaunchConfiguration";
         this.launchConfigurationButton.tooltip = "Click to select the make launch configuration (binary, args and current path)";
-        this.launchConfigurationButton.show();
+        this.launchConfigurationButton.hide();
 
         this.debugButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.2);
         this.debugButton.command = "makefile.launchDebug";
         this.debugButton.tooltip = "Click to debug the selected executable";
         this.debugButton.text = "$(bug) Debug";
-        this.debugButton.show();
+        this.debugButton.hide();
 
         this.runButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 4.1);
         this.runButton.command = "makefile.launchRun";
         this.runButton.tooltip = "Click to launch the selected executable";
         this.runButton.text = "$(terminal) Run";
-        this.runButton.show();
+        this.runButton.hide();
     }
 
     public dispose(): void {

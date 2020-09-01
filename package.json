@@ -49,7 +49,18 @@
         "onCommand:makefile.configure",
         "onCommand:makefile.cleanConfigure",
         "onCommand:makefile.preConfigure",
+        "onCommand:makefile.outline.setBuildConfiguration",
+        "onCommand:makefile.outline.setBuildTarget",
+        "onCommand:makefile.outline.buildTarget",
+        "onCommand:makefile.outline.buildCleanTarget",
+        "onCommand:makefile.outline.setLaunchConfiguration",
+        "onCommand:makefile.outline.launchDebug",
+        "onCommand:makefile.outline.launchRun",
+        "onCommand:makefile.outline.configure",
+        "onCommand:makefile.outline.cleanConfigure",
+        "onCommand:makefile.outline.preConfigure",
         "onCommand:makefile.resetState",
+        "onView:makefile.outline",
         "workspaceContains:makefile",
         "workspaceContains:Makefile"
     ],
@@ -103,6 +114,74 @@
             {
                 "command": "makefile.preConfigure",
                 "title": "Makefile: Pre-Configure"
+            },
+            {
+                "command": "makefile.outline.buildTarget",
+                "title": "Build",
+                "icon": {
+                    "light": "res/light/build.svg",
+                    "dark": "res/dark/build.svg"
+                }
+            },
+            {
+                "command": "makefile.outline.buildCleanTarget",
+                "title": "Build clean"
+            },
+            {
+                "command": "makefile.outline.launchDebug",
+                "title": "Debug",
+                "icon": {
+                    "light": "res/light/debug.svg",
+                    "dark": "res/dark/debug.svg"
+                }
+            },
+            {
+                "command": "makefile.outline.launchRun",
+                "title": "Run in terminal",
+                "icon": {
+                    "light": "res/light/run.svg",
+                    "dark": "res/dark/run.svg"
+                }
+            },
+            {
+                "command": "makefile.outline.setBuildConfiguration",
+                "title": "Change build configuration",
+                "icon": {
+                    "light": "res/light/edit.svg",
+                    "dark": "res/dark/edit.svg"
+                }
+            },
+            {
+                "command": "makefile.outline.setBuildTarget",
+                "title": "Change build target",
+                "icon": {
+                    "light": "res/light/edit.svg",
+                    "dark": "res/dark/edit.svg"
+                }
+            },
+            {
+                "command": "makefile.outline.setLaunchConfiguration",
+                "title": "Change launch configuration",
+                "icon": {
+                    "light": "res/light/edit.svg",
+                    "dark": "res/dark/edit.svg"
+                }
+            },
+            {
+                "command": "makefile.outline.configure",
+                "title": "Configure",
+                "icon": {
+                    "light": "res/light/configure.svg",
+                    "dark": "res/dark/configure.svg"
+                }
+            },
+            {
+                "command": "makefile.outline.cleanConfigure",
+                "title": "Clean configure"
+            },
+            {
+                "command": "makefile.outline.preConfigure",
+                "title": "Pre-Configure"
             },
             {
                 "command": "makefile.resetState",
@@ -309,6 +388,109 @@
                     "scope": "resource"
                 }
             }
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "makefile__viewContainer",
+                    "title": "Makefile",
+                    "icon": "res/viewcontainer.svg"
+                }
+            ]
+        },
+        "views": {
+            "makefile__viewContainer": [
+                {
+                    "id": "makefile.outline",
+                    "name": ""
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "makefile.outline.preConfigure",
+                    "when": "view == makefile.outline",
+                    "group": "1_makefileOutline@1"
+                },
+                {
+                    "command": "makefile.outline.configure",
+                    "when": "view == makefile.outline",
+                    "group": "1_makefileOutline@2"
+                },
+                {
+                    "command": "makefile.outline.cleanConfigure",
+                    "when": "view == makefile.outline",
+                    "group": "1_makefileOutline@3"
+                },
+                {
+                    "command": "makefile.outline.buildTarget",
+                    "when": "view == makefile.outline",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "makefile.outline.buildCleanTarget",
+                    "when": "view == makefile.outline",
+                    "group": "1_makefileOutline@4"
+                },
+                {
+                    "command": "makefile.outline.launchDebug",
+                    "when": "view == makefile.outline",
+                    "group": "navigation@2"
+                },
+                {
+                    "command": "makefile.outline.launchRun",
+                    "when": "view == makefile.outline",
+                    "group": "navigation@3"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "makefile.outline.configure",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=configuration/",
+                    "group": "1_stateActions@1"
+                },
+                {
+                    "command": "makefile.outline.cleanConfigure",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=configuration/",
+                    "group": "1_stateActions@2"
+                },
+                {
+                    "command": "makefile.outline.setBuildConfiguration",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=configuration/",
+                    "group": "inline@1"
+                },
+                {
+                    "command": "makefile.outline.buildTarget",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
+                    "group": "1_stateActions@1"
+                },
+                {
+                    "command": "makefile.outline.buildCleanTarget",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
+                    "group": "1_stateActions@2"
+                },
+                {
+                    "command": "makefile.outline.setBuildTarget",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
+                    "group": "inline@1"
+                },
+                {
+                    "command": "makefile.outline.launchDebug",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
+                    "group": "1_stateActions@1"
+                },
+                {
+                    "command": "makefile.outline.launchRun",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
+                    "group": "1_stateActions@2"
+                },
+                {
+                    "command": "makefile.outline.setLaunchConfiguration",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
+                    "group": "inline@1"
+                }
+            ]
         }
     },
     "scripts": {

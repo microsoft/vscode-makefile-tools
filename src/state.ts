@@ -56,7 +56,12 @@ export class StateManager {
   // (makefile configuration change, build target change,
   // settings or makefiles edits)
   get configureDirty(): boolean {
-    return this._get<boolean>('configureDirty') || true;
+    let dirty: boolean | undefined = this._get<boolean>('configureDirty');
+    if (dirty === undefined) {
+        dirty = true;
+    }
+
+    return dirty;
   }
   set configureDirty(v: boolean) {
     this._update('configureDirty', v);

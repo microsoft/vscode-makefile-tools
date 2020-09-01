@@ -9,6 +9,7 @@ import * as make from './make';
 import * as parser from './parser';
 import * as state from './state';
 import * as telemetry from './telemetry';
+import * as tree from './tree';
 import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
@@ -20,6 +21,12 @@ let launcher: launch.Launcher = launch.getLauncher();
 export let extension: MakefileToolsExtension;
 
 export class MakefileToolsExtension {
+    public readonly _projectOutlineProvider = new tree.ProjectOutlineProvider();
+    private readonly _projectOutlineTreeView = vscode.window.createTreeView('makefile.outline', {
+        treeDataProvider: this._projectOutlineProvider,
+        showCollapseAll: false
+    });
+
     private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
     private mementoState = new state.StateManager(this.extensionContext);
     private cppToolsAPI?: cpp.CppToolsApi;
@@ -41,6 +48,7 @@ export class MakefileToolsExtension {
     }
 
     public dispose(): void {
+        this._projectOutlineTreeView.dispose();
         if (this.cppToolsAPI) {
             this.cppToolsAPI.dispose();
         }
@@ -197,6 +205,46 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.resetState', () => {
         telemetry.logEvent("commandResetState");
         extension.getState().reset();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.configure', () => {
+        return vscode.commands.executeCommand("makefile.configure");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.cleanConfigure', () => {
+        return vscode.commands.executeCommand("makefile.cleanConfigure");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.preConfigure', () => {
+        return vscode.commands.executeCommand("makefile.preConfigure");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.setLaunchConfiguration', () => {
+        return vscode.commands.executeCommand("makefile.setLaunchConfiguration");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.launchDebug', () => {
+        return vscode.commands.executeCommand("makefile.launchDebug");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.launchRun', () => {
+        return vscode.commands.executeCommand("makefile.launchRun");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.setBuildTarget', () => {
+        return vscode.commands.executeCommand("makefile.setBuildTarget");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.buildTarget', () => {
+        return vscode.commands.executeCommand("makefile.buildTarget");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.buildCleanTarget', () => {
+        return vscode.commands.executeCommand("makefile.buildCleanTarget");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.setBuildConfiguration', () => {
+        return vscode.commands.executeCommand("makefile.setBuildConfiguration");
     }));
 
     configuration.readLoggingLevel();

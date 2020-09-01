@@ -501,16 +501,13 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
         }
 
         try {
-            let stdoutStr: string = "";
-            let stderrStr: string = "";
-
             let stdout: any = (result: string): void => {
-                stdoutStr += result;
                 progress.report({increment: 1, message: "..."});
+                logger.messageNoCR(result);
             };
 
             let stderr: any = (result: string): void => {
-                stderrStr += result;
+                logger.messageNoCR(result);
             };
 
             let closing: any = (retCode: number, signal: string): void => {
@@ -518,7 +515,6 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
                     logger.message("The pre-configure succeeded.");
                 } else {
                     logger.message("The pre-configure script failed. This project may not configure successfully.");
-                    logger.message(stderrStr);
                 }
 
                 // Apply the environment produced by running the pre-configure script.
