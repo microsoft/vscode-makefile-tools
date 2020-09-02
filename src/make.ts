@@ -190,9 +190,9 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                         title: "Cancelling build...",
                         cancellable: false,
                     },
-                    async (progress) => {
-                        await util.killTree(progress, curPID);
-                    });
+                        async (progress) => {
+                            await util.killTree(progress, curPID);
+                        });
             });
 
                 setIsBuilding(true);
@@ -461,9 +461,9 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
                         title: "Cancelling pre-configure...",
                         cancellable: false,
                     },
-                    async (progress) => {
-                        await util.killTree(progress, curPID);
-                    });
+                        async (progress) => {
+                            await util.killTree(progress, curPID);
+                        });
             });
 
                 setIsPreConfiguring(true);
@@ -647,9 +647,9 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
                             title: "Cancelling configure...",
                             cancellable: false,
                         },
-                        async (progress) => {
-                            return await util.killTree(progress, curPID);
-                        });
+                            async (progress) => {
+                                return util.killTree(progress, curPID);
+                            });
                     } else {
                         // The configure process may run make twice (or three times if the build target is reset),
                         // with parsing in between and after. There is also the CppTools IntelliSense custom provider update
@@ -670,7 +670,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
                 setIsConfiguring(true);
 
-                return await doConfigure(progress, cancel, updateTargets);
+                return doConfigure(progress, cancel, updateTargets);
             },
         );
     } catch (e) {
@@ -725,8 +725,6 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
 
         let onEnd: any = (retc: number): void => {
             if (retc === ConfigureBuildReturnCodeTypes.success) {
-                resolve(retc);
-
                 let launchConfigurationsStr: string[] = [];
                 launchConfigurations.forEach(config => {
                     launchConfigurationsStr.push(configuration.launchConfigurationToString(config));
@@ -754,9 +752,10 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
                 // There might be already a few valid launch targets identified,
                 // but since they might not be all reset to empty.
                 configuration.setLaunchTargets([]);
-                reject(new Error(`Parsing launch targets returned error code ${retc}.`));
             }
-        }
+
+            resolve(retc);
+        };
 
         setTimeout(parser.parseLaunchConfigurations, 0, cancel, dryRunOutput, onStatus, onFoundLaunchConfiguration, onEnd);
     });
@@ -777,8 +776,6 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
 
         let onEnd: any = (retc: number): void => {
             if (retc === ConfigureBuildReturnCodeTypes.success) {
-                resolve(retc);
-
                 if (targets.length === 0) {
                     configuration.setBuildTargets([]);
                     logger.message("No build targets have been detected.");
@@ -790,9 +787,10 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
                 // There might be already a few valid build targets identified,
                 // but since they might not be all reset to empty.
                 configuration.setBuildTargets([]);
-                reject(new Error(`Parsing build targets returned error code ${retc}.`));
             }
-        }
+
+            resolve(retc);
+        };
 
         setTimeout(parser.parseTargets, 0, cancel, dryRunOutput, onStatus, onFoundTarget, onEnd);
     });
@@ -815,15 +813,15 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
 
         let onEnd: any = (retc: number): void => {
             if (retc === ConfigureBuildReturnCodeTypes.success) {
-                resolve(retc);
                 extension.updateCppToolsProvider();
             } else {
                 // IntelliSense may be valid if cancelling happened later
                 // but because it is most likely incomplete reset to nothing.
                 extension.emptyCustomConfigurationProvider();
-                reject(new Error(`Parsing IntelliSense returned error code ${retc}.`));
             }
-        }
+
+            resolve(retc);
+        };
 
         setTimeout(parser.parseCustomConfigProvider, 0, cancel, dryRunOutput, onStatus, onFoundCustomConfigProviderItem, onEnd);
     });
@@ -840,14 +838,13 @@ export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vs
             if (retc === ConfigureBuildReturnCodeTypes.success) {
                 resolve(result);
             } else {
-                reject(new Error(`Pre-processing dry-run output returned error code ${retc}.`));
+                resolve(null);
             }
         };
 
         setTimeout(parser.preprocessDryRunOutput, 0, cancel, dryrunOutput, onStatus, onEnd);
     });
 }
-
 
 // Update IntelliSense and launch targets with information parsed from a user given build log,
 // the dryrun cache or make dryrun output if the cache is not present.
@@ -872,7 +869,6 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
 
-
     // Configure IntelliSense
     // Don't override retc1, since make invocations may fail with errors different than cancel
     // and we still complete the configure process.
@@ -880,7 +876,6 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     if (await updateProvider(progress, cancel, preprocessedDryrunOutput, recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
-
 
     // Configure launch targets as parsed from the makefile
     // (and not as read from settings via makefile.launchConfigurations).

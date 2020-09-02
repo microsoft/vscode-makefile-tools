@@ -130,18 +130,18 @@ export function toolPathInEnv(name: string): string | undefined {
 
 export async function killTree(progress: vscode.Progress<{}>, pid: number): Promise<void> {
     return new Promise<void>(async function (resolve, reject): Promise<void> {
-    if (process.platform !== 'win32') {
-        let children: number[] = [];
-        let stdoutStr: string = "";
+        if (process.platform !== 'win32') {
+            let children: number[] = [];
+            let stdoutStr: string = "";
 
-        let stdout: any = (result: string): void => {
-            stdoutStr += result;
-        };
+            let stdout: any = (result: string): void => {
+                stdoutStr += result;
+            };
 
-        let stderr: any = (result: string): void => {
-        };
+            let stderr: any = (result: string): void => {
+            };
 
-        let closing: any = (retCode: number, signal: string): void => {
+            let closing: any = (retCode: number, signal: string): void => {
                 if (!!stdoutStr.length) {
                     children = stdoutStr.split('\n').map((line: string) => Number.parseInt(line));
 
@@ -157,7 +157,7 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
             };
 
             try {
-                spawnChildProcess('pgrep', ['-P', pid.toString()], vscode.workspace.rootPath || "", stdout, stderr, closing);
+                await spawnChildProcess('pgrep', ['-P', pid.toString()], vscode.workspace.rootPath || "", stdout, stderr, closing);
             } catch (e) {
                 if (e.retCode === 1) {
                     // all good, it means there are no children processes
@@ -178,6 +178,7 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
             }
         } else {
             child_process.exec(`taskkill /pid ${pid} /T /F`);
+            resolve();
         }
     });
 }

@@ -476,9 +476,11 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         }
 
         // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
+        // On linux/mac, it often is 'Makefile', so we have to verify we default to the right filename.
         if (!makefileUsed) {
-            makefileUsed = (process.platform === "win32") ? "./makefile" : "./Makefile";
+            makefileUsed = (util.checkFileExistsSync(util.resolvePathToRoot("./makefile"))) ? "./makefile" : "./Makefile";
         }
+
         makefileUsed = util.resolvePathToRoot(makefileUsed);
         if (!util.checkFileExistsSync(makefileUsed)) {
             vscode.window.showErrorMessage("Makefile entry point not found.");
@@ -663,9 +665,9 @@ export async function initFromStateAndSettings(): Promise<void> {
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
     vscode.window.onDidChangeActiveTextEditor(e => {
-        let documentFileExtension: string | undefined;
+        let language: string = "";
         if (e) {
-            documentFileExtension = path.parse(e.document.uri.fsPath).ext;
+            language = e.document.languageId;
         }
 
         // It is too annoying to generate a configure on any kind of editor focus change
@@ -674,12 +676,9 @@ export async function initFromStateAndSettings(): Promise<void> {
         // the only "operation" left that we need to make sure it's up to date
         // is IntelliSense, so trigger a configure when we switch editor focus
         // into C/C++ source code.
-        switch (documentFileExtension) {
-            case ".c":
-            case ".cpp":
-            case ".cxx":
-            case ".h":
-            case ".hpp":
+        switch (language) {
+            case "c":
+            case "cpp":
                 // If configureDirty is already set from a previous VSCode session,
                 // at workspace load this event (onDidChangeActiveTextEditor) is triggered automatically
                 // and if makefile.configureOnOpen is true, there is a race between two configure operations,

@@ -58,11 +58,11 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
 
             async function chunkWrapper(): Promise<void> {
                 return new Promise<void>(async function (resolve, reject): Promise<void> {
-                    function doChunk() {
+                    function doChunk(): void {
                         let chunkIndex: number = 0;
 
                         while (match && chunkIndex <= chunkSize) {
-                            if (!make.getIsConfiguring()) {
+                            if (cancel.isCancellationRequested) {
                                 break;
                             }
 
@@ -87,6 +87,8 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
                                 setTimeout(doChunk, 0);
                             }
                         } // while match
+
+                        resolve();
                     } // doChunk function
 
                     doChunk();
@@ -130,7 +132,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
         async function chunk1Wrapper(): Promise<void> {
             return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk1(level: number) {
+                function doChunk1(level: number): void {
                     statusCallback("Preprocessing the dry-run output...1");
                     if (level === 1) {
                         let extensionRootPath: string = path.resolve(__dirname, "../../");
@@ -148,6 +150,8 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                     } else {
                         setTimeout(doChunk1, 0, 1);
                     }
+
+                    resolve();
                 }
 
                 doChunk1(0);
@@ -161,10 +165,10 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
         async function chunk2Wrapper(): Promise<void> {
             return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk2() {
+                function doChunk2(): void {
                     let chunkIndex: number = 0;
                     while (match) {
-                        if (!make.getIsConfiguring()) {
+                        if (cancel.isCancellationRequested) {
                             break;
                         }
 
@@ -183,6 +187,8 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                             setTimeout(doChunk2, 0);
                         }
                     } // while loop
+
+                    resolve();
                 } // doChunk2
                 doChunk2();
             });
@@ -200,10 +206,10 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
         async function chunk3Wrapper(): Promise<void> {
             return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk3() {
+                function doChunk3(): void {
                     let chunkIndex: number = 0;
                     while (index <= numberOfLines && chunkIndex <= chunkSize) {
-                        if (!make.getIsConfiguring()) {
+                        if (cancel.isCancellationRequested) {
                             break;
                         }
 
@@ -246,6 +252,8 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                             setTimeout(doChunk3, 0);
                         }
                     } // while loop
+
+                    resolve();
                 } // doChunk3
                 doChunk3();
             });
@@ -255,7 +263,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
         async function chunk4Wrapper(): Promise<void> {
             return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk4(level: number) {
+                function doChunk4(level: number): void {
                     statusCallback("Preprocessing the dry-run output...4");
 
                     if (level === 1) {
@@ -273,11 +281,11 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                         if (process.platform === "win32") {
                             preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ \/link /g, "/link \n link.exe ");
                         }
-
-                        resolve();
                     } else {
                         setTimeout(doChunk4, 0, 1);
                     }
+
+                    resolve();
                 }
 
                 doChunk4(0);
@@ -637,7 +645,7 @@ export interface CustomConfigProviderItem {
     intelliSenseMode: util.IntelliSenseMode;
     compilerFullPath: string;
     files: string[];
-    windowsSDKVersion?: string
+    windowsSDKVersion?: string;
 }
 
 // Parse the output of the make dry-run command in order to provide CppTools
@@ -672,10 +680,10 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
         let numberOfLines: number = dryRunOutputLines.length;
         let index: number = 0;
 
-        function doChunk() {
+        function doChunk(): void {
             let chunkIndex: number = 0;
             while (index <= numberOfLines && chunkIndex <= chunkSize) {
-                if (!make.getIsConfiguring()) {
+                if (cancel.isCancellationRequested) {
                     break;
                 }
 
@@ -791,6 +799,8 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     setTimeout(doChunk, 0);
                 }
             } // while loop
+
+            resolve();
         } // doChunk function
 
         doChunk();
@@ -829,13 +839,13 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
         async function chunk1Wrapper(): Promise<void> {
             return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk1() {
+                function doChunk1(): void {
                     let chunkIndex: number = 0;
                     while (index <= numberOfLines && chunkIndex <= chunkSize) {
-                        if (!make.getIsConfiguring()) {
+                        if (cancel.isCancellationRequested) {
                             break;
                         }
-        
+
                         let line: string = dryRunOutputLines[index];
 
                         statusCallback("Parsing for launch targets... (inspecting for link commands");
@@ -974,6 +984,8 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                             setTimeout(doChunk1, 0);
                         }
                     } // while loop
+
+                    resolve();
                 } // doChunk1 function
 
                 doChunk1();
@@ -981,7 +993,6 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
         } // chunk1Wrapper
 
         await chunk1Wrapper();
-
 
         // If no binaries are found to be built, there is no point in parsing for invoking targets
         if (targetBinaries.length === 0) {
@@ -1018,10 +1029,10 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
         });
 
         index = 0;
-        function doChunk2() {
+        function doChunk2(): void {
             let chunkIndex: number = 0;
             while (index <= numberOfLines && chunkIndex <= chunkSize) {
-                if (!make.getIsConfiguring()) {
+                if (cancel.isCancellationRequested) {
                     break;
                 }
 
@@ -1071,6 +1082,8 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                     setTimeout(doChunk2, 0);
                 }
             } // while loop
+
+            resolve();
         } // doChunk2 function
 
         doChunk2();

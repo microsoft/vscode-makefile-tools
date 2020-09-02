@@ -55,7 +55,7 @@ export function logEvent(eventName: string, properties?: Properties, measures?: 
 }
 
 // Allow-lists for various settings.
-function filterSetting(value: any, key: string) : any {
+function filterSetting(value: any, key: string) : string {
     if (key === "makefile.dryrunSwitches") {
         let dryrunSwitches: string[] = value;
         let filteredSwitches: string[] | undefined = dryrunSwitches.map(sw => {
