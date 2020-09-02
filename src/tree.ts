@@ -8,9 +8,6 @@ interface NamedItem {
     name: string;
 }
 
-  /**
- * Base class of nodes in all tree nodes
- */
 abstract class BaseNode {
     constructor(public readonly id: string) { }
     abstract getTreeItem(): vscode.TreeItem;
@@ -148,15 +145,11 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
         this._currentConfigurationItem = new ConfigurationNode("Unset");
         this._currentBuildTargetItem = new BuildTargetNode("Unset");
         this._currentLaunchTargetItem = new LaunchTargetNode("Unset");
-        this._children.push(this._currentConfigurationItem);
-        this._children.push(this._currentBuildTargetItem);
-        this._children.push(this._currentLaunchTargetItem);
     }
 
     private _currentConfigurationItem: ConfigurationNode;
     private _currentBuildTargetItem: BuildTargetNode;
     private _currentLaunchTargetItem: LaunchTargetNode;
-    private _children: BaseNode[] = [];
 
     get onDidChangeTreeData(): any {
         return this._changeEvent.event;
@@ -169,7 +162,7 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
             return node.getChildren();
         }
 
-        return this._children;
+        return [this._currentConfigurationItem, this._currentBuildTargetItem, this._currentLaunchTargetItem];
     }
 
     update(configuration: string, buildTarget: string, launchTarget: string): void {
