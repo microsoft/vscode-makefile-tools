@@ -662,6 +662,10 @@ export async function initFromStateAndSettings(): Promise<void> {
 
     analyzeConfigureParams();
 
+    extension._projectOutlineProvider.update(extension.getState().buildConfiguration || "unset",
+                                             extension.getState().buildTarget || "unset",
+                                             extension.getState().launchConfiguration || "unset");
+
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
     vscode.window.onDidChangeActiveTextEditor(e => {
@@ -911,6 +915,7 @@ export async function initFromStateAndSettings(): Promise<void> {
 export function setConfigurationByName(configurationName: string): void {
     extension.getState().buildConfiguration = configurationName;
     setCurrentMakefileConfiguration(configurationName);
+    extension._projectOutlineProvider.updateConfiguration(configurationName);
 }
 
 export function prepareConfigurationsQuickPick(): string[] {
@@ -989,6 +994,7 @@ export function setTargetByName(targetName: string) : void {
     statusBar.setTarget(displayTarget);
     logger.message("Setting target " + displayTarget);
     extension.getState().buildTarget = currentTarget;
+    extension._projectOutlineProvider.updateBuildTarget(targetName);
 }
 
 // Fill a drop-down with all the target names run by building the makefile for the current configuration
@@ -1001,7 +1007,10 @@ export async function selectTarget(): Promise<void> {
     }
 
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
-    if (extension.getState().configureDirty) {
+    if (extension.getState().configureDirty ||
+        // The configure state might not be dirty from the last session but if the project is set to skip
+        // configure on open and no configure happened yet we still must warn.
+        (configureOnOpen === false && !extension.getRanConfigureInSession())) {
         logger.message("The project needs a configure to populate the build targets correctly.");
         if (configureAfterCommand) {
             let retc: number = await make.cleanConfigure(make.TriggeredBy.configureBeforeTargetChange);
@@ -1084,6 +1093,8 @@ export function setLaunchConfigurationByName(launchConfigurationName: string) : 
         extension.getState().launchConfiguration = undefined;
         statusBar.setLaunchConfiguration("No launch configuration set");
     }
+
+    extension._projectOutlineProvider.updateLaunchTarget(launchConfigurationName);
 }
 
 // Fill a drop-down with all the launch configurations found for binaries built by the makefile
@@ -1096,7 +1107,10 @@ export async function selectLaunchConfiguration(): Promise<void> {
     }
 
     // warn about an out of date configure state and configure if makefile.configureAfterCommand allows.
-    if (extension.getState().configureDirty) {
+    if (extension.getState().configureDirty ||
+        // The configure state might not be dirty from the last session but if the project is set to skip
+        // configure on open and no configure happened yet we still must warn.
+        (configureOnOpen === false && !extension.getRanConfigureInSession())) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
         if (configureAfterCommand) {
             let retc: number = await make.cleanConfigure(make.TriggeredBy.configureBeforeLaunchTargetChange);
@@ -1109,12 +1123,24 @@ export async function selectLaunchConfiguration(): Promise<void> {
     // TODO: create a quick pick with description and details for items
     // to better view the long targets commands
 
+    // In the quick pick, include also any makefile.launchConfigurations entries,
+    // as long as they exist on disk and without allowing duplicates.
+    let launchTargetsNames: string[] = launchTargets;
+    launchConfigurations.forEach(launchConfiguration => {
+        if (util.checkFileExistsSync(launchConfiguration.binaryPath)) {
+            launchTargetsNames.push(launchConfigurationToString(launchConfiguration));
+        }
+    });
+    launchTargetsNames = launchTargetsNames.sort().filter(function (elem, index, self): boolean {
+        return index === self.indexOf(elem);
+    });
+
     let options: vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
     if (launchTargets.length === 0) {
         options.placeHolder = "No launch targets identified";
     }
-    const chosen: string | undefined = await vscode.window.showQuickPick(launchTargets, options);
+    const chosen: string | undefined = await vscode.window.showQuickPick(launchTargetsNames, options);
 
     if (chosen) {
         let currentLaunchConfiguration: LaunchConfiguration | undefined = getCurrentLaunchConfiguration();

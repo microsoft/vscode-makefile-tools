@@ -609,7 +609,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         // equivalent to pushd
         let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ')(.*)'");
         if (match) {
-            newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
+            newCurrentPath = util.makeFullPath(match[4], lastCurrentPath) || "";
         } else {
             newCurrentPath = "Could not parse directory";
         }
