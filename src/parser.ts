@@ -25,6 +25,17 @@ const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 const chunkSize: number = 100;
 
+async function scheduleTask(task: (taskEndCallback: () => void) => Promise<void>): Promise<void> {
+    return new Promise<void>(resolve => {
+        let onEnd: any = (): void => {
+            resolve();
+        }
+
+        setImmediate(() => {
+            task(onEnd);
+        });
+    });
+}
 export async function parseTargets(cancel: vscode.CancellationToken, verboseLog: string,
                                    statusCallback: (message: string) => void,
                                    foundTargetCallback: (target: string) => void,
@@ -56,8 +67,8 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
 
             match = regexpTarget.exec(extractedLog);
 
-            async function chunkWrapper(): Promise<void> {
-                return new Promise<void>(async function (resolve, reject): Promise<void> {
+            if (match) {
+                await scheduleTask(async (taskEndCallback: () => void) => {
                     function doChunk(): void {
                         let chunkIndex: number = 0;
 
@@ -88,16 +99,12 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
                             }
                         } // while match
 
-                        resolve();
+                        taskEndCallback();
                     } // doChunk function
 
                     doChunk();
-                });
-            } // chunkWrapper
-
-            if (match) {
-                await chunkWrapper();
-            }
+                }); // scheduleTask
+            }// if match
 
             result = regexpExtract.exec(verboseLog);
         } // while result
@@ -130,41 +137,35 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         // and not generating a different output with every new location where Makefile Tools is enlisted.
         // A real user scenario wouldn't need this construct.
 
-        async function chunk1Wrapper(): Promise<void> {
-            return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk1(level: number): void {
-                    statusCallback("Preprocessing the dry-run output...1");
-                    if (level === 1) {
-                        let extensionRootPath: string = path.resolve(__dirname, "../../");
-                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+        await scheduleTask(async (taskEndCallback: () => void) => {
+            function doChunk1(level: number): void {
+                statusCallback("Preprocessing the dry-run output...1");
+                if (level === 1) {
+                    let extensionRootPath: string = path.resolve(__dirname, "../../");
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
 
-                        // Split multiple commands concatenated by '&&'
-                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
+                    // Split multiple commands concatenated by '&&'
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
 
-                        // Split multiple commands concatenated by ";"
-                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
+                    // Split multiple commands concatenated by ";"
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
 
-                        // Concatenate lines ending with ' \', forming one complete command
-                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\r\\n/mg, "\n");
-                        resolve();
-                    } else {
-                        setTimeout(doChunk1, 0, 1);
-                    }
-
-                    resolve();
+                    // Concatenate lines ending with ' \', forming one complete command
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\r\\n/mg, "\n");
+                    taskEndCallback();
+                } else {
+                    setTimeout(doChunk1, 0, 1);
                 }
+            }
 
-                doChunk1(0);
-            });
-        } // chunk1Wrapper
-
-        await chunk1Wrapper();
+            doChunk1(0);
+        }); // scheduleTask
 
         let regexp: RegExp = /\s+\\$/mg;
         let match: RegExpExecArray | null = regexp.exec(preprocessedDryRunOutputStr);
 
-        async function chunk2Wrapper(): Promise<void> {
-            return new Promise<void>(async function (resolve, reject): Promise<void> {
+        if (match) {
+            await scheduleTask(async (taskEndCallback: () => void) => {
                 function doChunk2(): void {
                     let chunkIndex: number = 0;
                     while (match) {
@@ -179,7 +180,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                         match = regexp.exec(preprocessedDryRunOutputStr);
 
                         if (!match) {
-                            resolve();
+                            taskEndCallback();
                         }
 
                         chunkIndex++;
@@ -187,16 +188,10 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                             setTimeout(doChunk2, 0);
                         }
                     } // while loop
-
-                    resolve();
                 } // doChunk2
                 doChunk2();
-            });
-        } // chunk2Wrapper
-
-        if (match) {
-            await chunk2Wrapper();
-        }
+            }); // scheduleTask
+        } // if match
 
         // Process some more makefile output weirdness
         let preprocessedDryRunOutputLines: string[] = [];
@@ -204,95 +199,85 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         let numberOfLines: number = preprocessedLines.length;
         let index: number = 0;
 
-        async function chunk3Wrapper(): Promise<void> {
-            return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk3(): void {
-                    let chunkIndex: number = 0;
-                    while (index <= numberOfLines && chunkIndex <= chunkSize) {
-                        if (cancel.isCancellationRequested) {
-                            break;
-                        }
-
-                        let line: string = preprocessedLines[index];
-
-                        statusCallback("Preprocessing the dry-run output...3");
-                        let strC: string = "--mode=compile";
-                        let idxC: number = line.indexOf(strC);
-                        if (idxC >= 0) {
-                            line = line.replace(line.substring(0, idxC), "");
-                            line = line.replace(strC, "");
-                        }
-
-                        let strL: string = "--mode=link";
-                        let idxL: number = line.indexOf(strL);
-                        if (idxL >= 0) {
-                            line = line.replace(line.substring(0, idxL), "");
-                            line = line.replace(strL, "");
-                        }
-
-                        // Ignore any lines containing $ because they are redundant and not useful
-                        // for IntelliSense config provider or launch parsing.
-                        // These lines are produced by the verbose log switch --print-data-base,
-                        // which is useful in parsing for build targets.
-                        if (!line.includes("$")) {
-                            preprocessedDryRunOutputLines.push(line);
-                        }
-
-                        if (idxL >= 0 && idxC >= 0) {
-                            logger.message("Not supporting --mode=compile and --mode=link on the same line");
-                        }
-
-                        index++;
-                        if (index === numberOfLines) {
-                            resolve();
-                        }
-
-                        chunkIndex++;
-                        if (chunkIndex === chunkSize) {
-                            setTimeout(doChunk3, 0);
-                        }
-                    } // while loop
-
-                    resolve();
-                } // doChunk3
-                doChunk3();
-            });
-        } // chunk3Wrapper
-
-        await chunk3Wrapper();
-
-        async function chunk4Wrapper(): Promise<void> {
-            return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk4(level: number): void {
-                    statusCallback("Preprocessing the dry-run output...4");
-
-                    if (level === 1) {
-                        preprocessedDryRunOutputStr = preprocessedDryRunOutputLines.join("\n");
-
-                        // Extract the link command
-                        // Keep the /link switch to the cl command because otherwise we will see compiling without /c
-                        // and we will deduce some other output binary based on its /Fe or /Fo or first source given,
-                        // instead of the output binary defined via the link operation (which will be parsed on the next line).
-                        // TODO: address more accurately the overriding scenarios between output files defined via cl.exe
-                        // and output files defined via cl.exe /link.
-                        // For example, "cl.exe source.cpp /Fetest.exe /link /debug" still produces test.exe
-                        // but cl.exe source.cpp /Fetest.exe /link /out:test2.exe produces only test2.exe.
-                        // For now, ignore any output binary rules of cl while having the /link switch.
-                        if (process.platform === "win32") {
-                            preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ \/link /g, "/link \n link.exe ");
-                        }
-                    } else {
-                        setTimeout(doChunk4, 0, 1);
+        await scheduleTask(async (taskEndCallback: () => void) => {
+            function doChunk3(): void {
+                let chunkIndex: number = 0;
+                while (index <= numberOfLines && chunkIndex <= chunkSize) {
+                    if (cancel.isCancellationRequested) {
+                        break;
                     }
 
-                    resolve();
+                    let line: string = preprocessedLines[index];
+
+                    statusCallback("Preprocessing the dry-run output...3");
+                    let strC: string = "--mode=compile";
+                    let idxC: number = line.indexOf(strC);
+                    if (idxC >= 0) {
+                        line = line.replace(line.substring(0, idxC), "");
+                        line = line.replace(strC, "");
+                    }
+
+                    let strL: string = "--mode=link";
+                    let idxL: number = line.indexOf(strL);
+                    if (idxL >= 0) {
+                        line = line.replace(line.substring(0, idxL), "");
+                        line = line.replace(strL, "");
+                    }
+
+                    // Ignore any lines containing $ because they are redundant and not useful
+                    // for IntelliSense config provider or launch parsing.
+                    // These lines are produced by the verbose log switch --print-data-base,
+                    // which is useful in parsing for build targets.
+                    if (!line.includes("$")) {
+                        preprocessedDryRunOutputLines.push(line);
+                    }
+
+                    if (idxL >= 0 && idxC >= 0) {
+                        logger.message("Not supporting --mode=compile and --mode=link on the same line");
+                    }
+
+                    index++;
+                    if (index === numberOfLines) {
+                        taskEndCallback();
+                    }
+
+                    chunkIndex++;
+                    if (chunkIndex === chunkSize) {
+                        setTimeout(doChunk3, 0);
+                    }
+                } // while loop
+            } // doChunk3
+            doChunk3();
+        }); // scheduleTask
+
+        await scheduleTask(async (taskEndCallback: () => void) => {
+            function doChunk4(level: number): void {
+                statusCallback("Preprocessing the dry-run output...4");
+
+                if (level === 1) {
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputLines.join("\n");
+
+                    // Extract the link command
+                    // Keep the /link switch to the cl command because otherwise we will see compiling without /c
+                    // and we will deduce some other output binary based on its /Fe or /Fo or first source given,
+                    // instead of the output binary defined via the link operation (which will be parsed on the next line).
+                    // TODO: address more accurately the overriding scenarios between output files defined via cl.exe
+                    // and output files defined via cl.exe /link.
+                    // For example, "cl.exe source.cpp /Fetest.exe /link /debug" still produces test.exe
+                    // but cl.exe source.cpp /Fetest.exe /link /out:test2.exe produces only test2.exe.
+                    // For now, ignore any output binary rules of cl while having the /link switch.
+                    if (process.platform === "win32") {
+                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ \/link /g, "/link \n link.exe ");
+                    }
+
+                    taskEndCallback();
+                } else {
+                    setTimeout(doChunk4, 0, 1);
                 }
+            }
 
-                doChunk4(0);
-            });
-        } // chunk4Wrapper
-
-        await chunk4Wrapper();
+            doChunk4(0);
+        }); // scheduleTask
 
         endCallback(make.ConfigureBuildReturnCodeTypes.success, preprocessedDryRunOutputStr);
         resolve(make.ConfigureBuildReturnCodeTypes.success);
@@ -799,12 +784,28 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     setTimeout(doChunk, 0);
                 }
             } // while loop
-
-            resolve();
         } // doChunk function
 
         doChunk();
     }); // return new promise
+}
+
+// Target binaries arguments special handling
+function filterTargetBinaryArgs(args: string[]): string[] {
+    let processedArgs: string[] = [];
+
+    args.forEach(arg => {
+        // Once we encounter a redirection character (pipe, stdout/stderr) remove it,
+        // together with all the arguments that are following,
+        // since they are not real parameters of the binary tool that is analyzed.
+        if (arg === '>' || arg === '1>' || arg === '2>' || arg === '|') {
+            return processedArgs;
+        }
+        
+        processedArgs.push(arg);
+    });
+
+    return processedArgs;
 }
 
 // Parse the output of the make dry-run command in order to provide VS Code debugger
@@ -837,162 +838,156 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
         let numberOfLines: number = dryRunOutputLines.length;
         let index: number = 0;
 
-        async function chunk1Wrapper(): Promise<void> {
-            return new Promise<void>(async function (resolve, reject): Promise<void> {
-                function doChunk1(): void {
-                    let chunkIndex: number = 0;
-                    while (index <= numberOfLines && chunkIndex <= chunkSize) {
-                        if (cancel.isCancellationRequested) {
-                            break;
-                        }
+        await scheduleTask(async (taskEndCallback: () => void) => {
+            function doChunk1(): void {
+                let chunkIndex: number = 0;
+                while (index <= numberOfLines && chunkIndex <= chunkSize) {
+                    if (cancel.isCancellationRequested) {
+                        break;
+                    }
 
-                        let line: string = dryRunOutputLines[index];
+                    let line: string = dryRunOutputLines[index];
 
-                        statusCallback("Parsing for launch targets... (inspecting for link commands");
-                        currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
-                        currentPath = currentPathHistory[currentPathHistory.length - 1];
+                    statusCallback("Parsing for launch targets... (inspecting for link commands");
+                    currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
+                    currentPath = currentPathHistory[currentPathHistory.length - 1];
 
-                        // A target binary is usually produced by the linker with the /out or /o switch,
-                        // but there are several scenarios (for win32 Microsoft cl.exe)
-                        // when the compiler is producing an output binary directly (via the /Fe switch)
-                        // or indirectly (based on some naming default rules in the absence of /Fe)
-                        let linkerTargetBinary: string | undefined;
-                        let compilerTargetBinary: string | undefined;
+                    // A target binary is usually produced by the linker with the /out or /o switch,
+                    // but there are several scenarios (for win32 Microsoft cl.exe)
+                    // when the compiler is producing an output binary directly (via the /Fe switch)
+                    // or indirectly (based on some naming default rules in the absence of /Fe)
+                    let linkerTargetBinary: string | undefined;
+                    let compilerTargetBinary: string | undefined;
 
-                        if (process.platform === "win32") {
-                            let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
-                            if (compilerTool) {
-                                // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
-                                // Note: no need to worry about the DLL case that this extension doesn't support yet
-                                // since a compiler can produce implicitly only an executable.
+                    if (process.platform === "win32") {
+                        let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
+                        if (compilerTool) {
+                            // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
+                            // Note: no need to worry about the DLL case that this extension doesn't support yet
+                            // since a compiler can produce implicitly only an executable.
 
-                                if (path.basename(compilerTool.fullPath).startsWith("cl")) {
-                                    if (!isSwitchPassedInArguments(compilerTool.arguments, ["c", "P", "E", "EP"])) {
-                                        logger.message("Found compiler command:\n" + line, "Verbose");
+                            if (path.basename(compilerTool.fullPath).startsWith("cl")) {
+                                if (!isSwitchPassedInArguments(compilerTool.arguments, ["c", "P", "E", "EP"])) {
+                                    logger.message("Found compiler command:\n" + line, "Verbose");
 
-                                        // First read the value of the /Fe switch (for cl.exe)
-                                        compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
+                                    // First read the value of the /Fe switch (for cl.exe)
+                                    compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
 
-                                        // Then assume first object file base name (defined with /Fo) + exe
-                                        // The binary is produced in the same folder where the compiling operation takes place,
-                                        // and not in an eventual different obj path.
-                                        // Note: /Fo is not allowed on multiple sources compilations so there will be only one if found
-                                        if (!compilerTargetBinary) {
-                                            let objFile: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fo"]);
-                                            if (objFile) {
-                                                let parsedObjPath: path.ParsedPath = path.parse(objFile);
-                                                compilerTargetBinary = parsedObjPath.name + ".exe";
-                                                logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                                    compilerTargetBinary + " from the first object passed in with /Fo", "Verbose");
-                                            }
-                                        } else {
-                                            logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose");
-                                        }
-
-                                        // Then assume first source file base name + exe.
-                                        // The binary is produced in the same folder where the compiling operation takes place,
-                                        // and not in an eventual different source path.
-                                        if (!compilerTargetBinary) {
-                                            let srcFiles: string[] | undefined = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
-                                            if (srcFiles.length >= 1) {
-                                                let parsedSourcePath: path.ParsedPath = path.parse(srcFiles[0]);
-                                                compilerTargetBinary = parsedSourcePath.name + ".exe";
-                                                logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                                    compilerTargetBinary + " from the first source file passed in", "Verbose");
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (compilerTargetBinary) {
-                                    compilerTargetBinary = util.makeFullPath(compilerTargetBinary, currentPath);
-                                }
-                            }
-                        }
-
-                        let linkerTool: ToolInvocation | undefined = parseLineAsTool(line, linkers, currentPath);
-                        if (linkerTool) {
-                            // TODO: implement launch support for DLLs and LIBs, besides executables.
-                            if (!isSwitchPassedInArguments(linkerTool.arguments, ["dll", "lib", "shared"])) {
-                                // Gcc/Clang tools can also perform linking so don't parse any output binary
-                                // if there are switches passed in to cause early stop of compilation: -c, -E, -S
-                                // (-o will not point to an executable)
-                                // Also, the ld switches -r and -Ur do not produce executables.
-                                if (!isSwitchPassedInArguments(linkerTool.arguments, ["c", "E", "S", "r", "Ur"])) {
-                                    linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
-                                    logger.message("Found linker command: " + line, "Verbose");
-
-                                    if (!linkerTargetBinary) {
-                                        // For Microsoft link.exe, the default output binary takes the base name
-                                        // of the first file (obj, lib, etc...) that is passed to the linker.
-                                        // The binary is produced in the same folder where the linking operation takes place,
-                                        // and not in an eventual different obj/lib path.
-                                        if (process.platform === "win32" && path.basename(linkerTool.fullPath).startsWith("link")) {
-                                            let files: string[] = parseFilesFromToolArguments(linkerTool.arguments, ["obj", "lib"]);
-                                            if (files.length >= 1) {
-                                                let parsedPath: path.ParsedPath = path.parse(files[0]);
-                                                let targetBinaryFromFirstObjLib: string = parsedPath.name + ".exe";
-                                                logger.message("The link command is not producing a target binary explicitly. Assuming " +
-                                                    targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose");
-                                                linkerTargetBinary = targetBinaryFromFirstObjLib;
-                                            }
-                                        } else {
-                                            // The default output binary from a linking operation is usually a.out on linux/mac,
-                                            // produced in the same folder where the toolset is run.
-                                            logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose");
-                                            linkerTargetBinary = "a.out";
+                                    // Then assume first object file base name (defined with /Fo) + exe
+                                    // The binary is produced in the same folder where the compiling operation takes place,
+                                    // and not in an eventual different obj path.
+                                    // Note: /Fo is not allowed on multiple sources compilations so there will be only one if found
+                                    if (!compilerTargetBinary) {
+                                        let objFile: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fo"]);
+                                        if (objFile) {
+                                            let parsedObjPath: path.ParsedPath = path.parse(objFile);
+                                            compilerTargetBinary = parsedObjPath.name + ".exe";
+                                            logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
+                                                compilerTargetBinary + " from the first object passed in with /Fo", "Verbose");
                                         }
                                     } else {
-                                        logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
+                                        logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose");
+                                    }
+
+                                    // Then assume first source file base name + exe.
+                                    // The binary is produced in the same folder where the compiling operation takes place,
+                                    // and not in an eventual different source path.
+                                    if (!compilerTargetBinary) {
+                                        let srcFiles: string[] | undefined = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
+                                        if (srcFiles.length >= 1) {
+                                            let parsedSourcePath: path.ParsedPath = path.parse(srcFiles[0]);
+                                            compilerTargetBinary = parsedSourcePath.name + ".exe";
+                                            logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
+                                                compilerTargetBinary + " from the first source file passed in", "Verbose");
+                                        }
                                     }
                                 }
+                            }
 
-                                if (linkerTargetBinary) {
-                                    linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
-                                }
+                            if (compilerTargetBinary) {
+                                compilerTargetBinary = util.makeFullPath(compilerTargetBinary, currentPath);
                             }
                         }
+                    }
 
-                        // It is not possible to have compilerTargetBinary and linkerTargetBinary both defined,
-                        // because a dry-run output line cannot be a compilation and an explicit link at the same time.
-                        // (cl.exe with /link switch is split into two lines - cl.exe and link.exe - during dry-run preprocessing).
-                        // Also for gcc/clang, -o switch or the default output will be a .o in the presence of -c and an executable otherwise.
-                        let targetBinary: string | undefined = linkerTargetBinary || compilerTargetBinary;
-                        if (targetBinary) {
-                            targetBinaries.push(targetBinary);
+                    let linkerTool: ToolInvocation | undefined = parseLineAsTool(line, linkers, currentPath);
+                    if (linkerTool) {
+                        // TODO: implement launch support for DLLs and LIBs, besides executables.
+                        if (!isSwitchPassedInArguments(linkerTool.arguments, ["dll", "lib", "shared"])) {
+                            // Gcc/Clang tools can also perform linking so don't parse any output binary
+                            // if there are switches passed in to cause early stop of compilation: -c, -E, -S
+                            // (-o will not point to an executable)
+                            // Also, the ld switches -r and -Ur do not produce executables.
+                            if (!isSwitchPassedInArguments(linkerTool.arguments, ["c", "E", "S", "r", "Ur"])) {
+                                linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
+                                logger.message("Found linker command: " + line, "Verbose");
 
-                            // Include limited launch configuration, when only the binary is known,
-                            // in which case the execution path is defaulting to workspace root folder
-                            // and there are no args.
-                            let launchConfiguration: configuration.LaunchConfiguration = {
-                                binaryPath: targetBinary,
-                                cwd: vscode.workspace.rootPath || "",
-                                binaryArgs: []
-                            };
+                                if (!linkerTargetBinary) {
+                                    // For Microsoft link.exe, the default output binary takes the base name
+                                    // of the first file (obj, lib, etc...) that is passed to the linker.
+                                    // The binary is produced in the same folder where the linking operation takes place,
+                                    // and not in an eventual different obj/lib path.
+                                    if (process.platform === "win32" && path.basename(linkerTool.fullPath).startsWith("link")) {
+                                        let files: string[] = parseFilesFromToolArguments(linkerTool.arguments, ["obj", "lib"]);
+                                        if (files.length >= 1) {
+                                            let parsedPath: path.ParsedPath = path.parse(files[0]);
+                                            let targetBinaryFromFirstObjLib: string = parsedPath.name + ".exe";
+                                            logger.message("The link command is not producing a target binary explicitly. Assuming " +
+                                                targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose");
+                                            linkerTargetBinary = targetBinaryFromFirstObjLib;
+                                        }
+                                    } else {
+                                        // The default output binary from a linking operation is usually a.out on linux/mac,
+                                        // produced in the same folder where the toolset is run.
+                                        logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose");
+                                        linkerTargetBinary = "a.out";
+                                    }
+                                } else {
+                                    logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
+                                }
+                            }
 
-                            logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
-                            onFoundLaunchConfiguration(launchConfiguration);
+                            if (linkerTargetBinary) {
+                                linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
+                            }
                         }
+                    }
 
-                        index++;
-                        if (index === numberOfLines) {
-                            resolve();
-                        }
+                    // It is not possible to have compilerTargetBinary and linkerTargetBinary both defined,
+                    // because a dry-run output line cannot be a compilation and an explicit link at the same time.
+                    // (cl.exe with /link switch is split into two lines - cl.exe and link.exe - during dry-run preprocessing).
+                    // Also for gcc/clang, -o switch or the default output will be a .o in the presence of -c and an executable otherwise.
+                    let targetBinary: string | undefined = linkerTargetBinary || compilerTargetBinary;
+                    if (targetBinary) {
+                        targetBinaries.push(targetBinary);
 
-                        chunkIndex++;
-                        if (chunkIndex === chunkSize) {
-                            setTimeout(doChunk1, 0);
-                        }
-                    } // while loop
+                        // Include limited launch configuration, when only the binary is known,
+                        // in which case the execution path is defaulting to workspace root folder
+                        // and there are no args.
+                        let launchConfiguration: configuration.LaunchConfiguration = {
+                            binaryPath: targetBinary,
+                            cwd: vscode.workspace.rootPath || "",
+                            binaryArgs: []
+                        };
 
-                    resolve();
-                } // doChunk1 function
+                        logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
+                        onFoundLaunchConfiguration(launchConfiguration);
+                    }
 
-                doChunk1();
-            });
-        } // chunk1Wrapper
+                    index++;
+                    if (index === numberOfLines) {
+                        taskEndCallback();
+                    }
 
-        await chunk1Wrapper();
+                    chunkIndex++;
+                    if (chunkIndex === chunkSize) {
+                        setTimeout(doChunk1, 0);
+                    }
+                } // while loop
+            } // doChunk1 function
+
+            doChunk1();
+        }); // scheduleTask
 
         // If no binaries are found to be built, there is no point in parsing for invoking targets
         if (targetBinaries.length === 0) {
@@ -1059,6 +1054,9 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                     // Include complete launch configuration: binary, execution path and args
                     // are known from parsing the dry-run
                     let splitArgs: string[] = targetBinaryTool.arguments ? targetBinaryTool.arguments.split(" ") : [];
+                    if (splitArgs.length > 0) {
+                        splitArgs = filterTargetBinaryArgs(splitArgs);
+                    }
 
                     let launchConfiguration: configuration.LaunchConfiguration = {
                         binaryPath: targetBinaryTool.fullPath,
@@ -1082,8 +1080,6 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                     setTimeout(doChunk2, 0);
                 }
             } // while loop
-
-            resolve();
         } // doChunk2 function
 
         doChunk2();

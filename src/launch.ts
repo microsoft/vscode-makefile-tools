@@ -155,8 +155,10 @@ export class Launcher implements vscode.Disposable {
                        "\n   cwd = " + debugConfig.cwd + " (= " + this.launchTargetDirectory() + ")" +
                        "\n   args = " + args.join(" ") +
                        "\n   program = " + debugConfig.program + " (= " + this.launchTargetPath() + ")" +
-                       "\n   miMode = " + debugConfig.miMode +
-                       "\n   miDebuggerPath = " + debugConfig.miDebuggerPath);
+                       "\n   MIMode = " + debugConfig.MIMode +
+                       "\n   miDebuggerPath = " + debugConfig.miDebuggerPath +
+                       "\n   stopAtEntry = " + debugConfig.stopAtEntry +
+                       "\n   symbolSearchPath = " + debugConfig.symbolSearchPath);
 
         return debugConfig;
     }
