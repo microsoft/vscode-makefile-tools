@@ -22,7 +22,7 @@
 // Some of these tests need also some fake binaries being checked in
 // (enough to pass an 'if exists' check), to cover the identification of launch binaries
 // that are called with arguments in the makefile.
-// See comment in parser.ts, parseLineAsTool and parseForLaunchConfiguration.
+// See comment in parser.ts, parseLineAsTool and parseLaunchConfiguration.
 
 import * as assert from 'assert';
 import * as configuration from '../../configuration';

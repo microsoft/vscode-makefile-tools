@@ -105,7 +105,7 @@ function readMakefilePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makefilePath = workspaceConfiguration.get<string>("makefilePath");
     if (!makefilePath) {
-        logger.message("No path to the make tool is defined in the settings file");
+        logger.message("No path to the makefile is defined in the settings file");
     } else {
         makefilePath = util.resolvePathToRoot(makefilePath);
     }
@@ -434,7 +434,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         configurationMakeArgs.push(makefileUsed);
     }
 
-    if (makefileConfiguration?.makePath) {
+    if (configurationMakeCommand) {
         logger.message("Deduced command '" + configurationMakeCommand + " " + configurationMakeArgs.join(" ") + "' for configuration " + configuration);
     }
 
@@ -450,7 +450,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
         // If configuration command has a path (absolute or relative), check if it exists on disk and error if not.
         // If no path is given to the make tool, search all paths in the environment and error if make is not on the path.
-        if (path.parse(configurationMakeCommand).dir !== "") {
+        if (configurationCommandPath  !== "") {
             if (!util.checkFileExistsSync(configurationMakeCommand)) {
                 vscode.window.showErrorMessage("Make not found.");
                 logger.message("Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.");
@@ -476,9 +476,11 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         }
 
         // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
+        // On linux/mac, it often is 'Makefile', so we have to verify we default to the right filename.
         if (!makefileUsed) {
-            makefileUsed = "./makefile";
+            makefileUsed = (util.checkFileExistsSync(util.resolvePathToRoot("./makefile"))) ? "./makefile" : "./Makefile";
         }
+
         makefileUsed = util.resolvePathToRoot(makefileUsed);
         if (!util.checkFileExistsSync(makefileUsed)) {
             vscode.window.showErrorMessage("Makefile entry point not found.");
@@ -577,7 +579,10 @@ function readMakefileConfigurations(): void {
     }
 
     // Verify if the current makefile configuration is still part of the list and unset otherwise.
-    if (!makefileConfigurationNames.includes(currentMakefileConfiguration)) {
+    // Exception: "Default" which means the user didn't set it and relies on whatever default
+    // the current set of makefiles support. "Default" is not going to be part of the list
+    // but we shouldn't log about it.
+    if (currentMakefileConfiguration !== "Default" && !makefileConfigurationNames.includes(currentMakefileConfiguration)) {
         logger.message(`Current makefile configuration ${currentMakefileConfiguration} is no longer present in the available list.` +
             ` Re-setting the current makefile configuration to default.`);
         setConfigurationByName("Default");
@@ -664,17 +669,45 @@ export async function initFromStateAndSettings(): Promise<void> {
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
     vscode.window.onDidChangeActiveTextEditor(e => {
-        // If configureDirty is already set from a previous VSCode session,
-        // at workspace load this event (onDidChangeActiveTextEditor) is triggered automatically
-        // and if makefile.configureOnOpen is true, there is a race between two configure operations,
-        // one of which being unnecessary. Ignore the cleanConfigure call here
-        // only when makefile.configureOnOpen is true and we know we didn't complete a first configure yet.
-        if (extension.getState().configureDirty && configureOnEdit) {
-            if (getConfigureOnOpen() === false || extension.getRanConfigureInSession()) {
-                // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
-                logger.message("Configuring clean after settings or makefile changes...");
-                make.cleanConfigure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
-            }
+        let language: string = "";
+        if (e) {
+            language = e.document.languageId;
+        }
+
+        // It is too annoying to generate a configure on any kind of editor focus change
+        // (for example even searching in the logging window generates this event).
+        // Since all the operations are guarded by the configureDirty state,
+        // the only "operation" left that we need to make sure it's up to date
+        // is IntelliSense, so trigger a configure when we switch editor focus
+        // into C/C++ source code.
+        switch (language) {
+            case "c":
+            case "cpp":
+                // If configureDirty is already set from a previous VSCode session,
+                // at workspace load this event (onDidChangeActiveTextEditor) is triggered automatically
+                // and if makefile.configureOnOpen is true, there is a race between two configure operations,
+                // one of which being unnecessary. If configureOnOpen is false, there is no race
+                // but still we don't want to override the behavior desired by the user.
+                // Additionally, if anything dirtied the configure state during a (pre)configure or build,
+                // skip this clean configure, to avoid annoying "blocked operation" notifications.
+                // The configure state remains dirty and a new configure will be triggered eventually:
+                // (selecting a new configuration, target or launch, build, editor focus change).
+                // Guarding only for not being blocked is not enough. For example,
+                // in the first scenario explained above, the race happens when nothing looks blocked
+                // here, but leading to a block notification soon.
+                if (extension.getState().configureDirty && configureOnEdit) {
+                    if ((extension.getCompletedConfigureInSession())
+                        && !make.blockedByOp(make.Operations.configure, false)) {
+                        // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
+                        logger.message("Configuring clean after settings or makefile changes...");
+                        make.cleanConfigure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
+                    }
+                }
+
+                break;
+
+            default:
+                break;
         }
     });
 
@@ -708,7 +741,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // Changing a launch configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
                 readCurrentLaunchConfiguration(); // this gets a refreshed view of all launch configurations
-                                                  // and also updates the current one in case it was affected
+                // and also updates the current one in case it was affected
                 updatedSettingsSubkeys.push(subKey);
             }
 

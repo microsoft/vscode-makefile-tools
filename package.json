@@ -206,7 +206,6 @@
                             },
                             "makefilePath": {
                                 "type": "string",
-                                "default": "makefile",
                                 "description": "File path to the makefile"
                             },
                             "makePath": {
@@ -320,13 +319,11 @@
                 },
                 "makefile.makePath": {
                     "type": "string",
-                    "default": "make",
                     "description": "The path to the make tool",
                     "scope": "resource"
                 },
                 "makefile.makefilePath": {
                     "type": "string",
-                    "default": "makefile",
                     "description": "The path to the makefile of the project",
                     "scope": "resource"
                 },
@@ -494,10 +491,10 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run mycompile",
+        "vscode:prepublish": "yarn mycompile",
         "mycompile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "pretest": "npm run mycompile",
+        "pretest": "yarn mycompile",
         "test": "node ./out/src/test/runTest.js"
     },
     "devDependencies": {

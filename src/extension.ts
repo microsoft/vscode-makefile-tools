@@ -38,11 +38,6 @@ export class MakefileToolsExtension {
 
     public getState(): state.StateManager { return this.mementoState; }
 
-    // Parse the dry-run output and populate data for cpptools
-    public constructIntellisense(dryRunOutputStr: string): void {
-        parser.parseForCppToolsCustomConfigProvider(dryRunOutputStr);
-    }
-
     public emptyCustomConfigurationProvider() : void {
         this.cppConfigurationProvider.empty();
     }
@@ -60,11 +55,20 @@ export class MakefileToolsExtension {
     }
 
     // Similar to state.ranConfigureInCodebaseLifetime, but within the scope of a VSCode session.
+    // It is used for calling cppToolsAPI.notifyReady only once in a VSCode session.
+    // It means that a configure was started within the scope of this VSCode session
+    // but it doesn't mean that the configure process is completed already.
     private ranConfigureInSession: boolean = false;
     public getRanConfigureInSession() : boolean { return this.ranConfigureInSession; }
 
+    // Similar to ranConfigureInSession, but becomes true at the end of a configure process,
+    // regardless of the success status.
+    private completedConfigureInSession: boolean = false;
+    public getCompletedConfigureInSession() : boolean { return this.completedConfigureInSession; }
+    public setCompletedConfigureInSession(completed: boolean) : void { this.completedConfigureInSession = completed; }
+
     // Request a custom config provider update.
-    public async updateCppToolsProvider(): Promise<void> {
+    public updateCppToolsProvider(): void {
         this.cppConfigurationProvider.logConfigurationProvider();
 
         if (this.cppToolsAPI) {
@@ -100,31 +104,12 @@ export class MakefileToolsExtension {
         }
     }
 
-    public buildCustomConfigurationProvider(
-        defines: string[],
-        includePath: string[],
-        forcedInclude: string[],
-        standard: util.StandardVersion,
-        intelliSenseMode: util.IntelliSenseMode,
-        compilerPath: string,
-        filesPaths: string[],
-        windowsSdkVersion?: string
-    ): void {
-        this.compilerFullPath = compilerPath;
-        this.cppConfigurationProvider.buildCustomConfigurationProvider(defines, includePath, forcedInclude, standard, intelliSenseMode, compilerPath, filesPaths, windowsSdkVersion);
+    public buildCustomConfigurationProvider(customConfigProviderItem: parser.CustomConfigProviderItem): void {
+        this.compilerFullPath = customConfigProviderItem.compilerFullPath;
+        this.cppConfigurationProvider.buildCustomConfigurationProvider(customConfigProviderItem);
     }
 
     public getCompilerFullPath() : string | undefined { return this.compilerFullPath; }
-}
-
-// A change of target or configuration triggered a new dry-run,
-// which produced a new output string to be parsed
-export async function updateProvider(dryRunOutputStr: string): Promise<void> {
-    logger.message("Updating the CppTools IntelliSense Configuration Provider.");
-    await extension.registerCppToolsProvider();
-    extension.emptyCustomConfigurationProvider();
-    extension.constructIntellisense(dryRunOutputStr);
-    await extension.updateCppToolsProvider();
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
