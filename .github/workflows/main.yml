@@ -28,4 +28,11 @@ jobs:
         run: |
           npm install
           npm install -g vsce
-          vsce package -o makefile-tools.vsix
+          vsce package --yarn -o makefile-tools.vsix
+          
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.1.4
+        with:
+          name: makefile-tools.vsix
+          path: ./makefile-tools.vsix
+          if-no-files-found: error
