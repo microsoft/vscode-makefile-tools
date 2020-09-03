@@ -1,6 +1,7 @@
 // Support for integration with CppTools Custom Configuration Provider
 
 import * as logger from './logger';
+import * as parser from './parser';
 import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
@@ -75,28 +76,20 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     //                 Attention for defines syntax: _CL_=/DMyDefine#1 versus /DMyDefine=1
     //     - take into account the effect of undefines /U
     // In case of conflicting switches, the command prompt overwrites the makefile
-    public buildCustomConfigurationProvider(
-        defines: string[],
-        includePath: string[],
-        forcedInclude: string[],
-        standard: util.StandardVersion,
-        intelliSenseMode: util.IntelliSenseMode,
-        compilerPath: string,
-        filesPaths: string[],
-        windowsSdkVersion?: string): void {
+    public buildCustomConfigurationProvider(customConfigProviderItem: parser.CustomConfigProviderItem): void {
         const configuration: cpp.SourceFileConfiguration = {
-            defines,
-            standard : standard || "c++17",
-            includePath,
-            forcedInclude,
-            intelliSenseMode,
-            compilerPath,
-            windowsSdkVersion
+            defines: customConfigProviderItem.defines,
+            standard : customConfigProviderItem.standard || "c++17",
+            includePath: customConfigProviderItem.includes,
+            forcedInclude: customConfigProviderItem.forcedIncludes,
+            intelliSenseMode: customConfigProviderItem.intelliSenseMode,
+            compilerPath: customConfigProviderItem.compilerFullPath,
+            windowsSdkVersion: customConfigProviderItem.windowsSDKVersion
         };
 
         // cummulativeBrowsePath incorporates all the files and the includes paths
         // of all the compiler invocations of the current configuration
-        filesPaths.forEach(filePath => {
+        customConfigProviderItem.files.forEach(filePath => {
             this.fileIndex.set(path.normalize(filePath), {
                 uri: vscode.Uri.file(filePath),
                 configuration,
@@ -108,13 +101,13 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
             }
         });
 
-        includePath.forEach(incl => {
+        customConfigProviderItem.includes.forEach(incl => {
             if (!cummulativeBrowsePath.includes(incl)) {
                 cummulativeBrowsePath.push(incl);
             }
         });
 
-        forcedInclude.forEach(fincl => {
+        customConfigProviderItem.forcedIncludes.forEach(fincl => {
             if (!cummulativeBrowsePath.includes(fincl)) {
                 cummulativeBrowsePath.push(fincl);
             }
@@ -122,9 +115,9 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 
         this.workspaceBrowseConfiguration = {
             browsePath: cummulativeBrowsePath,
-            standard,
-            compilerPath,
-            windowsSdkVersion
+            standard: customConfigProviderItem.standard,
+            compilerPath: customConfigProviderItem.compilerFullPath,
+            windowsSdkVersion: customConfigProviderItem.windowsSDKVersion
         };
     }
 
