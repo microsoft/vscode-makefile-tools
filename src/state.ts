@@ -8,11 +8,11 @@ export class StateManager {
   constructor(readonly extensionContext: vscode.ExtensionContext) {}
 
   private _get<T>(key: string): T | undefined {
-    return this.extensionContext.globalState.get<T>(key);
+    return this.extensionContext.workspaceState.get<T>(key);
   }
 
   private _update(key: string, value: any): Thenable<void> {
-    return this.extensionContext.globalState.update(key, value);
+    return this.extensionContext.workspaceState.update(key, value);
   }
 
   // The project build configuration (one of the entries in the array of makefile.configurations
