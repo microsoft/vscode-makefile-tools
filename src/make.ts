@@ -901,7 +901,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     }
     let doLaunchEndTime: number = Date.now();
     logger.message(`Launch elapsed time: ${(doLaunchEndTime - doIntelliSenseEndTime) / 1000}`);
-    
+
     // Verify if the current launch configuration is still part of the list and unset otherwise.
     let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
     let currentLaunchConfigurationStr: string | undefined = currentLaunchConfiguration ? configuration.launchConfigurationToString(currentLaunchConfiguration) : "";
@@ -922,14 +922,16 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         if (retc2 === ConfigureBuildReturnCodeTypes.cancelled) {
             return retc2;
         }
+        let doGenerateDryrunTargetsEndTime: number = Date.now();
+        logger.message(`Generate dryrun for targets elapsed time: ${(doGenerateDryrunTargetsEndTime - doLaunchEndTime) / 1000}`);
 
         logger.message(`Parsing for build targets from: "${parseFile}"`);
         if (await parseTargets(progress, cancel, parseContent || "", recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
             return ConfigureBuildReturnCodeTypes.cancelled;
         }
         let doBuildTargetsEndTime: number = Date.now();
-        logger.message(`BuildTargets elapsed time: ${(doBuildTargetsEndTime - doLaunchEndTime) / 1000}`);
-    
+        logger.message(`BuildTargets elapsed time: ${(doBuildTargetsEndTime - doGenerateDryrunTargetsEndTime) / 1000}`);
+
         // Verify if the current build target is still part of the list and unset otherwise.
         buildTargets = configuration.getBuildTargets();
         let currentBuildTarget: string | undefined = configuration.getCurrentTarget();
