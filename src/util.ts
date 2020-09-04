@@ -128,93 +128,102 @@ export function toolPathInEnv(name: string): string | undefined {
     });
 }
 
-export async function killTree(progress: vscode.Progress<{}>, pid: number): Promise<void> {
-    return new Promise<void>(async function (resolve, reject): Promise<void> {
-        if (process.platform !== 'win32') {
-            let children: number[] = [];
-            let stdoutStr: string = "";
-
-            let stdout: any = (result: string): void => {
-                stdoutStr += result;
-            };
-
-            let stderr: any = (result: string): void => {
-            };
-
-            let closing: any = (retCode: number, signal: string): void => {
-                if (!!stdoutStr.length) {
-                    children = stdoutStr.split('\n').map((line: string) => Number.parseInt(line));
-
-                    logger.message(`Found children subprocesses: ${stdoutStr}.`);
-                    for (const other of children) {
-                        if (other) {
-                            killTree(progress, other);
-                        }
-                    }
-                }
-
-                resolve();
-            };
-
-            try {
-                await spawnChildProcess('pgrep', ['-P', pid.toString()], vscode.workspace.rootPath || "", stdout, stderr, closing);
-            } catch (e) {
-                if (e.retCode === 1) {
-                    // all good, it means there are no children processes
-                } else {
-                    throw e;
-                }
-            }
-
-            try {
-                logger.message(`Killing process PID = ${pid}`);
-                progress.report({ increment: 1, message: `Terminating process PID=${pid}` });
-                process.kill(pid, 'SIGINT');
-            } catch (e) {
-                if (e.code === 'ESRCH') {
-                } else {
-                    throw e;
-                }
-            }
-        } else {
-            child_process.exec(`taskkill /pid ${pid} /T /F`);
-            resolve();
-        }
-    });
-}
-
-// Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
-export function spawnChildProcess(process: string, args: string[], workingDirectory: string,
-    stdoutCallback: (stdout: string) => void,
-    stderrCallback: (stderr: string) => void,
-    closingCallback: (retc: number, signal: string) => void): Promise<void> {
-
-    return new Promise<void>(function (resolve, reject): void {
-        const child: child_process.ChildProcess = child_process.spawn(process, args, { cwd: workingDirectory, shell: true });
-        make.setCurPID(child.pid);
-
-        child.stdout.on('data', (data) => {
-            stdoutCallback(`${data}`);
-        });
-
-        child.stderr.on('data', (data) => {
-            stderrCallback(`${data}`);
-        });
-
-        child.on('close', (retCode: number, signal: string) => {
-            closingCallback(retCode, signal);
-        });
-
-        child.on('exit', (code: number) => {
-            if (code !== 0) {
-                reject(new Error(`${process} exited with error code ${code}`));
+function taskKill(pid: number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        child_process.exec(`taskkill /pid ${pid} /T /F`, (error) => {
+            if (error) {
+                reject(error);
             } else {
                 resolve();
             }
         });
+    });
+}
+
+export async function killTree(progress: vscode.Progress<{}>, pid: number): Promise<void> {
+    if (process.platform === 'win32') {
+        try {
+            await taskKill(pid);
+        } catch (e) {
+            logger.message(`Failed to kill process ${pid}: ${e}`);
+        }
+        return;
+    }
+
+    let children: number[] = [];
+    let stdoutStr: string = "";
+
+    let stdout: any = (result: string): void => {
+        stdoutStr += result;
+    };
+
+    try {
+        const result: SpawnProcessResult = await spawnChildProcess('pgrep', ['-P', pid.toString()], vscode.workspace.rootPath || "", stdout);
+        if (!!stdoutStr.length) {
+            children = stdoutStr.split('\n').map((line: string) => Number.parseInt(line));
+
+            logger.message(`Found children subprocesses: ${stdoutStr}.`);
+            for (const other of children) {
+                if (other) {
+                    await killTree(progress, other);
+                }
+            }
+        }
+    } catch (e) {
+        logger.message(e.message);
+        throw e;
+    }
+
+    try {
+        logger.message(`Killing process PID = ${pid}`);
+        progress.report({ increment: 1, message: `Terminating process PID=${pid}` });
+        process.kill(pid, 'SIGINT');
+    } catch (e) {
+        if (e.code !== 'ESRCH') {
+            throw e;
+        }
+    }
+}
+
+export interface SpawnProcessResult {
+    returnCode: number;
+    signal: string;
+}
+
+// Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
+export function spawnChildProcess(
+    process: string,
+    args: string[],
+    workingDirectory: string,
+    stdoutCallback?: (stdout: string) => void,
+    stderrCallback?: (stderr: string) => void): Promise<SpawnProcessResult> {
+
+    return new Promise<SpawnProcessResult>((resolve, reject) => {
+        const child: child_process.ChildProcess = child_process.spawn(process, args, { cwd: workingDirectory, shell: true });
+        make.setCurPID(child.pid);
+
+        if (stdoutCallback) {
+            child.stdout.on('data', (data) => {
+                stdoutCallback(`${data}`);
+            });
+        }
+
+        if (stderrCallback) {
+            child.stderr.on('data', (data) => {
+                stderrCallback(`${data}`);
+            });
+        }
+
+        child.on('close', (returnCode: number, signal: string) => {
+            resolve({returnCode, signal});
+        });
+
+        child.on('exit', (returnCode: number) => {
+            resolve({returnCode, signal: ""});
+        });
 
         if (child.pid === undefined) {
-            throw new Error("PID undefined");
+            reject(new Error(`Failed to spawn process: ${process} ${args}`));
         }
     });
 }
