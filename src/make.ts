@@ -355,7 +355,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         // --dry-run is not included in the defaults array either.
         makeArgs.push("--dry-run");
         const dryrunSwitches: string[] | undefined = configuration.getDryrunSwitches();
-        if (dryrunSwitches) {
+        if (dryrunSwitches && !forTargets) {
             makeArgs = makeArgs.concat(dryrunSwitches);
         }
 
