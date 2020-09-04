@@ -271,7 +271,7 @@
                 },
                 "makefile.dryrunSwitches": {
                     "type": "array",
-                    "default": ["--always-make", "--keep-going", "--print-data-base", "--print-directory"],
+                    "default": ["--always-make", "--keep-going", "--print-directory"],
                     "description": "Arguments to pass to the dry-run make invocation",
                     "items": {
                         "type": "string"
