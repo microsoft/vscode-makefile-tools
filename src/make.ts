@@ -337,7 +337,9 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
 
         // Prepend the target to the arguments given in the makefile.configurations object,
         // unless we want to parse for the full set of available targets.
-        if (!forTargets) {
+        if (forTargets) {
+            makeArgs.push("all");
+        } else {
             let currentTarget: string | undefined = configuration.getCurrentTarget();
             if (currentTarget) {
                 makeArgs.push(currentTarget);
@@ -347,7 +349,10 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         // Include all the make arguments defined in makefile.configurations.makeArgs
         makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
 
-        // Append --dry-run switches
+        // Append --dry-run switches and additionally --print-data-base, which is not included
+        // in the defaults for makefile.dryrunSwitches because it is useful only for
+        // parsing targets and extremely time consuming for the other configure sub-phases.
+        // --dry-run is not included in the defaults array either.
         makeArgs.push("--dry-run");
         const dryrunSwitches: string[] | undefined = configuration.getDryrunSwitches();
         if (dryrunSwitches) {
@@ -355,6 +360,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }
 
         if (forTargets) {
+            makeArgs.push("--print-data-base");
             logger.messageNoCR("Generating targets information with command: ");
         } else {
             logger.messageNoCR("Generating configuration cache with command: ");
@@ -702,6 +708,9 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         telemetryProperties.buildTarget = processTargetForTelemetry(newBuildTarget);
         telemetry.logEvent("configure", telemetryProperties, telemetryMeasures);
 
+        logger.message(`Preconfigure elapsed time: ${preConfigureElapsedTime}`);
+        logger.message(`Configure elapsed time: ${configureElapsedTime}`);
+
         setIsConfiguring(false);
     }
 }
@@ -853,7 +862,10 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     let retc3: number | undefined;
 
     // This generates the dryrun output and caches it.
+    let doConfigureStartTime: number = Date.now();
     retc1 = await generateParseContent(progress, cancel, false, recursiveDoConfigure);
+    let doConfigureEndTime: number = Date.now();
+    logger.message(`Generate dry-run elapsed time: ${(doConfigureEndTime - doConfigureStartTime) / 1000}`);
     if (retc1 === ConfigureBuildReturnCodeTypes.cancelled) {
         return retc1;
     }
@@ -864,6 +876,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     if (!preprocessedDryrunOutput) {
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
+    let doPreprocessEndTime: number = Date.now();
+    logger.message(`Preprocess elapsed time: ${(doPreprocessEndTime - doConfigureEndTime) / 1000}`);
 
     // Configure IntelliSense
     // Don't override retc1, since make invocations may fail with errors different than cancel
@@ -872,6 +886,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     if (await updateProvider(progress, cancel, preprocessedDryrunOutput, recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
+    let doIntelliSenseEndTime: number = Date.now();
+    logger.message(`IntelliSense elapsed time: ${(doIntelliSenseEndTime - doPreprocessEndTime) / 1000}`);
 
     // Configure launch targets as parsed from the makefile
     // (and not as read from settings via makefile.launchConfigurations).
@@ -879,6 +895,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     if (await parseLaunchConfigurations(progress, cancel, preprocessedDryrunOutput, recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
+    let doLaunchEndTime: number = Date.now();
+    logger.message(`Launch elapsed time: ${(doLaunchEndTime - doIntelliSenseEndTime) / 1000}`);
 
     // Verify if the current launch configuration is still part of the list and unset otherwise.
     let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
@@ -895,23 +913,20 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     let buildTargets: string[] = configuration.getBuildTargets();
     if (updateTargets || buildTargets.length === 0 ||
         (buildTargets.length === 1 && buildTargets[0] === "all")) {
-        // If the current target is other than default (empty "") or "all",
-        // we need to generate a different dryrun output.
-        // No preprocessing is needed to parse the targets.
-        let target: string | undefined = configuration.getCurrentTarget();
-        if (target !== "" && target !== "all") {
-            logger.message("Generating parse content for build targets.");
-            retc2 = await generateParseContent(progress, cancel, true, recursiveDoConfigure);
-            if (retc2 === ConfigureBuildReturnCodeTypes.cancelled) {
-                return retc2;
-            }
-
+        logger.message("Generating parse content for build targets.");
+        retc2 = await generateParseContent(progress, cancel, true, recursiveDoConfigure);
+        if (retc2 === ConfigureBuildReturnCodeTypes.cancelled) {
+            return retc2;
         }
+        let doGenerateDryrunTargetsEndTime: number = Date.now();
+        logger.message(`Generate dryrun for targets elapsed time: ${(doGenerateDryrunTargetsEndTime - doLaunchEndTime) / 1000}`);
 
         logger.message(`Parsing for build targets from: "${parseFile}"`);
         if (await parseTargets(progress, cancel, parseContent || "", recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
             return ConfigureBuildReturnCodeTypes.cancelled;
         }
+        let doBuildTargetsEndTime: number = Date.now();
+        logger.message(`BuildTargets elapsed time: ${(doBuildTargetsEndTime - doGenerateDryrunTargetsEndTime) / 1000}`);
 
         // Verify if the current build target is still part of the list and unset otherwise.
         buildTargets = configuration.getBuildTargets();
