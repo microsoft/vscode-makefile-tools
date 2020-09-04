@@ -202,7 +202,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         await scheduleTask(async (taskEndCallback: () => void) => {
             function doChunk3(): void {
                 let chunkIndex: number = 0;
-                while (index <= numberOfLines && chunkIndex <= chunkSize) {
+                while (index < numberOfLines && chunkIndex <= chunkSize) {
                     if (cancel.isCancellationRequested) {
                         break;
                     }
@@ -609,7 +609,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         // equivalent to pushd
         let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ')(.*)'");
         if (match) {
-            newCurrentPath = util.makeFullPath(match[4], lastCurrentPath) || "";
+            newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
         } else {
             newCurrentPath = "Could not parse directory";
         }
@@ -674,7 +674,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                 let line: string = dryRunOutputLines[index];
 
-                statusCallback("Parsing for InteliSense...");
+                statusCallback("Parsing for IntelliSense...");
                 currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
                 currentPath = currentPathHistory[currentPathHistory.length - 1];
 
