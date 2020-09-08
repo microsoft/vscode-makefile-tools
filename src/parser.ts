@@ -228,7 +228,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                     // for IntelliSense config provider or launch parsing.
                     // These lines are produced by the verbose log switch --print-data-base,
                     // which is useful in parsing for build targets.
-                    if (!line.includes("$")) {
+                    if (!line.includes("$(")) {
                         preprocessedDryRunOutputLines.push(line);
                     }
 
