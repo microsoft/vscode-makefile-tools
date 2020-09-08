@@ -607,9 +607,9 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose");
     } else if (line.includes('Entering directory')) { // equivalent to pushd
         // The make switch print-directory wraps the folder in various ways.
-        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ('|`|\"))(.*)('|`|\")");
+        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['|`|\"])(.*)['|`|\"]");
         if (match) {
-            newCurrentPath = util.makeFullPath(match[4], lastCurrentPath) || "";
+            newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
         } else {
             newCurrentPath = "Could not parse directory";
         }
