@@ -29,7 +29,7 @@ async function scheduleTask(task: (taskEndCallback: () => void) => Promise<void>
     return new Promise<void>(resolve => {
         let onEnd: any = (): void => {
             resolve();
-        }
+        };
 
         setImmediate(() => {
             task(onEnd);
@@ -228,7 +228,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                     // for IntelliSense config provider or launch parsing.
                     // These lines are produced by the verbose log switch --print-data-base,
                     // which is useful in parsing for build targets.
-                    if (!line.includes("$")) {
+                    if (!line.includes("$(")) {
                         preprocessedDryRunOutputLines.push(line);
                     }
 
@@ -605,9 +605,9 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         currentPathHistory.push(newCurrentPath);
         logger.message("Analyzing line: " + line, "Verbose");
         logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose");
-    } else if (line.includes('Entering directory')) {
-        // equivalent to pushd
-        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ')(.*)'");
+    } else if (line.includes('Entering directory')) { // equivalent to pushd
+        // The make switch print-directory wraps the folder in various ways.
+        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['|`|\"])(.*)['|`|\"]");
         if (match) {
             newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
         } else {
@@ -667,7 +667,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
         function doChunk(): void {
             let chunkIndex: number = 0;
-            while (index <= numberOfLines && chunkIndex <= chunkSize) {
+            while (index < numberOfLines && chunkIndex <= chunkSize) {
                 if (cancel.isCancellationRequested) {
                     break;
                 }
@@ -801,7 +801,7 @@ function filterTargetBinaryArgs(args: string[]): string[] {
         if (arg === '>' || arg === '1>' || arg === '2>' || arg === '|') {
             return processedArgs;
         }
-        
+
         processedArgs.push(arg);
     });
 
@@ -841,7 +841,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
         await scheduleTask(async (taskEndCallback: () => void) => {
             function doChunk1(): void {
                 let chunkIndex: number = 0;
-                while (index <= numberOfLines && chunkIndex <= chunkSize) {
+                while (index < numberOfLines && chunkIndex <= chunkSize) {
                     if (cancel.isCancellationRequested) {
                         break;
                     }
@@ -1026,7 +1026,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
         index = 0;
         function doChunk2(): void {
             let chunkIndex: number = 0;
-            while (index <= numberOfLines && chunkIndex <= chunkSize) {
+            while (index < numberOfLines && chunkIndex <= chunkSize) {
                 if (cancel.isCancellationRequested) {
                     break;
                 }

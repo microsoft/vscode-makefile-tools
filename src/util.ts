@@ -199,7 +199,7 @@ export function spawnChildProcess(
     stderrCallback?: (stderr: string) => void): Promise<SpawnProcessResult> {
 
     return new Promise<SpawnProcessResult>((resolve, reject) => {
-        const child: child_process.ChildProcess = child_process.spawn(process, args, { cwd: workingDirectory, shell: true });
+        const child: child_process.ChildProcess = child_process.spawn(`"${process}"`, args, { cwd: workingDirectory, shell: true });
         make.setCurPID(child.pid);
 
         if (stdoutCallback) {
