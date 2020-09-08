@@ -352,6 +352,7 @@ function parseLineAsTool(
     if (process.platform === "win32" && !path.extname(toolNameInMakefile)) {
         toolNameInMakefile += ".exe";
     }
+
     toolPathInMakefile = toolPathInMakefile.trimLeft();
     let toolFullPath: string = util.makeFullPath(toolPathInMakefile + toolNameInMakefile, currentPath);
     toolFullPath = util.removeQuotes(toolFullPath);
@@ -392,9 +393,13 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
     // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
     //   to reject a case where a part of a path looks like a switch with its value
     // - can be wrapped by a pair of ', before the switch prefix and after the switch value
-    // - the value can be wrapped by a pair of "
-    // - one or none or more spaces/tabs between the switch and the value
-    let regexpStr: string = '(^|\\s+)\\\'?(\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*))(\\".*?\\"|[^\\\'\\s]+)\\\'?';
+    // - the value can be wrapped by a pair of ", ' or `, even simmetrical combinations like '"...content..."'
+    //   and should be able to not stop at space when inside the quote characters. Example: -I'"pa th"'
+    // - one or none or more spaces/tabs or ':' between the switch and the value
+    // - when the switch value contains a '=', the right half can be also quoted by ', " or `
+    //   and should be able to not stop at space when inside the quote characters. Example: -DMyDefine="some define"
+    let regexpStr: string = '(^|\\s+)\\\'?(\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw +
+                            '(:|=|\\s*))(\\`.*?\\`|\\\'.*?\\\'|\\".*?\\"|[^\\s]+)\\\'?';
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null;
     let results: string[] = [];
@@ -607,7 +612,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose");
     } else if (line.includes('Entering directory')) { // equivalent to pushd
         // The make switch print-directory wraps the folder in various ways.
-        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['|`|\"])(.*)['|`|\"]");
+        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory [\'\`\\\"])(.*)[\'\`\\\"]");
         if (match) {
             newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
         } else {
@@ -695,6 +700,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     includes = util.makeFullPaths(includes, currentPath);
                     logger.message("    Includes: " + includes.join(";"), "Verbose");
                     let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
+                    forcedIncludes = forcedIncludes.concat(parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'include'));
                     forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
                     logger.message("    Forced includes: " + forcedIncludes.join(";"), "Verbose");
 
