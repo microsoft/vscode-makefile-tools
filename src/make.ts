@@ -186,14 +186,14 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                     // Kill make and all its children subprocesses.
                     logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
                     await vscode.window.withProgress({
-                        location: vscode.ProgressLocation.Notification,
-                        title: "Cancelling build...",
-                        cancellable: false,
-                    },
+                            location: vscode.ProgressLocation.Notification,
+                            title: "Cancelling build...",
+                            cancellable: false,
+                        },
                         async (progress) => {
                             await util.killTree(progress, curPID);
                         });
-            });
+                });
 
                 setIsBuilding(true);
                 let retc: number = await doBuildTarget(progress, target, clean);
@@ -235,36 +235,30 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
 }
 
 export async function doBuildTarget(progress: vscode.Progress<{}>, target: string, clean: boolean = false): Promise<number> {
-    return new Promise<number>(function (resolve, reject): void {
-        let makeArgs: string[] = prepareBuildTarget(target, clean);
-        try {
-            // Append without end of line since there is one already included in the stdout/stderr fragments
-            let stdout: any = (result: string): void => {
-                logger.messageNoCR(result);
-                progress.report({increment: 1, message: "..."});
-            };
+    let makeArgs: string[] = prepareBuildTarget(target, clean);
+    try {
+        // Append without end of line since there is one already included in the stdout/stderr fragments
+        let stdout: any = (result: string): void => {
+            logger.messageNoCR(result);
+            progress.report({increment: 1, message: "..."});
+        };
 
-            let stderr: any = (result: string): void => {
-                logger.messageNoCR(result);
-            };
+        let stderr: any = (result: string): void => {
+            logger.messageNoCR(result);
+        };
 
-            let closing: any = (retCode: number, signal: string): void => {
-                if (retCode !== ConfigureBuildReturnCodeTypes.success) {
-                    logger.message(`Target ${target} failed to build.`);
-                } else {
-                    logger.message(`Target ${target} built successfully.`);
-                }
-
-                resolve(retCode);
-            };
-
-            util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
-        } catch (error) {
-            // No need for notification popup, since the build result is visible already in the output channel
-            logger.message(error);
-            resolve(ConfigureBuildReturnCodeTypes.notFound);
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr);
+        if (result.returnCode !== ConfigureBuildReturnCodeTypes.success) {
+            logger.message(`Target ${target} failed to build.`);
+        } else {
+            logger.message(`Target ${target} built successfully.`);
         }
-    });
+        return result.returnCode;
+    } catch (error) {
+        // No need for notification popup, since the build result is visible already in the output channel
+        logger.message(error);
+        return ConfigureBuildReturnCodeTypes.notFound;
+    }
 }
 
 // Content to be parsed by various operations post configure (like finding all build/launch targets).
@@ -331,99 +325,94 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }
     }
 
-    return new Promise<number>(function (resolve, reject): void {
-        // Continue with the make dryrun invocation
-        let makeArgs: string[] = [];
+    // Continue with the make dryrun invocation
+    let makeArgs: string[] = [];
 
-        // Prepend the target to the arguments given in the makefile.configurations object,
-        // unless we want to parse for the full set of available targets.
-        if (forTargets) {
-            makeArgs.push("all");
-        } else {
-            let currentTarget: string | undefined = configuration.getCurrentTarget();
-            if (currentTarget) {
-                makeArgs.push(currentTarget);
+    // Prepend the target to the arguments given in the makefile.configurations object,
+    // unless we want to parse for the full set of available targets.
+    if (forTargets) {
+        makeArgs.push("all");
+    } else {
+        let currentTarget: string | undefined = configuration.getCurrentTarget();
+        if (currentTarget) {
+            makeArgs.push(currentTarget);
+        }
+    }
+
+    // Include all the make arguments defined in makefile.configurations.makeArgs
+    makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
+
+    // Append --dry-run switches and additionally --print-data-base, which is not included
+    // in the defaults for makefile.dryrunSwitches because it is useful only for
+    // parsing targets and extremely time consuming for the other configure sub-phases.
+    // --dry-run is not included in the defaults array either.
+    makeArgs.push("--dry-run");
+    const dryrunSwitches: string[] | undefined = configuration.getDryrunSwitches();
+    if (dryrunSwitches && !forTargets) {
+        makeArgs = makeArgs.concat(dryrunSwitches);
+    }
+
+    if (forTargets) {
+        makeArgs.push("--print-data-base");
+        logger.messageNoCR("Generating targets information with command: ");
+    } else {
+        logger.messageNoCR("Generating configuration cache with command: ");
+    }
+
+    logger.message(configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));
+
+    try {
+        let stdoutStr: string = "";
+        let stderrStr: string = "";
+
+        let stdout: any = (result: string): void => {
+            stdoutStr += result;
+            progress.report({increment: 1, message: "Generating dry-run output..." +
+                                                    ((recursive) ? "(recursive)" : "") +
+                                                    ((forTargets) ? "(for targets specifically)" : "")});
+        };
+
+        let stderr: any = (result: string): void => {
+            stderrStr += result;
+        };
+
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr);
+        if (result.returnCode !== ConfigureBuildReturnCodeTypes.success) {
+            logger.message("The make dry-run command failed.");
+            if (forTargets) {
+                logger.message("We may parse an incomplete set of build targets.");
+            } else {
+                logger.message("IntelliSense may work only partially or not at all.");
+            }
+            logger.message(stderrStr);
+
+            // Report the standard dry-run error & guide only when the configure was not cancelled
+            // by the user (which causes retCode to be null).
+            // Also don't write the cache if this operation was cancelled
+            // because it may be incomplete and affect a future non clean configure.
+            if (result.returnCode !== null) {
+                util.reportDryRunError();
             }
         }
 
-        // Include all the make arguments defined in makefile.configurations.makeArgs
-        makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
+        // Don't write the cache if this operation was cancelled because stdoutStr
+        // may be incomplete and affect a future non clean configure.
+        if (result.returnCode !== null) {
+            if (cache) {
+                logger.message(`Writing the configuration cache: ${cache}`);
+                fs.writeFileSync(cache, stdoutStr);
+                parseFile = cache;
+            }
 
-        // Append --dry-run switches and additionally --print-data-base, which is not included
-        // in the defaults for makefile.dryrunSwitches because it is useful only for
-        // parsing targets and extremely time consuming for the other configure sub-phases.
-        // --dry-run is not included in the defaults array either.
-        makeArgs.push("--dry-run");
-        const dryrunSwitches: string[] | undefined = configuration.getDryrunSwitches();
-        if (dryrunSwitches && !forTargets) {
-            makeArgs = makeArgs.concat(dryrunSwitches);
+            parseContent = stdoutStr;
         }
 
-        if (forTargets) {
-            makeArgs.push("--print-data-base");
-            logger.messageNoCR("Generating targets information with command: ");
-        } else {
-            logger.messageNoCR("Generating configuration cache with command: ");
-        }
-
-        logger.message(configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));
-
-        try {
-            let stdoutStr: string = "";
-            let stderrStr: string = "";
-
-            let stdout: any = (result: string): void => {
-                stdoutStr += result;
-                progress.report({increment: 1, message: "Generating dry-run output..." +
-                                                        ((recursive) ? "(recursive)" : "") +
-                                                        ((forTargets) ? "(for targets specifically)" : "")});
-            };
-
-            let stderr: any = (result: string): void => {
-                stderrStr += result;
-            };
-
-            let closing: any = (retCode: number, signal: string): void => {
-                if (retCode !== ConfigureBuildReturnCodeTypes.success) {
-                    logger.message("The make dry-run command failed.");
-                    if (forTargets) {
-                        logger.message("We may parse an incomplete set of build targets.");
-                    } else {
-                        logger.message("IntelliSense may work only partially or not at all.");
-                    }
-                    logger.message(stderrStr);
-
-                    // Report the standard dry-run error & guide only when the configure was not cancelled
-                    // by the user (which causes retCode to be null).
-                    // Also don't write the cache if this operation was cancelled
-                    // because it may be incomplete and affect a future non clean configure.
-                    if (retCode !== null) {
-                        util.reportDryRunError();
-                    }
-                }
-
-                // Don't write the cache if this operation was cancelled because stdoutStr
-                // may be incomplete and affect a future non clean configure.
-                if (retCode !== null) {
-                    if (cache) {
-                        logger.message(`Writing the configuration cache: ${cache}`);
-                        fs.writeFileSync(cache, stdoutStr);
-                        parseFile = cache;
-                    }
-
-                    parseContent = stdoutStr;
-                }
-
-                resolve(retCode);
-                curPID = -1;
-            };
-
-            util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
-        } catch (error) {
-            resolve(ConfigureBuildReturnCodeTypes.notFound);
-            logger.message(error);
-        }
-    });
+        curPID = -1;
+        return result.returnCode;
+    } catch (error) {
+        logger.message(error);
+        return ConfigureBuildReturnCodeTypes.notFound;
+    }
 }
 
 export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
@@ -463,14 +452,14 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
                     logger.message("The user is cancelling the pre-configure...");
                     logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
                     await vscode.window.withProgress({
-                        location: vscode.ProgressLocation.Notification,
-                        title: "Cancelling pre-configure...",
-                        cancellable: false,
-                    },
+                            location: vscode.ProgressLocation.Notification,
+                            title: "Cancelling pre-configure...",
+                            cancellable: false,
+                        },
                         async (progress) => {
                             await util.killTree(progress, curPID);
                         });
-            });
+                });
 
                 setIsPreConfiguring(true);
                 let retc: number = await runPreConfigureScript(progress, scriptFile || ""); // get rid of || ""
@@ -515,67 +504,62 @@ async function applyEnvironment(content: string | undefined) : Promise<void> {
 }
 
 export async function runPreConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
-    return new Promise<number>(function (resolve, reject): void {
-        logger.message(`Pre-configuring...\nScript: "${configuration.getPreConfigureScript()}"`);
+    logger.message(`Pre-configuring...\nScript: "${configuration.getPreConfigureScript()}"`);
 
-        // Create a temporary wrapper for the user pre-configure script so that we collect
-        // in another temporary output file the environrment variables that were produced.
-        let wrapScriptFile: string = path.join(util.tmpDir(), "wrapPreconfigureScript");
-        let wrapScriptOutFile: string = wrapScriptFile + ".out";
-        let wrapScriptContent: string;
-        if (process.platform === "win32") {
-            wrapScriptContent = `call ${scriptFile}\r\n`;
-            wrapScriptContent += `set > ${wrapScriptOutFile}`;
-            wrapScriptFile += ".bat";
+    // Create a temporary wrapper for the user pre-configure script so that we collect
+    // in another temporary output file the environrment variables that were produced.
+    let wrapScriptFile: string = path.join(util.tmpDir(), "wrapPreconfigureScript");
+    let wrapScriptOutFile: string = wrapScriptFile + ".out";
+    let wrapScriptContent: string;
+    if (process.platform === "win32") {
+        wrapScriptContent = `call ${scriptFile}\r\n`;
+        wrapScriptContent += `set > ${wrapScriptOutFile}`;
+        wrapScriptFile += ".bat";
+    } else {
+        wrapScriptContent = `source ${scriptFile}\n`;
+        wrapScriptContent += `printenv > ${wrapScriptOutFile}`;
+        wrapScriptFile += ".sh";
+    }
+
+    util.writeFile(wrapScriptFile, wrapScriptContent);
+
+    let scriptArgs: string[] = [];
+    let runCommand: string;
+    if (process.platform === 'win32') {
+        runCommand = "cmd";
+        scriptArgs.push("/c");
+        scriptArgs.push(wrapScriptFile);
+    } else {
+        runCommand = "/bin/bash";
+        scriptArgs.push("-c");
+        scriptArgs.push(`"source ${wrapScriptFile}"`);
+    }
+
+    try {
+        let stdout: any = (result: string): void => {
+            progress.report({increment: 1, message: "..."});
+            logger.messageNoCR(result);
+        };
+
+        let stderr: any = (result: string): void => {
+            logger.messageNoCR(result);
+        };
+
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr);
+        if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
+            logger.message("The pre-configure succeeded.");
         } else {
-            wrapScriptContent = `source ${scriptFile}\n`;
-            wrapScriptContent += `printenv > ${wrapScriptOutFile}`;
-            wrapScriptFile += ".sh";
+            logger.message("The pre-configure script failed. This project may not configure successfully.");
         }
 
-        util.writeFile(wrapScriptFile, wrapScriptContent);
+        // Apply the environment produced by running the pre-configure script.
+        applyEnvironment(util.readFile(wrapScriptOutFile));
 
-        let scriptArgs: string[] = [];
-        let runCommand: string;
-        if (process.platform === 'win32') {
-            runCommand = "cmd";
-            scriptArgs.push("/c");
-            scriptArgs.push(wrapScriptFile);
-        } else {
-            runCommand = "/bin/bash";
-            scriptArgs.push("-c");
-            scriptArgs.push(`"source ${wrapScriptFile}"`);
-        }
-
-        try {
-            let stdout: any = (result: string): void => {
-                progress.report({increment: 1, message: "..."});
-                logger.messageNoCR(result);
-            };
-
-            let stderr: any = (result: string): void => {
-                logger.messageNoCR(result);
-            };
-
-            let closing: any = (retCode: number, signal: string): void => {
-                if (retCode === ConfigureBuildReturnCodeTypes.success) {
-                    logger.message("The pre-configure succeeded.");
-                } else {
-                    logger.message("The pre-configure script failed. This project may not configure successfully.");
-                }
-
-                // Apply the environment produced by running the pre-configure script.
-                applyEnvironment(util.readFile(wrapScriptOutFile));
-
-                resolve(retCode);
-            };
-
-            util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr, closing);
-        } catch (error) {
-            logger.message(error);
-            resolve(ConfigureBuildReturnCodeTypes.notFound);
-        }
-    });
+        return result.returnCode;
+    } catch (error) {
+        logger.message(error);
+        return ConfigureBuildReturnCodeTypes.notFound;
+    }
 }
 
 export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean = true): Promise<number> {
@@ -640,15 +624,15 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
                 title: "Configuring...",
                 cancellable: true,
             },
-            async (progress, cancel) => {
+            (progress, cancel) => {
                 cancel.onCancellationRequested(async () => {
                     if (curPID !== -1) {
                         logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
                         await vscode.window.withProgress({
-                            location: vscode.ProgressLocation.Notification,
-                            title: "Cancelling configure...",
-                            cancellable: false,
-                        },
+                                location: vscode.ProgressLocation.Notification,
+                                title: "Cancelling configure...",
+                                cancellable: false,
+                            },
                             async (progress) => {
                                 return util.killTree(progress, curPID);
                             });
