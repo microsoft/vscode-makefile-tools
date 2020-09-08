@@ -86,7 +86,7 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
                                 foundTargetCallback(match[1]);
                             }
 
-                            statusCallback("Parsing build targets...");
+                            statusCallback("Parsing build targets");
                             match = regexpTarget.exec(extractedLog);
 
                             if (!match) {
@@ -139,7 +139,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
         await scheduleTask(async (taskEndCallback: () => void) => {
             function doChunk1(level: number): void {
-                statusCallback("Preprocessing the dry-run output...1");
+                statusCallback("Preprocessing the dry-run output - 1");
                 if (level === 1) {
                     let extensionRootPath: string = path.resolve(__dirname, "../../");
                     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
@@ -173,7 +173,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                             break;
                         }
 
-                        statusCallback("Preprocessing the dry-run output...2");
+                        statusCallback("Preprocessing the dry-run output - 2");
                         let result: string = match[0];
                         result = result.concat("\n");
                         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(result, " ");
@@ -209,7 +209,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
                     let line: string = preprocessedLines[index];
 
-                    statusCallback("Preprocessing the dry-run output...3");
+                    statusCallback("Preprocessing the dry-run output - 3");
                     let strC: string = "--mode=compile";
                     let idxC: number = line.indexOf(strC);
                     if (idxC >= 0) {
@@ -252,7 +252,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
         await scheduleTask(async (taskEndCallback: () => void) => {
             function doChunk4(level: number): void {
-                statusCallback("Preprocessing the dry-run output...4");
+                statusCallback("Preprocessing the dry-run output - 4");
 
                 if (level === 1) {
                     preprocessedDryRunOutputStr = preprocessedDryRunOutputLines.join("\n");
@@ -674,7 +674,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                 let line: string = dryRunOutputLines[index];
 
-                statusCallback("Parsing for IntelliSense...");
+                statusCallback("Parsing for IntelliSense");
                 currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
                 currentPath = currentPathHistory[currentPathHistory.length - 1];
 
@@ -848,7 +848,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
                     let line: string = dryRunOutputLines[index];
 
-                    statusCallback("Parsing for launch targets... (inspecting for link commands");
+                    statusCallback("Parsing for launch targets: inspecting for link commands");
                     currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
                     currentPath = currentPathHistory[currentPathHistory.length - 1];
 
@@ -1033,7 +1033,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
                 let line: string = dryRunOutputLines[index];
 
-                statusCallback("Parsing for launch targets... (inspecting built binary invocations).");
+                statusCallback("Parsing for launch targets: inspecting built binary invocations");
                 currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
                 currentPath = currentPathHistory[currentPathHistory.length - 1];
 

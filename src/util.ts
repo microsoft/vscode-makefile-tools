@@ -176,7 +176,7 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
 
     try {
         logger.message(`Killing process PID = ${pid}`);
-        progress.report({ increment: 1, message: `Terminating process PID=${pid}` });
+        progress.report({ increment: 1, message: `Terminating process PID=${pid} ...` });
         process.kill(pid, 'SIGINT');
     } catch (e) {
         if (e.code !== 'ESRCH') {

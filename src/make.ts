@@ -187,7 +187,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                     logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
                     await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
-                            title: "Cancelling build...",
+                            title: "Cancelling build",
                             cancellable: false,
                         },
                         async (progress) => {
@@ -367,9 +367,10 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
 
         let stdout: any = (result: string): void => {
             stdoutStr += result;
-            progress.report({increment: 1, message: "Generating dry-run output..." +
-                                                    ((recursive) ? "(recursive)" : "") +
-                                                    ((forTargets) ? "(for targets specifically)" : "")});
+            progress.report({increment: 1, message: "Generating dry-run output" +
+                                                    ((recursive) ? " (recursive)" : "") +
+                                                    ((forTargets) ? " (for targets specifically)" : "" +
+                                                    "...")});
         };
 
         let stderr: any = (result: string): void => {
@@ -453,7 +454,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
                     logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
                     await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
-                            title: "Cancelling pre-configure...",
+                            title: "Cancelling pre-configure",
                             cancellable: false,
                         },
                         async (progress) => {
@@ -621,7 +622,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     try {
         return await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: "Configuring...",
+                title: "Configuring",
                 cancellable: true,
             },
             (progress, cancel) => {
@@ -630,7 +631,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
                         logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
                         await vscode.window.withProgress({
                                 location: vscode.ProgressLocation.Notification,
-                                title: "Cancelling configure...",
+                                title: "Cancelling configure",
                                 cancellable: false,
                             },
                             async (progress) => {
@@ -705,7 +706,7 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
         let launchConfigurations: configuration.LaunchConfiguration[] = [];
 
         let onStatus: any = (status: string): void => {
-            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
         };
 
         let onFoundLaunchConfiguration: any = (launchConfiguration: configuration.LaunchConfiguration): void => {
@@ -756,7 +757,7 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
         let targets: string[] = [];
 
         let onStatus: any = (status: string): void => {
-            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
         };
 
         let onFoundTarget: any = (target: string): void => {
@@ -793,7 +794,7 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
 
     return new Promise<number>(async function (resolve, reject): Promise<void> {
         let onStatus: any = (status: string): void => {
-            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
         };
 
         let onFoundCustomConfigProviderItem: any = (customConfigProviderItem: parser.CustomConfigProviderItem): void => {
@@ -820,7 +821,7 @@ export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vs
                                        dryrunOutput: string, recursive: boolean = false): Promise<string | null> {
     return new Promise<string | null>(async function (resolve, reject): Promise<void> {
         let onStatus: any = (status: string): void => {
-            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
         };
 
         let onEnd: any = (retc: number, result: string | null): void => {
