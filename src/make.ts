@@ -752,37 +752,32 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
 
 async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
     dryRunOutput: string, recursive: boolean = false): Promise<number> {
-    return new Promise<number>(async function (resolve, reject): Promise<void> {
-        let targets: string[] = [];
+    let targets: string[] = [];
 
-        let onStatus: any = (status: string): void => {
-            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
-        };
+    let onStatus: any = (status: string): void => {
+        progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+    };
 
-        let onFoundTarget: any = (target: string): void => {
-            targets.push(target);
-        };
+    let onFoundTarget: any = (target: string): void => {
+        targets.push(target);
+    };
 
-        let onEnd: any = (retc: number): void => {
-            if (retc === ConfigureBuildReturnCodeTypes.success) {
-                if (targets.length === 0) {
-                    configuration.setBuildTargets([]);
-                    logger.message("No build targets have been detected.");
-                } else {
-                    configuration.setBuildTargets(targets.sort());
-                    logger.message("Found the following build targets defined in the makefile: " + targets.join(";"));
-                }
-            } else {
-                // There might be already a few valid build targets identified,
-                // but since they might not be all reset to empty.
-                configuration.setBuildTargets([]);
-            }
+    let retc: number = await parser.parseTargets(cancel, dryRunOutput, onStatus, onFoundTarget);
+    if (retc === ConfigureBuildReturnCodeTypes.success) {
+        if (targets.length === 0) {
+            configuration.setBuildTargets([]);
+            logger.message("No build targets have been detected.");
+        } else {
+            configuration.setBuildTargets(targets.sort());
+            logger.message("Found the following build targets defined in the makefile: " + targets.join(";"));
+        }
+    } else {
+        // There might be already a few valid build targets identified,
+        // but since there might be some missing, reset to empty.
+        configuration.setBuildTargets([]);
+    }
 
-            resolve(retc);
-        };
-
-        setTimeout(parser.parseTargets, 0, cancel, dryRunOutput, onStatus, onFoundTarget, onEnd);
-    });
+    return retc;
 }
 
 async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,

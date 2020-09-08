@@ -25,7 +25,7 @@ const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 const chunkSize: number = 100;
 
-async function scheduleTask(task: (taskEndCallback: () => void) => Promise<void>): Promise<void> {
+function scheduleTask(task: (taskEndCallback: () => void) => Promise<void>): Promise<void> {
     return new Promise<void>(resolve => {
         let onEnd: any = (): void => {
             resolve();
@@ -36,82 +36,71 @@ async function scheduleTask(task: (taskEndCallback: () => void) => Promise<void>
         });
     });
 }
-export async function parseTargets(cancel: vscode.CancellationToken, verboseLog: string,
+
+export async function parseTargets(cancel: vscode.CancellationToken,
+                                   verboseLog: string,
                                    statusCallback: (message: string) => void,
-                                   foundTargetCallback: (target: string) => void,
-                                   endCallback: (retc: number) => void): Promise<number> {
+                                   foundTargetCallback: (target: string) => void): Promise<number> {
     if (cancel.isCancellationRequested) {
         return make.ConfigureBuildReturnCodeTypes.cancelled;
     }
 
-    cancel.onCancellationRequested(() => {
-        endCallback(make.ConfigureBuildReturnCodeTypes.cancelled);
-    });
+    // Extract the text between "# Files" and "# Finished Make data base" lines
+    // There can be more than one matching section.
+    let regexpExtract: RegExp = /(# Files\n*)([\s\S]*?)(# Finished Make data base)/mg;
+    let result: RegExpExecArray | null;
+    let extractedLog: string = "";
 
-    return new Promise<number>(async function (resolve, reject): Promise<void> {
-        // Extract the text between "# Files" and "# Finished Make data base" lines
-        // There can be more than one matching section.
-        let regexpExtract: RegExp = /(# Files\n*)([\s\S]*?)(# Finished Make data base)/mg;
-        let result: RegExpExecArray | null;
-        let extractedLog: string = "";
+    let matches: string[] = [];
+    let match: string[] | null;
+    result = await util.scheduleTask2(() => regexpExtract.exec(verboseLog));
 
-        let matches: string[] = [];
-        let match: string[] | null;
-        result = regexpExtract.exec(verboseLog);
+    while (result) {
+        extractedLog = result[2];
 
-        while (result) {
-            extractedLog = result[2];
+        // skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target
+        let regexpTarget: RegExp = /^(?!\n?[#\.])(?<!^\n?# Not a target:\s*)\s*(\S+):\s+/mg;
 
-            // skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target
-            let regexpTarget: RegExp = /^(?!\n?[#\.])(?<!^\n?# Not a target:\s*)\s*(\S+):\s+/mg;
+        match = regexpTarget.exec(extractedLog);
 
-            match = regexpTarget.exec(extractedLog);
+        if (match) {
+            let done: boolean = false;
+            let doParsingChunk: (() => void) = () => {
+                let chunkIndex: number = 0;
 
-            if (match) {
-                await scheduleTask(async (taskEndCallback: () => void) => {
-                    function doChunk(): void {
-                        let chunkIndex: number = 0;
+                while (match && chunkIndex <= chunkSize) {
+                    // Make sure we don't insert duplicates.
+                    // They can be caused by the makefile syntax of defining variables for a target.
+                    // That creates multiple lines with the same target name followed by :,
+                    // which is the pattern parsed here.
+                    if (!matches.includes(match[1])) {
+                        matches.push(match[1]);
+                        foundTargetCallback(match[1]);
+                    }
 
-                        while (match && chunkIndex <= chunkSize) {
-                            if (cancel.isCancellationRequested) {
-                                break;
-                            }
+                    statusCallback("Parsing build targets...");
+                    match = regexpTarget.exec(extractedLog);
 
-                            // Make sure we don't insert duplicates.
-                            // They can be caused by the makefile syntax of defining variables for a target.
-                            // That creates multiple lines with the same target name followed by :,
-                            // which is the pattern parsed here.
-                            if (!matches.includes(match[1])) {
-                                matches.push(match[1]);
-                                foundTargetCallback(match[1]);
-                            }
+                    if (!match) {
+                        done = true;
+                    }
 
-                            statusCallback("Parsing build targets...");
-                            match = regexpTarget.exec(extractedLog);
+                    chunkIndex++;
+                }
+            };
+            while (!done) {
+                if (cancel.isCancellationRequested) {
+                    break;
+                }
 
-                            if (!match) {
-                                resolve();
-                            }
+                await util.scheduleTask2(doParsingChunk);
+            }
+        } // if match
 
-                            chunkIndex++;
-                            if (chunkIndex === chunkSize) {
-                                setTimeout(doChunk, 0);
-                            }
-                        } // while match
+        result = await util.scheduleTask2(() => regexpExtract.exec(verboseLog));
+    } // while result
 
-                        taskEndCallback();
-                    } // doChunk function
-
-                    doChunk();
-                }); // scheduleTask
-            }// if match
-
-            result = regexpExtract.exec(verboseLog);
-        } // while result
-
-        resolve(make.ConfigureBuildReturnCodeTypes.success);
-        endCallback(make.ConfigureBuildReturnCodeTypes.success);
-    }); // return promise
+    return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;
 }
 
 // Make various preprocessing transformations on the dry-run output
