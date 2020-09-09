@@ -130,19 +130,20 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     });
 
     return new Promise<number>(async function (resolve, reject): Promise<void> {
-        // Expand {REPO:VSCODE-MAKEFILE-TOOLS} to the full path of the root of the extension
-        // This is used for the pre-created dry-run logs consumed by the tests,
-        // in order to be able to have source files and includes for the test repro
-        // within the test subfolder of the extension repo, while still exercising full paths for parsing
-        // and not generating a different output with every new location where Makefile Tools is enlisted.
-        // A real user scenario wouldn't need this construct.
-
         await scheduleTask(async (taskEndCallback: () => void) => {
             function doChunk1(level: number): void {
                 statusCallback("Preprocessing the dry-run output - 1");
                 if (level === 1) {
-                    let extensionRootPath: string = path.resolve(__dirname, "../../");
-                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+                    // Expand {REPO:VSCODE-MAKEFILE-TOOLS} to the full path of the root of the extension
+                    // This is used for the pre-created dry-run logs consumed by the tests,
+                    // in order to be able to have source files and includes for the test repro
+                    // within the test subfolder of the extension repo, while still exercising full paths for parsing
+                    // and not generating a different output with every new location where Makefile Tools is enlisted.
+                    // A real user scenario wouldn't need this construct.
+                    if (process.env['MAKEFILE_TOOLS_TESTING'] === '1') {
+                        let extensionRootPath: string = path.resolve(__dirname, "../../");
+                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+                    }
 
                     // Split multiple commands concatenated by '&&'
                     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
@@ -150,8 +151,10 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                     // Split multiple commands concatenated by ";"
                     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
 
-                    // Concatenate lines ending with ' \', forming one complete command
+                    // Sometimes the ending of lines ends up being a mix and match of \n and \r\n.
+                    // Make it uniform to \n to ease other processing later.
                     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\r\\n/mg, "\n");
+                    
                     taskEndCallback();
                 } else {
                     setTimeout(doChunk1, 0, 1);
@@ -161,101 +164,22 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
             doChunk1(0);
         }); // scheduleTask
 
-        let regexp: RegExp = /\s+\\$/mg;
-        let match: RegExpExecArray | null = regexp.exec(preprocessedDryRunOutputStr);
-
-        if (match) {
-            await scheduleTask(async (taskEndCallback: () => void) => {
-                function doChunk2(): void {
-                    let chunkIndex: number = 0;
-                    while (match) {
-                        if (cancel.isCancellationRequested) {
-                            break;
-                        }
-
-                        statusCallback("Preprocessing the dry-run output - 2");
-                        let result: string = match[0];
-                        result = result.concat("\n");
-                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(result, " ");
-                        match = regexp.exec(preprocessedDryRunOutputStr);
-
-                        if (!match) {
-                            taskEndCallback();
-                        }
-
-                        chunkIndex++;
-                        if (chunkIndex === chunkSize) {
-                            setTimeout(doChunk2, 0);
-                        }
-                    } // while loop
-                } // doChunk2
-                doChunk2();
-            }); // scheduleTask
-        } // if match
-
-        // Process some more makefile output weirdness
-        let preprocessedDryRunOutputLines: string[] = [];
-        let preprocessedLines: string[] = preprocessedDryRunOutputStr.split("\n");
-        let numberOfLines: number = preprocessedLines.length;
-        let index: number = 0;
-
         await scheduleTask(async (taskEndCallback: () => void) => {
-            function doChunk3(): void {
-                let chunkIndex: number = 0;
-                while (index < numberOfLines && chunkIndex <= chunkSize) {
-                    if (cancel.isCancellationRequested) {
-                        break;
-                    }
-
-                    let line: string = preprocessedLines[index];
-
-                    statusCallback("Preprocessing the dry-run output - 3");
-                    let strC: string = "--mode=compile";
-                    let idxC: number = line.indexOf(strC);
-                    if (idxC >= 0) {
-                        line = line.replace(line.substring(0, idxC), "");
-                        line = line.replace(strC, "");
-                    }
-
-                    let strL: string = "--mode=link";
-                    let idxL: number = line.indexOf(strL);
-                    if (idxL >= 0) {
-                        line = line.replace(line.substring(0, idxL), "");
-                        line = line.replace(strL, "");
-                    }
-
-                    // Ignore any lines containing $ because they are redundant and not useful
-                    // for IntelliSense config provider or launch parsing.
-                    // These lines are produced by the verbose log switch --print-data-base,
-                    // which is useful in parsing for build targets.
-                    if (!line.includes("$(")) {
-                        preprocessedDryRunOutputLines.push(line);
-                    }
-
-                    if (idxL >= 0 && idxC >= 0) {
-                        logger.message("Not supporting --mode=compile and --mode=link on the same line");
-                    }
-
-                    index++;
-                    if (index === numberOfLines) {
-                        taskEndCallback();
-                    }
-
-                    chunkIndex++;
-                    if (chunkIndex === chunkSize) {
-                        setTimeout(doChunk3, 0);
-                    }
-                } // while loop
-            } // doChunk3
-            doChunk3();
-        }); // scheduleTask
-
-        await scheduleTask(async (taskEndCallback: () => void) => {
-            function doChunk4(level: number): void {
-                statusCallback("Preprocessing the dry-run output - 4");
-
+            function doChunk2(level: number): void {
+                statusCallback("Preprocessing the dry-run output - 2");
                 if (level === 1) {
-                    preprocessedDryRunOutputStr = preprocessedDryRunOutputLines.join("\n");
+                    // Some compiler/linker commands are split on multiple lines.
+                    // At the end of every intermediate line is at least a space, then a \ and end of line.
+                    // Concatenate all these lines to see clearly each command on one line.
+                    let regexp: RegExp = /\s+\\$\n/mg;
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, " ");
+
+                    // Process some more makefile output weirdness
+                    // When --mode=compile or --mode-link are present in a line, we can ignore anything that is before
+                    // and all that is after is a normal complete compiler or link command.
+                    // Replace these patterns with end of line so that the parser will see only the right half.
+                    regexp = /--mode=compile|--mode-link/mg;
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
 
                     // Extract the link command
                     // Keep the /link switch to the cl command because otherwise we will see compiling without /c
@@ -272,11 +196,11 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
                     taskEndCallback();
                 } else {
-                    setTimeout(doChunk4, 0, 1);
+                    setTimeout(doChunk2, 0, 1);
                 }
             }
 
-            doChunk4(0);
+            doChunk2(0);
         }); // scheduleTask
 
         endCallback(make.ConfigureBuildReturnCodeTypes.success, preprocessedDryRunOutputStr);
@@ -892,7 +816,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                     }
 
                     let line: string = dryRunOutputLines[index];
-
+    
                     statusCallback("Parsing for launch targets: inspecting for link commands");
                     currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
                     currentPath = currentPathHistory[currentPathHistory.length - 1];
