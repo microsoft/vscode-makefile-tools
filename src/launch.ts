@@ -239,7 +239,10 @@ export class Launcher implements vscode.Disposable {
         // Add a pair of quotes just in case there is a space in the binary path
         let terminalCommand: string = '"' + this.launchTargetPath() + '" ';
         terminalCommand += this.launchTargetArgs().join(" ");
-        logger.message("Running command '" + terminalCommand + "' in the terminal from location '" + this.launchTargetDirectory() + "'");
+
+        // Log the message for high verbosity only because the output channel will become visible over the terminal,
+        // even if the terminal show() is called after the logger show().
+        logger.message("Running command '" + terminalCommand + "' in the terminal from location '" + this.launchTargetDirectory() + "'", "Debug");
         return terminalCommand;
     }
 
@@ -263,18 +266,16 @@ export class Launcher implements vscode.Disposable {
         let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined;
         if (status === LaunchStatuses.success) {
             currentLaunchConfiguration = configuration.getCurrentLaunchConfiguration();
-        }
-
-        if (currentLaunchConfiguration) {
             let terminalCommand: string = this.prepareRunCurrentTarget();
             this.launchTerminal.sendText(terminalCommand);
+
+            let telemetryProperties: telemetry.Properties = {
+                status: status
+            };
+            telemetry.logEvent("run", telemetryProperties);
+    
             this.launchTerminal.show();
         }
-
-        let telemetryProperties: telemetry.Properties = {
-            status: status
-        };
-        telemetry.logEvent("run", telemetryProperties);
 
         return this.launchTerminal;
     }

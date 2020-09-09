@@ -9,7 +9,7 @@ let makeOutputChannel: vscode.OutputChannel | undefined;
 function getOutputChannel(): vscode.OutputChannel {
     if (!makeOutputChannel) {
         makeOutputChannel = vscode.window.createOutputChannel("Makefile tools");
-        makeOutputChannel.show();
+        makeOutputChannel.show(true); // don't take focus
     }
 
     return makeOutputChannel;
@@ -43,7 +43,7 @@ export function message(message: string, loggingLevel?: string): void {
     // We want the focus change events to be triggered by changing editors,
     // not by the output channel writing one more message, especially of lower importance.
     if (!loggingLevel || loggingLevel === "Normal") {
-        makeOutputChannel?.show();
+        makeOutputChannel?.show(true); // don't take focus
     }
 
     let channel: vscode.OutputChannel = getOutputChannel();
@@ -71,7 +71,7 @@ export function messageNoCR(message: string, loggingLevel?: string): void {
     // We want the focus change events to be triggered by changing editors,
     // not by the output channel writing one more message, especially of lower importance.
     if (!loggingLevel || loggingLevel === "Normal") {
-        makeOutputChannel?.show();
+        makeOutputChannel?.show(true); // don't take focus
     }
 
     let channel: vscode.OutputChannel = getOutputChannel();

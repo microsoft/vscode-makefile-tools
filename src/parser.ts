@@ -392,14 +392,45 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
     // - '-' or '/' or '--' as switch prefix
     // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
     //   to reject a case where a part of a path looks like a switch with its value
+    //    (example: "drive:/dir/Ifolder" taking /Ifolder as include switch).
     // - can be wrapped by a pair of ', before the switch prefix and after the switch value
-    // - the value can be wrapped by a pair of ", ' or `, even simmetrical combinations like '"...content..."'
-    //   and should be able to not stop at space when inside the quote characters. Example: -I'"pa th"'
-    // - one or none or more spaces/tabs or ':' between the switch and the value
-    // - when the switch value contains a '=', the right half can be also quoted by ', " or `
-    //   and should be able to not stop at space when inside the quote characters. Example: -DMyDefine="some define"
-    let regexpStr: string = '(^|\\s+)\\\'?(\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw +
-                            '(:|=|\\s*))(\\`.*?\\`|\\\'.*?\\\'|\\".*?\\"|[^\\s]+)\\\'?';
+    //    (example: '-DMY_DEFINE=SOMETHING' or '/I drive/folder/subfolder').
+    // - one or none or more spaces/tabs or ':' or '=' between the switch and the value
+    //    (examples): -Ipath, -I path, -I    path, -std=gnu89
+    // - the value can be wrapped by a pair of ", ' or `, even simmetrical combinations ('"..."')
+    //   and should be able to not stop at space when inside the quote characters.
+    //    (examples): -D'MY_DEFINE', -D "MY_DEFINE=SOME_VALUE", -I`drive:/folder with space/subfolder`
+    // - when the switch value contains a '=', the right half can be also quoted by ', ", ` or '"..."'
+    //   and should be able to not stop at space when inside the quote characters.
+    //    (example): -DMY_DEFINE='"SOME_VALUE"'
+    let regexpStr: string = '(^|\\s+)' + // start of line or any amount of space character
+                            '\\\'?' + // optional quoting around the whole construct (prefix, switch name and value)
+                            // prefix, switch name, separator between switch name and switch value
+                            '(' +
+                                '\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*)' +
+                            ')' +
+                            // the switch value
+                            '(' +
+                                '\\`[^\\`]*?\\`|' + // anything between `
+                                '\\\'[^\\\']*?\\\'|' + // anything between '
+                                '\\"[^\\"]*?\\"|' + // anything between "
+                                // not fully quoted switch value scenarios
+                                '(' +
+                                    // the left side (or whole value if no '=' is following)
+                                    '(' +
+                                        '[^\\s=]+' + // not quoted switch value component
+                                    ')' +
+                                    '(' +
+                                        '=' + // separator between switch value left side and right side
+                                        '(' +
+                                            '\\`[^\\`]*?\\`|' + // anything between `
+                                            '\\\'[^\\\']*?\\\'|' + // anything between '
+                                            '\\"[^\\"]*?\\"|' + // anything between "
+                                            '[^\\s=]+' + // not quoted right side of switch value
+                                        ')' +
+                                    ')?' +
+                                ')' +
+                            ')\\\'?';
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null;
     let results: string[] = [];
@@ -427,6 +458,10 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
 // Parsing the switches separately wouldn't give us the order information.
 // Also, we don't have yet a function to parse the whole string of arguments into individual arguments,
 // so that we anaylze each switch one by one, thus knowing the order.
+// TODO: review the regexp for parseMultipleSwitchFromToolArguments to make sure all new capabilities
+// are reflected in the regexp here (especially around quoting scenarios and '=').
+// For now it's not critical because parseMultipleSwitchesFromToolArguments is called for target
+// architecture switches which don't have such complex scenarios.
 function parseMultipleSwitchesFromToolArguments(args: string, simpleSwitches: string[], valueSwitches: string[]): string[] {
     // - '-' or '/' or '--' as switch prefix
     // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
@@ -474,6 +509,10 @@ function parseMultipleSwitchesFromToolArguments(args: string, simpleSwitches: st
 // The helper returns the value passed via the given switch
 // Examples for compiler: -std:c++17, -Fotest.obj, -Fe test.exe
 // Example for linker: -out:test.exe versus -o a.out
+// TODO: review the regexp for parseMultipleSwitchFromToolArguments to make sure all new capabilities
+// are reflected in the regexp here (especially around quoting scenarios and '=').
+// For now it's not critical because parseSingleSwitchFromToolArguments is called for switches
+// that have simple value scenarios.
 function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string | undefined {
     // - '-' or '/' or '--' as switch prefix
     // - before the switch, we allow only for one or more spaces/tabs OR begining of line,
