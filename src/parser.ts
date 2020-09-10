@@ -763,16 +763,16 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 function filterTargetBinaryArgs(args: string[]): string[] {
     let processedArgs: string[] = [];
 
-    args.forEach(arg => {
+    for (const arg of args) {
         // Once we encounter a redirection character (pipe, stdout/stderr) remove it,
         // together with all the arguments that are following,
         // since they are not real parameters of the binary tool that is analyzed.
         if (arg === '>' || arg === '1>' || arg === '2>' || arg === '|') {
-            return processedArgs;
+            break;
         }
 
         processedArgs.push(arg);
-    });
+    }
 
     return processedArgs;
 }
