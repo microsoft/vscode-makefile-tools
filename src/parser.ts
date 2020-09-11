@@ -333,7 +333,9 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
     match1 = regexp.exec(args);
     while (match1) {
         // Marks the beginning of the current switch (prefix + name).
-        // The exact switch prefix is needed when we call other parser helpers later.
+        // The exact switch prefix is needed when we call other parser helpers later
+        // and also CppTools expects the compiler arguments to be prefixed
+        // when received from the custom providers.
         index1 = regexp.lastIndex - match1[0].length;
         // skip over the switches separator if it happens to be comma
         if (match1[0][0] === ",") {
@@ -383,10 +385,6 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
 
                 // Remove the switch prefix because it's not needed by CppTools (SourceFileConfiguration.compilerArgs).
                 finalSwitch = finalSwitch.trim();
-                if (match1) {
-                    finalSwitch = finalSwitch.substring(match1[2].length, finalSwitch.length);
-                }
-
                 switches.push(finalSwitch);
             });
         }
@@ -440,8 +438,9 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
                                             '\\`[^\\`]*?\\`|' + // anything between `
                                             '\\\'[^\\\']*?\\\'|' + // anything between '
                                             '\\"[^\\"]*?\\"|' + // anything between "
-                                            '[^\\s=,]+' + // not quoted right side of switch value
+                                            '[^\\s,]+' +  // not quoted right side of switch value
                                                           // comma is excluded because it can be a switch separator sometimes
+                                                          // equal is actually allowed (example gcc switch: -fmacro-prefix-map=./= )
                                         ')' +
                                     ')?' +
                                 ')' +
