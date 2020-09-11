@@ -308,6 +308,95 @@ function parseLineAsTool(
     };
 }
 
+// Helper to identify anything that looks like a compiler switch in the given command string.
+// The result is passed to IntelliSense custom configuration provider as compilerArgs.
+// excludeArgs helps with narrowing down the search, when we know for sure that we're not
+// interested in some switches. For example, -D, -I, -FI, -include, -std are treated separately.
+function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): string[] {
+    // Identify the non value part of the switch: prefix, switch name
+    // and what may separate this from an eventual switch value
+    let switches: string[] = [];
+    let regExpStr: string = "(^|,|\\s+)(--|-" +
+                            // On Win32 allow '/' as switch prefix as well,
+                            // otherwise it conflicts with path character
+                            (process.platform === "win32" ? "|\\/" : "") +
+                            ")([a-zA-Z0-9_]+)";
+    let regexp: RegExp = RegExp(regExpStr, "mg");
+    let match1: RegExpExecArray | null;
+    let match2: RegExpExecArray | null;
+    let index1: number = -1;
+    let index2: number = -1;
+
+    // With every loop iteration we need 2 switch matches so that we analyze the text
+    // that is between them. If the current match is the last one, then we will analyze
+    // everything until the end of line.
+    match1 = regexp.exec(args);
+    while (match1) {
+        // Marks the beginning of the current switch (prefix + name).
+        // The exact switch prefix is needed when we call other parser helpers later.
+        index1 = regexp.lastIndex - match1[0].length;
+        // skip over the switches separator if it happens to be comma
+        if (match1[0][0] === ",") {
+            index1++;
+        }
+
+        // Marks the beginning of the next switch
+        match2 = regexp.exec(args);
+        if (match2) {
+            index2 = regexp.lastIndex - match2[0].length;
+        } else {
+            index2 = args.length;
+        }
+
+        // The substring to analyze for the current switch.
+        // It doesn't help to look beyond the next switch match.
+        let partialArgs: string = args.substring(index1, index2);
+        let swi: string = match1[3];
+        swi = swi.trim();
+
+        // Skip over any switches that we know we don't need
+        let exclude: boolean = false;
+        for (const arg of excludeArgs) {
+            if (swi.startsWith(arg)) {
+                exclude = true;
+                break;
+            }
+        }
+
+        if (!exclude) {
+            // The other parser helpers differ from this one by the fact that they know
+            // what switch they are looking for. This helper first identifies anything
+            // that looks like a switch and then calls parseMultipleSwitchFromToolArguments
+            // which knows how to parse complex scenarios of spaces, quotes and other characters.
+            let swiValues: string[] = parseMultipleSwitchFromToolArguments(partialArgs, swi);
+
+            // If no values are found, it means the switch has simple syntax.
+            // Add this to the array.
+            if (swiValues.length === 0) {
+                swiValues.push(swi);
+            }
+
+            swiValues.forEach(value => {
+                // The end of the current switch value
+                let index3: number = partialArgs.indexOf(value) + value.length;
+                let finalSwitch: string = partialArgs.substring(0, index3);
+
+                // Remove the switch prefix because it's not needed by CppTools (SourceFileConfiguration.compilerArgs).
+                finalSwitch = finalSwitch.trim();
+                if (match1) {
+                    finalSwitch = finalSwitch.substring(match1[2].length, finalSwitch.length);
+                }
+
+                switches.push(finalSwitch);
+            });
+        }
+
+        match1 = match2;
+    }
+
+    return switches;
+}
+
 // Helper that parses for a particular switch that can occur one or more times
 // in the tool command line (example -I or -D for compiler)
 // and returns an array of the values passed via that switch
@@ -342,7 +431,8 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
                                 '(' +
                                     // the left side (or whole value if no '=' is following)
                                     '(' +
-                                        '[^\\s=]+' + // not quoted switch value component
+                                        '[^\\s=,]+' + // not quoted switch value component
+                                                      // comma is excluded because it can be a switch separator sometimes
                                     ')' +
                                     '(' +
                                         '=' + // separator between switch value left side and right side
@@ -350,7 +440,8 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
                                             '\\`[^\\`]*?\\`|' + // anything between `
                                             '\\\'[^\\\']*?\\\'|' + // anything between '
                                             '\\"[^\\"]*?\\"|' + // anything between "
-                                            '[^\\s=]+' + // not quoted right side of switch value
+                                            '[^\\s=,]+' + // not quoted right side of switch value
+                                                          // comma is excluded because it can be a switch separator sometimes
                                         ')' +
                                     ')?' +
                                 ')' +
@@ -575,7 +666,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose");
     } else if (line.includes('Entering directory')) { // equivalent to pushd
         // The make switch print-directory wraps the folder in various ways.
-        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory [\'\`\\\"])(.*)[\'\`\\\"]");
+        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['`\"])(.*)['`\"]");
         if (match) {
             newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
         } else {
@@ -597,6 +688,7 @@ export interface CustomConfigProviderItem {
     standard: util.StandardVersion;
     intelliSenseMode: util.IntelliSenseMode;
     compilerFullPath: string;
+    compilerArgs: string[];
     files: string[];
     windowsSDKVersion?: string;
 }
@@ -658,6 +750,10 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     }
                     logger.message("    Compiler path: " + compilerFullPath, "Verbose");
 
+                    let compilerArgs: string[] = [];
+                    compilerArgs = parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std"]);
+                    logger.message("    Compiler args: " + compilerArgs.join(";"), "Verbose");
+
                     // Parse and log the includes, forced includes and the defines
                     let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
                     includes = util.makeFullPaths(includes, currentPath);
@@ -667,8 +763,6 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
                     logger.message("    Forced includes: " + forcedIncludes.join(";"), "Verbose");
 
-                    // TODO-BUG: fix regexp for parseMultipleSwitchFromToolArguments
-                    // Include dirs not detected properly in 8cc (because of '" "')
                     let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
                     logger.message("    Defines: " + defines.join(";"), "Verbose");
 
@@ -719,7 +813,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                         logger.message("    Standard: " + standard, "Verbose");
 
                         if (ext.extension) {
-                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files, windowsSDKVersion });
+                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion });
                         }
                     } else {
                         // If the compiler command is mixing c and c++ source files, send a custom configuration for each of the source files separately,
@@ -736,7 +830,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                             logger.message("    Standard: " + standard, "Verbose");
 
                             if (ext.extension) {
-                                onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files: [file], windowsSDKVersion });
+                                onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion });
                             }
                         });
                     }

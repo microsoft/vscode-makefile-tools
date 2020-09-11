@@ -790,7 +790,30 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
                               dryRunOutput: string, recursive: boolean = false): Promise<number> {
     logger.message("Updating the CppTools IntelliSense Configuration Provider." + ((recursive) ? "(recursive)" : ""));
     await extension.registerCppToolsProvider();
-    extension.emptyCustomConfigurationProvider();
+
+    // If the --always-make is present in the setup, it's good to reset the custom configuration provider
+    // at every configure to ensure that no files that have been removed from the project
+    // still have IntelliSense working, because that will confusingly happen only until the next project reload.
+    // If these switches are missing from the default setup (probably because some project
+    // specific issues that made the user remove them) then it's better to not empty
+    // the configuration provider, because otherwise we lose valid IntelliSense information
+    // for files that are part of up-to-date targets (which are not ran even by dry-run
+    // if --always-make is missing).
+    // TODO: when always-make missing, investigate whether --touch (-t) is used in preconfigure
+    // or makefile.configurations, to empty the custom provider then too.
+    // The --touch switch doesn't work together with other switches, so it can't be in makefile.dryrunSwitches.
+    // Even if other targets are included in the make command line, if --touch is present,
+    // make will only do the touch operation. To have effect, --touch needs to be run in a different make command,
+    // before the configure make command.
+    let dryRunSwitches: string[] | undefined = configuration.getDryrunSwitches();
+    let canEmptyConfigProvider: boolean = (dryRunSwitches !== undefined &&
+                                           (dryRunSwitches.includes("--always-make") || dryRunSwitches.includes("-B")));
+    let makeCommand: string[] = configuration.getConfigurationMakeArgs();
+    canEmptyConfigProvider = canEmptyConfigProvider || makeCommand.includes("--always-make") || makeCommand.includes("-B");
+
+    if (canEmptyConfigProvider) {
+        extension.emptyCustomConfigurationProvider();
+    }
 
     return new Promise<number>(async function (resolve, reject): Promise<void> {
         let onStatus: any = (status: string): void => {
@@ -807,7 +830,9 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
             } else {
                 // IntelliSense may be valid if cancelling happened later
                 // but because it is most likely incomplete reset to nothing.
-                extension.emptyCustomConfigurationProvider();
+                if (canEmptyConfigProvider) {
+                    extension.emptyCustomConfigurationProvider();
+                }
             }
 
             resolve(retc);
