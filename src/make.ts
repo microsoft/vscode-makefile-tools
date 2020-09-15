@@ -187,7 +187,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                     logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
                     await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
-                            title: "Cancelling build...",
+                            title: "Cancelling build",
                             cancellable: false,
                         },
                         async (progress) => {
@@ -367,9 +367,10 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
 
         let stdout: any = (result: string): void => {
             stdoutStr += result;
-            progress.report({increment: 1, message: "Generating dry-run output..." +
-                                                    ((recursive) ? "(recursive)" : "") +
-                                                    ((forTargets) ? "(for targets specifically)" : "")});
+            progress.report({increment: 1, message: "Generating dry-run output" +
+                                                    ((recursive) ? " (recursive)" : "") +
+                                                    ((forTargets) ? " (for targets specifically)" : "" +
+                                                    "...")});
         };
 
         let stderr: any = (result: string): void => {
@@ -453,7 +454,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
                     logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
                     await vscode.window.withProgress({
                             location: vscode.ProgressLocation.Notification,
-                            title: "Cancelling pre-configure...",
+                            title: "Cancelling pre-configure",
                             cancellable: false,
                         },
                         async (progress) => {
@@ -621,7 +622,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     try {
         return await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: "Configuring...",
+                title: "Configuring",
                 cancellable: true,
             },
             (progress, cancel) => {
@@ -630,7 +631,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
                         logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
                         await vscode.window.withProgress({
                                 location: vscode.ProgressLocation.Notification,
-                                title: "Cancelling configure...",
+                                title: "Cancelling configure",
                                 cancellable: false,
                             },
                             async (progress) => {
@@ -705,7 +706,7 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
         let launchConfigurations: configuration.LaunchConfiguration[] = [];
 
         let onStatus: any = (status: string): void => {
-            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
         };
 
         let onFoundLaunchConfiguration: any = (launchConfiguration: configuration.LaunchConfiguration): void => {
@@ -784,11 +785,34 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
                               dryRunOutput: string, recursive: boolean = false): Promise<number> {
     logger.message("Updating the CppTools IntelliSense Configuration Provider." + ((recursive) ? "(recursive)" : ""));
     await extension.registerCppToolsProvider();
-    extension.emptyCustomConfigurationProvider();
+
+    // If the --always-make is present in the setup, it's good to reset the custom configuration provider
+    // at every configure to ensure that no files that have been removed from the project
+    // still have IntelliSense working, because that will confusingly happen only until the next project reload.
+    // If these switches are missing from the default setup (probably because some project
+    // specific issues that made the user remove them) then it's better to not empty
+    // the configuration provider, because otherwise we lose valid IntelliSense information
+    // for files that are part of up-to-date targets (which are not ran even by dry-run
+    // if --always-make is missing).
+    // TODO: when always-make missing, investigate whether --touch (-t) is used in preconfigure
+    // or makefile.configurations, to empty the custom provider then too.
+    // The --touch switch doesn't work together with other switches, so it can't be in makefile.dryrunSwitches.
+    // Even if other targets are included in the make command line, if --touch is present,
+    // make will only do the touch operation. To have effect, --touch needs to be run in a different make command,
+    // before the configure make command.
+    let dryRunSwitches: string[] | undefined = configuration.getDryrunSwitches();
+    let canEmptyConfigProvider: boolean = (dryRunSwitches !== undefined &&
+                                           (dryRunSwitches.includes("--always-make") || dryRunSwitches.includes("-B")));
+    let makeCommand: string[] = configuration.getConfigurationMakeArgs();
+    canEmptyConfigProvider = canEmptyConfigProvider || makeCommand.includes("--always-make") || makeCommand.includes("-B");
+
+    if (canEmptyConfigProvider) {
+        extension.emptyCustomConfigurationProvider();
+    }
 
     return new Promise<number>(async function (resolve, reject): Promise<void> {
         let onStatus: any = (status: string): void => {
-            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
         };
 
         let onFoundCustomConfigProviderItem: any = (customConfigProviderItem: parser.CustomConfigProviderItem): void => {
@@ -801,7 +825,9 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
             } else {
                 // IntelliSense may be valid if cancelling happened later
                 // but because it is most likely incomplete reset to nothing.
-                extension.emptyCustomConfigurationProvider();
+                if (canEmptyConfigProvider) {
+                    extension.emptyCustomConfigurationProvider();
+                }
             }
 
             resolve(retc);
@@ -815,7 +841,7 @@ export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vs
                                        dryrunOutput: string, recursive: boolean = false): Promise<string | null> {
     return new Promise<string | null>(async function (resolve, reject): Promise<void> {
         let onStatus: any = (status: string): void => {
-            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+            progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
         };
 
         let onEnd: any = (retc: number, result: string | null): void => {

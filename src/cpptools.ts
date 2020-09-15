@@ -62,6 +62,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         this.workspaceBrowseConfiguration = {
             browsePath: [],
             compilerPath: undefined,
+            compilerArgs: undefined,
             standard: undefined,
             windowsSdkVersion: undefined
         };
@@ -84,6 +85,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
             forcedInclude: customConfigProviderItem.forcedIncludes,
             intelliSenseMode: customConfigProviderItem.intelliSenseMode,
             compilerPath: customConfigProviderItem.compilerFullPath,
+            compilerArgs: customConfigProviderItem.compilerArgs,
             windowsSdkVersion: customConfigProviderItem.windowsSDKVersion
         };
 
@@ -117,6 +119,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
             browsePath: cummulativeBrowsePath,
             standard: customConfigProviderItem.standard,
             compilerPath: customConfigProviderItem.compilerFullPath,
+            compilerArgs: customConfigProviderItem.compilerArgs,
             windowsSdkVersion: customConfigProviderItem.windowsSDKVersion
         };
     }
@@ -126,6 +129,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         logger.message("    Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
         logger.message("    Standard: " + this.workspaceBrowseConfiguration.standard);
         logger.message("    Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath);
+        logger.message("    Compiler Arguments: " + this.workspaceBrowseConfiguration.compilerArgs);
         if (process.platform === "win32" && this.workspaceBrowseConfiguration.windowsSdkVersion) {
             logger.message("    Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
         }
@@ -141,6 +145,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
             logger.message("    Standard: " + filePath.configuration.standard);
             logger.message("    IntelliSense Mode: " + filePath.configuration.intelliSenseMode);
             logger.message("    Compiler Path: " + filePath.configuration.compilerPath);
+            logger.message("    Compiler Arguments: " + filePath.configuration.compilerArgs);
             if (process.platform === "win32" && filePath.configuration.windowsSdkVersion) {
                 logger.message("    Windows SDK Version: " + filePath.configuration.windowsSdkVersion);
             }

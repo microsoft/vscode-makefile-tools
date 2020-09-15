@@ -119,19 +119,20 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     });
 
     return new Promise<number>(async function (resolve, reject): Promise<void> {
-        // Expand {REPO:VSCODE-MAKEFILE-TOOLS} to the full path of the root of the extension
-        // This is used for the pre-created dry-run logs consumed by the tests,
-        // in order to be able to have source files and includes for the test repro
-        // within the test subfolder of the extension repo, while still exercising full paths for parsing
-        // and not generating a different output with every new location where Makefile Tools is enlisted.
-        // A real user scenario wouldn't need this construct.
-
         await scheduleTask(async (taskEndCallback: () => void) => {
             function doChunk1(level: number): void {
-                statusCallback("Preprocessing the dry-run output...1");
+                statusCallback("Preprocessing the dry-run output - 1");
                 if (level === 1) {
-                    let extensionRootPath: string = path.resolve(__dirname, "../../");
-                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+                    // Expand {REPO:VSCODE-MAKEFILE-TOOLS} to the full path of the root of the extension
+                    // This is used for the pre-created dry-run logs consumed by the tests,
+                    // in order to be able to have source files and includes for the test repro
+                    // within the test subfolder of the extension repo, while still exercising full paths for parsing
+                    // and not generating a different output with every new location where Makefile Tools is enlisted.
+                    // A real user scenario wouldn't need this construct.
+                    if (process.env['MAKEFILE_TOOLS_TESTING'] === '1') {
+                        let extensionRootPath: string = path.resolve(__dirname, "../../");
+                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+                    }
 
                     // Split multiple commands concatenated by '&&'
                     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
@@ -139,8 +140,10 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                     // Split multiple commands concatenated by ";"
                     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
 
-                    // Concatenate lines ending with ' \', forming one complete command
+                    // Sometimes the ending of lines ends up being a mix and match of \n and \r\n.
+                    // Make it uniform to \n to ease other processing later.
                     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\r\\n/mg, "\n");
+                    
                     taskEndCallback();
                 } else {
                     setTimeout(doChunk1, 0, 1);
@@ -150,101 +153,22 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
             doChunk1(0);
         }); // scheduleTask
 
-        let regexp: RegExp = /\s+\\$/mg;
-        let match: RegExpExecArray | null = regexp.exec(preprocessedDryRunOutputStr);
-
-        if (match) {
-            await scheduleTask(async (taskEndCallback: () => void) => {
-                function doChunk2(): void {
-                    let chunkIndex: number = 0;
-                    while (match) {
-                        if (cancel.isCancellationRequested) {
-                            break;
-                        }
-
-                        statusCallback("Preprocessing the dry-run output...2");
-                        let result: string = match[0];
-                        result = result.concat("\n");
-                        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(result, " ");
-                        match = regexp.exec(preprocessedDryRunOutputStr);
-
-                        if (!match) {
-                            taskEndCallback();
-                        }
-
-                        chunkIndex++;
-                        if (chunkIndex === chunkSize) {
-                            setTimeout(doChunk2, 0);
-                        }
-                    } // while loop
-                } // doChunk2
-                doChunk2();
-            }); // scheduleTask
-        } // if match
-
-        // Process some more makefile output weirdness
-        let preprocessedDryRunOutputLines: string[] = [];
-        let preprocessedLines: string[] = preprocessedDryRunOutputStr.split("\n");
-        let numberOfLines: number = preprocessedLines.length;
-        let index: number = 0;
-
         await scheduleTask(async (taskEndCallback: () => void) => {
-            function doChunk3(): void {
-                let chunkIndex: number = 0;
-                while (index < numberOfLines && chunkIndex <= chunkSize) {
-                    if (cancel.isCancellationRequested) {
-                        break;
-                    }
-
-                    let line: string = preprocessedLines[index];
-
-                    statusCallback("Preprocessing the dry-run output...3");
-                    let strC: string = "--mode=compile";
-                    let idxC: number = line.indexOf(strC);
-                    if (idxC >= 0) {
-                        line = line.replace(line.substring(0, idxC), "");
-                        line = line.replace(strC, "");
-                    }
-
-                    let strL: string = "--mode=link";
-                    let idxL: number = line.indexOf(strL);
-                    if (idxL >= 0) {
-                        line = line.replace(line.substring(0, idxL), "");
-                        line = line.replace(strL, "");
-                    }
-
-                    // Ignore any lines containing $ because they are redundant and not useful
-                    // for IntelliSense config provider or launch parsing.
-                    // These lines are produced by the verbose log switch --print-data-base,
-                    // which is useful in parsing for build targets.
-                    if (!line.includes("$(")) {
-                        preprocessedDryRunOutputLines.push(line);
-                    }
-
-                    if (idxL >= 0 && idxC >= 0) {
-                        logger.message("Not supporting --mode=compile and --mode=link on the same line");
-                    }
-
-                    index++;
-                    if (index === numberOfLines) {
-                        taskEndCallback();
-                    }
-
-                    chunkIndex++;
-                    if (chunkIndex === chunkSize) {
-                        setTimeout(doChunk3, 0);
-                    }
-                } // while loop
-            } // doChunk3
-            doChunk3();
-        }); // scheduleTask
-
-        await scheduleTask(async (taskEndCallback: () => void) => {
-            function doChunk4(level: number): void {
-                statusCallback("Preprocessing the dry-run output...4");
-
+            function doChunk2(level: number): void {
+                statusCallback("Preprocessing the dry-run output - 2");
                 if (level === 1) {
-                    preprocessedDryRunOutputStr = preprocessedDryRunOutputLines.join("\n");
+                    // Some compiler/linker commands are split on multiple lines.
+                    // At the end of every intermediate line is at least a space, then a \ and end of line.
+                    // Concatenate all these lines to see clearly each command on one line.
+                    let regexp: RegExp = /\s+\\$\n/mg;
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, " ");
+
+                    // Process some more makefile output weirdness
+                    // When --mode=compile or --mode-link are present in a line, we can ignore anything that is before
+                    // and all that is after is a normal complete compiler or link command.
+                    // Replace these patterns with end of line so that the parser will see only the right half.
+                    regexp = /--mode=compile|--mode-link/mg;
+                    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
 
                     // Extract the link command
                     // Keep the /link switch to the cl command because otherwise we will see compiling without /c
@@ -261,11 +185,11 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
 
                     taskEndCallback();
                 } else {
-                    setTimeout(doChunk4, 0, 1);
+                    setTimeout(doChunk2, 0, 1);
                 }
             }
 
-            doChunk4(0);
+            doChunk2(0);
         }); // scheduleTask
 
         endCallback(make.ConfigureBuildReturnCodeTypes.success, preprocessedDryRunOutputStr);
@@ -341,6 +265,7 @@ function parseLineAsTool(
     if (process.platform === "win32" && !path.extname(toolNameInMakefile)) {
         toolNameInMakefile += ".exe";
     }
+
     toolPathInMakefile = toolPathInMakefile.trimLeft();
     let toolFullPath: string = util.makeFullPath(toolPathInMakefile + toolNameInMakefile, currentPath);
     toolFullPath = util.removeQuotes(toolFullPath);
@@ -372,6 +297,93 @@ function parseLineAsTool(
     };
 }
 
+// Helper to identify anything that looks like a compiler switch in the given command string.
+// The result is passed to IntelliSense custom configuration provider as compilerArgs.
+// excludeArgs helps with narrowing down the search, when we know for sure that we're not
+// interested in some switches. For example, -D, -I, -FI, -include, -std are treated separately.
+function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): string[] {
+    // Identify the non value part of the switch: prefix, switch name
+    // and what may separate this from an eventual switch value
+    let switches: string[] = [];
+    let regExpStr: string = "(^|,|\\s+)(--|-" +
+                            // On Win32 allow '/' as switch prefix as well,
+                            // otherwise it conflicts with path character
+                            (process.platform === "win32" ? "|\\/" : "") +
+                            ")([a-zA-Z0-9_]+)";
+    let regexp: RegExp = RegExp(regExpStr, "mg");
+    let match1: RegExpExecArray | null;
+    let match2: RegExpExecArray | null;
+    let index1: number = -1;
+    let index2: number = -1;
+
+    // With every loop iteration we need 2 switch matches so that we analyze the text
+    // that is between them. If the current match is the last one, then we will analyze
+    // everything until the end of line.
+    match1 = regexp.exec(args);
+    while (match1) {
+        // Marks the beginning of the current switch (prefix + name).
+        // The exact switch prefix is needed when we call other parser helpers later
+        // and also CppTools expects the compiler arguments to be prefixed
+        // when received from the custom providers.
+        index1 = regexp.lastIndex - match1[0].length;
+        // skip over the switches separator if it happens to be comma
+        if (match1[0][0] === ",") {
+            index1++;
+        }
+
+        // Marks the beginning of the next switch
+        match2 = regexp.exec(args);
+        if (match2) {
+            index2 = regexp.lastIndex - match2[0].length;
+        } else {
+            index2 = args.length;
+        }
+
+        // The substring to analyze for the current switch.
+        // It doesn't help to look beyond the next switch match.
+        let partialArgs: string = args.substring(index1, index2);
+        let swi: string = match1[3];
+        swi = swi.trim();
+
+        // Skip over any switches that we know we don't need
+        let exclude: boolean = false;
+        for (const arg of excludeArgs) {
+            if (swi.startsWith(arg)) {
+                exclude = true;
+                break;
+            }
+        }
+
+        if (!exclude) {
+            // The other parser helpers differ from this one by the fact that they know
+            // what switch they are looking for. This helper first identifies anything
+            // that looks like a switch and then calls parseMultipleSwitchFromToolArguments
+            // which knows how to parse complex scenarios of spaces, quotes and other characters.
+            let swiValues: string[] = parseMultipleSwitchFromToolArguments(partialArgs, swi);
+
+            // If no values are found, it means the switch has simple syntax.
+            // Add this to the array.
+            if (swiValues.length === 0) {
+                swiValues.push(swi);
+            }
+
+            swiValues.forEach(value => {
+                // The end of the current switch value
+                let index3: number = partialArgs.indexOf(value) + value.length;
+                let finalSwitch: string = partialArgs.substring(0, index3);
+
+                // Remove the switch prefix because it's not needed by CppTools (SourceFileConfiguration.compilerArgs).
+                finalSwitch = finalSwitch.trim();
+                switches.push(finalSwitch);
+            });
+        }
+
+        match1 = match2;
+    }
+
+    return switches;
+}
+
 // Helper that parses for a particular switch that can occur one or more times
 // in the tool command line (example -I or -D for compiler)
 // and returns an array of the values passed via that switch
@@ -380,10 +392,48 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
     // - '-' or '/' or '--' as switch prefix
     // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
     //   to reject a case where a part of a path looks like a switch with its value
+    //    (example: "drive:/dir/Ifolder" taking /Ifolder as include switch).
     // - can be wrapped by a pair of ', before the switch prefix and after the switch value
-    // - the value can be wrapped by a pair of "
-    // - one or none or more spaces/tabs between the switch and the value
-    let regexpStr: string = '(^|\\s+)\\\'?(\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*))(\\".*?\\"|[^\\\'\\s]+)\\\'?';
+    //    (example: '-DMY_DEFINE=SOMETHING' or '/I drive/folder/subfolder').
+    // - one or none or more spaces/tabs or ':' or '=' between the switch and the value
+    //    (examples): -Ipath, -I path, -I    path, -std=gnu89
+    // - the value can be wrapped by a pair of ", ' or `, even simmetrical combinations ('"..."')
+    //   and should be able to not stop at space when inside the quote characters.
+    //    (examples): -D'MY_DEFINE', -D "MY_DEFINE=SOME_VALUE", -I`drive:/folder with space/subfolder`
+    // - when the switch value contains a '=', the right half can be also quoted by ', ", ` or '"..."'
+    //   and should be able to not stop at space when inside the quote characters.
+    //    (example): -DMY_DEFINE='"SOME_VALUE"'
+    let regexpStr: string = '(^|\\s+)' + // start of line or any amount of space character
+                            '\\\'?' + // optional quoting around the whole construct (prefix, switch name and value)
+                            // prefix, switch name, separator between switch name and switch value
+                            '(' +
+                                '\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*)' +
+                            ')' +
+                            // the switch value
+                            '(' +
+                                '\\`[^\\`]*?\\`|' + // anything between `
+                                '\\\'[^\\\']*?\\\'|' + // anything between '
+                                '\\"[^\\"]*?\\"|' + // anything between "
+                                // not fully quoted switch value scenarios
+                                '(' +
+                                    // the left side (or whole value if no '=' is following)
+                                    '(' +
+                                        '[^\\s=,]+' + // not quoted switch value component
+                                                      // comma is excluded because it can be a switch separator sometimes
+                                    ')' +
+                                    '(' +
+                                        '=' + // separator between switch value left side and right side
+                                        '(' +
+                                            '\\`[^\\`]*?\\`|' + // anything between `
+                                            '\\\'[^\\\']*?\\\'|' + // anything between '
+                                            '\\"[^\\"]*?\\"|' + // anything between "
+                                            '[^\\s,]+' +  // not quoted right side of switch value
+                                                          // comma is excluded because it can be a switch separator sometimes
+                                                          // equal is actually allowed (example gcc switch: -fmacro-prefix-map=./= )
+                                        ')' +
+                                    ')?' +
+                                ')' +
+                            ')\\\'?';
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null;
     let results: string[] = [];
@@ -411,6 +461,10 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
 // Parsing the switches separately wouldn't give us the order information.
 // Also, we don't have yet a function to parse the whole string of arguments into individual arguments,
 // so that we anaylze each switch one by one, thus knowing the order.
+// TODO: review the regexp for parseMultipleSwitchFromToolArguments to make sure all new capabilities
+// are reflected in the regexp here (especially around quoting scenarios and '=').
+// For now it's not critical because parseMultipleSwitchesFromToolArguments is called for target
+// architecture switches which don't have such complex scenarios.
 function parseMultipleSwitchesFromToolArguments(args: string, simpleSwitches: string[], valueSwitches: string[]): string[] {
     // - '-' or '/' or '--' as switch prefix
     // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
@@ -458,6 +512,10 @@ function parseMultipleSwitchesFromToolArguments(args: string, simpleSwitches: st
 // The helper returns the value passed via the given switch
 // Examples for compiler: -std:c++17, -Fotest.obj, -Fe test.exe
 // Example for linker: -out:test.exe versus -o a.out
+// TODO: review the regexp for parseMultipleSwitchFromToolArguments to make sure all new capabilities
+// are reflected in the regexp here (especially around quoting scenarios and '=').
+// For now it's not critical because parseSingleSwitchFromToolArguments is called for switches
+// that have simple value scenarios.
 function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string | undefined {
     // - '-' or '/' or '--' as switch prefix
     // - before the switch, we allow only for one or more spaces/tabs OR begining of line,
@@ -596,7 +654,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose");
     } else if (line.includes('Entering directory')) { // equivalent to pushd
         // The make switch print-directory wraps the folder in various ways.
-        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['|`|\"])(.*)['|`|\"]");
+        let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['`\"])(.*)['`\"]");
         if (match) {
             newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
         } else {
@@ -618,6 +676,7 @@ export interface CustomConfigProviderItem {
     standard: util.StandardVersion;
     intelliSenseMode: util.IntelliSenseMode;
     compilerFullPath: string;
+    compilerArgs: string[];
     files: string[];
     windowsSDKVersion?: string;
 }
@@ -663,7 +722,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                 let line: string = dryRunOutputLines[index];
 
-                statusCallback("Parsing for IntelliSense...");
+                statusCallback("Parsing for IntelliSense");
                 currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
                 currentPath = currentPathHistory[currentPathHistory.length - 1];
 
@@ -679,16 +738,19 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     }
                     logger.message("    Compiler path: " + compilerFullPath, "Verbose");
 
+                    let compilerArgs: string[] = [];
+                    compilerArgs = parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std"]);
+                    logger.message("    Compiler args: " + compilerArgs.join(";"), "Verbose");
+
                     // Parse and log the includes, forced includes and the defines
                     let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
                     includes = util.makeFullPaths(includes, currentPath);
                     logger.message("    Includes: " + includes.join(";"), "Verbose");
                     let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
+                    forcedIncludes = forcedIncludes.concat(parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'include'));
                     forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
                     logger.message("    Forced includes: " + forcedIncludes.join(";"), "Verbose");
 
-                    // TODO-BUG: fix regexp for parseMultipleSwitchFromToolArguments
-                    // Include dirs not detected properly in 8cc (because of '" "')
                     let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
                     logger.message("    Defines: " + defines.join(";"), "Verbose");
 
@@ -739,7 +801,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                         logger.message("    Standard: " + standard, "Verbose");
 
                         if (ext.extension) {
-                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files, windowsSDKVersion });
+                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion });
                         }
                     } else {
                         // If the compiler command is mixing c and c++ source files, send a custom configuration for each of the source files separately,
@@ -756,7 +818,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                             logger.message("    Standard: " + standard, "Verbose");
 
                             if (ext.extension) {
-                                onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, files: [file], windowsSDKVersion });
+                                onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion });
                             }
                         });
                     }
@@ -783,16 +845,16 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 function filterTargetBinaryArgs(args: string[]): string[] {
     let processedArgs: string[] = [];
 
-    args.forEach(arg => {
+    for (const arg of args) {
         // Once we encounter a redirection character (pipe, stdout/stderr) remove it,
         // together with all the arguments that are following,
         // since they are not real parameters of the binary tool that is analyzed.
         if (arg === '>' || arg === '1>' || arg === '2>' || arg === '|') {
-            return processedArgs;
+            break;
         }
 
         processedArgs.push(arg);
-    });
+    }
 
     return processedArgs;
 }
@@ -836,8 +898,8 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                     }
 
                     let line: string = dryRunOutputLines[index];
-
-                    statusCallback("Parsing for launch targets... (inspecting for link commands");
+    
+                    statusCallback("Parsing for launch targets: inspecting for link commands");
                     currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
                     currentPath = currentPathHistory[currentPathHistory.length - 1];
 
@@ -1022,7 +1084,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
                 let line: string = dryRunOutputLines[index];
 
-                statusCallback("Parsing for launch targets... (inspecting built binary invocations).");
+                statusCallback("Parsing for launch targets: inspecting built binary invocations");
                 currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
                 currentPath = currentPathHistory[currentPathHistory.length - 1];
 

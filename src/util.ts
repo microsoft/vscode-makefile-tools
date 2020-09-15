@@ -176,7 +176,7 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
 
     try {
         logger.message(`Killing process PID = ${pid}`);
-        progress.report({ increment: 1, message: `Terminating process PID=${pid}` });
+        progress.report({ increment: 1, message: `Terminating process PID=${pid} ...` });
         process.kill(pid, 'SIGINT');
     } catch (e) {
         if (e.code !== 'ESRCH') {
@@ -377,7 +377,7 @@ export function mergeProperties(dst: any, src: any): any {
         }
 
         if (dst[prop] !== undefined) {
-            logger.message(`Destination object already has property ${prop} set to ${dst[prop]}. Overwriting from source with ${src[prop]}`, "Verbose");
+            logger.message(`Destination object already has property ${prop} set to ${dst[prop]}. Overwriting from source with ${src[prop]}`, "Debug");
         }
 
         dst[prop] = src[prop];
