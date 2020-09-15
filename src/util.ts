@@ -406,7 +406,7 @@ export function resolvePathToRoot(relPath: string): string {
 
 // Schedule a task to be run at some future time. This allows other pending tasks to
 // execute ahead of the scheduled task and provides a form of async behavior for TypeScript.
-export function scheduleTask2<T>(task: () => T): Promise<T> {
+export function scheduleTask<T>(task: () => T): Promise<T> {
     return new Promise<T>((resolve, reject) => {
         setImmediate(() => {
             try {
