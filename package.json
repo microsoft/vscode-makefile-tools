@@ -319,6 +319,7 @@
                 },
                 "makefile.makePath": {
                     "type": "string",
+                    "default": "make",
                     "description": "The path to the make tool",
                     "scope": "resource"
                 },

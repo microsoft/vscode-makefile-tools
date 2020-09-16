@@ -87,10 +87,9 @@ export function setMakePath(path: string): void { makePath = path; }
 function readMakePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makePath = workspaceConfiguration.get<string>("makePath");
+    // Don't resolve makePath to root, because make needs to be searched in the path too.
     if (!makePath) {
         logger.message("No path to the make tool is defined in the settings file");
-    } else {
-        makePath = util.resolvePathToRoot(makePath);
     }
 }
 
@@ -478,7 +477,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
         // On linux/mac, it often is 'Makefile', so we have to verify we default to the right filename.
         if (!makefileUsed) {
-            makefileUsed = (util.checkFileExistsSync(util.resolvePathToRoot("./makefile"))) ? "./makefile" : "./Makefile";
+            makefileUsed = (util.checkFileExistsSync(util.resolvePathToRoot("./Makefile"))) ? "./Makefile" : "./makefile";
         }
 
         makefileUsed = util.resolvePathToRoot(makefileUsed);
