@@ -404,6 +404,21 @@ export function resolvePathToRoot(relPath: string): string {
     return relPath;
 }
 
+// Schedule a task to be run at some future time. This allows other pending tasks to
+// execute ahead of the scheduled task and provides a form of async behavior for TypeScript.
+export function scheduleTask<T>(task: () => T): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        setImmediate(() => {
+            try {
+                const result: T = task();
+                resolve(result);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    });
+}
+
 export function thisExtension(): vscode.Extension<any> {
     const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('ms-vscode.makefile-tools');
     if (!ext) {
