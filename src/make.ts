@@ -834,7 +834,7 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
 }
 
 export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
-                                       dryrunOutput: string, recursive: boolean = false): Promise<{retc: number,result: string}> {
+                                       dryrunOutput: string, recursive: boolean = false): Promise<parser.PreprocessDryRunOutputReturnType> {
     if (cancel.isCancellationRequested) {
         return {retc: ConfigureBuildReturnCodeTypes.cancelled, result: ""};
     }
@@ -868,8 +868,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     // Some initial preprocessing required before any parsing is done.
     logger.message(`Preprocessing dryrun output read from: "${parseFile}"`);
     let preprocessedDryrunOutput: string;
-    let preprocessedDryrunOutputResult: {retc: number,result: string} = await preprocessDryRun(progress, cancel, parseContent || "", recursiveDoConfigure);
-    if (preprocessedDryrunOutputResult.retc === ConfigureBuildReturnCodeTypes.success) {
+    let preprocessedDryrunOutputResult: parser.PreprocessDryRunOutputReturnType = await preprocessDryRun(progress, cancel, parseContent || "", recursiveDoConfigure);
+    if (preprocessedDryrunOutputResult.result) {
         preprocessedDryrunOutput = preprocessedDryrunOutputResult.result;
     } else {
         return preprocessedDryrunOutputResult.retc;

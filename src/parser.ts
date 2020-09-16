@@ -90,14 +90,19 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
     return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;
 }
 
+export interface PreprocessDryRunOutputReturnType {
+    retc: number,
+    result?: string
+}
+
 // Make various preprocessing transformations on the dry-run output
 // TODO: "cmd -c", "start cmd", "exit"
 export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, dryRunOutputStr: string,
-                                             statusCallback: (message: string) => void): Promise<{retc: number,result: string}> {
+                                             statusCallback: (message: string) => void): Promise<PreprocessDryRunOutputReturnType> {
     let preprocessedDryRunOutputStr: string = dryRunOutputStr;
 
     if (cancel.isCancellationRequested) {
-        return { retc: make.ConfigureBuildReturnCodeTypes.cancelled, result: "" };
+        return { retc: make.ConfigureBuildReturnCodeTypes.cancelled};
     }
 
     statusCallback("Preprocessing the dry-run output");
@@ -171,13 +176,11 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         await util.scheduleTask(func);
 
         if (cancel.isCancellationRequested) {
-            return { retc: make.ConfigureBuildReturnCodeTypes.cancelled, result: "" };
+            return { retc: make.ConfigureBuildReturnCodeTypes.cancelled};
         }
     };
 
-    return cancel.isCancellationRequested ?
-           {retc: make.ConfigureBuildReturnCodeTypes.cancelled, result: ""} :
-           {retc: make.ConfigureBuildReturnCodeTypes.success, result: preprocessedDryRunOutputStr};
+    return {retc: make.ConfigureBuildReturnCodeTypes.success, result: preprocessedDryRunOutputStr};
 
     // TODO: Insert preprocessed files content
 
