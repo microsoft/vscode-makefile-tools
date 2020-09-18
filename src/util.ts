@@ -318,6 +318,10 @@ export function removeQuotes(str: string): string {
     return str;
 }
 
+export function elapsedTimeSince(start: number): number {
+    return (Date.now() - start ) / 1000;
+}
+
 // Helper to evaluate whether two settings (objects or simple types) represent the same content.
 // It recursively analyzes any inner subobjects and is also not affected
 // by a different order of properties.
@@ -386,8 +390,8 @@ export function mergeProperties(dst: any, src: any): any {
     return dst;
 }
 
-export function reportDryRunError(): void {
-    logger.message(`You can see the detailed dry-run output at ${configuration.getConfigurationCache()}`);
+export function reportDryRunError(dryrunOutputFile: string): void {
+    logger.message(`You can see the detailed dry-run output at ${dryrunOutputFile}`);
     logger.message("Make sure that the extension is invoking the same make command as in your development prompt environment.");
     logger.message("You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]");
     logger.message("Also make sure your code base does not have any known issues with the dry-run switches used by this extension (makefile.dryrunSwitches).");

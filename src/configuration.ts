@@ -722,7 +722,9 @@ export async function initFromStateAndSettings(): Promise<void> {
         }
     });
 
-    // Watch for Makefile Tools setting updates that can change the IntelliSense config provider dirty state
+    // Watch for Makefile Tools setting updates that can change the IntelliSense config provider dirty state.
+    // More than one setting may be updated on one settings.json save,
+    // so make sure to OR the dirty state when it's calculated by a formula (not a simple TRUE value).
     vscode.workspace.onDidChangeConfiguration(async e => {
         if (vscode.workspace.workspaceFolders &&
             e.affectsConfiguration('makefile', vscode.workspace.workspaceFolders[0].uri)) {
@@ -766,7 +768,17 @@ export async function initFromStateAndSettings(): Promise<void> {
                 updatedBuildLog = util.resolvePathToRoot(updatedBuildLog);
             }
             if (updatedBuildLog !== buildLog) {
-                extension.getState().configureDirty = true;
+                // Configure is dirty only if the current configuration
+                // doesn't have already another build log set
+                // (which overrides the global one).
+                let currentMakefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
+                    if (k.name === getCurrentMakefileConfiguration()) {
+                        return k;
+                    }
+                });
+
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !currentMakefileConfiguration || !currentMakefileConfiguration.buildLog;
                 readBuildLog();
                 updatedSettingsSubkeys.push(subKey);
             }
@@ -809,21 +821,20 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (updatedConfigurationCache !== configurationCache) {
                 // A change in makefile.configurationCache should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
                 readConfigurationCache();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "makePath";
             let updatedMakePath : string | undefined = workspaceConfiguration.get<string>(subKey);
-            if (updatedMakePath) {
-                updatedMakePath = util.resolvePathToRoot(updatedMakePath);
-            }
             if (updatedMakePath !== makePath) {
                 // Not very likely, but it is safe to consider that a different make tool
                 // may produce a different dry-run output with potential impact on IntelliSense,
                 // so trigger an update (unless we read from a build log).
-                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakePath();
                 updatedSettingsSubkeys.push(subKey);
             }
@@ -836,7 +847,8 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (updatedMakefilePath !== makefilePath) {
                 // A change in makefile.makefilePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakefilePath();
                 updatedSettingsSubkeys.push(subKey);
             }
@@ -856,7 +868,8 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (!util.areEqual(updatedDryrunSwitches, dryrunSwitches)) {
                 // A change in makefile.dryrunSwitches should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
                 readDryrunSwitches();
                 updatedSettingsSubkeys.push(subKey);
             }

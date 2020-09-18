@@ -151,8 +151,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                 logger.message("Attempting to run build after a failed configure.");
             }
 
-            let configureEndTime: number = Date.now();
-            configureElapsedTime = (configureEndTime - buildStartTime) / 1000;
+            configureElapsedTime = util.elapsedTimeSince(buildStartTime);
         }
     }
 
@@ -204,8 +203,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                     retc = ConfigureBuildReturnCodeTypes.cancelled;
                 }
 
-                let buildEndTime: number = Date.now();
-                let buildElapsedTime: number = (buildEndTime - buildStartTime) / 1000;
+                let buildElapsedTime: number = util.elapsedTimeSince(buildStartTime);
                 const telemetryProperties: telemetry.Properties = {
                     exitCode: retc.toString(),
                     target: processTargetForTelemetry(target),
@@ -289,8 +287,10 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     //     1. makefile.buildLog provided by the user in settings
     //     2. configuration cache (the previous dryrun output): makefile.configurationCache
     //     3. the make dryrun output if (2) is missing
+    // We do not use buildLog for build targets analysis because 
+    // we can afford to invoke make -pRrq (very quick even on large projects).
     let buildLog: string | undefined = configuration.getConfigurationBuildLog();
-    if (buildLog) {
+    if (buildLog && !forTargets) {
         parseContent = util.readFile(buildLog);
         if (parseContent) {
             parseFile = buildLog;
@@ -315,20 +315,29 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     // Include all the make arguments defined in makefile.configurations.makeArgs
     makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
 
-    // Append --dry-run switches and additionally --print-data-base, which is not included
-    // in the defaults for makefile.dryrunSwitches because it is useful only for
-    // parsing targets and extremely time consuming for the other configure sub-phases.
-    // --dry-run is not included in the defaults array either.
-    makeArgs.push("--dry-run");
+    // If we are analyzing build targets, we need the following switches:
+    //  --print-data-base (which generates verbose output where we parse targets from).
+    // --no-builtin-variables and --no-builtin-rules (to reduce the size of the
+    // output produced by --print-data-base and also to obtain a list of targets
+    // that make sense, skipping over implicit targets like objects from sources
+    // or binaries from objects and libs).
+    // --question (to not execute anything, for us equivalent of dry-run
+    // but without printing commands, which contributes again to a smaller output).
+    // If we are analyzing compiler/linker commands for IntelliSense and launch targets,
+    // we use --dry-run and anything from makefile.dryrunSwitches.
     const dryrunSwitches: string[] | undefined = configuration.getDryrunSwitches();
-    if (dryrunSwitches && !forTargets) {
-        makeArgs = makeArgs.concat(dryrunSwitches);
-    }
-
     if (forTargets) {
         makeArgs.push("--print-data-base");
+        makeArgs.push("--no-builtin-variables");
+        makeArgs.push("--no-builtin-rules");
+        makeArgs.push("--question");
         logger.messageNoCR("Generating targets information with command: ");
     } else {
+        makeArgs.push("--dry-run");
+        if (dryrunSwitches) {
+            makeArgs = makeArgs.concat(dryrunSwitches);
+        }    
+
         logger.messageNoCR("Generating configuration cache with command: ");
     }
 
@@ -352,8 +361,14 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
 
         let startTime: number = Date.now();
         const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr);
-        let endTime: number = Date.now();
-        logger.message(`Generating dry-run elapsed time: ${(endTime - startTime) / 1000}`);
+        let elapsedTime: number = util.elapsedTimeSince(startTime);
+        logger.message(`Generating dry-run elapsed time: ${elapsedTime}`);
+
+        let dryrunFile : string = util.resolvePathToRoot(forTargets ? "./pRrq.log" : "./dryrun.log");
+        logger.message(`Writing the dry-run output: ${dryrunFile}`);
+        fs.writeFileSync(dryrunFile, stdoutStr);
+        parseFile = dryrunFile;
+        parseContent = stdoutStr;
 
         if (result.returnCode !== ConfigureBuildReturnCodeTypes.success) {
             logger.message("The make dry-run command failed.");
@@ -369,16 +384,9 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
             // Also don't write the cache if this operation was cancelled
             // because it may be incomplete and affect a future non clean configure.
             if (result.returnCode !== null) {
-                util.reportDryRunError();
+                util.reportDryRunError(dryrunFile);
             }
         }
-
-        // Write the dry-run output for reference. No setting needed.
-        let dryrunFile: string = "./dryrun.log";
-        logger.message(`Writing the dry-run output: ${dryrunFile}`);
-        fs.writeFileSync(dryrunFile, stdoutStr);
-        parseFile = dryrunFile;
-        parseContent = stdoutStr;
 
         curPID = -1;
         return result.returnCode;
@@ -443,8 +451,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
                     retc = ConfigureBuildReturnCodeTypes.cancelled;
                 }
 
-                let preConfigureEndTime: number = Date.now();
-                let preConfigureElapsedTime: number = (preConfigureEndTime - preConfigureStartTime) / 1000;
+                let preConfigureElapsedTime: number = util.elapsedTimeSince(preConfigureStartTime);
                 const telemetryMeasures: telemetry.Measures = {
                     preConfigureElapsedTime: preConfigureElapsedTime
                 };
@@ -535,7 +542,7 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     }
 }
 
-interface ConfigurationCache {
+interface ConfigurationCacheContent {
     customConfigProviderItems: parser.CustomConfigProviderItem[];
     launchTargets: string[];
     buildTargets: string[];
@@ -562,8 +569,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
             logger.message("Attempting to run configure after a failed pre-configure.");
         }
 
-        let preConfigureEndTime: number = Date.now();
-        preConfigureElapsedTime = (preConfigureEndTime - configureStartTime) / 1000;
+        preConfigureElapsedTime = util.elapsedTimeSince(configureStartTime);
     }
 
     // Identify for telemetry whether this configure will invoke make or will read from a build log
@@ -573,7 +579,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     // or perform a full parse
     let ranParse: boolean = true;
 
-    let buildLog: string | undefined = configuration.getBuildLog();
+    let buildLog: string | undefined = configuration.getConfigurationBuildLog();
     let configurationCache: string | undefined = configuration.getConfigurationCache();
 
     // If build log is set and exists, we are sure make is not getting invoked,
@@ -650,8 +656,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         logger.message(e.message);
         return retc;
     } finally {
-        let configureEndTime: number = Date.now();
-        let configureElapsedTime: number = (configureEndTime - configureStartTime) / 1000;
+        let configureElapsedTime: number = (Date.now() - configureStartTime) / 1000;
         let newBuildTarget: string | undefined = configuration.getCurrentTarget();
         const telemetryMeasures: telemetry.Measures = {
             numberBuildTargets: configuration.getBuildTargets().length,
@@ -685,7 +690,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
         setIsConfiguring(false);
 
-        let configurationCacheItems: ConfigurationCache = {
+        let configurationCacheContent: ConfigurationCacheContent = {
             buildTargets: configuration.getBuildTargets(),
             launchTargets: configuration.getLaunchTargets(),
             customConfigProviderItems: getCustomConfigProviderItems()
@@ -696,7 +701,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         // whether we read from a build log or parse a dry-run output.
         let cache: string | undefined = configuration.getConfigurationCache();
         if (cache && ranParse) {
-            util.writeFile(cache, JSON.stringify(configurationCacheItems));
+            util.writeFile(cache, JSON.stringify(configurationCacheContent));
         }
     }
 }
@@ -837,8 +842,6 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
         // the commands for some of the files, so we can't simply add without a duplicates check.
         if (!getCustomConfigProviderItems().includes(customConfigProviderItem)) {
             addCustomConfigProviderItem(customConfigProviderItem);
-        } else {
-            logger.message("temporary breakpoint");
         }
 
         extension.buildCustomConfigurationProvider(customConfigProviderItem);
@@ -889,10 +892,10 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         let content: string | undefined = util.readFile(cache);
         if (content) {
             try {
-                let configurationCache: ConfigurationCache = JSON.parse(content);
-                configuration.setBuildTargets(configurationCache.buildTargets);
-                configuration.setLaunchTargets(configurationCache.launchTargets);
-                setCustomConfigProviderItems(configurationCache.customConfigProviderItems);
+                let configurationCacheContent: ConfigurationCacheContent = JSON.parse(content);
+                configuration.setBuildTargets(configurationCacheContent.buildTargets);
+                configuration.setLaunchTargets(configurationCacheContent.launchTargets);
+                setCustomConfigProviderItems(configurationCacheContent.customConfigProviderItems);
                 return ConfigureBuildReturnCodeTypes.success;
             } catch (e) {
                 logger.message("An error occured while parsing the configuration cache.");
@@ -901,8 +904,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
             }
         }
     }
-    let endTime: number = Date.now();
-    logger.message(`Load configuration from cache elapsed time: ${(endTime - startTime) / 1000}`);
+    let elapsedTime: number = util.elapsedTimeSince(startTime);
+    logger.message(`Load configuration from cache elapsed time: ${elapsedTime}`);
 
     // This generates the dryrun output (saving it on disk) or reads an alternative build log.
     // Timings for this sub-phase happen inside.
@@ -921,8 +924,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     } else {
         return preprocessedDryrunOutputResult.retc;
     }
-    endTime = Date.now();
-    logger.message(`Preprocess elapsed time: ${(endTime - startTime) / 1000}`);
+    elapsedTime = util.elapsedTimeSince(startTime);
+    logger.message(`Preprocess elapsed time: ${elapsedTime}`);
 
     // Configure IntelliSense
     // Don't override retc1, since make invocations may fail with errors different than cancel
@@ -932,8 +935,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     if (await updateProvider(progress, cancel, preprocessedDryrunOutput, recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
-    endTime = Date.now();
-    logger.message(`Parsing for IntelliSense elapsed time: ${(endTime - startTime) / 1000}`);
+    elapsedTime = util.elapsedTimeSince(startTime);
+    logger.message(`Parsing for IntelliSense elapsed time: ${elapsedTime}`);
 
     // Configure launch targets as parsed from the makefile
     // (and not as read from settings via makefile.launchConfigurations).
@@ -942,8 +945,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     if (await parseLaunchConfigurations(progress, cancel, preprocessedDryrunOutput, recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
         return ConfigureBuildReturnCodeTypes.cancelled;
     }
-    endTime = Date.now();
-    logger.message(`Parsing for launch targets elapsed time: ${(endTime - startTime) / 1000}`);
+    elapsedTime = util.elapsedTimeSince(startTime);
+    logger.message(`Parsing for launch targets elapsed time: ${elapsedTime}`);
 
     // Verify if the current launch configuration is still part of the list and unset otherwise.
     let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
@@ -971,8 +974,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         if (await parseTargets(progress, cancel, parseContent || "", recursiveDoConfigure) === ConfigureBuildReturnCodeTypes.cancelled) {
             return ConfigureBuildReturnCodeTypes.cancelled;
         }
-        endTime = Date.now();
-        logger.message(`Parsing build targets elapsed time: ${(endTime - startTime) / 1000}`);
+        elapsedTime = util.elapsedTimeSince(startTime);
+        logger.message(`Parsing build targets elapsed time: ${elapsedTime}`);
 
         // Verify if the current build target is still part of the list and unset otherwise.
         buildTargets = configuration.getBuildTargets();
@@ -1037,13 +1040,6 @@ function cleanCache(): void {
     if (cache) {
         if (util.checkFileExistsSync(cache)) {
             logger.message(`Deleting the configuration cache: ${cache}`);
-            fs.unlinkSync(cache);
-        }
-
-        cache = path.parse(cache).dir;
-        cache = path.join(cache, "targetsCache.log");
-        if (util.checkFileExistsSync(cache)) {
-            logger.message(`Deleting the targets cache: ${cache}`);
             fs.unlinkSync(cache);
         }
     }
