@@ -52,6 +52,21 @@ export class MakefileToolsExtension {
     // Register this extension as a new provider or request an update
     public async registerCppToolsProvider(): Promise<void> {
         await this.ensureCppToolsProviderRegistered();
+
+        // Call notifyReady earlier than when the provider is updated,
+        // as soon as we know that we are going to actually parse for IntelliSense.
+        // This allows CppTools to ask earlier about source files in use
+        // and Makefile Tools may return a targeted source file configuration
+        // if it was already computed in our internal arrays (make.ts: customConfigProviderItems).
+        // If the requested file isn't yet processed, it will get updated when configure is finished.
+        // TODO: remember all requests that are coming and send an update as soon as we detect
+        // any of them being pushed into make.customConfigProviderItems.
+        if (this.cppToolsAPI) {
+            if (!this.ranConfigureInSession && this.cppToolsAPI.notifyReady) {
+                this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
+                this.ranConfigureInSession = true;
+            }
+        }
     }
 
     // Similar to state.ranConfigureInCodebaseLifetime, but within the scope of a VSCode session.
@@ -69,15 +84,10 @@ export class MakefileToolsExtension {
 
     // Request a custom config provider update.
     public updateCppToolsProvider(): void {
-        this.cppConfigurationProvider.logConfigurationProvider();
+        this.cppConfigurationProvider.logConfigurationProviderBrowse();
 
         if (this.cppToolsAPI) {
-            if (!this.ranConfigureInSession && this.cppToolsAPI.notifyReady) {
-                this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
-                this.ranConfigureInSession = true;
-            } else {
-                this.cppToolsAPI.didChangeCustomConfiguration(this.cppConfigurationProvider);
-            }
+            this.cppToolsAPI.didChangeCustomConfiguration(this.cppConfigurationProvider);
         }
     }
 
@@ -245,11 +255,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     await configuration.initFromStateAndSettings();
 
     if (configuration.getConfigureOnOpen()) {
-        if (extension.getState().configureDirty) {
-            await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
-        } else {
-            await make.configure(make.TriggeredBy.configureOnOpen);
-        }
+        // Always clean configure on open
+        await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
     }
 
     // Analyze settings for type validation and telemetry

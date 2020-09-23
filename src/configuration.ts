@@ -7,6 +7,7 @@ import * as make from './make';
 import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
+import * as parser from './parser';
 import * as path from 'path';
 import * as telemetry from './telemetry';
 
@@ -178,7 +179,7 @@ export function readExtensionLog(): void {
     extensionLog = workspaceConfiguration.get<string>("extensionLog");
     if (extensionLog) {
         extensionLog = util.resolvePathToRoot(extensionLog);
-        logger.message('Writing extension log at {0}', extensionLog);
+        logger.message(`Writing extension log at ${extensionLog}`);
     }
 }
 
@@ -193,7 +194,7 @@ export function readPreConfigureScript(): void {
     preConfigureScript = workspaceConfiguration.get<string>("preConfigureScript");
     if (preConfigureScript) {
         preConfigureScript = util.resolvePathToRoot(preConfigureScript);
-        logger.message('Found pre-configure script defined as {0}', preConfigureScript);
+        logger.message(`Found pre-configure script defined as ${preConfigureScript}`);
         if (!util.checkFileExistsSync(preConfigureScript)) {
             logger.message("Pre-configure script not found on disk.");
         }
@@ -697,9 +698,8 @@ export async function initFromStateAndSettings(): Promise<void> {
                 if (extension.getState().configureDirty && configureOnEdit) {
                     if ((extension.getCompletedConfigureInSession())
                         && !make.blockedByOp(make.Operations.configure, false)) {
-                        // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
                         logger.message("Configuring clean after settings or makefile changes...");
-                        make.cleanConfigure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
+                        make.configure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
                     }
                 }
 
@@ -966,7 +966,7 @@ export async function setNewConfiguration(): Promise<void> {
 
         if (configureAfterCommand) {
             logger.message("Automatically reconfiguring the project after a makefile configuration change.");
-            await make.cleanConfigure(make.TriggeredBy.configureAfterConfigurationChange);
+            await make.configure(make.TriggeredBy.configureAfterConfigurationChange);
         }
 
         // Refresh telemetry for this new makefile configuration
@@ -1022,10 +1022,10 @@ export async function selectTarget(): Promise<void> {
     if (extension.getState().configureDirty ||
         // The configure state might not be dirty from the last session but if the project is set to skip
         // configure on open and no configure happened yet we still must warn.
-        (configureOnOpen === false && !extension.getRanConfigureInSession())) {
+        (configureOnOpen === false && !extension.getCompletedConfigureInSession())) {
         logger.message("The project needs a configure to populate the build targets correctly.");
         if (configureAfterCommand) {
-            let retc: number = await make.cleanConfigure(make.TriggeredBy.configureBeforeTargetChange);
+            let retc: number = await make.configure(make.TriggeredBy.configureBeforeTargetChange);
             if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
                 logger.message("The build targets list may not be accurate because configure failed.");
             }
@@ -1064,7 +1064,7 @@ export async function selectTarget(): Promise<void> {
         if (configureAfterCommand) {
             // The set of build targets remains the same even if the current target has changed
             logger.message("Automatically reconfiguring the project after a build target change.");
-            await make.cleanConfigure(make.TriggeredBy.configureAfterTargetChange, false);
+            await make.configure(make.TriggeredBy.configureAfterTargetChange, false);
         }
     }
 }
@@ -1122,10 +1122,10 @@ export async function selectLaunchConfiguration(): Promise<void> {
     if (extension.getState().configureDirty ||
         // The configure state might not be dirty from the last session but if the project is set to skip
         // configure on open and no configure happened yet we still must warn.
-        (configureOnOpen === false && !extension.getRanConfigureInSession())) {
+        (configureOnOpen === false && !extension.getCompletedConfigureInSession())) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
         if (configureAfterCommand) {
-            let retc: number = await make.cleanConfigure(make.TriggeredBy.configureBeforeLaunchTargetChange);
+            let retc: number = await make.configure(make.TriggeredBy.configureBeforeLaunchTargetChange);
             if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
                 logger.message("The launch targets list may not be accurate because configure failed.");
             }
@@ -1225,3 +1225,9 @@ export function setBuildTargets(targets: string[]): void { buildTargets = target
 let launchTargets: string[] = [];
 export function getLaunchTargets(): string[] { return launchTargets; }
 export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
+
+// List of all the custom configuration provider items that are sent to CppTools
+let customConfigProviderItems: parser.CustomConfigProviderItem[] = [];
+export function getCustomConfigProviderItems(): parser.CustomConfigProviderItem[] { return customConfigProviderItems; }
+export function setCustomConfigProviderItems(items: parser.CustomConfigProviderItem[]): void { customConfigProviderItems = items; }
+

@@ -21,6 +21,14 @@ let isConfiguring: boolean = false;
 export function getIsConfiguring(): boolean { return isConfiguring; }
 export function setIsConfiguring(configuring: boolean): void { isConfiguring = configuring; }
 
+let configureIsInBackground: boolean = false;
+export function getConfigureIsInBackground(): boolean { return configureIsInBackground; }
+export function setConfigureIsInBackground(background: boolean): void { configureIsInBackground = background; }
+
+let configureIsClean: boolean = false;
+export function getConfigureIsClean(): boolean { return configureIsClean; }
+export function setConfigureIsClean(clean: boolean): void { configureIsClean = clean; }
+
 let isPreConfiguring: boolean = false;
 export function getIsPreConfiguring(): boolean { return isPreConfiguring; }
 export function setIsPreConfiguring(preConfiguring: boolean): void { isPreConfiguring = preConfiguring; }
@@ -64,6 +72,27 @@ export enum TriggeredBy {
     configureBeforeLaunchTargetChange = "configureDirty (before launch target change), settings (configureAfterCommand)",
 }
 
+// Build/launch targets and IntelliSense configuration provider items that are computed
+// during the current configure ('delta' configuration arrays).
+// The arrays counterparts from configuration.ts ('final' configuration arrays)
+// preserve the previous configure data until this current configure is finished,
+// when both sets are merged.
+let buildTargets: string[] = [];
+function getBuildTargets(): string[] { return buildTargets; }
+function setBuildTargets(targets: string[]): void { buildTargets = targets; }
+
+let launchTargets: string[] = [];
+function getLaunchTargets(): string[] { return launchTargets; }
+function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
+
+let customConfigProviderItems: parser.CustomConfigProviderItem[] = [];
+export function getCustomConfigProviderItems(): parser.CustomConfigProviderItem[] { return customConfigProviderItems; }
+function setCustomConfigProviderItems(items: parser.CustomConfigProviderItem[]): void { customConfigProviderItems = items; }
+function addCustomConfigProviderItem(item: parser.CustomConfigProviderItem) : void {
+    customConfigProviderItems.push(item);
+    extension.buildCustomConfigurationProvider(item);
+}
+
 // Identifies and logs whether an operation should be prevented from running.
 // So far, the only blocking scenarios are if an ongoing configure, pre-configure or build
 // is blocking other new similar operations and setter commands (selection of new configurations, targets, etc...)
@@ -82,7 +111,12 @@ export function blockedByOp(op: Operations, showPopup: boolean = true): Operatio
     }
 
     if (getIsConfiguring()) {
-        blocker = Operations.configure;
+        // A configure in the background shouldn't block anything except another configure
+        if (getConfigureIsInBackground() && op !== Operations.configure) {
+            vscode.window.showInformationMessage(`The project is configuring in the background and ${op} may run on out-of-date input.`);
+        } else {
+            blocker = Operations.configure;
+        }
     }
 
     if (getIsBuilding()) {
@@ -146,7 +180,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
     if (extension.getState().configureDirty) {
         logger.message("The project needs to configure in order to build properly the current target.");
         if (configuration.getConfigureAfterCommand()) {
-            configureExitCode = await cleanConfigure(TriggeredBy.configureBeforeBuild);
+            configureExitCode = await configure(TriggeredBy.configureBeforeBuild);
             if (configureExitCode !== ConfigureBuildReturnCodeTypes.success) {
                 logger.message("Attempting to run build after a failed configure.");
             }
@@ -334,9 +368,18 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         logger.messageNoCR("Generating targets information with command: ");
     } else {
         makeArgs.push("--dry-run");
-        if (dryrunSwitches) {
-            makeArgs = makeArgs.concat(dryrunSwitches);
-        }    
+
+        // If this is not a clean configure, remove --always-make from the arguments list.
+        // We need to have --always-make in makefile.dryrunSwitches and remove it for not clean configure
+        // (as opposed to not having --always-make in makefile.dryrunSwitches and adding it for clean configure)
+        // because we want to avoid having 2 dryrun switches settings (one for clean and one for not clean configure)
+        // and also because the user needs to be able to remove --always-make from any make --dry-run invocation,
+        // if it causes trouble.
+        dryrunSwitches?.forEach(sw => {
+            if (getConfigureIsClean() || (sw !== "--always-make" && sw !== "-B")) {
+                makeArgs.push(sw);
+            }
+        });
 
         logger.messageNoCR("Generating configuration cache with command: ");
     }
@@ -344,11 +387,16 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     logger.message(configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));
 
     try {
+        let dryrunFile : string = util.resolvePathToRoot(forTargets ? "./pRrq.log" : "./dryrun.log");
+        logger.message(`Writing the dry-run output: ${dryrunFile}`);
+        util.writeFile(dryrunFile, configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + "\r\n");
+
         let stdoutStr: string = "";
         let stderrStr: string = "";
 
         let stdout: any = (result: string): void => {
             stdoutStr += result;
+            fs.appendFileSync(dryrunFile, `${result} \r\n`);
             progress.report({increment: 1, message: "Generating dry-run output" +
                                                     ((recursive) ? " (recursive)" : "") +
                                                     ((forTargets) ? " (for targets specifically)" : "" +
@@ -356,6 +404,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         };
 
         let stderr: any = (result: string): void => {
+            fs.appendFileSync(dryrunFile, `${result} \r\n`);
             stderrStr += result;
         };
 
@@ -364,19 +413,16 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         let elapsedTime: number = util.elapsedTimeSince(startTime);
         logger.message(`Generating dry-run elapsed time: ${elapsedTime}`);
 
-        let dryrunFile : string = util.resolvePathToRoot(forTargets ? "./pRrq.log" : "./dryrun.log");
-        logger.message(`Writing the dry-run output: ${dryrunFile}`);
-        fs.writeFileSync(dryrunFile, stdoutStr);
         parseFile = dryrunFile;
         parseContent = stdoutStr;
 
-        if (result.returnCode !== ConfigureBuildReturnCodeTypes.success) {
+        // The error codes returned by the targets invocation (make -pRrq) mean something else
+        // (for example if targets are out of date). We can ignore the return code for this
+        // because it "can't fail". It represents only display of database and no targets are actually run.
+        // try syntax error
+        if (result.returnCode !== ConfigureBuildReturnCodeTypes.success && forTargets !== true) {
             logger.message("The make dry-run command failed.");
-            if (forTargets) {
-                logger.message("We may parse an incomplete set of build targets.");
-            } else {
-                logger.message("IntelliSense may work only partially or not at all.");
-            }
+            logger.message("IntelliSense may work only partially or not at all.");
             logger.message(stderrStr);
 
             // Report the standard dry-run error & guide only when the configure was not cancelled
@@ -548,6 +594,15 @@ interface ConfigurationCacheContent {
     buildTargets: string[];
 }
 
+// A non clean configure loads first any pre-existing cache, so that the user
+// has IntelliSense and build/launch targets available earlier.
+// Then invokes make dry-run (without --always-make which is used for clean configure only)
+// or reads from a provided build log and parses new content to be added to the configuration cache.
+// The configuration cache content and the CppTools custom IntelliSense provider are not reset.
+// This way we can add incrementally to what has been parsed from the previous clean configure.
+// There is the downside that any files that are removed from the makefile
+// (thus disappearing from the log with commands) will still have IntelliSense loaded
+// until the next clean configure.
 export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean = true): Promise<number> {
     // Mark that this workspace had at least one attempt at configuring, before any chance of early return,
     // to accurately identify whether this project configured successfully out of the box or not.
@@ -572,31 +627,21 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         preConfigureElapsedTime = util.elapsedTimeSince(configureStartTime);
     }
 
-    // Identify for telemetry whether this configure will invoke make or will read from a build log
-    let ranMake: boolean = true;
-
-    // Identify for telemetry whether this configure will read configuration constructs from cache
-    // or perform a full parse
-    let ranParse: boolean = true;
-
+    // Identify for telemetry whether this configure will invoke make --dry-run or will read from a build log
+    // If a build log is set and it exists, we are sure make --dry-run is not getting invoked.
+    let makeDryRun: boolean = true;
     let buildLog: string | undefined = configuration.getConfigurationBuildLog();
-    let configurationCache: string | undefined = configuration.getConfigurationCache();
-
-    // If build log is set and exists, we are sure make is not getting invoked,
-    // but parsing is done or not depending on cache being present.
-    // If configure cache exists, we are sure there is no parsing done and no make invoked.
-    // If this is a clean configure and a configuration cache was previously created,
-    // cleanConfigure already deleted it and it will get recreated below,
-    // so checking now on the existence of the configuration cache is a good indication
-    // whether this configure is clean or not.
-    if (configurationCache && util.checkFileExistsSync(configurationCache)) {
-        ranMake = false;
-        ranParse = false;
-    } else if (buildLog && util.checkFileExistsSync(buildLog)) {
-        ranMake = false;
-        ranParse = true;
+    if (buildLog && util.checkFileExistsSync(buildLog)) {
+        makeDryRun = false;
     }
 
+    // Identify for telemetry whether this configure will read configuration constructs from cache.
+    let readCache: boolean = false;
+    let configurationCache: string | undefined = configuration.getConfigurationCache();
+    if (configurationCache && util.checkFileExistsSync(configurationCache)) {
+        readCache = true;
+    }; 
+    
     // Identify for telemetry whether:
     //   - this configure will need to double the workload, if it needs to analyze the build targets separately.
     //   - this configure will need to reset the build target to the default, which will need a reconfigure.
@@ -645,6 +690,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
                     retc = ConfigureBuildReturnCodeTypes.cancelled;
                     setIsConfiguring(false);
+                    setConfigureIsClean(false);
+                    setConfigureIsInBackground(false);
                 });
 
                 setIsConfiguring(true);
@@ -656,19 +703,86 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         logger.message(e.message);
         return retc;
     } finally {
-        let configureElapsedTime: number = (Date.now() - configureStartTime) / 1000;
+        let configureElapsedTime: number = util.elapsedTimeSince(configureStartTime);
+
+        // The new configure internal arrays
+        let newBuildTargets: string[] = [];
+        let newLaunchTargets: string[] = [];
+        let newCustomConfigProviderItems: parser.CustomConfigProviderItem[] = [];
+
+        // If this was not a clean configure, incorporate the previous configure data,
+        // which was read from the cache.
+        if (!getConfigureIsClean()) {
+            newBuildTargets = newBuildTargets.concat(configuration.getBuildTargets());
+            newLaunchTargets = newLaunchTargets.concat(configuration.getLaunchTargets());
+            newCustomConfigProviderItems = newCustomConfigProviderItems.concat(configuration.getCustomConfigProviderItems());
+
+            // Incorporate any new data computed during this configure, avoiding duplicates.
+            // If this is not a clean configure, the arrays and the CppTools provider
+            // were not reset and there is a risk of concat-ing duplicates.
+            // Depending how the makefile is set, a dry-run may still show compile commands
+            // for files that are up to date even if --always-make is missing, so remove duplicates.
+            getBuildTargets().forEach(target => {
+                if (!newBuildTargets.includes(target)) {
+                    newBuildTargets.push(target);
+                }
+            });
+
+            getLaunchTargets().forEach(target => {
+                if (!newLaunchTargets.includes(target)) {
+                    newLaunchTargets.push(target);
+                }
+            });
+
+            getCustomConfigProviderItems().forEach(item => {
+                if (!newCustomConfigProviderItems.includes(item)) {
+                    newCustomConfigProviderItems.push(item);
+                }
+            });
+        } else {
+            // Even if our configure internal arrays are empty, we need to reset
+            // the CppTools IntelliSense provider as well.
+            extension.emptyCustomConfigurationProvider();
+
+            newBuildTargets = newBuildTargets.concat(getBuildTargets());
+            newLaunchTargets = newLaunchTargets.concat(getLaunchTargets());
+            newCustomConfigProviderItems = newCustomConfigProviderItems.concat(getCustomConfigProviderItems());
+        }
+
+        // Update the configuration final arrays
+        configuration.setBuildTargets(newBuildTargets);
+        configuration.setLaunchTargets(newLaunchTargets);
+        configuration.setCustomConfigProviderItems(newCustomConfigProviderItems);
+
+        // Empty the configuration 'delta' arrays
+        setBuildTargets([]);
+        setLaunchTargets([]);
+        setCustomConfigProviderItems([]);
+
+        let configurationCacheContent: ConfigurationCacheContent = {
+            buildTargets: newBuildTargets,
+            launchTargets: newLaunchTargets,
+            customConfigProviderItems: newCustomConfigProviderItems
+        };
+
+        // Rewrite the configuration cache according to the last updates of the internal arrays.
+        if (configurationCache) {
+            util.writeFile(configurationCache, JSON.stringify(configurationCacheContent));
+        }
+
         let newBuildTarget: string | undefined = configuration.getCurrentTarget();
         const telemetryMeasures: telemetry.Measures = {
-            numberBuildTargets: configuration.getBuildTargets().length,
-            numberLaunchTargets: configuration.getLaunchTargets().length,
+            numberBuildTargets: buildTargets.length,
+            numberLaunchTargets: launchTargets.length,
             numberMakefileConfigurations: configuration.getMakefileConfigurations().length,
             totalElapsedTime: configureElapsedTime
         };
         const telemetryProperties: telemetry.Properties = {
             exitCode: retc.toString(),
             firstTime: (!ranConfigureInCodebaseLifetime).toString(),
-            ranMake: ranMake.toString(),
-            ranParse: ranParse.toString(),
+            makeDryRun: makeDryRun.toString(),
+            readCache: readCache.toString(),
+            isClean: getConfigureIsClean().toString(),
             processTargetsSeparately: processTargetsSeparately.toString(),
             resetBuildTarget: (oldBuildTarget !== newBuildTarget).toString(),
             triggeredBy: triggeredBy
@@ -680,29 +794,17 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         }
         if (preConfigureElapsedTime !== undefined) {
             telemetryMeasures.preConfigureElapsedTime =  preConfigureElapsedTime;
+            logger.message(`Preconfigure elapsed time: ${preConfigureElapsedTime}`);
         }
 
         telemetryProperties.buildTarget = processTargetForTelemetry(newBuildTarget);
         telemetry.logEvent("configure", telemetryProperties, telemetryMeasures);
 
-        logger.message(`Preconfigure elapsed time: ${preConfigureElapsedTime}`);
         logger.message(`Configure elapsed time: ${configureElapsedTime}`);
 
         setIsConfiguring(false);
-
-        let configurationCacheContent: ConfigurationCacheContent = {
-            buildTargets: configuration.getBuildTargets(),
-            launchTargets: configuration.getLaunchTargets(),
-            customConfigProviderItems: getCustomConfigProviderItems()
-        };
-
-        // Update the configuration cache if this operation was clean.
-        // Re-parsing is a good indication of a clean configure,
-        // whether we read from a build log or parse a dry-run output.
-        let cache: string | undefined = configuration.getConfigurationCache();
-        if (cache && ranParse) {
-            util.writeFile(cache, JSON.stringify(configurationCacheContent));
-        }
+        setConfigureIsClean(false);
+        setConfigureIsInBackground(false);
     }
 }
 
@@ -731,8 +833,8 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
         });
 
         if (launchConfigurationsStr.length === 0) {
-            logger.message("No launch configurations have been detected.");
-            configuration.setLaunchTargets([]);
+            logger.message("No" + (getConfigureIsClean() ? "" : "new") + " launch configurations have been detected.");
+            setLaunchTargets([]);
         } else {
             // Sort and remove duplicates that can be created in the following scenarios:
             //    - the same target binary invoked several times with the same arguments and from the same path
@@ -746,12 +848,12 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
             });
 
             logger.message("Found the following launch targets defined in the makefile: " + launchConfigurationsStr.join(";"));
-            configuration.setLaunchTargets(launchConfigurationsStr);
+            setLaunchTargets(launchConfigurationsStr);
         }
     } else {
         // There might be already a few valid launch targets identified,
         // but since they might not be all reset to empty.
-        configuration.setLaunchTargets([]);
+        setLaunchTargets([]);
     }
 
     return retc;
@@ -778,25 +880,20 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
     let retc: number = await parser.parseTargets(cancel, dryRunOutput, onStatus, onFoundTarget);
     if (retc === ConfigureBuildReturnCodeTypes.success) {
         if (targets.length === 0) {
-            configuration.setBuildTargets([]);
-            logger.message("No build targets have been detected.");
+            setBuildTargets([]);
+            logger.message("No" + (getConfigureIsClean() ? "" : "new") + "build targets have been detected.");
         } else {
-            configuration.setBuildTargets(targets.sort());
+            setBuildTargets(targets.sort());
             logger.message("Found the following build targets defined in the makefile: " + targets.join(";"));
         }
     } else {
         // There might be already a few valid build targets identified,
         // but since there might be some missing, reset to empty.
-        configuration.setBuildTargets([]);
+        setBuildTargets([]);
     }
 
     return retc;
 }
-
-let customConfigProviderItems: parser.CustomConfigProviderItem[] = [];
-function getCustomConfigProviderItems(): parser.CustomConfigProviderItem[] { return customConfigProviderItems; }
-function setCustomConfigProviderItems(items: parser.CustomConfigProviderItem[]): void { customConfigProviderItems = items; }
-function addCustomConfigProviderItem(item: parser.CustomConfigProviderItem) : void { customConfigProviderItems.push(item); }
 
 async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
                               dryRunOutput: string, recursive: boolean = false): Promise<number> {
@@ -806,30 +903,6 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
 
     logger.message("Updating the CppTools IntelliSense Configuration Provider." + ((recursive) ? "(recursive)" : ""));
     await extension.registerCppToolsProvider();
-
-    // If the --always-make is present in the setup, it's good to reset the custom configuration provider
-    // at every configure to ensure that no files that have been removed from the project
-    // still have IntelliSense working, because that will confusingly happen only until the next project reload.
-    // If these switches are missing from the default setup (probably because some project
-    // specific issues that made the user remove them) then it's better to not empty
-    // the configuration provider, because otherwise we lose valid IntelliSense information
-    // for files that are part of up-to-date targets (which are not ran even by dry-run
-    // if --always-make is missing).
-    // TODO: when always-make missing, investigate whether --touch (-t) is used in preconfigure
-    // or makefile.configurations, to empty the custom provider then too.
-    // The --touch switch doesn't work together with other switches, so it can't be in makefile.dryrunSwitches.
-    // Even if other targets are included in the make command line, if --touch is present,
-    // make will only do the touch operation. To have effect, --touch needs to be run in a different make command,
-    // before the configure make command.
-    let dryRunSwitches: string[] | undefined = configuration.getDryrunSwitches();
-    let canEmptyConfigProvider: boolean = (dryRunSwitches !== undefined &&
-                                           (dryRunSwitches.includes("--always-make") || dryRunSwitches.includes("-B")));
-    let makeCommand: string[] = configuration.getConfigurationMakeArgs();
-    canEmptyConfigProvider = canEmptyConfigProvider || makeCommand.includes("--always-make") || makeCommand.includes("-B");
-
-    if (canEmptyConfigProvider) {
-        extension.emptyCustomConfigurationProvider();
-    }
 
     let onStatus: any = (status: string): void => {
         progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
@@ -843,19 +916,11 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
         if (!getCustomConfigProviderItems().includes(customConfigProviderItem)) {
             addCustomConfigProviderItem(customConfigProviderItem);
         }
-
-        extension.buildCustomConfigurationProvider(customConfigProviderItem);
     };
 
     let retc: number = await parser.parseCustomConfigProvider(cancel, dryRunOutput, onStatus, onFoundCustomConfigProviderItem);
-    if (retc === ConfigureBuildReturnCodeTypes.success) {
+    if (retc !== ConfigureBuildReturnCodeTypes.cancelled) {
         extension.updateCppToolsProvider();
-    } else {
-        // IntelliSense may be valid if cancelling happened later
-        // but because it is most likely incomplete reset to nothing.
-        if (canEmptyConfigProvider) {
-            extension.emptyCustomConfigurationProvider();
-        }
     }
 
     return retc;
@@ -874,6 +939,84 @@ export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vs
     return await parser.preprocessDryRunOutput(cancel, dryrunOutput, onStatus);
 }
 
+export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken): Promise<number> {
+    if (cancel.isCancellationRequested) {
+        return ConfigureBuildReturnCodeTypes.cancelled;
+    }
+
+    let startTime: number = Date.now();
+    let elapsedTime: number;
+
+    let cache: string | undefined = configuration.getConfigurationCache();
+    if (cache) {
+        let content: string | undefined = util.readFile(cache);
+        if (content) {
+            try {
+                progress.report({ increment: 1, message: "Configuring from cache" });
+                logger.message(`Configuring from cache: ${cache}`);
+                let configurationCacheContent: ConfigurationCacheContent = JSON.parse(content);
+                await util.scheduleTask(() => {extension.registerCppToolsProvider()});
+
+                await util.scheduleTask(() => {
+                    configuration.setBuildTargets(configurationCacheContent.buildTargets);
+                    configuration.setLaunchTargets(configurationCacheContent.launchTargets);
+                    configuration.setCustomConfigProviderItems(configurationCacheContent.customConfigProviderItems);
+                });
+
+                // Send to CppTools
+                let numberOfItems: number = configurationCacheContent.customConfigProviderItems.length;
+                let index: number = 0;
+                let done: boolean = false;
+                function doSendChunk(): void {
+                    let chunkIndex: number = 0;
+                    while (index < numberOfItems && chunkIndex <= 10) {
+                        if (cancel.isCancellationRequested) {
+                            break;
+                        }
+
+                        progress.report({ increment: 1, message: "Configuring from cache" });
+                        let item: parser.CustomConfigProviderItem = configurationCacheContent.customConfigProviderItems[index];
+                        addCustomConfigProviderItem(item);
+    
+                        index++;
+                        if (index === numberOfItems) {
+                            done = true;
+                        }
+
+                        chunkIndex++;
+                    } // while loop
+                } // doSendChunk function
+
+                while (!done) {
+                    if (cancel.isCancellationRequested) {
+                        break;
+                    }
+
+                    await util.scheduleTask(doSendChunk);
+                }
+
+                if (!cancel.isCancellationRequested) {
+                    extension.updateCppToolsProvider();
+                }
+            } catch (e) {
+                logger.message("An error occured while parsing the configuration cache.");
+                logger.message("Running clean configure instead.");
+                setConfigureIsInBackground(false);
+                setConfigureIsClean(true);
+            }
+
+            elapsedTime = util.elapsedTimeSince(startTime);
+            logger.message(`Load configuration from cache elapsed time: ${elapsedTime}`);
+        } else {
+            return ConfigureBuildReturnCodeTypes.notFound;
+        }
+    } else {
+        return ConfigureBuildReturnCodeTypes.notFound;
+    }
+
+    return cancel.isCancellationRequested ? ConfigureBuildReturnCodeTypes.cancelled : ConfigureBuildReturnCodeTypes.success;
+}
+
 // Update IntelliSense and launch targets with information parsed from a user given build log,
 // the dryrun cache or make dryrun output if the cache is not present.
 // Sometimes the targets do not need an update (for example, when there has been
@@ -885,27 +1028,24 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     let retc3: number | undefined;
 
     let startTime: number = Date.now();
+    let elapsedTime: number;
+
+    // Configure does not start in the background (we have to load a configuration cache first).
+    setConfigureIsInBackground(false);
 
     // If available, load all the configure constructs via json from the cache file.
-    let cache: string | undefined = configuration.getConfigurationCache();
-    if (cache) {
-        let content: string | undefined = util.readFile(cache);
-        if (content) {
-            try {
-                let configurationCacheContent: ConfigurationCacheContent = JSON.parse(content);
-                configuration.setBuildTargets(configurationCacheContent.buildTargets);
-                configuration.setLaunchTargets(configurationCacheContent.launchTargets);
-                setCustomConfigProviderItems(configurationCacheContent.customConfigProviderItems);
-                return ConfigureBuildReturnCodeTypes.success;
-            } catch (e) {
-                logger.message("An error occured while parsing the configuration cache.");
-                logger.message("Running clean configure instead.");
-                cleanCache();
-            }
+    // If this doConfigure is in level 1 of recursion, avoid loading the configuration cache again
+    // since it's been done at recursion level 0.
+    if (!recursiveDoConfigure) {
+        retc1 = await loadConfigurationFromCache(progress, cancel);
+        if (retc1 === ConfigureBuildReturnCodeTypes.cancelled) {
+            return retc1;
+        } else if (retc1 === ConfigureBuildReturnCodeTypes.success) {
+            // In case of success, the following configure steps should not block any other operation
+            // and can be performed in the background.
+            setConfigureIsInBackground(true);
         }
     }
-    let elapsedTime: number = util.elapsedTimeSince(startTime);
-    logger.message(`Load configuration from cache elapsed time: ${elapsedTime}`);
 
     // This generates the dryrun output (saving it on disk) or reads an alternative build log.
     // Timings for this sub-phase happen inside.
@@ -949,11 +1089,13 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     logger.message(`Parsing for launch targets elapsed time: ${elapsedTime}`);
 
     // Verify if the current launch configuration is still part of the list and unset otherwise.
+    // Consider the old launch targets and the new ones (produced by the above parseLaunchConfigurations).
     let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
     let currentLaunchConfigurationStr: string | undefined = currentLaunchConfiguration ? configuration.launchConfigurationToString(currentLaunchConfiguration) : "";
-    if (currentLaunchConfigurationStr !== "" && !configuration.getLaunchTargets().includes(currentLaunchConfigurationStr)) {
-        logger.message(`Current launch configuration ${currentLaunchConfigurationStr} is no longer present in the available list.`);
-        configuration.setLaunchConfigurationByName("");
+    if (currentLaunchConfigurationStr !== "" &&
+        !configuration.getLaunchTargets().concat(getLaunchTargets()).includes(currentLaunchConfigurationStr)) {
+            logger.message(`Current launch configuration ${currentLaunchConfigurationStr} is no longer present in the available list.`);
+            configuration.setLaunchConfigurationByName("");
     }
 
     // Configure build targets only if necessary:
@@ -978,7 +1120,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         logger.message(`Parsing build targets elapsed time: ${elapsedTime}`);
 
         // Verify if the current build target is still part of the list and unset otherwise.
-        buildTargets = configuration.getBuildTargets();
+        // Consider the old build targets and the new ones (produced by the above parseTargets).
+        buildTargets = configuration.getBuildTargets().concat(getBuildTargets());
         let currentBuildTarget: string | undefined = configuration.getCurrentTarget();
         if (currentBuildTarget && currentBuildTarget !== "" && currentBuildTarget !== "all" &&
             !buildTargets.includes(currentBuildTarget)) {
@@ -1004,9 +1147,9 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
             logger.message("Automatically reconfiguring the project after a build target change.");
             recursiveDoConfigure = true;
 
-            // Ensure the cache is cleaned at this point. Even if the original configure operation
-            // was explicitly not clean, resetting the build target requires a clean configure.
-            cleanCache();
+            // This one level recursive doConfigure will keep the same clean state as the caller
+            // since setConfigureIsClean runs before the caller configure and resets after
+            // the eventual recursive configure.
             retc3 = await doConfigure(progress, cancel, updateTargets, true);
         }
     }
@@ -1034,18 +1177,10 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         ((retc1 === retc2 || retc2 === undefined) ? retc1 : ConfigureBuildReturnCodeTypes.mixedErr);
 }
 
-// Delete the dryrun cache (including targets cache) and configure
-function cleanCache(): void {
-    let cache: string | undefined = configuration.getConfigurationCache();
-    if (cache) {
-        if (util.checkFileExistsSync(cache)) {
-            logger.message(`Deleting the configuration cache: ${cache}`);
-            fs.unlinkSync(cache);
-        }
-    }
-}
-
-// Configure after cleaning the cache
+// A clean configure = a non clean configure + empty the CppTools custom IntelliSense config provider.
+// In the case of a dry-run setting (not a build log) it also means adding --always-make to the make invocation.
+// Because we want to first read any existing cache and let the remaining heavy processing run in the background,
+// we don't delete the cache here. We just mark it to be later deleted by the non clean configure.
 export async function cleanConfigure(triggeredBy: TriggeredBy, updateTargets: boolean = true): Promise<number> {
     // Even if the core configure process also checks for blocking operations,
     // verify the same here as well, to make sure that we don't delete the caches
@@ -1054,7 +1189,7 @@ export async function cleanConfigure(triggeredBy: TriggeredBy, updateTargets: bo
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
-    cleanCache();
+    setConfigureIsClean(true);
 
     return configure(triggeredBy, updateTargets);
 }

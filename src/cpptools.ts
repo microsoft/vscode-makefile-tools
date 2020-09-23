@@ -92,10 +92,13 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         // cummulativeBrowsePath incorporates all the files and the includes paths
         // of all the compiler invocations of the current configuration
         customConfigProviderItem.files.forEach(filePath => {
-            this.fileIndex.set(path.normalize(filePath), {
+            let sourceFileConfigurationItem: cpp.SourceFileConfigurationItem = {
                 uri: vscode.Uri.file(filePath),
                 configuration,
-            });
+            }
+
+            this.fileIndex.set(path.normalize(filePath), sourceFileConfigurationItem);
+            this.logConfigurationProviderItem(sourceFileConfigurationItem);
 
             let folder: string = path.dirname(filePath);
             if (!cummulativeBrowsePath.includes(folder)) {
@@ -124,7 +127,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         };
     }
 
-    public logConfigurationProvider(): void {
+    public logConfigurationProviderBrowse(): void {
         logger.message("Sending Workspace Browse Configuration: -----------------------------------");
         logger.message("    Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
         logger.message("    Standard: " + this.workspaceBrowseConfiguration.standard);
@@ -134,22 +137,30 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
             logger.message("    Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
         }
         logger.message("----------------------------------------------------------------------------");
+    }
+
+    public logConfigurationProviderItem(filePath: cpp.SourceFileConfigurationItem): void {
+        logger.message("Sending configuration for file " + filePath.uri.toString() + " -----------------------------------", "Verbose");
+        logger.message("    Defines: " + filePath.configuration.defines.join(";"), "Verbose");
+        logger.message("    Includes: " + filePath.configuration.includePath.join(";"), "Verbose");
+        if (filePath.configuration.forcedInclude) {
+            logger.message("    Force Includes: " + filePath.configuration.forcedInclude.join(";"), "Verbose");
+        }
+        logger.message("    Standard: " + filePath.configuration.standard, "Verbose");
+        logger.message("    IntelliSense Mode: " + filePath.configuration.intelliSenseMode, "Verbose");
+        logger.message("    Compiler Path: " + filePath.configuration.compilerPath, "Verbose");
+        logger.message("    Compiler Arguments: " + filePath.configuration.compilerArgs, "Verbose");
+        if (process.platform === "win32" && filePath.configuration.windowsSdkVersion, "Verbose") {
+            logger.message("    Windows SDK Version: " + filePath.configuration.windowsSdkVersion, "Verbose");
+        }
+        logger.message("---------------------------------------------------------------------------------------------------", "Verbose");
+    }
+
+    public logConfigurationProviderComplete(): void {
+        this.logConfigurationProviderBrowse();
 
         this.fileIndex.forEach(filePath => {
-            logger.message("Sending configuration for file " + filePath.uri.toString() + " -----------------------------------");
-            logger.message("    Defines: " + filePath.configuration.defines.join(";"));
-            logger.message("    Includes: " + filePath.configuration.includePath.join(";"));
-            if (filePath.configuration.forcedInclude) {
-                logger.message("    Force Includes: " + filePath.configuration.forcedInclude.join(";"));
-            }
-            logger.message("    Standard: " + filePath.configuration.standard);
-            logger.message("    IntelliSense Mode: " + filePath.configuration.intelliSenseMode);
-            logger.message("    Compiler Path: " + filePath.configuration.compilerPath);
-            logger.message("    Compiler Arguments: " + filePath.configuration.compilerArgs);
-            if (process.platform === "win32" && filePath.configuration.windowsSdkVersion) {
-                logger.message("    Windows SDK Version: " + filePath.configuration.windowsSdkVersion);
-            }
-            logger.message("---------------------------------------------------------------------------------------------------");
+            this.logConfigurationProviderItem(filePath);
         });
     }
 }
