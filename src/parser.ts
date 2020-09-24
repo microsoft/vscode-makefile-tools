@@ -680,9 +680,6 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
     logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.');
 
-    // Empty the cummulative browse path built during the previous dry-run parsing
-    cpptools.clearCummulativeBrowsePath();
-
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
     let currentPath: string = vscode.workspace.rootPath || "";

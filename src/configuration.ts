@@ -1143,10 +1143,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
             launchTargetsNames.push(launchConfigurationToString(launchConfiguration));
         }
     });
-    launchTargetsNames = launchTargetsNames.sort().filter(function (elem, index, self): boolean {
-        return index === self.indexOf(elem);
-    });
-
+    launchTargetsNames = util.sortAndRemoveDuplicates(launchTargetsNames);
     let options: vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
     if (launchTargets.length === 0) {
@@ -1225,9 +1222,4 @@ export function setBuildTargets(targets: string[]): void { buildTargets = target
 let launchTargets: string[] = [];
 export function getLaunchTargets(): string[] { return launchTargets; }
 export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
-
-// List of all the custom configuration provider items that are sent to CppTools
-let customConfigProviderItems: parser.CustomConfigProviderItem[] = [];
-export function getCustomConfigProviderItems(): parser.CustomConfigProviderItem[] { return customConfigProviderItems; }
-export function setCustomConfigProviderItems(items: parser.CustomConfigProviderItem[]): void { customConfigProviderItems = items; }
 

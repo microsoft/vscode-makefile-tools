@@ -389,6 +389,15 @@ export function mergeProperties(dst: any, src: any): any {
 
     return dst;
 }
+export function removeDuplicates(src: any[]) : any[] {
+    return src.filter(function (elem, index, self): boolean {
+        return index === self.indexOf(elem);
+    });
+}
+
+export function sortAndRemoveDuplicates(src: any[]) : any[] {
+    return removeDuplicates(src.sort());
+}
 
 export function reportDryRunError(dryrunOutputFile: string): void {
     logger.message(`You can see the detailed dry-run output at ${dryrunOutputFile}`);

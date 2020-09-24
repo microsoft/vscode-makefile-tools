@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
 import * as parser from './parser';
+import * as path from 'path';
 import * as state from './state';
 import * as telemetry from './telemetry';
 import * as tree from './tree';
@@ -28,6 +29,8 @@ export class MakefileToolsExtension {
     });
 
     private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
+    public getCppConfigurationProvider(): cpptools.CppConfigurationProvider { return this.cppConfigurationProvider; }
+
     private mementoState = new state.StateManager(this.extensionContext);
     private cppToolsAPI?: cpp.CppToolsApi;
     private cppConfigurationProviderRegister?: Promise<void>;
@@ -37,10 +40,6 @@ export class MakefileToolsExtension {
     }
 
     public getState(): state.StateManager { return this.mementoState; }
-
-    public emptyCustomConfigurationProvider() : void {
-        this.cppConfigurationProvider.empty();
-    }
 
     public dispose(): void {
         this._projectOutlineTreeView.dispose();
@@ -114,9 +113,66 @@ export class MakefileToolsExtension {
         }
     }
 
+    private cummulativeBrowsePath: string[] = [];
+    public clearCummulativeBrowsePath(): void {
+        this.cummulativeBrowsePath = [];
+    }
+
     public buildCustomConfigurationProvider(customConfigProviderItem: parser.CustomConfigProviderItem): void {
         this.compilerFullPath = customConfigProviderItem.compilerFullPath;
-        this.cppConfigurationProvider.buildCustomConfigurationProvider(customConfigProviderItem);
+        let provider: cpptools.CustomConfigurationProvider = make.getDeltaCustomConfigurationProvider();
+
+        const configuration: cpp.SourceFileConfiguration = {
+            defines: customConfigProviderItem.defines,
+            standard: customConfigProviderItem.standard || "c++17",
+            includePath: customConfigProviderItem.includes,
+            forcedInclude: customConfigProviderItem.forcedIncludes,
+            intelliSenseMode: customConfigProviderItem.intelliSenseMode,
+            compilerPath: customConfigProviderItem.compilerFullPath,
+            compilerArgs: customConfigProviderItem.compilerArgs,
+            windowsSdkVersion: customConfigProviderItem.windowsSDKVersion
+        };
+
+        // cummulativeBrowsePath incorporates all the files and the includes paths
+        // of all the compiler invocations of the current configuration
+        customConfigProviderItem.files.forEach(filePath => {
+            let sourceFileConfigurationItem: cpp.SourceFileConfigurationItem = {
+                uri: vscode.Uri.file(filePath),
+                configuration,
+            }
+
+            // These are the configurations processed during the current configure.
+            // Store them in the 'delta' file index instead of the final one.
+            provider.fileIndex.set(path.normalize(filePath), sourceFileConfigurationItem);
+            extension.getCppConfigurationProvider().logConfigurationProviderItem(sourceFileConfigurationItem);
+
+            let folder: string = path.dirname(filePath);
+            if (!this.cummulativeBrowsePath.includes(folder)) {
+                this.cummulativeBrowsePath.push(folder);
+            }
+        });
+
+        customConfigProviderItem.includes.forEach(incl => {
+            if (!this.cummulativeBrowsePath.includes(incl)) {
+                this.cummulativeBrowsePath.push(incl);
+            }
+        });
+
+        customConfigProviderItem.forcedIncludes.forEach(fincl => {
+            if (!this.cummulativeBrowsePath.includes(fincl)) {
+                this.cummulativeBrowsePath.push(fincl);
+            }
+        });
+
+        provider.workspaceBrowse = {
+            browsePath: this.cummulativeBrowsePath,
+            standard: customConfigProviderItem.standard,
+            compilerPath: customConfigProviderItem.compilerFullPath,
+            compilerArgs: customConfigProviderItem.compilerArgs,
+            windowsSdkVersion: customConfigProviderItem.windowsSDKVersion
+        };
+
+        make.setCustomConfigurationProvider(provider);
     }
 
     public getCompilerFullPath() : string | undefined { return this.compilerFullPath; }
