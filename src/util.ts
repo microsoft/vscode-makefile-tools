@@ -389,13 +389,20 @@ export function mergeProperties(dst: any, src: any): any {
 
     return dst;
 }
-export function removeDuplicates(src: any[]) : any[] {
-    return src.filter(function (elem, index, self): boolean {
-        return index === self.indexOf(elem);
+export function removeDuplicates(src: string[]) : string[] {
+    let seen: {[key: string]: boolean} = {};
+    let result: string[] = [];
+    src.forEach(item =>{
+        if (!seen[item]) {
+            seen[item] = true;
+            result.push(item);
+        }
     });
+
+    return result;
 }
 
-export function sortAndRemoveDuplicates(src: any[]) : any[] {
+export function sortAndRemoveDuplicates(src: string[]) : string[] {
     return removeDuplicates(src.sort());
 }
 

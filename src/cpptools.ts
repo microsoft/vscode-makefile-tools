@@ -82,11 +82,11 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         });
 
         this.workspaceBrowseConfiguration = {
-            browsePath: util.sortAndRemoveDuplicates(provider.workspaceBrowse.browsePath.concat(provider.workspaceBrowse.browsePath)),
-            compilerArgs: util.sortAndRemoveDuplicates(provider.workspaceBrowse.compilerArgs?.concat(provider.workspaceBrowse.compilerArgs) || []),
-            compilerPath: (provider.workspaceBrowse.compilerPath),
-            standard: (provider.workspaceBrowse.standard),
-            windowsSdkVersion: (provider.workspaceBrowse.windowsSdkVersion)
+            browsePath: util.sortAndRemoveDuplicates(this.workspaceBrowseConfiguration.browsePath.concat(provider.workspaceBrowse.browsePath)),
+            compilerArgs: this.workspaceBrowseConfiguration.compilerArgs?.concat(provider.workspaceBrowse.compilerArgs || []),
+            compilerPath: provider.workspaceBrowse.compilerPath,
+            standard: provider.workspaceBrowse.standard,
+            windowsSdkVersion: provider.workspaceBrowse.windowsSdkVersion
         };
     }
 
@@ -125,8 +125,8 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         logger.message("----------------------------------------------------------------------------");
     }
 
-    public logConfigurationProviderItem(filePath: cpp.SourceFileConfigurationItem): void {
-        logger.message("Sending configuration for file " + filePath.uri.toString() + " -----------------------------------", "Verbose");
+    public logConfigurationProviderItem(filePath: cpp.SourceFileConfigurationItem, fromCache: boolean = false): void {
+        logger.message("Sending configuration " + (fromCache ? "(from cache) " : "") + "for file " + filePath.uri.toString() + " -----------------------------------", "Verbose");
         logger.message("    Defines: " + filePath.configuration.defines.join(";"), "Verbose");
         logger.message("    Includes: " + filePath.configuration.includePath.join(";"), "Verbose");
         if (filePath.configuration.forcedInclude) {
@@ -147,7 +147,10 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
             this.logConfigurationProviderBrowse();
 
             this.fileIndex.forEach(filePath => {
-                this.logConfigurationProviderItem(filePath);
+                // logConfigurationProviderComplete is called (so far) only after loading
+                // the configurations from cache, so mark the boolean to be able to distinguish
+                // the log entries in case of interleaved output.
+                this.logConfigurationProviderItem(filePath, true);
             });
         }
     }

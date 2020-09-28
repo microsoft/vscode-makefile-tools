@@ -228,7 +228,7 @@ export function readConfigurationCache(): void {
         configurationCache = util.resolvePathToRoot(configurationCache);
     }
 
-    logger.message(`Dry-run output cached at ${configurationCache}`);
+    logger.message(`Configurations cached at ${configurationCache}`);
 }
 
 let dryrunSwitches: string[] | undefined;

@@ -48,6 +48,19 @@ export class MakefileToolsExtension {
         }
     }
 
+    // Used for calling cppToolsAPI.notifyReady only once in a VSCode session.
+    private ranNotifyReadyInSession: boolean = false;
+    public getRanNotifyReadyInSession() : boolean { return this.ranNotifyReadyInSession; }
+    public setRanNotifyReadyInSession(ran: boolean) : void { this.ranNotifyReadyInSession = ran; }
+
+    // Similar to state.ranConfigureInCodebaseLifetime, but at the scope of a VSCode session
+    // and returns an error code instead of a boolean (needed for various checks).
+    // Undefined means not completed yet (either not run at all or ongoing).
+    // Cancelled means still completed.
+    private completedConfigureInSession: make.ConfigureBuildReturnCodeTypes | undefined;
+    public getCompletedConfigureInSession() : make.ConfigureBuildReturnCodeTypes | undefined { return this.completedConfigureInSession; }
+    public setCompletedConfigureInSession(completed: make.ConfigureBuildReturnCodeTypes) : void { this.completedConfigureInSession = completed; }
+
     // Register this extension as a new provider or request an update
     public async registerCppToolsProvider(): Promise<void> {
         await this.ensureCppToolsProviderRegistered();
@@ -61,25 +74,12 @@ export class MakefileToolsExtension {
         // TODO: remember all requests that are coming and send an update as soon as we detect
         // any of them being pushed into make.customConfigProviderItems.
         if (this.cppToolsAPI) {
-            if (!this.ranConfigureInSession && this.cppToolsAPI.notifyReady) {
+            if (!this.ranNotifyReadyInSession && this.cppToolsAPI.notifyReady) {
                 this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
-                this.ranConfigureInSession = true;
+                this.setRanNotifyReadyInSession(true);
             }
         }
     }
-
-    // Similar to state.ranConfigureInCodebaseLifetime, but within the scope of a VSCode session.
-    // It is used for calling cppToolsAPI.notifyReady only once in a VSCode session.
-    // It means that a configure was started within the scope of this VSCode session
-    // but it doesn't mean that the configure process is completed already.
-    private ranConfigureInSession: boolean = false;
-    public getRanConfigureInSession() : boolean { return this.ranConfigureInSession; }
-
-    // Similar to ranConfigureInSession, but becomes true at the end of a configure process,
-    // regardless of the success status.
-    private completedConfigureInSession: boolean = false;
-    public getCompletedConfigureInSession() : boolean { return this.completedConfigureInSession; }
-    public setCompletedConfigureInSession(completed: boolean) : void { this.completedConfigureInSession = completed; }
 
     // Request a custom config provider update.
     public updateCppToolsProvider(): void {
@@ -159,7 +159,8 @@ export class MakefileToolsExtension {
         });
 
         customConfigProviderItem.forcedIncludes.forEach(fincl => {
-            if (!this.cummulativeBrowsePath.includes(fincl)) {
+            let folder: string = path.dirname(fincl);
+            if (!this.cummulativeBrowsePath.includes(folder)) {
                 this.cummulativeBrowsePath.push(fincl);
             }
         });

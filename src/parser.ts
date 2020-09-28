@@ -5,14 +5,12 @@
 
 import * as configuration from './configuration';
 import * as cpp from 'vscode-cpptools';
-import * as cpptools from './cpptools';
 import * as ext from './extension';
 import * as logger from './logger';
 import * as make from './make';
 import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
-import { setTimeout } from 'timers';
 
 // List of compiler tools plus the most common aliases cc and c++
 // ++ needs to be escaped for the regular expression in parseLineAsTool.
