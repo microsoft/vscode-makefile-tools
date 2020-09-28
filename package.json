@@ -337,7 +337,7 @@
                 "makefile.extensionOutputFolder": {
                     "type": "string",
                     "description": "The path to various output files produced by the extension",
-                    "default": ".vscode",
+                    "default": "./.vscode",
                     "scope": "resource"
                 },
                 "makefile.extensionLog": {

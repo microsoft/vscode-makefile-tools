@@ -54,12 +54,9 @@ export class MakefileToolsExtension {
     public setRanNotifyReadyInSession(ran: boolean) : void { this.ranNotifyReadyInSession = ran; }
 
     // Similar to state.ranConfigureInCodebaseLifetime, but at the scope of a VSCode session
-    // and returns an error code instead of a boolean (needed for various checks).
-    // Undefined means not completed yet (either not run at all or ongoing).
-    // Cancelled means still completed.
-    private completedConfigureInSession: make.ConfigureBuildReturnCodeTypes | undefined;
-    public getCompletedConfigureInSession() : make.ConfigureBuildReturnCodeTypes | undefined { return this.completedConfigureInSession; }
-    public setCompletedConfigureInSession(completed: make.ConfigureBuildReturnCodeTypes) : void { this.completedConfigureInSession = completed; }
+    private completedConfigureInSession: boolean = false;
+    public getCompletedConfigureInSession() : boolean | undefined { return this.completedConfigureInSession; }
+    public setCompletedConfigureInSession(completed: boolean) : void { this.completedConfigureInSession = completed; }
 
     // Register this extension as a new provider or request an update
     public async registerCppToolsProvider(): Promise<void> {

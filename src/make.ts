@@ -420,7 +420,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         };
 
         let startTime: number = Date.now();
-        const heartBeatTimeout: number = 60; // one minute. TODO: make this a setting
+        const heartBeatTimeout: number = 30; // half minute. TODO: make this a setting
         let timeout = setInterval(function () { 
             let elapsedHeartBit: number = util.elapsedTimeSince(heartBeat);
             if (elapsedHeartBit > heartBeatTimeout) {
@@ -432,7 +432,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
                 // It's enough to show this warning popup once.
                 clearInterval(timeout);
             }
-        }, heartBeatTimeout * 1000);
+        }, 5 * 1000);
 
         const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr);
         clearInterval(timeout);
@@ -788,7 +788,13 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         setIsConfiguring(false);
         setConfigureIsClean(false);
         setConfigureIsInBackground(false);
-        extension.setCompletedConfigureInSession(retc);
+
+        // Let's consider that a cancelled configure is not a complete configure,
+        // even if, depending when the cancel happened, the cache may have been loaded already.
+        // Cancelled configures reach this point too, because of the finally construct.
+        if (retc !== ConfigureBuildReturnCodeTypes.cancelled) {
+            extension.setCompletedConfigureInSession(true);
+        }
     }
 }
 
@@ -965,7 +971,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
             try {
                 progress.report({ increment: 1, message: "Configuring from cache" });
                 logger.message(`Configuring from cache: ${cachePath}`);
-                let ConfigurationCache: ConfigurationCache = {
+                let configurationCache: ConfigurationCache = {
                     buildTargets: [],
                     launchTargets: [],
                     customConfigurationProvider: {
@@ -975,7 +981,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
                         fileIndex: []
                     }
                 };
-                ConfigurationCache = JSON.parse(content);
+                configurationCache = JSON.parse(content);
 
                 // Trick to get proper URIs after reading from the cache.
                 // At the moment of writing into the cache, the URIs have
@@ -983,22 +989,22 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
                 // After saving and re-reading, we need the below,
                 // otherwise CppTools doesn't get anything.
                 await util.scheduleTask(() => {
-                    ConfigurationCache.customConfigurationProvider.fileIndex.forEach(i => {
+                    configurationCache.customConfigurationProvider.fileIndex.forEach(i => {
                         i[1].uri = vscode.Uri.file(i[0]);
                     });
                 });
 
                 await util.scheduleTask(() => {
-                    configuration.setBuildTargets(ConfigurationCache.buildTargets);
-                    configuration.setLaunchTargets(ConfigurationCache.launchTargets);
+                    configuration.setBuildTargets(configurationCache.buildTargets);
+                    configuration.setLaunchTargets(configurationCache.launchTargets);
                 });
 
                 await util.scheduleTask(() => {
                     // The configurations saved in the cache are read directly into the final file index.
                     extension.getCppConfigurationProvider().setCustomConfigurationProvider({
-                        workspaceBrowse: ConfigurationCache.customConfigurationProvider.workspaceBrowse,
+                        workspaceBrowse: configurationCache.customConfigurationProvider.workspaceBrowse,
                         // Trick to read a map from json
-                        fileIndex: new Map<string, cpp.SourceFileConfigurationItem>(ConfigurationCache.customConfigurationProvider.fileIndex)
+                        fileIndex: new Map<string, cpp.SourceFileConfigurationItem>(configurationCache.customConfigurationProvider.fileIndex)
                     });
                 });
 
@@ -1048,12 +1054,12 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     // If available, load all the configure constructs via json from the cache file.
     // If this doConfigure is in level 1 of recursion, avoid loading the configuration cache again
     // since it's been done at recursion level 0.
-    // Also skip if there was a not cancelled configure before in this VSCode session,
+    // Also skip if there was at least one completed configure before in this VSCode session,
     // regardless of any other failure error code, because at the end of that last configure,
     // the extension saved this configuration content (that we can skip loading now) into the cache.
     // The loading from cache is cheap, but logging it (for Verbose level) may interfere unnecessarily
     // with the output channel, especially since that logging is not awaited for.
-    if (!recursiveDoConfigure && extension.getCompletedConfigureInSession() !== ConfigureBuildReturnCodeTypes.cancelled) {
+    if (!recursiveDoConfigure && !extension.getCompletedConfigureInSession()) {
         retc1 = await loadConfigurationFromCache(progress, cancel);
         if (retc1 === ConfigureBuildReturnCodeTypes.cancelled) {
             return retc1;

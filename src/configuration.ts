@@ -171,9 +171,21 @@ export function setExtensionOutputFolder(folder: string): void { extensionOutput
 // Useful to control where such potentially large files should reside.
 export function readExtensionOutputFolder(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    extensionOutputFolder = workspaceConfiguration.get<string>("extensionOutputFolder");
+    const propKey: string = "extensionOutputFolder";
+    extensionOutputFolder = workspaceConfiguration.get<string>(propKey);
     if (extensionOutputFolder) {
         extensionOutputFolder = util.resolvePathToRoot(extensionOutputFolder);
+
+        if (!util.checkDirectoryExistsSync(extensionOutputFolder)) {
+            logger.message(`Provided extension output folder does not exist: ${extensionOutputFolder}.`);
+            let defaultExtensionOutputFolder: string | undefined = workspaceConfiguration.inspect<string>(propKey)?.defaultValue;
+            if (defaultExtensionOutputFolder) {
+                logger.message(`Switching to default: ${defaultExtensionOutputFolder}.`);
+                workspaceConfiguration.update(propKey, defaultExtensionOutputFolder);
+                extensionOutputFolder = util.resolvePathToRoot(defaultExtensionOutputFolder);
+            }
+        }
+
         logger.message(`Dropping various extension output files at ${extensionOutputFolder}`);
     }
 }
@@ -810,10 +822,25 @@ export async function initFromStateAndSettings(): Promise<void> {
 
             subKey = "extensionOutputFolder";
             let updatedExtensionOutputFolder : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let switchedToDefault: boolean = false;
             if (updatedExtensionOutputFolder) {
                 updatedExtensionOutputFolder = util.resolvePathToRoot(updatedExtensionOutputFolder);
+                if (!util.checkDirectoryExistsSync(updatedExtensionOutputFolder)) {
+                    logger.message(`Provided extension output folder does not exist: ${updatedExtensionOutputFolder}.`);
+                    let defaultExtensionOutputFolder: string | undefined = workspaceConfiguration.inspect<string>(subKey)?.defaultValue;
+                    if (defaultExtensionOutputFolder) {
+                        logger.message(`Switching to default: ${defaultExtensionOutputFolder}.`);
+                        updatedExtensionOutputFolder = util.resolvePathToRoot(defaultExtensionOutputFolder);
+                        // This will trigger another settings changed event
+                        workspaceConfiguration.update(subKey, defaultExtensionOutputFolder);
+                        updatedSettingsSubkeys.push(subKey);
+                        // to prevent the below readExtensionOutputFolder to be executed now,
+                        // it will during the next immediate changed event
+                        switchedToDefault = true;
+                    }
+                }
             }
-            if (updatedExtensionOutputFolder !== extensionOutputFolder) {
+            if (updatedExtensionOutputFolder !== extensionOutputFolder && !switchedToDefault) {
                 // No IntelliSense update needed.
                 readExtensionOutputFolder();
                 updatedSettingsSubkeys.push(subKey);
