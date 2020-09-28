@@ -291,7 +291,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
 
 // Content to be parsed by various operations post configure (like finding all build/launch targets).
 // Represents the content of the provided makefile.buildLog or a fresh output of make --dry-run
-// (which is also written into makefile.configurationCache).
+// (which is also written into makefile.configurationCachePath).
 let parseContent: string | undefined;
 export function getParseContent(): string | undefined { return parseContent; }
 export function setParseContent(content: string): void { parseContent = content; }
@@ -315,7 +315,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
 
     // Rules for parse content and file:
     //     1. makefile.buildLog provided by the user in settings
-    //     2. configuration cache (the previous dryrun output): makefile.configurationCache
+    //     2. configuration cache (the previous dryrun output): makefile.configurationCachePath
     //     3. the make dryrun output if (2) is missing
     // We do not use buildLog for build targets analysis because 
     // we can afford to invoke make -pRrq (very quick even on large projects).
@@ -390,7 +390,12 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     logger.message(configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));
 
     try {
-        let dryrunFile : string = util.resolvePathToRoot(forTargets ? "./targets.log" : "./dryrun.log");
+        let dryrunFile : string = forTargets ? "./targets.log" : "./dryrun.log";
+        let extensionOutputFolder: string | undefined = configuration.getExtensionOutputFolder();
+        if (extensionOutputFolder) {
+            dryrunFile = path.join(extensionOutputFolder, dryrunFile);
+        }
+        dryrunFile = util.resolvePathToRoot(dryrunFile);
         logger.message(`Writing the dry-run output: ${dryrunFile}`);
         util.writeFile(dryrunFile, configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + "\r\n");
 
@@ -609,7 +614,7 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     }
 }
 
-interface ConfigurationCacheContent {
+interface ConfigurationCache {
     buildTargets: string[];
     launchTargets: string[];
     customConfigurationProvider: {
@@ -664,8 +669,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
     // Identify for telemetry whether this configure will read configuration constructs from cache.
     let readCache: boolean = false;
-    let configurationCache: string | undefined = configuration.getConfigurationCache();
-    if (configurationCache && util.checkFileExistsSync(configurationCache)) {
+    let configurationCachePath: string | undefined = configuration.getConfigurationCachePath();
+    if (configurationCachePath && util.checkFileExistsSync(configurationCachePath)) {
         readCache = true;
     }; 
     
@@ -731,7 +736,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         return retc;
     } finally {
         let provider: cpptools.CustomConfigurationProvider = extension.getCppConfigurationProvider().getCustomConfigurationProvider();
-        let configurationCacheContent: ConfigurationCacheContent = {
+        let ConfigurationCache: ConfigurationCache = {
             buildTargets: configuration.getBuildTargets(),
             launchTargets: configuration.getLaunchTargets(),
             customConfigurationProvider: {
@@ -743,8 +748,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
         // Rewrite the configuration cache according to the last updates of the internal arrays,
         // but not if the configure was cancelled.
-        if (configurationCache && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
-            util.writeFile(configurationCache, JSON.stringify(configurationCacheContent));
+        if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
+            util.writeFile(configurationCachePath, JSON.stringify(ConfigurationCache));
         }
 
         let newBuildTarget: string | undefined = configuration.getCurrentTarget();
@@ -953,14 +958,14 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
     let elapsedTime: number;
 
     await util.scheduleTask(() => {extension.registerCppToolsProvider()});
-    let cache: string | undefined = configuration.getConfigurationCache();
-    if (cache) {
-        let content: string | undefined = util.readFile(cache);
+    let cachePath: string | undefined = configuration.getConfigurationCachePath();
+    if (cachePath) {
+        let content: string | undefined = util.readFile(cachePath);
         if (content) {
             try {
                 progress.report({ increment: 1, message: "Configuring from cache" });
-                logger.message(`Configuring from cache: ${cache}`);
-                let configurationCacheContent: ConfigurationCacheContent = {
+                logger.message(`Configuring from cache: ${cachePath}`);
+                let ConfigurationCache: ConfigurationCache = {
                     buildTargets: [],
                     launchTargets: [],
                     customConfigurationProvider: {
@@ -970,7 +975,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
                         fileIndex: []
                     }
                 };
-                configurationCacheContent = JSON.parse(content);
+                ConfigurationCache = JSON.parse(content);
 
                 // Trick to get proper URIs after reading from the cache.
                 // At the moment of writing into the cache, the URIs have
@@ -978,22 +983,22 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
                 // After saving and re-reading, we need the below,
                 // otherwise CppTools doesn't get anything.
                 await util.scheduleTask(() => {
-                    configurationCacheContent.customConfigurationProvider.fileIndex.forEach(i => {
+                    ConfigurationCache.customConfigurationProvider.fileIndex.forEach(i => {
                         i[1].uri = vscode.Uri.file(i[0]);
                     });
                 });
 
                 await util.scheduleTask(() => {
-                    configuration.setBuildTargets(configurationCacheContent.buildTargets);
-                    configuration.setLaunchTargets(configurationCacheContent.launchTargets);
+                    configuration.setBuildTargets(ConfigurationCache.buildTargets);
+                    configuration.setLaunchTargets(ConfigurationCache.launchTargets);
                 });
 
                 await util.scheduleTask(() => {
                     // The configurations saved in the cache are read directly into the final file index.
                     extension.getCppConfigurationProvider().setCustomConfigurationProvider({
-                        workspaceBrowse: configurationCacheContent.customConfigurationProvider.workspaceBrowse,
+                        workspaceBrowse: ConfigurationCache.customConfigurationProvider.workspaceBrowse,
                         // Trick to read a map from json
-                        fileIndex: new Map<string, cpp.SourceFileConfigurationItem>(configurationCacheContent.customConfigurationProvider.fileIndex)
+                        fileIndex: new Map<string, cpp.SourceFileConfigurationItem>(ConfigurationCache.customConfigurationProvider.fileIndex)
                     });
                 });
 
@@ -1057,6 +1062,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
             // and can be performed in the background.
             setConfigureIsInBackground(true);
         }
+    } else {
+        logger.message("Loading configurations from cache is not necessary.", "Verbose");
     }
 
     // This generates the dryrun output (saving it on disk) or reads an alternative build log.

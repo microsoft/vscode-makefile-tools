@@ -300,6 +300,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     configuration.readLoggingLevel();
+    configuration.readExtensionOutputFolder();
     configuration.readExtensionLog();
 
     // Delete the extension log file, if exists

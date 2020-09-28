@@ -162,6 +162,22 @@ export function readLoggingLevel(): void {
     logger.message(`Logging level: ${loggingLevel}`);
 }
 
+let extensionOutputFolder: string | undefined;
+export function getExtensionOutputFolder(): string | undefined { return extensionOutputFolder; }
+export function setExtensionOutputFolder(folder: string): void { extensionOutputFolder = folder; }
+
+// Read from settings the path to a folder where the extension is dropping various output files
+// (like extension.log, dry-run.log, targets.log).
+// Useful to control where such potentially large files should reside.
+export function readExtensionOutputFolder(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    extensionOutputFolder = workspaceConfiguration.get<string>("extensionOutputFolder");
+    if (extensionOutputFolder) {
+        extensionOutputFolder = util.resolvePathToRoot(extensionOutputFolder);
+        logger.message(`Dropping various extension output files at ${extensionOutputFolder}`);
+    }
+}
+
 let extensionLog: string | undefined;
 export function getExtensionLog(): string | undefined { return extensionLog; }
 export function setExtensionLog(path: string): void { extensionLog = path; }
@@ -178,7 +194,12 @@ export function readExtensionLog(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     extensionLog = workspaceConfiguration.get<string>("extensionLog");
     if (extensionLog) {
-        extensionLog = util.resolvePathToRoot(extensionLog);
+        if (extensionOutputFolder) {
+            extensionLog = path.join(extensionOutputFolder, extensionLog);
+        } else {
+            extensionLog = util.resolvePathToRoot(extensionLog);
+        }
+
         logger.message(`Writing extension log at ${extensionLog}`);
     }
 }
@@ -213,22 +234,26 @@ export function readAlwaysPreConfigure(): void {
     logger.message(`Always pre-configure: ${alwaysPreConfigure}`);
 }
 
-let configurationCache: string | undefined;
-export function getConfigurationCache(): string | undefined { return configurationCache; }
-export function setConfigurationCache(path: string): void { configurationCache = path; }
+let configurationCachePath: string | undefined;
+export function getConfigurationCachePath(): string | undefined { return configurationCachePath; }
+export function setConfigurationCachePath(path: string): void { configurationCachePath = path; }
 
 // Read from settings the path to a cache file containing the output of the last dry-run make command.
 // This file is recreated when opening a project, when changing the build configuration or the build target
 // and when the settings watcher detects a change of any properties that may impact the dryrun output.
-export function readConfigurationCache(): void {
+export function readConfigurationCachePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configurationCache = workspaceConfiguration.get<string>("configurationCache");
-    if (configurationCache) {
-        configurationCache = util.resolvePathToRoot(configurationCache);
+    configurationCachePath = workspaceConfiguration.get<string>("configurationCachePath");
+    if (configurationCachePath) {
+        if (extensionOutputFolder) {
+            configurationCachePath = path.join(extensionOutputFolder, configurationCachePath);
+        } else {
+            configurationCachePath = util.resolvePathToRoot(configurationCachePath);
+        }
     }
 
-    logger.message(`Configurations cached at ${configurationCache}`);
+    logger.message(`Configurations cached at ${configurationCachePath}`);
 }
 
 let dryrunSwitches: string[] | undefined;
@@ -644,7 +669,7 @@ export function readConfigureAfterCommand(): void {
 
 // Initialization from settings (or backup default rules), done at activation time
 export async function initFromStateAndSettings(): Promise<void> {
-    readConfigurationCache();
+    readConfigurationCachePath();
     readMakePath();
     readMakefilePath();
     readBuildLog();
@@ -783,10 +808,25 @@ export async function initFromStateAndSettings(): Promise<void> {
                 updatedSettingsSubkeys.push(subKey);
             }
 
+            subKey = "extensionOutputFolder";
+            let updatedExtensionOutputFolder : string | undefined = workspaceConfiguration.get<string>(subKey);
+            if (updatedExtensionOutputFolder) {
+                updatedExtensionOutputFolder = util.resolvePathToRoot(updatedExtensionOutputFolder);
+            }
+            if (updatedExtensionOutputFolder !== extensionOutputFolder) {
+                // No IntelliSense update needed.
+                readExtensionOutputFolder();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
             subKey = "extensionLog";
             let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedExtensionLog) {
-                updatedExtensionLog = util.resolvePathToRoot(updatedExtensionLog);
+                if (extensionOutputFolder) {
+                    updatedExtensionLog = path.join(extensionOutputFolder, updatedExtensionLog);
+                } else {
+                    updatedExtensionLog = util.resolvePathToRoot(updatedExtensionLog);
+                }
             }
             if (updatedExtensionLog !== extensionLog) {
                 // No IntelliSense update needed.
@@ -813,17 +853,21 @@ export async function initFromStateAndSettings(): Promise<void> {
                 updatedSettingsSubkeys.push(subKey);
             }
 
-            subKey = "configurationCache";
-            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>(subKey);
-            if (updatedConfigurationCache) {
-                updatedConfigurationCache = util.resolvePathToRoot(updatedConfigurationCache);
+            subKey = "configurationCachePath";
+            let updatedConfigurationCachePath : string | undefined = workspaceConfiguration.get<string>(subKey);
+            if (updatedConfigurationCachePath) {
+                if (extensionOutputFolder) {
+                    updatedExtensionLog = path.join(extensionOutputFolder, updatedConfigurationCachePath);
+                } else {
+                    updatedConfigurationCachePath = util.resolvePathToRoot(updatedConfigurationCachePath);
+                }
             }
-            if (updatedConfigurationCache !== configurationCache) {
-                // A change in makefile.configurationCache should trigger an IntelliSense update
+            if (updatedConfigurationCachePath !== configurationCachePath) {
+                // A change in makefile.configurationCachePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
-                readConfigurationCache();
+                readConfigurationCachePath();
                 updatedSettingsSubkeys.push(subKey);
             }
 

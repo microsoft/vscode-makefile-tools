@@ -334,13 +334,19 @@
                     "default": null,
                     "scope": "resource"
                 },
+                "makefile.extensionOutputFolder": {
+                    "type": "string",
+                    "description": "The path to various output files produced by the extension",
+                    "default": ".vscode",
+                    "scope": "resource"
+                },
                 "makefile.extensionLog": {
                     "type": "string",
                     "description": "The path to an output file storing all content from the Makefile output channel",
                     "default": null,
                     "scope": "resource"
                 },
-                "makefile.configurationCache": {
+                "makefile.configurationCachePath": {
                     "type": "string",
                     "description": "The path to a cache file storing the output of the last dry-run make command",
                     "default": "./configurationCache.log",
