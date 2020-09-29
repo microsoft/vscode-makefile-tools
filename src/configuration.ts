@@ -1,13 +1,11 @@
 // Configuration support
 
 import {extension} from './extension';
-import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
 import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
-import * as parser from './parser';
 import * as path from 'path';
 import * as telemetry from './telemetry';
 

@@ -90,6 +90,7 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
 
 export interface PreprocessDryRunOutputReturnType {
     retc: number,
+    elapsed: number,
     result?: string
 }
 
@@ -100,9 +101,13 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     let preprocessedDryRunOutputStr: string = dryRunOutputStr;
 
     if (cancel.isCancellationRequested) {
-        return { retc: make.ConfigureBuildReturnCodeTypes.cancelled};
+        return {
+            retc: make.ConfigureBuildReturnCodeTypes.cancelled,
+            elapsed: 0
+        };
     }
 
+    let startTime: number = Date.now();
     statusCallback("Preprocessing the dry-run output");
 
     // Array of tasks required to be executed during the preprocess configure phase
@@ -174,11 +179,18 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         await util.scheduleTask(func);
 
         if (cancel.isCancellationRequested) {
-            return { retc: make.ConfigureBuildReturnCodeTypes.cancelled};
+            return {
+                retc: make.ConfigureBuildReturnCodeTypes.cancelled,
+                elapsed: util.elapsedTimeSince(startTime)
+            };
         }
     };
 
-    return {retc: make.ConfigureBuildReturnCodeTypes.success, result: preprocessedDryRunOutputStr};
+    return {
+        retc: make.ConfigureBuildReturnCodeTypes.success,
+        elapsed: util.elapsedTimeSince(startTime),
+        result: preprocessedDryRunOutputStr
+    };
 
     // TODO: Insert preprocessed files content
 
