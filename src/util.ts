@@ -2,7 +2,6 @@
 
 import * as fs from 'fs';
 import * as child_process from 'child_process';
-import * as configuration from './configuration';
 import * as logger from './logger';
 import * as make from './make';
 import * as path from 'path';
