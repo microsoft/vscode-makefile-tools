@@ -5,14 +5,12 @@
 
 import * as configuration from './configuration';
 import * as cpp from 'vscode-cpptools';
-import * as cpptools from './cpptools';
 import * as ext from './extension';
 import * as logger from './logger';
 import * as make from './make';
 import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
-import { setTimeout } from 'timers';
 
 // List of compiler tools plus the most common aliases cc and c++
 // ++ needs to be escaped for the regular expression in parseLineAsTool.
@@ -680,9 +678,6 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
     logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.');
 
-    // Empty the cummulative browse path built during the previous dry-run parsing
-    cpptools.clearCummulativeBrowsePath();
-
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
     let currentPath: string = vscode.workspace.rootPath || "";
@@ -717,43 +712,33 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     let toolBaseName: string = path.basename(compilerFullPath);
                     compilerFullPath = path.join(util.toolPathInEnv(toolBaseName) || "", toolBaseName);
                 }
-                logger.message("    Compiler path: " + compilerFullPath, "Verbose");
 
                 let compilerArgs: string[] = [];
                 compilerArgs = parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std"]);
-                logger.message("    Compiler args: " + compilerArgs.join(";"), "Verbose");
 
                 // Parse and log the includes, forced includes and the defines
                 let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
                 includes = util.makeFullPaths(includes, currentPath);
-                logger.message("    Includes: " + includes.join(";"), "Verbose");
                 let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
                 forcedIncludes = forcedIncludes.concat(parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'include'));
                 forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
-                logger.message("    Forced includes: " + forcedIncludes.join(";"), "Verbose");
 
                 let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
-                logger.message("    Defines: " + defines.join(";"), "Verbose");
 
                 // Parse the IntelliSense mode
                 // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
                 let targetArchitecture: util.TargetArchitecture = getTargetArchitecture(compilerTool.arguments);
                 let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(ext.extension.getCppToolsVersion(), compilerFullPath, targetArchitecture);
-                logger.message("    IntelliSense mode: " + intelliSenseMode, "Verbose");
 
                 // For windows, parse the sdk version
                 let windowsSDKVersion: string | undefined = "";
                 if (process.platform === "win32") {
                     windowsSDKVersion = process.env["WindowsSDKVersion"];
-                    if (windowsSDKVersion) {
-                        logger.message('Windows SDK Version: ' + windowsSDKVersion, "Verbose");
-                    }
                 }
 
                 // Parse the source files
                 let files: string[] = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
                 files = util.makeFullPaths(files, currentPath);
-                logger.message("    Source files: " + files.join(";"), "Verbose");
 
                 // The language represented by this compilation command
                 let language: util.Language;
@@ -777,10 +762,8 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                 // If the command is compiling the same extension or uses -TC/-TP, send all the source files in one batch.
                 if (language) {
-                    // More standard validation and defaults, in the context of the whole command.
+                        // More standard validation and defaults, in the context of the whole command.
                     let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
-                    logger.message("    Standard: " + standard, "Verbose");
-
                     if (ext.extension) {
                         onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion });
                     }
@@ -796,8 +779,6 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                         // More standard validation and defaults, in the context of each source file.
                         let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
-                        logger.message("    Standard: " + standard, "Verbose");
-
                         if (ext.extension) {
                             onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion });
                         }

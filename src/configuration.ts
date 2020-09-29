@@ -7,6 +7,7 @@ import * as make from './make';
 import * as ui from './ui';
 import * as util from './util';
 import * as vscode from 'vscode';
+import * as parser from './parser';
 import * as path from 'path';
 import * as telemetry from './telemetry';
 
@@ -87,10 +88,9 @@ export function setMakePath(path: string): void { makePath = path; }
 function readMakePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makePath = workspaceConfiguration.get<string>("makePath");
+    // Don't resolve makePath to root, because make needs to be searched in the path too.
     if (!makePath) {
         logger.message("No path to the make tool is defined in the settings file");
-    } else {
-        makePath = util.resolvePathToRoot(makePath);
     }
 }
 
@@ -162,6 +162,34 @@ export function readLoggingLevel(): void {
     logger.message(`Logging level: ${loggingLevel}`);
 }
 
+let extensionOutputFolder: string | undefined;
+export function getExtensionOutputFolder(): string | undefined { return extensionOutputFolder; }
+export function setExtensionOutputFolder(folder: string): void { extensionOutputFolder = folder; }
+
+// Read from settings the path to a folder where the extension is dropping various output files
+// (like extension.log, dry-run.log, targets.log).
+// Useful to control where such potentially large files should reside.
+export function readExtensionOutputFolder(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    const propKey: string = "extensionOutputFolder";
+    extensionOutputFolder = workspaceConfiguration.get<string>(propKey);
+    if (extensionOutputFolder) {
+        extensionOutputFolder = util.resolvePathToRoot(extensionOutputFolder);
+
+        if (!util.checkDirectoryExistsSync(extensionOutputFolder)) {
+            logger.message(`Provided extension output folder does not exist: ${extensionOutputFolder}.`);
+            let defaultExtensionOutputFolder: string | undefined = workspaceConfiguration.inspect<string>(propKey)?.defaultValue;
+            if (defaultExtensionOutputFolder) {
+                logger.message(`Switching to default: ${defaultExtensionOutputFolder}.`);
+                workspaceConfiguration.update(propKey, defaultExtensionOutputFolder);
+                extensionOutputFolder = util.resolvePathToRoot(defaultExtensionOutputFolder);
+            }
+        }
+
+        logger.message(`Dropping various extension output files at ${extensionOutputFolder}`);
+    }
+}
+
 let extensionLog: string | undefined;
 export function getExtensionLog(): string | undefined { return extensionLog; }
 export function setExtensionLog(path: string): void { extensionLog = path; }
@@ -178,8 +206,13 @@ export function readExtensionLog(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     extensionLog = workspaceConfiguration.get<string>("extensionLog");
     if (extensionLog) {
-        extensionLog = util.resolvePathToRoot(extensionLog);
-        logger.message('Writing extension log at {0}', extensionLog);
+        if (extensionOutputFolder) {
+            extensionLog = path.join(extensionOutputFolder, extensionLog);
+        } else {
+            extensionLog = util.resolvePathToRoot(extensionLog);
+        }
+
+        logger.message(`Writing extension log at ${extensionLog}`);
     }
 }
 
@@ -194,7 +227,7 @@ export function readPreConfigureScript(): void {
     preConfigureScript = workspaceConfiguration.get<string>("preConfigureScript");
     if (preConfigureScript) {
         preConfigureScript = util.resolvePathToRoot(preConfigureScript);
-        logger.message('Found pre-configure script defined as {0}', preConfigureScript);
+        logger.message(`Found pre-configure script defined as ${preConfigureScript}`);
         if (!util.checkFileExistsSync(preConfigureScript)) {
             logger.message("Pre-configure script not found on disk.");
         }
@@ -213,22 +246,26 @@ export function readAlwaysPreConfigure(): void {
     logger.message(`Always pre-configure: ${alwaysPreConfigure}`);
 }
 
-let configurationCache: string | undefined;
-export function getConfigurationCache(): string | undefined { return configurationCache; }
-export function setConfigurationCache(path: string): void { configurationCache = path; }
+let configurationCachePath: string | undefined;
+export function getConfigurationCachePath(): string | undefined { return configurationCachePath; }
+export function setConfigurationCachePath(path: string): void { configurationCachePath = path; }
 
 // Read from settings the path to a cache file containing the output of the last dry-run make command.
 // This file is recreated when opening a project, when changing the build configuration or the build target
 // and when the settings watcher detects a change of any properties that may impact the dryrun output.
-export function readConfigurationCache(): void {
+export function readConfigurationCachePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configurationCache = workspaceConfiguration.get<string>("configurationCache");
-    if (configurationCache) {
-        configurationCache = util.resolvePathToRoot(configurationCache);
+    configurationCachePath = workspaceConfiguration.get<string>("configurationCachePath");
+    if (configurationCachePath) {
+        if (extensionOutputFolder) {
+            configurationCachePath = path.join(extensionOutputFolder, configurationCachePath);
+        } else {
+            configurationCachePath = util.resolvePathToRoot(configurationCachePath);
+        }
     }
 
-    logger.message(`Dry-run output cached at ${configurationCache}`);
+    logger.message(`Configurations cached at ${configurationCachePath}`);
 }
 
 let dryrunSwitches: string[] | undefined;
@@ -478,7 +515,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
         // On linux/mac, it often is 'Makefile', so we have to verify we default to the right filename.
         if (!makefileUsed) {
-            makefileUsed = (util.checkFileExistsSync(util.resolvePathToRoot("./makefile"))) ? "./makefile" : "./Makefile";
+            makefileUsed = (util.checkFileExistsSync(util.resolvePathToRoot("./Makefile"))) ? "./Makefile" : "./makefile";
         }
 
         makefileUsed = util.resolvePathToRoot(makefileUsed);
@@ -644,7 +681,7 @@ export function readConfigureAfterCommand(): void {
 
 // Initialization from settings (or backup default rules), done at activation time
 export async function initFromStateAndSettings(): Promise<void> {
-    readConfigurationCache();
+    readConfigurationCachePath();
     readMakePath();
     readMakefilePath();
     readBuildLog();
@@ -698,9 +735,8 @@ export async function initFromStateAndSettings(): Promise<void> {
                 if (extension.getState().configureDirty && configureOnEdit) {
                     if ((extension.getCompletedConfigureInSession())
                         && !make.blockedByOp(make.Operations.configure, false)) {
-                        // Normal configure doesn't have effect when the settings relevant for configureDirty changed.
                         logger.message("Configuring clean after settings or makefile changes...");
-                        make.cleanConfigure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
+                        make.configure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
                     }
                 }
 
@@ -723,7 +759,9 @@ export async function initFromStateAndSettings(): Promise<void> {
         }
     });
 
-    // Watch for Makefile Tools setting updates that can change the IntelliSense config provider dirty state
+    // Watch for Makefile Tools setting updates that can change the IntelliSense config provider dirty state.
+    // More than one setting may be updated on one settings.json save,
+    // so make sure to OR the dirty state when it's calculated by a formula (not a simple TRUE value).
     vscode.workspace.onDidChangeConfiguration(async e => {
         if (vscode.workspace.workspaceFolders &&
             e.affectsConfiguration('makefile', vscode.workspace.workspaceFolders[0].uri)) {
@@ -767,15 +805,55 @@ export async function initFromStateAndSettings(): Promise<void> {
                 updatedBuildLog = util.resolvePathToRoot(updatedBuildLog);
             }
             if (updatedBuildLog !== buildLog) {
-                extension.getState().configureDirty = true;
+                // Configure is dirty only if the current configuration
+                // doesn't have already another build log set
+                // (which overrides the global one).
+                let currentMakefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
+                    if (k.name === getCurrentMakefileConfiguration()) {
+                        return k;
+                    }
+                });
+
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !currentMakefileConfiguration || !currentMakefileConfiguration.buildLog;
                 readBuildLog();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "extensionOutputFolder";
+            let updatedExtensionOutputFolder : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let switchedToDefault: boolean = false;
+            if (updatedExtensionOutputFolder) {
+                updatedExtensionOutputFolder = util.resolvePathToRoot(updatedExtensionOutputFolder);
+                if (!util.checkDirectoryExistsSync(updatedExtensionOutputFolder)) {
+                    logger.message(`Provided extension output folder does not exist: ${updatedExtensionOutputFolder}.`);
+                    let defaultExtensionOutputFolder: string | undefined = workspaceConfiguration.inspect<string>(subKey)?.defaultValue;
+                    if (defaultExtensionOutputFolder) {
+                        logger.message(`Switching to default: ${defaultExtensionOutputFolder}.`);
+                        updatedExtensionOutputFolder = util.resolvePathToRoot(defaultExtensionOutputFolder);
+                        // This will trigger another settings changed event
+                        workspaceConfiguration.update(subKey, defaultExtensionOutputFolder);
+                        updatedSettingsSubkeys.push(subKey);
+                        // to prevent the below readExtensionOutputFolder to be executed now,
+                        // it will during the next immediate changed event
+                        switchedToDefault = true;
+                    }
+                }
+            }
+            if (updatedExtensionOutputFolder !== extensionOutputFolder && !switchedToDefault) {
+                // No IntelliSense update needed.
+                readExtensionOutputFolder();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "extensionLog";
             let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedExtensionLog) {
-                updatedExtensionLog = util.resolvePathToRoot(updatedExtensionLog);
+                if (extensionOutputFolder) {
+                    updatedExtensionLog = path.join(extensionOutputFolder, updatedExtensionLog);
+                } else {
+                    updatedExtensionLog = util.resolvePathToRoot(updatedExtensionLog);
+                }
             }
             if (updatedExtensionLog !== extensionLog) {
                 // No IntelliSense update needed.
@@ -802,29 +880,32 @@ export async function initFromStateAndSettings(): Promise<void> {
                 updatedSettingsSubkeys.push(subKey);
             }
 
-            subKey = "configurationCache";
-            let updatedConfigurationCache : string | undefined = workspaceConfiguration.get<string>(subKey);
-            if (updatedConfigurationCache) {
-                updatedConfigurationCache = util.resolvePathToRoot(updatedConfigurationCache);
+            subKey = "configurationCachePath";
+            let updatedConfigurationCachePath : string | undefined = workspaceConfiguration.get<string>(subKey);
+            if (updatedConfigurationCachePath) {
+                if (extensionOutputFolder) {
+                    updatedExtensionLog = path.join(extensionOutputFolder, updatedConfigurationCachePath);
+                } else {
+                    updatedConfigurationCachePath = util.resolvePathToRoot(updatedConfigurationCachePath);
+                }
             }
-            if (updatedConfigurationCache !== configurationCache) {
-                // A change in makefile.configurationCache should trigger an IntelliSense update
+            if (updatedConfigurationCachePath !== configurationCachePath) {
+                // A change in makefile.configurationCachePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
-                readConfigurationCache();
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
+                readConfigurationCachePath();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "makePath";
             let updatedMakePath : string | undefined = workspaceConfiguration.get<string>(subKey);
-            if (updatedMakePath) {
-                updatedMakePath = util.resolvePathToRoot(updatedMakePath);
-            }
             if (updatedMakePath !== makePath) {
                 // Not very likely, but it is safe to consider that a different make tool
                 // may produce a different dry-run output with potential impact on IntelliSense,
                 // so trigger an update (unless we read from a build log).
-                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakePath();
                 updatedSettingsSubkeys.push(subKey);
             }
@@ -837,7 +918,8 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (updatedMakefilePath !== makefilePath) {
                 // A change in makefile.makefilePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakefilePath();
                 updatedSettingsSubkeys.push(subKey);
             }
@@ -857,7 +939,8 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (!util.areEqual(updatedDryrunSwitches, dryrunSwitches)) {
                 // A change in makefile.dryrunSwitches should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
-                extension.getState().configureDirty = !buildLog || !util.checkFileExistsSync(buildLog);
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
                 readDryrunSwitches();
                 updatedSettingsSubkeys.push(subKey);
             }
@@ -954,7 +1037,7 @@ export async function setNewConfiguration(): Promise<void> {
 
         if (configureAfterCommand) {
             logger.message("Automatically reconfiguring the project after a makefile configuration change.");
-            await make.cleanConfigure(make.TriggeredBy.configureAfterConfigurationChange);
+            await make.configure(make.TriggeredBy.configureAfterConfigurationChange);
         }
 
         // Refresh telemetry for this new makefile configuration
@@ -1010,10 +1093,10 @@ export async function selectTarget(): Promise<void> {
     if (extension.getState().configureDirty ||
         // The configure state might not be dirty from the last session but if the project is set to skip
         // configure on open and no configure happened yet we still must warn.
-        (configureOnOpen === false && !extension.getRanConfigureInSession())) {
+        (configureOnOpen === false && !extension.getCompletedConfigureInSession())) {
         logger.message("The project needs a configure to populate the build targets correctly.");
         if (configureAfterCommand) {
-            let retc: number = await make.cleanConfigure(make.TriggeredBy.configureBeforeTargetChange);
+            let retc: number = await make.configure(make.TriggeredBy.configureBeforeTargetChange);
             if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
                 logger.message("The build targets list may not be accurate because configure failed.");
             }
@@ -1052,7 +1135,7 @@ export async function selectTarget(): Promise<void> {
         if (configureAfterCommand) {
             // The set of build targets remains the same even if the current target has changed
             logger.message("Automatically reconfiguring the project after a build target change.");
-            await make.cleanConfigure(make.TriggeredBy.configureAfterTargetChange, false);
+            await make.configure(make.TriggeredBy.configureAfterTargetChange, false);
         }
     }
 }
@@ -1110,10 +1193,10 @@ export async function selectLaunchConfiguration(): Promise<void> {
     if (extension.getState().configureDirty ||
         // The configure state might not be dirty from the last session but if the project is set to skip
         // configure on open and no configure happened yet we still must warn.
-        (configureOnOpen === false && !extension.getRanConfigureInSession())) {
+        (configureOnOpen === false && !extension.getCompletedConfigureInSession())) {
         logger.message("The project needs a configure to populate the launch targets correctly.");
         if (configureAfterCommand) {
-            let retc: number = await make.cleanConfigure(make.TriggeredBy.configureBeforeLaunchTargetChange);
+            let retc: number = await make.configure(make.TriggeredBy.configureBeforeLaunchTargetChange);
             if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
                 logger.message("The launch targets list may not be accurate because configure failed.");
             }
@@ -1131,10 +1214,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
             launchTargetsNames.push(launchConfigurationToString(launchConfiguration));
         }
     });
-    launchTargetsNames = launchTargetsNames.sort().filter(function (elem, index, self): boolean {
-        return index === self.indexOf(elem);
-    });
-
+    launchTargetsNames = util.sortAndRemoveDuplicates(launchTargetsNames);
     let options: vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
     if (launchTargets.length === 0) {
@@ -1213,3 +1293,4 @@ export function setBuildTargets(targets: string[]): void { buildTargets = target
 let launchTargets: string[] = [];
 export function getLaunchTargets(): string[] { return launchTargets; }
 export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
+
