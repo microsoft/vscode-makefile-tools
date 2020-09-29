@@ -7,6 +7,7 @@ import * as fs from 'fs';
 import * as logger from './logger';
 import * as make from './make';
 import * as parser from './parser';
+import * as path from 'path';
 import * as state from './state';
 import * as telemetry from './telemetry';
 import * as tree from './tree';
@@ -28,6 +29,8 @@ export class MakefileToolsExtension {
     });
 
     private readonly cppConfigurationProvider = new cpptools.CppConfigurationProvider();
+    public getCppConfigurationProvider(): cpptools.CppConfigurationProvider { return this.cppConfigurationProvider; }
+
     private mementoState = new state.StateManager(this.extensionContext);
     private cppToolsAPI?: cpp.CppToolsApi;
     private cppConfigurationProviderRegister?: Promise<void>;
@@ -38,10 +41,6 @@ export class MakefileToolsExtension {
 
     public getState(): state.StateManager { return this.mementoState; }
 
-    public emptyCustomConfigurationProvider() : void {
-        this.cppConfigurationProvider.empty();
-    }
-
     public dispose(): void {
         this._projectOutlineTreeView.dispose();
         if (this.cppToolsAPI) {
@@ -49,35 +48,42 @@ export class MakefileToolsExtension {
         }
     }
 
+    // Used for calling cppToolsAPI.notifyReady only once in a VSCode session.
+    private ranNotifyReadyInSession: boolean = false;
+    public getRanNotifyReadyInSession() : boolean { return this.ranNotifyReadyInSession; }
+    public setRanNotifyReadyInSession(ran: boolean) : void { this.ranNotifyReadyInSession = ran; }
+
+    // Similar to state.ranConfigureInCodebaseLifetime, but at the scope of a VSCode session
+    private completedConfigureInSession: boolean = false;
+    public getCompletedConfigureInSession() : boolean | undefined { return this.completedConfigureInSession; }
+    public setCompletedConfigureInSession(completed: boolean) : void { this.completedConfigureInSession = completed; }
+
     // Register this extension as a new provider or request an update
     public async registerCppToolsProvider(): Promise<void> {
         await this.ensureCppToolsProviderRegistered();
+
+        // Call notifyReady earlier than when the provider is updated,
+        // as soon as we know that we are going to actually parse for IntelliSense.
+        // This allows CppTools to ask earlier about source files in use
+        // and Makefile Tools may return a targeted source file configuration
+        // if it was already computed in our internal arrays (make.ts: customConfigProviderItems).
+        // If the requested file isn't yet processed, it will get updated when configure is finished.
+        // TODO: remember all requests that are coming and send an update as soon as we detect
+        // any of them being pushed into make.customConfigProviderItems.
+        if (this.cppToolsAPI) {
+            if (!this.ranNotifyReadyInSession && this.cppToolsAPI.notifyReady) {
+                this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
+                this.setRanNotifyReadyInSession(true);
+            }
+        }
     }
-
-    // Similar to state.ranConfigureInCodebaseLifetime, but within the scope of a VSCode session.
-    // It is used for calling cppToolsAPI.notifyReady only once in a VSCode session.
-    // It means that a configure was started within the scope of this VSCode session
-    // but it doesn't mean that the configure process is completed already.
-    private ranConfigureInSession: boolean = false;
-    public getRanConfigureInSession() : boolean { return this.ranConfigureInSession; }
-
-    // Similar to ranConfigureInSession, but becomes true at the end of a configure process,
-    // regardless of the success status.
-    private completedConfigureInSession: boolean = false;
-    public getCompletedConfigureInSession() : boolean { return this.completedConfigureInSession; }
-    public setCompletedConfigureInSession(completed: boolean) : void { this.completedConfigureInSession = completed; }
 
     // Request a custom config provider update.
     public updateCppToolsProvider(): void {
-        this.cppConfigurationProvider.logConfigurationProvider();
+        this.cppConfigurationProvider.logConfigurationProviderBrowse();
 
         if (this.cppToolsAPI) {
-            if (!this.ranConfigureInSession && this.cppToolsAPI.notifyReady) {
-                this.cppToolsAPI.notifyReady(this.cppConfigurationProvider);
-                this.ranConfigureInSession = true;
-            } else {
-                this.cppToolsAPI.didChangeCustomConfiguration(this.cppConfigurationProvider);
-            }
+            this.cppToolsAPI.didChangeCustomConfiguration(this.cppConfigurationProvider);
         }
     }
 
@@ -104,9 +110,67 @@ export class MakefileToolsExtension {
         }
     }
 
+    private cummulativeBrowsePath: string[] = [];
+    public clearCummulativeBrowsePath(): void {
+        this.cummulativeBrowsePath = [];
+    }
+
     public buildCustomConfigurationProvider(customConfigProviderItem: parser.CustomConfigProviderItem): void {
         this.compilerFullPath = customConfigProviderItem.compilerFullPath;
-        this.cppConfigurationProvider.buildCustomConfigurationProvider(customConfigProviderItem);
+        let provider: cpptools.CustomConfigurationProvider = make.getDeltaCustomConfigurationProvider();
+
+        const configuration: cpp.SourceFileConfiguration = {
+            defines: customConfigProviderItem.defines,
+            standard: customConfigProviderItem.standard || "c++17",
+            includePath: customConfigProviderItem.includes,
+            forcedInclude: customConfigProviderItem.forcedIncludes,
+            intelliSenseMode: customConfigProviderItem.intelliSenseMode,
+            compilerPath: customConfigProviderItem.compilerFullPath,
+            compilerArgs: customConfigProviderItem.compilerArgs,
+            windowsSdkVersion: customConfigProviderItem.windowsSDKVersion
+        };
+
+        // cummulativeBrowsePath incorporates all the files and the includes paths
+        // of all the compiler invocations of the current configuration
+        customConfigProviderItem.files.forEach(filePath => {
+            let sourceFileConfigurationItem: cpp.SourceFileConfigurationItem = {
+                uri: vscode.Uri.file(filePath),
+                configuration,
+            }
+
+            // These are the configurations processed during the current configure.
+            // Store them in the 'delta' file index instead of the final one.
+            provider.fileIndex.set(path.normalize(filePath), sourceFileConfigurationItem);
+            extension.getCppConfigurationProvider().logConfigurationProviderItem(sourceFileConfigurationItem);
+
+            let folder: string = path.dirname(filePath);
+            if (!this.cummulativeBrowsePath.includes(folder)) {
+                this.cummulativeBrowsePath.push(folder);
+            }
+        });
+
+        customConfigProviderItem.includes.forEach(incl => {
+            if (!this.cummulativeBrowsePath.includes(incl)) {
+                this.cummulativeBrowsePath.push(incl);
+            }
+        });
+
+        customConfigProviderItem.forcedIncludes.forEach(fincl => {
+            let folder: string = path.dirname(fincl);
+            if (!this.cummulativeBrowsePath.includes(folder)) {
+                this.cummulativeBrowsePath.push(fincl);
+            }
+        });
+
+        provider.workspaceBrowse = {
+            browsePath: this.cummulativeBrowsePath,
+            standard: customConfigProviderItem.standard,
+            compilerPath: customConfigProviderItem.compilerFullPath,
+            compilerArgs: customConfigProviderItem.compilerArgs,
+            windowsSdkVersion: customConfigProviderItem.windowsSDKVersion
+        };
+
+        make.setCustomConfigurationProvider(provider);
     }
 
     public getCompilerFullPath() : string | undefined { return this.compilerFullPath; }
@@ -233,6 +297,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     configuration.readLoggingLevel();
+    configuration.readExtensionOutputFolder();
     configuration.readExtensionLog();
 
     // Delete the extension log file, if exists
@@ -245,11 +310,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     await configuration.initFromStateAndSettings();
 
     if (configuration.getConfigureOnOpen()) {
-        if (extension.getState().configureDirty) {
-            await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
-        } else {
-            await make.configure(make.TriggeredBy.configureOnOpen);
-        }
+        // Always clean configure on open
+        await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
     }
 
     // Analyze settings for type validation and telemetry
