@@ -7,8 +7,9 @@ It also provides convenient commands to build, debug, and run your targets.
 
 ### Installation
 To install the extension, go to the [Actions](https://github.com/microsoft/vscode-makefile-tools/actions)
-tab in this repository and download the most recent build of the VSIX.  Once downloaded, use the
-"Install from VSIX..." command in VS Code to select and install the extension.
+tab or the [Releases](https://github.com/microsoft/vscode-makefile-tools/releases) page and download the
+most recent build of the VSIX.  Once downloaded, use the "Install from VSIX..." command in VS Code to select
+and install the extension.
 
 ### Activating the extension
 The extension will activate when it finds a Makefile in your `${workspaceFolder}`. If your Makefile does not
