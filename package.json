@@ -390,8 +390,14 @@
                     "description": "Always run the pre-configure script before configure",
                     "default": false,
                     "scope": "resource"
-                }
-            }
+                },
+                "makefile.phonyOnlyTargets": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Display only the phony targets",
+                  "scope": "resource"
+              }
+          }
         },
         "viewsContainers": {
             "activitybar": [
