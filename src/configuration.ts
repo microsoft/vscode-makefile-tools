@@ -278,7 +278,7 @@ export function setAdditionalCompilerNames(compilerNames: string[]): void { addi
 export function readAdditionalCompilerNames(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     additionalCompilerNames = workspaceConfiguration.get<string[]>("additionalCompilerNames");
-    logger.message(`Dry-run switches: ${additionalCompilerNames}`);
+    logger.message(`Additional compiler names: ${additionalCompilerNames}`);
 }
 
 let excludeCompilerNames: string[] | undefined;
@@ -287,7 +287,7 @@ export function setExcludeCompilerNames(compilerNames: string[]): void { exclude
 export function readExcludeCompilerNames(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     excludeCompilerNames = workspaceConfiguration.get<string[]>("excludeCompilerNames");
-    logger.message(`Dry-run switches: ${excludeCompilerNames}`);
+    logger.message(`Exclude compiler names: ${excludeCompilerNames}`);
 }
 
 let dryrunSwitches: string[] | undefined;
