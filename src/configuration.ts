@@ -204,7 +204,10 @@ export function readExtensionLog(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     extensionLog = workspaceConfiguration.get<string>("extensionLog");
     if (extensionLog) {
-        if (extensionOutputFolder) {
+        // If there is a directory defined within the extension log path,
+        // honor it and don't append to extensionOutputFolder.
+        let parsePath: path.ParsedPath = path.parse(extensionLog);
+        if (extensionOutputFolder && !parsePath.dir) {
             extensionLog = path.join(extensionOutputFolder, extensionLog);
         } else {
             extensionLog = util.resolvePathToRoot(extensionLog);
@@ -256,7 +259,10 @@ export function readConfigurationCachePath(): void {
     // how to get default from package.json to avoid problem with 'undefined' type?
     configurationCachePath = workspaceConfiguration.get<string>("configurationCachePath");
     if (configurationCachePath) {
-        if (extensionOutputFolder) {
+        // If there is a directory defined within the configuration cache path,
+        // honor it and don't append to extensionOutputFolder.
+        let parsePath: path.ParsedPath = path.parse(configurationCachePath);
+        if (extensionOutputFolder && !parsePath.dir) {
             configurationCachePath = path.join(extensionOutputFolder, configurationCachePath);
         } else {
             configurationCachePath = util.resolvePathToRoot(configurationCachePath);
@@ -264,6 +270,24 @@ export function readConfigurationCachePath(): void {
     }
 
     logger.message(`Configurations cached at ${configurationCachePath}`);
+}
+
+let additionalCompilerNames: string[] | undefined;
+export function getAdditionalCompilerNames(): string[] | undefined { return additionalCompilerNames; }
+export function setAdditionalCompilerNames(compilerNames: string[]): void { additionalCompilerNames = compilerNames; }
+export function readAdditionalCompilerNames(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    additionalCompilerNames = workspaceConfiguration.get<string[]>("additionalCompilerNames");
+    logger.message(`Dry-run switches: ${additionalCompilerNames}`);
+}
+
+let excludeCompilerNames: string[] | undefined;
+export function getExcludeCompilerNames(): string[] | undefined { return excludeCompilerNames; }
+export function setExcludeCompilerNames(compilerNames: string[]): void { excludeCompilerNames = compilerNames; }
+export function readExcludeCompilerNames(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    excludeCompilerNames = workspaceConfiguration.get<string[]>("excludeCompilerNames");
+    logger.message(`Dry-run switches: ${excludeCompilerNames}`);
 }
 
 let dryrunSwitches: string[] | undefined;
@@ -686,6 +710,8 @@ export async function initFromStateAndSettings(): Promise<void> {
     readPreConfigureScript();
     readAlwaysPreConfigure();
     readDryrunSwitches();
+    readAdditionalCompilerNames();
+    readExcludeCompilerNames();
     readCurrentMakefileConfiguration();
     readMakefileConfigurations();
     readCurrentTarget();
@@ -847,7 +873,10 @@ export async function initFromStateAndSettings(): Promise<void> {
             subKey = "extensionLog";
             let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedExtensionLog) {
-                if (extensionOutputFolder) {
+                // If there is a directory defined within the extension log path,
+                // honor it and don't append to extensionOutputFolder.
+                let parsePath: path.ParsedPath = path.parse(updatedExtensionLog);
+                if (extensionOutputFolder && !parsePath.dir) {
                     updatedExtensionLog = path.join(extensionOutputFolder, updatedExtensionLog);
                 } else {
                     updatedExtensionLog = util.resolvePathToRoot(updatedExtensionLog);
@@ -881,8 +910,11 @@ export async function initFromStateAndSettings(): Promise<void> {
             subKey = "configurationCachePath";
             let updatedConfigurationCachePath : string | undefined = workspaceConfiguration.get<string>(subKey);
             if (updatedConfigurationCachePath) {
-                if (extensionOutputFolder) {
-                    updatedExtensionLog = path.join(extensionOutputFolder, updatedConfigurationCachePath);
+                // If there is a directory defined within the configuration cache path,
+                // honor it and don't append to extensionOutputFolder.
+                let parsePath: path.ParsedPath = path.parse(updatedConfigurationCachePath);
+                if (extensionOutputFolder && !parsePath.dir) {
+                    updatedConfigurationCachePath = path.join(extensionOutputFolder, updatedConfigurationCachePath);
                 } else {
                     updatedConfigurationCachePath = util.resolvePathToRoot(updatedConfigurationCachePath);
                 }
@@ -940,6 +972,20 @@ export async function initFromStateAndSettings(): Promise<void> {
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
                 readDryrunSwitches();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "additionalCompilerNames";
+            let updatedAdditionalCompilerNames : string[] | undefined = workspaceConfiguration.get<string[]>(subKey);
+            if (!util.areEqual(updatedAdditionalCompilerNames, additionalCompilerNames)) {
+                readAdditionalCompilerNames();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "excludeCompilerNames";
+            let updatedExcludeCompilerNames : string[] | undefined = workspaceConfiguration.get<string[]>(subKey);
+            if (!util.areEqual(updatedExcludeCompilerNames, excludeCompilerNames)) {
+                readExcludeCompilerNames();
                 updatedSettingsSubkeys.push(subKey);
             }
 
