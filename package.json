@@ -361,6 +361,24 @@
                     },
                     "scope": "resource"
                 },
+                "makefile.additionalCompilerNames": {
+                    "type": "array",
+                    "default": [],
+                    "description": "Names of compiler tools to be added to the extension known list",
+                    "items": {
+                        "type": "string"
+                    },
+                    "scope": "resource"
+                },
+                "makefile.excludeCompilerNames": {
+                    "type": "array",
+                    "default": [],
+                    "description": "Names of compiler tools to be excluded from the extension known list",
+                    "items": {
+                        "type": "string"
+                    },
+                    "scope": "resource"
+                },
                 "makefile.configureOnOpen": {
                     "type": "boolean",
                     "default": true,

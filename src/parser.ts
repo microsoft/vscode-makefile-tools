@@ -14,11 +14,14 @@ import * as vscode from 'vscode';
 
 // List of compiler tools plus the most common aliases cc and c++
 // ++ needs to be escaped for the regular expression in parseLineAsTool.
+// Versioning and cross compilers naming variations dont' need to be included in this list,
+// they will be considered in the regular expression.
+// If one compiler name is a substring of another, include it after in this list.
 // todo: any other scenarios of aliases and symlinks
 // that would make parseLineAsTool to not match the regular expression,
 // therefore wrongly skipping over compilation lines?
-const compilers: string[] = ["clang\\+\\+", "clang", "cl", "gcc", "cc", "icc", "icl", "g\\+\\+", "c\\+\\+"];
-const linkers: string[] = ["link", "ilink", "ld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
+const compilers: string[] = ["clang\\+\\+", "clang-cl", "clang-cpp", "clang", "gcc", "gpp", "cpp", "icc", "cc", "icl", "cl", "g\\+\\+", "c\\+\\+"];
+const linkers: string[] = ["ilink", "link", "ld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
 const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 const chunkSize: number = 100;
@@ -243,6 +246,27 @@ function parseLineAsTool(
     toolNames: string[],
     currentPath: string
 ): ToolInvocation | undefined {
+    // To avoid hard-coding (and ever maintaining) in the tools list
+    // the various compilers/linkers that can have versions, prefixes or suffixes
+    // in their names, include a crafted regex around each tool name.
+    // Any number of prefix or suffix text, separated by '-'.
+    let versionedToolNames: string[] = [];
+    const prefixRegex: string = "(([a-zA-Z0-9-_.]*-)*";
+    const suffixRegex: string = "(-[a-zA-Z0-9-_.]*)*)";
+    toolNames.forEach(tool => {
+        // Check if the user defined this tool as to be excluded
+        if (!configuration.getExcludeCompilerNames()?.includes(tool)) {
+            versionedToolNames.push(`${prefixRegex}${tool}${suffixRegex}`);
+        }
+    });
+
+    // Add any additional tools specified by the user
+    configuration.getAdditionalCompilerNames()?.forEach(compiler => {
+        if (!toolNames.includes(compiler)) {
+            versionedToolNames.push(`${prefixRegex}${compiler}${suffixRegex}`);
+        }
+    });
+
     // - any spaces/tabs before the tool invocation
     // - with or without path (relative -to the makefile location- or full)
     // - with or without extension (windows only)
@@ -250,18 +274,17 @@ function parseLineAsTool(
     // - must have at least one space or tab after the tool invocation
     let regexpStr: string = '^[\\s\\"]*(.*?)(';
     if (process.platform === "win32") {
-        regexpStr += toolNames.join('\\.exe|');
+        regexpStr += versionedToolNames.join('\\.exe|');
 
-        // make sure to append extension if the array of tools has only one element,
-        // in which case .join is not doing anything
-        if (toolNames.length === 1) {
+        // ensure to append the extension for the last tool in the array since join didn't.
+        if (versionedToolNames.length > 0) {
             regexpStr += ('\\.exe');
         }
 
         regexpStr += '|';
     }
 
-    regexpStr += toolNames.join('|') + ')[\\s\\"]+(.*)$';
+    regexpStr += versionedToolNames.join('|') + ')[\\s\\"]+(.*)$';
 
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null = regexp.exec(line);
