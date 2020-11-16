@@ -677,6 +677,16 @@ export function readConfigureAfterCommand(): void {
     logger.message(`Configure after command: ${configureAfterCommand}`);
 }
 
+let phonyOnlyTargets: boolean | undefined;
+export function getPhonyOnlyTargets(): boolean | undefined { return phonyOnlyTargets; }
+export function setPhonyOnlyTargets(configure: boolean): void { phonyOnlyTargets = configure; }
+export function readPhonyOnlyTargets(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    // how to get default from package.json to avoid problem with 'undefined' type?
+    phonyOnlyTargets = workspaceConfiguration.get<boolean>("phonyOnlyTargets");
+    logger.message(`Only .PHONY targets: ${phonyOnlyTargets}`);
+}
+
 // Initialization from settings (or backup default rules), done at activation time
 export async function initFromStateAndSettings(): Promise<void> {
     readConfigurationCachePath();
@@ -694,6 +704,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     readConfigureOnOpen();
     readConfigureOnEdit();
     readConfigureAfterCommand();
+    readPhonyOnlyTargets();
 
     analyzeConfigureParams();
 
@@ -961,6 +972,13 @@ export async function initFromStateAndSettings(): Promise<void> {
             let updatedConfigureAfterCommand : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedConfigureAfterCommand !== configureAfterCommand) {
                 readConfigureAfterCommand();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "phonyOnlyTargets";
+            let updatedPhonyOnlyTargets : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            if (updatedPhonyOnlyTargets !== phonyOnlyTargets) {
+                readPhonyOnlyTargets();
                 updatedSettingsSubkeys.push(subKey);
             }
 

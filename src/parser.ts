@@ -43,8 +43,14 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
     while (result) {
         extractedLog = result[2];
 
-        // skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target
-        let regexpTarget: RegExp = /^(?!\n?[#\.])(?<!^\n?# Not a target:\s*)\s*(\S+):\s+/mg;
+        // Skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target.
+        // Additionally, if makefile.phonyOnlyTargets is true, include only targets
+        // succeeded by "#  Phony target (prerequisite of .PHONY).".
+        let regexpTargetStr: string = "^(?!\\n?[#\\.])(?<!^\\n?# Not a target:\\s*)\\s*(\\S+):\\s+";
+        if (configuration.getPhonyOnlyTargets()) {
+         regexpTargetStr += ".*\\s+(?=#  Phony target \\(prerequisite of \\.PHONY\\)\\.)";
+        }
+        let regexpTarget: RegExp = RegExp(regexpTargetStr, "mg");
 
         match = regexpTarget.exec(extractedLog);
 
@@ -159,7 +165,14 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
     });
 
-    // Extract the link command
+    // Remove lines with $ since they come from unexpanded yet variables. The extension can't do anything yet
+    // about them anyway and also there will be a correspondent line in the dryrun with these variables expanded.
+    preprocessTasks.push(function () {
+      regexp = /.*\$.*/mg;
+      preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "");
+    });
+
+  // Extract the link command
     // Keep the /link switch to the cl command because otherwise we will see compiling without /c
     // and we will deduce some other output binary based on its /Fe or /Fo or first source given,
     // instead of the output binary defined via the link operation (which will be parsed on the next line).

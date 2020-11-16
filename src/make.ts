@@ -559,12 +559,15 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
 // The input 'content' represents the output of a command that lists all the environment variables:
 // set on windows or printenv on linux/mac.
 async function applyEnvironment(content: string | undefined) : Promise<void> {
-    let lines: string[] = content?.split(/\r?\n/) || [];
-    lines.forEach(line => {
-        let eqPos: number = line.search("=");
-        let envVarName: string = line.substring(0, eqPos);
-        let envVarValue: string = line.substring(eqPos + 1, line.length);
-        process.env[envVarName] = envVarValue;
+   let lines: string[] = content?.split(/\r?\n/) || [];
+   lines.forEach(line => {
+      let eqPos: number = line.search("=");
+      // Sometimes we get a "" line and searching for = returns -1. Skip.
+      if (eqPos !== -1) {
+          let envVarName: string = line.substring(0, eqPos);
+          let envVarValue: string = line.substring(eqPos + 1, line.length);
+          process.env[envVarName] = envVarValue;
+       }
     });
 }
 
