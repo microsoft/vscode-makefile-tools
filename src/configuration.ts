@@ -770,7 +770,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                 if (extension.getState().configureDirty && configureOnEdit) {
                     if ((extension.getCompletedConfigureInSession())
                         && !make.blockedByOp(make.Operations.configure, false)) {
-                        logger.message("Configuring clean after settings or makefile changes...");
+                        logger.message("Configuring after settings or makefile changes...");
                         make.configure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
                     }
                 }

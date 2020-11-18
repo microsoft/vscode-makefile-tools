@@ -325,7 +325,7 @@ function parseLineAsTool(
     return {
         pathInMakefile: toolPathInMakefile,
         fullPath: toolFullPath,
-        arguments: match[3],
+        arguments: match[match.length - 1],
         found: toolFound
     };
 }

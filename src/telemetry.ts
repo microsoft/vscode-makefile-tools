@@ -55,7 +55,7 @@ export function logEvent(eventName: string, properties?: Properties, measures?: 
 }
 
 // Allow-lists for various settings.
-function filterSetting(value: any, key: string) : string {
+function filterSetting(value: any, key: string, defaultValue: string) : string {
     if (key === "makefile.dryrunSwitches") {
         let dryrunSwitches: string[] = value;
         let filteredSwitches: string[] | undefined = dryrunSwitches.map(sw => {
@@ -83,6 +83,15 @@ function filterSetting(value: any, key: string) : string {
         });
 
         return filteredSwitches.join(";");
+    }
+
+    // Even if the key represents a setting that shouldn't share its value,
+    // we can still record if it is undefined by the user (removed from settings.json)
+    // or equal to the default we set in package.json.
+    if (!value) {
+        return "undefined";
+    } else if (value === defaultValue) {
+        return defaultValue;
     }
 
     return "...";
@@ -161,7 +170,9 @@ function filterKey(key: string): string {
 // inaccurate or incomplete telemetry information for makefile and launch configurations.
 // This is not very critical since any of their state changes will update telemetry for them.
 export function analyzeSettings(setting: any, key: string, propSchema: any, ignoreDefault: boolean, telemetryProperties: Properties | null): Properties | null {
-    let type : string = typeof (setting);
+    // type can be undefined if setting is null,
+    // which happens when the user removes that setting.
+    let type : string | undefined = setting ? typeof (setting) : undefined;
     let jsonType : string | undefined = propSchema.type ? propSchema.type : undefined;
 
     // Skip anything else if the current setting represents a function.
@@ -179,8 +190,10 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
     // The type "array" defined in package.json is seen as object by the workspace setting type.
     // Not all package.json constructs have a type (example: configuration properties list)
     // but the workspace setting type sees them as object.
-    if (jsonType !== type && jsonType !== undefined && (type !== "object" || jsonType !== "array")) {
-        logger.message(`Settings versus package.json type mismatch for "${key}".`);
+    if (jsonType !== type &&
+        jsonType !== undefined && type !== undefined &&
+        (type !== "object" || jsonType !== "array")) {
+            logger.message(`Settings versus package.json type mismatch for "${key}".`);
     }
 
     // Enum values always safe to report.
@@ -212,14 +225,14 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
         // Apply allow-lists for strings.
         case "string":
             if (telemetryProperties) {
-                telemetryProperties[filterKey(key)] = filterSetting(setting, key);
+                telemetryProperties[filterKey(key)] = filterSetting(setting, key, propSchema.default);
             }
             break;
 
         case "array":
             // We are interested in logging arrays of basic types
             if (telemetryProperties && propSchema.items.type !== "object" && propSchema.items.type !== "array") {
-                telemetryProperties[filterKey(key)] = filterSetting(setting, key);
+                telemetryProperties[filterKey(key)] = filterSetting(setting, key, propSchema.default);
                 break;
             }
             /* falls through */
