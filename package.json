@@ -2,7 +2,7 @@
     "name": "makefile-tools",
     "displayName": "Makefile Tools",
     "description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "publisher": "ms-vscode",
     "preview": true,
     "icon": "res/makefile-logo.png",
@@ -349,7 +349,7 @@
                 "makefile.configurationCachePath": {
                     "type": "string",
                     "description": "The path to a cache file storing the output of the last dry-run make command",
-                    "default": "./configurationCache.log",
+                    "default": ".vscode/configurationCache.log",
                     "scope": "resource"
                 },
                 "makefile.dryrunSwitches": {
