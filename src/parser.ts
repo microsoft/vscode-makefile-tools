@@ -338,7 +338,7 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
     // Identify the non value part of the switch: prefix, switch name
     // and what may separate this from an eventual switch value
     let switches: string[] = [];
-    let regExpStr: string = "(^|,|\\s+)(--|-" +
+    let regExpStr: string = "(^|\\s+)(--|-" +
                             // On Win32 allow '/' as switch prefix as well,
                             // otherwise it conflicts with path character
                             (process.platform === "win32" ? "|\\/" : "") +
@@ -359,10 +359,6 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
         // and also CppTools expects the compiler arguments to be prefixed
         // when received from the custom providers.
         index1 = regexp.lastIndex - match1[0].length;
-        // skip over the switches separator if it happens to be comma
-        if (match1[0][0] === ",") {
-            index1++;
-        }
 
         // Marks the beginning of the next switch
         match2 = regexp.exec(args);
@@ -451,8 +447,7 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
                                 '(' +
                                     // the left side (or whole value if no '=' is following)
                                     '(' +
-                                        '[^\\s=,]+' + // not quoted switch value component
-                                                      // comma is excluded because it can be a switch separator sometimes
+                                        '[^\\s=]+' + // not quoted switch value component
                                     ')' +
                                     '(' +
                                         '=' + // separator between switch value left side and right side
@@ -460,8 +455,7 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
                                             '\\`[^\\`]*?\\`|' + // anything between `
                                             '\\\'[^\\\']*?\\\'|' + // anything between '
                                             '\\"[^\\"]*?\\"|' + // anything between "
-                                            '[^\\s,]+' +  // not quoted right side of switch value
-                                                          // comma is excluded because it can be a switch separator sometimes
+                                            '[^\\s]+' +  // not quoted right side of switch value
                                                           // equal is actually allowed (example gcc switch: -fmacro-prefix-map=./= )
                                         ')' +
                                     ')?' +
@@ -476,7 +470,6 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
         let result: string = match[6];
         if (result) {
             result = result.trim();
-            result = result.replace(/"/g, "");
             results.push(result);
         }
         match = regexp.exec(args);
@@ -528,7 +521,6 @@ function parseMultipleSwitchesFromToolArguments(args: string, simpleSwitches: st
         let result: string = match[12] || match[15];
         if (result) {
             result = result.trim();
-            result = result.replace(/"/g, "");
             results.push(result);
         }
         match = regexp.exec(args);
@@ -566,7 +558,6 @@ function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string 
         let result: string = match[5];
         if (result) {
             result = result.trim();
-            result = result.replace(/"/g, "");
             results.push(result);
         }
         match = regexp.exec(args);
@@ -628,7 +619,6 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
         let result: string = match[1];
         if (result) {
             result = result.trim();
-            result = result.replace(/"/g, "");
             files.push(result);
         }
         match = regexp.exec(args);
@@ -761,8 +751,10 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     compilerFullPath = path.join(util.toolPathInEnv(toolBaseName) || "", toolBaseName);
                 }
 
+                // Exclude switches that are being processed separately (I, FI, include, D, std)
+                // and switches that don't affect IntelliSense but are causing errors.
                 let compilerArgs: string[] = [];
-                compilerArgs = parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std"]);
+                compilerArgs = parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std", "MF"]);
 
                 // Parse and log the includes, forced includes and the defines
                 let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');

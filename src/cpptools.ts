@@ -118,7 +118,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         logger.message("    Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
         logger.message("    Standard: " + this.workspaceBrowseConfiguration.standard);
         logger.message("    Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath);
-        logger.message("    Compiler Arguments: " + this.workspaceBrowseConfiguration.compilerArgs);
+        logger.message("    Compiler Arguments: " + this.workspaceBrowseConfiguration.compilerArgs?.join(";"));
         if (process.platform === "win32" && this.workspaceBrowseConfiguration.windowsSdkVersion) {
             logger.message("    Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
         }
@@ -135,7 +135,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         logger.message("    Standard: " + filePath.configuration.standard, "Verbose");
         logger.message("    IntelliSense Mode: " + filePath.configuration.intelliSenseMode, "Verbose");
         logger.message("    Compiler Path: " + filePath.configuration.compilerPath, "Verbose");
-        logger.message("    Compiler Arguments: " + filePath.configuration.compilerArgs, "Verbose");
+        logger.message("    Compiler Arguments: " + filePath.configuration.compilerArgs?.join(";"), "Verbose");
         if (process.platform === "win32" && filePath.configuration.windowsSdkVersion, "Verbose") {
             logger.message("    Windows SDK Version: " + filePath.configuration.windowsSdkVersion, "Verbose");
         }
