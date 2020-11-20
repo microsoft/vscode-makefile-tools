@@ -521,7 +521,6 @@ function parseMultipleSwitchesFromToolArguments(args: string, simpleSwitches: st
         let result: string = match[12] || match[15];
         if (result) {
             result = result.trim();
-            result = result.replace(/"/g, "");
             results.push(result);
         }
         match = regexp.exec(args);
@@ -754,8 +753,10 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     compilerFullPath = path.join(util.toolPathInEnv(toolBaseName) || "", toolBaseName);
                 }
 
+                // Exclude switches that are being processed separately (I, FI, include, D, std)
+                // and switches that don't affect IntelliSense but are causing errors.
                 let compilerArgs: string[] = [];
-                compilerArgs = parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std"]);
+                compilerArgs = parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std", "MF"]);
 
                 // Parse and log the includes, forced includes and the defines
                 let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
