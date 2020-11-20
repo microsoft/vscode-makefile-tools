@@ -3,6 +3,7 @@
 All notable changes to the "vscode-makefile-tools" extension will be documented in this file.
 
 ## 0.1.2
+- Fix squiggles caused by -MF switch and comma separated sub-switches.
 - Support suffixes/prefixes specific for version and cross compilers.
 - Add the possibility to list only the makefile targets marked as .PHONY.
 - Various bug fixes.
