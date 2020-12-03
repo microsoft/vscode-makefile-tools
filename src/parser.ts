@@ -561,7 +561,6 @@ function parseSingleSwitchFromToolArguments(args: string, sw: string[]): string 
         let result: string = match[5];
         if (result) {
             result = result.trim();
-            result = result.replace(/"/g, "");
             results.push(result);
         }
         match = regexp.exec(args);
@@ -623,7 +622,6 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
         let result: string = match[1];
         if (result) {
             result = result.trim();
-            result = result.replace(/"/g, "");
             files.push(result);
         }
         match = regexp.exec(args);
