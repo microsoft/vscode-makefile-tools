@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // TODO: support also the scenario of parsing a build log,
 // to overcome some of --dry-run limitations
 // (like some exceptions to the 'do not execute' rule
@@ -98,9 +101,9 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
 }
 
 export interface PreprocessDryRunOutputReturnType {
-    retc: number,
-    elapsed: number,
-    result?: string
+    retc: number;
+    elapsed: number;
+    result?: string;
 }
 
 // Make various preprocessing transformations on the dry-run output
@@ -120,7 +123,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     statusCallback("Preprocessing the dry-run output");
 
     // Array of tasks required to be executed during the preprocess configure phase
-    let preprocessTasks: { (): void; }[] = [];
+    let preprocessTasks: (() => void)[] = [];
 
     // Expand {REPO:VSCODE-MAKEFILE-TOOLS} to the full path of the root of the extension
     // This is used for the pre-created dry-run logs consumed by the tests,
@@ -128,7 +131,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // within the test subfolder of the extension repo, while still exercising full paths for parsing
     // and not generating a different output with every new location where Makefile Tools is enlisted.
     // A real user scenario wouldn't need this construct.
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         if (process.env['MAKEFILE_TOOLS_TESTING'] === '1') {
             let extensionRootPath: string = path.resolve(__dirname, "../../");
             preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
@@ -136,18 +139,18 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     });
 
     // Split multiple commands concatenated by '&&'
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
     });
 
     // Split multiple commands concatenated by ";"
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
     });
 
     // Sometimes the ending of lines ends up being a mix and match of \n and \r\n.
     // Make it uniform to \n to ease other processing later.
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\r\\n/mg, "\n");
     });
 
@@ -155,7 +158,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // At the end of every intermediate line is at least a space, then a \ and end of line.
     // Concatenate all these lines to see clearly each command on one line.
     let regexp: RegExp = /\s+\\$\n/mg;
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, " ");
     });
 
@@ -163,14 +166,14 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // When --mode=compile or --mode-link are present in a line, we can ignore anything that is before
     // and all that is after is a normal complete compiler or link command.
     // Replace these patterns with end of line so that the parser will see only the right half.
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         regexp = /--mode=compile|--mode-link/mg;
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
     });
 
     // Remove lines with $ since they come from unexpanded yet variables. The extension can't do anything yet
     // about them anyway and also there will be a correspondent line in the dryrun with these variables expanded.
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
       regexp = /.*\$.*/mg;
       preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "");
     });
@@ -184,14 +187,14 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // For example, "cl.exe source.cpp /Fetest.exe /link /debug" still produces test.exe
     // but cl.exe source.cpp /Fetest.exe /link /out:test2.exe produces only test2.exe.
     // For now, ignore any output binary rules of cl while having the /link switch.
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         if (process.platform === "win32") {
             preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ \/link /g, "/link \n link.exe ");
         }
     });
 
     // Loop through all the configure preprocess tasks, checking for cancel.
-    for(const func of preprocessTasks) {
+    for (const func of preprocessTasks) {
         await util.scheduleTask(func);
 
         if (cancel.isCancellationRequested) {
@@ -200,7 +203,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
                 elapsed: util.elapsedTimeSince(startTime)
             };
         }
-    };
+    }
 
     return {
         retc: make.ConfigureBuildReturnCodeTypes.success,
@@ -1030,7 +1033,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
             chunkIndex++;
         } // while loop
-    } // doLinkCommandsParsingChunk function
+    }; // doLinkCommandsParsingChunk function
 
     while (!done) {
         if (cancel.isCancellationRequested) {
@@ -1126,7 +1129,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
             chunkIndex++;
         } // while loop
-    } // doBinaryInvocationsParsingChunk function
+    }; // doBinaryInvocationsParsingChunk function
 
     while (!done) {
         if (cancel.isCancellationRequested) {

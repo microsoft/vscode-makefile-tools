@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Support for integration with CppTools Custom Configuration Provider
 
 import * as configuration from './configuration';
@@ -77,7 +80,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         }
 
         let map: Map<string, cpp.SourceFileConfigurationItem> = this.fileIndex;
-        provider.fileIndex.forEach(function(value, key) {
+        provider.fileIndex.forEach(function(value, key): void {
             map.set(key, value);
         });
 
@@ -136,7 +139,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         logger.message("    IntelliSense Mode: " + filePath.configuration.intelliSenseMode, "Verbose");
         logger.message("    Compiler Path: " + filePath.configuration.compilerPath, "Verbose");
         logger.message("    Compiler Arguments: " + filePath.configuration.compilerArgs?.join(";"), "Verbose");
-        if (process.platform === "win32" && filePath.configuration.windowsSdkVersion, "Verbose") {
+        if (process.platform === "win32" && filePath.configuration.windowsSdkVersion) {
             logger.message("    Windows SDK Version: " + filePath.configuration.windowsSdkVersion, "Verbose");
         }
         logger.message("---------------------------------------------------------------------------------------------------", "Verbose");

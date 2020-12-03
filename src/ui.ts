@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Deprecated UI support for buttons and quickpicks.
 // Replaced by makefile.outline view in the left side bar.
 // To be removed, hidden for now.

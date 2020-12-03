@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Makefile Tools extension
 
 import * as configuration from './configuration';
@@ -136,7 +139,7 @@ export class MakefileToolsExtension {
             let sourceFileConfigurationItem: cpp.SourceFileConfigurationItem = {
                 uri: vscode.Uri.file(filePath),
                 configuration,
-            }
+            };
 
             // These are the configurations processed during the current configure.
             // Store them in the 'delta' file index instead of the final one.
