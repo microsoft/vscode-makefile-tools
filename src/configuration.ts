@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Configuration support
 
 import {extension} from './extension';
@@ -1355,4 +1358,3 @@ export function setBuildTargets(targets: string[]): void { buildTargets = target
 let launchTargets: string[] = [];
 export function getLaunchTargets(): string[] { return launchTargets; }
 export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
-

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Helper APIs used by this extension
 
 import * as fs from 'fs';
@@ -318,7 +321,7 @@ export function removeQuotes(str: string): string {
 }
 
 export function elapsedTimeSince(start: number): number {
-    return (Date.now() - start ) / 1000;
+    return (Date.now() - start) / 1000;
 }
 
 // Helper to evaluate whether two settings (objects or simple types) represent the same content.
@@ -391,7 +394,7 @@ export function mergeProperties(dst: any, src: any): any {
 export function removeDuplicates(src: string[]) : string[] {
     let seen: {[key: string]: boolean} = {};
     let result: string[] = [];
-    src.forEach(item =>{
+    src.forEach(item => {
         if (!seen[item]) {
             seen[item] = true;
             result.push(item);

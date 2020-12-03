@@ -17,7 +17,9 @@ export class StateManager {
 
   // The project build configuration (one of the entries in the array of makefile.configurations
   // or a default).
-  get buildConfiguration(): string | undefined {
+  get buildConfiguration(): string | undefined {// Copyright (c) Microsoft Corporation.
+   // Licensed under the MIT license.
+
     return this._get<string>('buildConfiguration');
   }
   set buildConfiguration(v: string | undefined) {
