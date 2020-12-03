@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Makefile Tools Extension tests without sources and makefiles.
 // These tests take advantage of the possibility of parsing
 // a previously created dry-run 'make' output log.
