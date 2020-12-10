@@ -363,7 +363,7 @@ export function stringToLaunchConfiguration(str: string): LaunchConfiguration | 
 
     if (match) {
         let fullPath: string = util.makeFullPath(match[2], match[1]);
-        let splitArgs: string[] = match[3].split(",");
+        let splitArgs: string[] = (match[3] === "") ? [] : match[3].split(",");
 
         return {
             cwd: match[1],
@@ -491,6 +491,8 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     if (makefileUsed) {
         configurationMakeArgs.push("-f");
         configurationMakeArgs.push(makefileUsed);
+        configurationMakeArgs.push("-C");
+        configurationMakeArgs.push(path.parse(makefileUsed).dir);
     }
 
     if (configurationMakeCommand) {

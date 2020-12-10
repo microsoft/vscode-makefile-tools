@@ -114,19 +114,19 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     private fileIndex = new Map<string, cpp.SourceFileConfigurationItem>();
 
     public logConfigurationProviderBrowse(): void {
-        logger.message("Sending Workspace Browse Configuration: -----------------------------------");
-        logger.message("    Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"));
-        logger.message("    Standard: " + this.workspaceBrowseConfiguration.standard);
-        logger.message("    Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath);
-        logger.message("    Compiler Arguments: " + this.workspaceBrowseConfiguration.compilerArgs?.join(";"));
+        logger.message("Sending Workspace Browse Configuration: -----------------------------------", "Verbose");
+        logger.message("    Browse Path: " + this.workspaceBrowseConfiguration.browsePath.join(";"), "Verbose");
+        logger.message("    Standard: " + this.workspaceBrowseConfiguration.standard, "Verbose");
+        logger.message("    Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath, "Verbose");
+        logger.message("    Compiler Arguments: " + this.workspaceBrowseConfiguration.compilerArgs?.join(";"), "Verbose");
         if (process.platform === "win32" && this.workspaceBrowseConfiguration.windowsSdkVersion) {
-            logger.message("    Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion);
+            logger.message("    Windows SDK Version: " + this.workspaceBrowseConfiguration.windowsSdkVersion, "Verbose");
         }
-        logger.message("----------------------------------------------------------------------------");
+        logger.message("----------------------------------------------------------------------------", "Verbose");
     }
 
     public logConfigurationProviderItem(filePath: cpp.SourceFileConfigurationItem, fromCache: boolean = false): void {
-        logger.message("Sending configuration " + (fromCache ? "(from cache) " : "") + "for file " + filePath.uri.toString() + " -----------------------------------", "Verbose");
+        logger.message("Sending configuration " + (fromCache ? "(from cache) " : "") + "for file " + filePath.uri.toString() + " -----------------------------------");
         logger.message("    Defines: " + filePath.configuration.defines.join(";"), "Verbose");
         logger.message("    Includes: " + filePath.configuration.includePath.join(";"), "Verbose");
         if (filePath.configuration.forcedInclude) {

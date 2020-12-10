@@ -135,16 +135,6 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         }
     });
 
-    // Split multiple commands concatenated by '&&'
-    preprocessTasks.push(function () {
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
-    });
-
-    // Split multiple commands concatenated by ";"
-    preprocessTasks.push(function () {
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
-    });
-
     // Sometimes the ending of lines ends up being a mix and match of \n and \r\n.
     // Make it uniform to \n to ease other processing later.
     preprocessTasks.push(function () {
@@ -168,14 +158,15 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
     });
 
-    // Remove lines with $ since they come from unexpanded yet variables. The extension can't do anything yet
+    // Remove lines with $() since they come from unexpanded yet variables. The extension can't do anything yet
     // about them anyway and also there will be a correspondent line in the dryrun with these variables expanded.
+    // Don't remove lines with $ without paranthesis, there are valid compilation lines that would be ignored otherwise.
     preprocessTasks.push(function () {
-      regexp = /.*\$.*/mg;
-      preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "");
+      regexp = /.*\$\(.*/mg;
+      preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "SomethingGood");
     });
 
-  // Extract the link command
+    // Extract the link command
     // Keep the /link switch to the cl command because otherwise we will see compiling without /c
     // and we will deduce some other output binary based on its /Fe or /Fo or first source given,
     // instead of the output binary defined via the link operation (which will be parsed on the next line).
@@ -188,6 +179,19 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         if (process.platform === "win32") {
             preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ \/link /g, "/link \n link.exe ");
         }
+    });
+
+    // The splitting of multiple commands is better to be done at the end.
+    // Oherwise, this scenario interferes with the line ending '\' in some cases
+    // (see MAKE repo, ar.c compiler command, for example).
+    // Split multiple commands concatenated by '&&'
+    preprocessTasks.push(function () {
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
+    });
+
+    // Split multiple commands concatenated by ";"
+    preprocessTasks.push(function () {
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
     });
 
     // Loop through all the configure preprocess tasks, checking for cancel.
