@@ -265,15 +265,16 @@ interface ToolInvocation {
 function parseLineAsTool(
     line: string,
     toolNames: string[],
-    currentPath: string
+    currentPath: string,
+    isCompilerOrLinker: boolean = true
 ): ToolInvocation | undefined {
     // To avoid hard-coding (and ever maintaining) in the tools list
     // the various compilers/linkers that can have versions, prefixes or suffixes
     // in their names, include a crafted regex around each tool name.
     // Any number of prefix or suffix text, separated by '-'.
     let versionedToolNames: string[] = [];
-    const prefixRegex: string = "(([a-zA-Z0-9-_.]*-)*";
-    const suffixRegex: string = "(-[a-zA-Z0-9-_.]*)*)";
+    const prefixRegex: string = isCompilerOrLinker ? "(([a-zA-Z0-9-_.]*-)*" : "";
+    const suffixRegex: string = isCompilerOrLinker ? "(-[a-zA-Z0-9-_.]*)*)" : "";
     toolNames.forEach(tool => {
         // Check if the user defined this tool as to be excluded
         if (!configuration.getExcludeCompilerNames()?.includes(tool)) {
@@ -1017,7 +1018,9 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                                     linkerTargetBinary = "a.out";
                                 }
                             } else {
-                                logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
+                                if (linkerTargetBinary) {
+                                    logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
+                                }
                             }
                         }
 
@@ -1089,12 +1092,19 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
     currentPath = vscode.workspace.rootPath || "";
     currentPathHistory = [currentPath];
 
-    // Make also an array with only the base file names of the found target binaries.
+    // Since an executable can be called without its extension,
+    // on Windows only and only for extensions 'exe',
+    // create a new array with target binaries names
+    // to ensure we parse right these binaries invocation right.
     let targetBinariesNames: string[] = [];
     targetBinaries.forEach(target => {
         let parsedPath: path.ParsedPath = path.parse(target);
         if (!targetBinariesNames.includes(parsedPath.name)) {
-            targetBinariesNames.push(parsedPath.name);
+            if (process.platform === "win32" && parsedPath.ext === "exe") {
+                targetBinariesNames.push(parsedPath.name);
+            } else {
+                targetBinariesNames.push(parsedPath.base);
+            }
         }
     });
 
@@ -1128,7 +1138,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                 //         (because an "@if exist" is not resolved by the dry-run and appears in the output)
                 //       - cmd /c binary arg1 arg2 arg3
                 //       - start binary
-                let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath);
+                let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath, false);
                 if (targetBinaryTool) {
                     logger.message("Found binary execution command: " + line, "Verbose");
                     // Include complete launch configuration: binary, execution path and args
@@ -1348,3 +1358,4 @@ function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion
       return undefined;
     }
   }
+  
