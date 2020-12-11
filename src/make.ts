@@ -41,6 +41,7 @@ export enum ConfigureBuildReturnCodeTypes {
     cancelled = -2,
     notFound = -3,
     outOfDate = -4,
+    other = -5
 }
 
 export enum Operations {
@@ -609,13 +610,28 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
             logger.messageNoCR(result);
         };
 
+        let someErr: boolean = false;
         let stderr: any = (result: string): void => {
+            someErr = true;
             logger.messageNoCR(result);
         };
 
         const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr);
         if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
-            logger.message("The pre-configure succeeded.");
+            if (someErr) {
+                // Depending how the preconfigure scripts (and any inner called sub-scripts) are written,
+                // it may happen that the final error code returned by them to be succesful even if
+                // previous steps reported errors.
+                // Until a better error code analysis, simply warn wih a logger message and turn the successful
+                // return code into ConfigureBuildReurnCodeTypes.other, which would let us know in telemetry
+                // of this specific situation.
+                result.returnCode = ConfigureBuildReturnCodeTypes.other;
+                logger.message("The pre-configure script returned success code " +
+                               "but somewhere during the preconfigure process there were errors reported. " +
+                               "Double check the preconfigure output in the Makefile Tools channel.");
+            } else {
+                logger.message("The pre-configure succeeded.");
+            }
         } else {
             logger.message("The pre-configure script failed. This project may not configure successfully.");
         }
