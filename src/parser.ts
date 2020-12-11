@@ -149,12 +149,29 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, " ");
     });
 
+    // In case we parse a build log (as opposed to a dryrun log) for a project using libtool,
+    // capture the compiler commands reported by the libtool output.
+    // They may be redundant with the corresponding line from the dryrun (which is present in the build log as well)
+    // but in case of $ variables and commands invoked on the fly, the second time all are resolved/expanded
+    // and we can actually send good IntelliSense information for a good source code URL.
+    // For such a case, look at MONO (git clone https://github.com/mono/mono.git), for source code cordxtra.c
+    // Line with the original command, containing a 'test' command to determine on the fly the source code path.
+    // This line is present in the dryrun and also in the build log. Can't easily parse the correct source code path.
+    // /bin/bash ./libtool  --tag=CC   --mode=compile gcc -DHAVE_CONFIG_H   -I./include -I./include  -DGC_PTHREAD_START_STANDALONE    -fexceptions -Wall -Wextra -Wpedantic -Wno-long-long -g -O2 -fno-strict-aliasing  -MT cord/libcord_la-cordxtra.lo -MD -MP -MF cord/.deps/libcord_la-cordxtra.Tpo -c -o cord/libcord_la-cordxtra.lo `test -f 'cord/cordxtra.c' || echo './'`cord/cordxtra.c
+    // Line with the resolved command, from which the extension can parse a valid source code path.
+    // This line is present only in the build log, immediately following the above line.
+    // libtool: compile:  gcc -DHAVE_CONFIG_H -I./include -I./include -DGC_PTHREAD_START_STANDALONE -fexceptions -Wall -Wextra -Wpedantic -Wno-long-long -g -O2 -fno-strict-aliasing -MT cord/libcord_la-cordxtra.lo -MD -MP -MF cord/.deps/libcord_la-cordxtra.Tpo -c cord/cordxtra.c  -fPIC -DPIC -o cord/.libs/libcord_la-cordxtra.o
+        preprocessTasks.push(function () {
+        regexp = /libtool: compile:|libtool: link:/mg;
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
+    });
+
     // Process some more makefile output weirdness
     // When --mode=compile or --mode-link are present in a line, we can ignore anything that is before
     // and all that is after is a normal complete compiler or link command.
     // Replace these patterns with end of line so that the parser will see only the right half.
     preprocessTasks.push(function () {
-        regexp = /--mode=compile|--mode-link/mg;
+        regexp = /--mode=compile|--mode=link/mg;
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
     });
 
