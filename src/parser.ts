@@ -163,7 +163,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // libtool: compile:  gcc -DHAVE_CONFIG_H -I./include -I./include -DGC_PTHREAD_START_STANDALONE -fexceptions -Wall -Wextra -Wpedantic -Wno-long-long -g -O2 -fno-strict-aliasing -MT cord/libcord_la-cordxtra.lo -MD -MP -MF cord/.deps/libcord_la-cordxtra.Tpo -c cord/cordxtra.c  -fPIC -DPIC -o cord/.libs/libcord_la-cordxtra.o
         preprocessTasks.push(function () {
         regexp = /libtool: compile:|libtool: link:/mg;
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\nLIBTOOL_PATTERN\n");
     });
 
     // Process some more makefile output weirdness
@@ -172,7 +172,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // Replace these patterns with end of line so that the parser will see only the right half.
     preprocessTasks.push(function () {
         regexp = /--mode=compile|--mode=link/mg;
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\nLIBTOOL_PATTERN\n");
     });
 
     // Remove lines with $() since they come from unexpanded yet variables. The extension can't do anything yet
@@ -1017,15 +1017,20 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                                     logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose");
                                     linkerTargetBinary = "a.out";
                                 }
-                            } else {
-                                if (linkerTargetBinary) {
-                                    logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
-                                }
                             }
                         }
 
                         if (linkerTargetBinary) {
-                            linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
+                            // Until we implement a more robust link target analysis
+                            // (like query-ing for the executable attributes),
+                            // we can safely assume that a ".la" file produced by libtool
+                            // is a library and not an executable binary.
+                            if (linkerTargetBinary.endsWith(".la") && dryRunOutputLines[index - 1] === "LIBTOOL_PATTERN") {
+                                linkerTargetBinary = undefined;
+                            } else {
+                                logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
+                                linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
+                            }
                         }
                     }
                 }
@@ -1358,4 +1363,3 @@ function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion
       return undefined;
     }
   }
-  
