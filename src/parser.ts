@@ -1145,6 +1145,24 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                 //       - cmd /c binary arg1 arg2 arg3
                 //       - start binary
                 let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath, false);
+
+                // If the found target binary invocation does not happen from a location
+                // where it was built previously, don't include it as a launch target.
+                // We can debug only what was built. Also, it's quite common to run
+                // tools from the path during the build and we shouldn't launch those.
+                if (targetBinaryTool) {
+                    let foundTargetBinary: boolean = false;
+                    targetBinaries.forEach(target => {
+                        if (target === targetBinaryTool?.fullPath) {
+                            foundTargetBinary = true;
+                        }
+                    });
+
+                    if (!foundTargetBinary) {
+                        targetBinaryTool = undefined;
+                    }
+                }
+
                 if (targetBinaryTool) {
                     logger.message("Found binary execution command: " + line, "Verbose");
                     // Include complete launch configuration: binary, execution path and args
