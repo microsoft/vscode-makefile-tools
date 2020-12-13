@@ -409,6 +409,12 @@
                     "default": false,
                     "scope": "resource"
                 },
+                "makefile.ignoreDirectoryCommands": {
+                    "type": "boolean",
+                    "description": "Don't analyze directory changing commands like cd, push, pop.",
+                    "default": false,
+                    "scope": "resource"
+                },
                 "makefile.phonyOnlyTargets": {
                   "type": "boolean",
                   "default": false,

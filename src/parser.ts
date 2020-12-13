@@ -659,7 +659,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
     let lastCurrentPath: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
     let newCurrentPath: string = "";
 
-    if (line.startsWith('cd -')) {
+    if (line.startsWith('cd -') && !configuration.getIgnoreDirectoryCommands()) {
         // Swap the last two current paths in the history.
         if (lastCurrentPath) {
             currentPathHistory.pop();
@@ -671,13 +671,14 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         logger.message("CD- command: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose");
         currentPathHistory.push(lastCurrentPath);
         currentPathHistory.push(lastCurrentPath2);
-    } else if (line.startsWith('popd') || line.includes('Leaving directory')) {
+    } else if ((line.startsWith('popd') && !configuration.getIgnoreDirectoryCommands()) ||
+               line.includes('Leaving directory')) {
         let lastCurrentPath: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
         currentPathHistory.pop();
         let lastCurrentPath2: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
         logger.message("Analyzing line: " + line, "Verbose");
         logger.message("POPD command or end of MAKE -C: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose");
-    } else if (line.startsWith('cd')) {
+    } else if (line.startsWith('cd') && !configuration.getIgnoreDirectoryCommands()) {
         newCurrentPath = util.makeFullPath(line.slice(3), lastCurrentPath);
 
         // For "cd-" (which toggles between the last 2 current paths),
@@ -692,7 +693,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         currentPathHistory.push(newCurrentPath);
         logger.message("Analyzing line: " + line, "Verbose");
         logger.message("CD command: entering directory " + newCurrentPath, "Verbose");
-    } else if (line.startsWith('pushd')) {
+    } else if (line.startsWith('pushd') && !configuration.getIgnoreDirectoryCommands()) {
         newCurrentPath = util.makeFullPath(line.slice(6), lastCurrentPath);
         currentPathHistory.push(newCurrentPath);
         logger.message("Analyzing line: " + line, "Verbose");

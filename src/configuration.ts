@@ -705,12 +705,28 @@ export function readConfigureAfterCommand(): void {
 
 let phonyOnlyTargets: boolean | undefined;
 export function getPhonyOnlyTargets(): boolean | undefined { return phonyOnlyTargets; }
-export function setPhonyOnlyTargets(configure: boolean): void { phonyOnlyTargets = configure; }
+export function setPhonyOnlyTargets(phony: boolean): void { phonyOnlyTargets = phony; }
 export function readPhonyOnlyTargets(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
     phonyOnlyTargets = workspaceConfiguration.get<boolean>("phonyOnlyTargets");
     logger.message(`Only .PHONY targets: ${phonyOnlyTargets}`);
+}
+
+// This setting is useful for some repos where directory changing commands (cd, push, pop)
+// are missing or printed more than once, resulting in associating some IntelliSense information
+// with the wrong file or even with a non existent URL.
+// When this is set, the current path deduction relies only on --print-directory
+// (which prints the messages regarding "Entering direcory" and "Leaving directory"),
+// which is not perfect either for all repos.
+let ignoreDirectoryCommands: boolean | undefined;
+export function getIgnoreDirectoryCommands(): boolean | undefined { return ignoreDirectoryCommands; }
+export function setIgnoreDirectoryCommands(ignore: boolean): void { ignoreDirectoryCommands = ignore; }
+export function readIgnoreDirectoryCommands(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    // how to get default from package.json to avoid problem with 'undefined' type?
+    ignoreDirectoryCommands = workspaceConfiguration.get<boolean>("ignoreDirectoryCommands");
+    logger.message(`Ignore directory commands: ${ignoreDirectoryCommands}`);
 }
 
 // Initialization from settings (or backup default rules), done at activation time
@@ -733,6 +749,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     readConfigureOnEdit();
     readConfigureAfterCommand();
     readPhonyOnlyTargets();
+    readIgnoreDirectoryCommands();
 
     analyzeConfigureParams();
 
@@ -1027,6 +1044,13 @@ export async function initFromStateAndSettings(): Promise<void> {
             let updatedPhonyOnlyTargets : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedPhonyOnlyTargets !== phonyOnlyTargets) {
                 readPhonyOnlyTargets();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "ignoreDirectoryCommands";
+            let updatedIgnoreDirectoryCommands : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            if (updatedIgnoreDirectoryCommands !== ignoreDirectoryCommands) {
+                readIgnoreDirectoryCommands();
                 updatedSettingsSubkeys.push(subKey);
             }
 
