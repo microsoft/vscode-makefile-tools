@@ -667,8 +667,8 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
 
         let lastCurrentPath2: string = (currentPathHistory.length > 0) ? currentPathHistory.pop() || "" : lastCurrentPath;
 
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("CD- command: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose");
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("CD- command: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose", false);
         currentPathHistory.push(lastCurrentPath);
         currentPathHistory.push(lastCurrentPath2);
     } else if ((line.startsWith('popd') && !configuration.getIgnoreDirectoryCommands()) ||
@@ -676,8 +676,8 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         let lastCurrentPath: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
         currentPathHistory.pop();
         let lastCurrentPath2: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("POPD command or end of MAKE -C: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose");
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("POPD command or end of MAKE -C: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose", false);
     } else if (line.startsWith('cd') && !configuration.getIgnoreDirectoryCommands()) {
         newCurrentPath = util.makeFullPath(line.slice(3), lastCurrentPath);
 
@@ -691,13 +691,13 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         }
 
         currentPathHistory.push(newCurrentPath);
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("CD command: entering directory " + newCurrentPath, "Verbose");
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("CD command: entering directory " + newCurrentPath, "Verbose", false);
     } else if (line.startsWith('pushd') && !configuration.getIgnoreDirectoryCommands()) {
         newCurrentPath = util.makeFullPath(line.slice(6), lastCurrentPath);
         currentPathHistory.push(newCurrentPath);
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose");
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose", false);
     } else if (line.includes('Entering directory')) { // equivalent to pushd
         // The make switch print-directory wraps the folder in various ways.
         let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['`\"])(.*)['`\"]");
@@ -707,8 +707,8 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
             newCurrentPath = "Could not parse directory";
         }
 
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("MAKE -C: entering directory " + newCurrentPath, "Verbose");
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("MAKE -C: entering directory " + newCurrentPath, "Verbose", false);
         currentPathHistory.push(newCurrentPath);
     }
 
@@ -737,7 +737,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
         return make.ConfigureBuildReturnCodeTypes.cancelled;
     }
 
-    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.');
+    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.', "Normal", false);
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -765,7 +765,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
             let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
             if (compilerTool) {
-                logger.message("Found compiler command: " + line, "Verbose");
+                logger.message("Found compiler command: " + line, "Verbose", false);
 
                 // Compiler path is either what the makefile provides or found in the PATH environment variable or empty
                 let compilerFullPath: string = compilerTool.fullPath || "";
@@ -944,7 +944,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
                         if (path.basename(compilerTool.fullPath).startsWith("cl")) {
                             if (!isSwitchPassedInArguments(compilerTool.arguments, ["c", "P", "E", "EP"])) {
-                                logger.message("Found compiler command:\n" + line, "Verbose");
+                                logger.message("Found compiler command:\n" + line, "Verbose", false);
 
                                 // First read the value of the /Fe switch (for cl.exe)
                                 compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
@@ -959,10 +959,10 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                                         let parsedObjPath: path.ParsedPath = path.parse(objFile);
                                         compilerTargetBinary = parsedObjPath.name + ".exe";
                                         logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                            compilerTargetBinary + " from the first object passed in with /Fo", "Verbose");
+                                            compilerTargetBinary + " from the first object passed in with /Fo", "Verbose", false);
                                     }
                                 } else {
-                                    logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose");
+                                    logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose", false);
                                 }
 
                                 // Then assume first source file base name + exe.
@@ -974,7 +974,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                                         let parsedSourcePath: path.ParsedPath = path.parse(srcFiles[0]);
                                         compilerTargetBinary = parsedSourcePath.name + ".exe";
                                         logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                            compilerTargetBinary + " from the first source file passed in", "Verbose");
+                                            compilerTargetBinary + " from the first source file passed in", "Verbose", false);
                                     }
                                 }
                             }
@@ -996,7 +996,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                         // Also, the ld switches -r and -Ur do not produce executables.
                         if (!isSwitchPassedInArguments(linkerTool.arguments, ["c", "E", "S", "r", "Ur"])) {
                             linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
-                            logger.message("Found linker command: " + line, "Verbose");
+                            logger.message("Found linker command: " + line, "Verbose", false);
 
                             if (!linkerTargetBinary) {
                                 // For Microsoft link.exe, the default output binary takes the base name
@@ -1009,13 +1009,13 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                                         let parsedPath: path.ParsedPath = path.parse(files[0]);
                                         let targetBinaryFromFirstObjLib: string = parsedPath.name + ".exe";
                                         logger.message("The link command is not producing a target binary explicitly. Assuming " +
-                                            targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose");
+                                            targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose", false);
                                         linkerTargetBinary = targetBinaryFromFirstObjLib;
                                     }
                                 } else {
                                     // The default output binary from a linking operation is usually a.out on linux/mac,
                                     // produced in the same folder where the toolset is run.
-                                    logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose");
+                                    logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose", false);
                                     linkerTargetBinary = "a.out";
                                 }
                             }
@@ -1029,7 +1029,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                             if (linkerTargetBinary.endsWith(".la") && dryRunOutputLines[index - 1] === "LIBTOOL_PATTERN") {
                                 linkerTargetBinary = undefined;
                             } else {
-                                logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
+                                logger.message("Producing target binary: " + linkerTargetBinary, "Verbose", false);
                                 linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
                             }
                         }
@@ -1053,7 +1053,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                         binaryArgs: []
                     };
 
-                    logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
+                    logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose", false);
                     onFoundLaunchConfiguration(launchConfiguration);
                 }
             }
@@ -1164,7 +1164,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                 }
 
                 if (targetBinaryTool) {
-                    logger.message("Found binary execution command: " + line, "Verbose");
+                    logger.message("Found binary execution command: " + line, "Verbose", false);
                     // Include complete launch configuration: binary, execution path and args
                     // are known from parsing the dry-run
                     let splitArgs: string[] = targetBinaryTool.arguments ? targetBinaryTool.arguments.split(" ") : [];
@@ -1179,7 +1179,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                         binaryArgs: splitArgs
                     };
 
-                    logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
+                    logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose", false);
                     onFoundLaunchConfiguration(launchConfiguration);
                 }
             }
@@ -1321,12 +1321,12 @@ function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefi
     } else if (language === "cpp") {
         standard = parseCppStandard(std, canUseGnu);
         if (!standard) {
-            logger.message(`Unknown C++ standard control flag: ${std}`);
+            logger.message(`Unknown C++ standard control flag: ${std}`, "Normal", false);
         }
     } else if (language === "c") {
         standard = parseCStandard(std, canUseGnu);
         if (!standard) {
-            logger.message(`Unknown C standard control flag: ${std}`);
+            logger.message(`Unknown C standard control flag: ${std}`, "Normal", false);
         }
     } else if (language === undefined) {
         standard = parseCppStandard(std, canUseGnu);
@@ -1334,10 +1334,10 @@ function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefi
             standard = parseCStandard(std, canUseGnu);
         }
         if (!standard) {
-            logger.message(`Unknown standard control flag: ${std}`);
+            logger.message(`Unknown standard control flag: ${std}`, "Normal", false);
         }
     } else {
-        logger.message("Unknown language");
+        logger.message("Unknown language", "Normal", false);
     }
 
     return standard;

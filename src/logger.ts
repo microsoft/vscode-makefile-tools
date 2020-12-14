@@ -30,20 +30,15 @@ function loggingLevelApplies(messageVerbosity: string | undefined): boolean {
 }
 
 //TODO: implement more verbosity levels for the output log
-export function message(message: string, loggingLevel?: string): void {
+export function message(message: string, loggingLevel?: string, show: boolean = true): void {
     // Print the message only if the intended logging level matches the settings
     // or if no loggingLevel restriction is provided.
     if (!loggingLevelApplies(loggingLevel)) {
         return;
     }
 
-    // Don't show the output channel when the message verbosity level is not normal,
-    // to avoid various switch focus events, which may even trigger a configure
-    // (if makefile.configureOnEdit is true and the configure state is dirty).
-    // We want the focus change events to be triggered by changing editors,
-    // not by the output channel writing one more message, especially of lower importance.
-    if (!loggingLevel || loggingLevel === "Normal") {
-        makeOutputChannel?.show(true); // don't take focus
+    if (show) {
+        makeOutputChannel?.show();
     }
 
     let channel: vscode.OutputChannel = getOutputChannel();
@@ -58,20 +53,15 @@ export function message(message: string, loggingLevel?: string): void {
 
 // This is used for a few scenarios where the message already has end of line incorporated.
 // Example: stdout/stderr of a child process read before the stream is closed.
-export function messageNoCR(message: string, loggingLevel?: string): void {
+export function messageNoCR(message: string, loggingLevel?: string, show: boolean = true): void {
     // Print the message only if the intended logging level matches the settings
     // or if no loggingLevel restriction is provided.
     if (!loggingLevelApplies(loggingLevel)) {
         return;
     }
 
-    // Don't show the output channel when the message verbosity level is not normal,
-    // to avoid various switch focus events, which may even trigger a configure
-    // (if makefile.configureOnEdit is true and the configure state is dirty).
-    // We want the focus change events to be triggered by changing editors,
-    // not by the output channel writing one more message, especially of lower importance.
-    if (!loggingLevel || loggingLevel === "Normal") {
-        makeOutputChannel?.show(true); // don't take focus
+    if (show) {
+        makeOutputChannel?.show();
     }
 
     let channel: vscode.OutputChannel = getOutputChannel();

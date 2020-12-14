@@ -268,12 +268,12 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
         let stdout: any = (result: string): void => {
-            logger.messageNoCR(result);
+            logger.messageNoCR(result, "Normal", false);
             progress.report({increment: 1, message: "..."});
         };
 
         let stderr: any = (result: string): void => {
-            logger.messageNoCR(result);
+            logger.messageNoCR(result, "Normal", false);
         };
 
         const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr);
@@ -607,13 +607,13 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     try {
         let stdout: any = (result: string): void => {
             progress.report({increment: 1, message: "..."});
-            logger.messageNoCR(result);
+            logger.messageNoCR(result, "Normal", false);
         };
 
         let someErr: boolean = false;
         let stderr: any = (result: string): void => {
             someErr = true;
-            logger.messageNoCR(result);
+            logger.messageNoCR(result, "Normal", false);
         };
 
         const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr);
