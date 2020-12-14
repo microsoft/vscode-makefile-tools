@@ -37,8 +37,15 @@ export function message(message: string, loggingLevel?: string, show: boolean = 
         return;
     }
 
-    if (show) {
-        makeOutputChannel?.show();
+    // Don't show the output channel when the message verbosity level is not normal,
+    // to avoid various switch focus events, which may even trigger a configure
+    // (if makefile.configureOnEdit is true and the configure state is dirty).
+    // We want the focus change events to be triggered by changing editors,
+    // not by the output channel writing one more message, especially of lower importance.
+    if (!loggingLevel || loggingLevel === "Normal") {
+        if (show) {
+            makeOutputChannel?.show(true);
+        }
     }
 
     let channel: vscode.OutputChannel = getOutputChannel();
@@ -60,8 +67,15 @@ export function messageNoCR(message: string, loggingLevel?: string, show: boolea
         return;
     }
 
-    if (show) {
-        makeOutputChannel?.show();
+    // Don't show the output channel when the message verbosity level is not normal,
+    // to avoid various switch focus events, which may even trigger a configure
+    // (if makefile.configureOnEdit is true and the configure state is dirty).
+    // We want the focus change events to be triggered by changing editors,
+    // not by the output channel writing one more message, especially of lower importance.
+    if (!loggingLevel || loggingLevel === "Normal") {
+        if (show) {
+            makeOutputChannel?.show(true);
+        }
     }
 
     let channel: vscode.OutputChannel = getOutputChannel();

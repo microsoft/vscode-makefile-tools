@@ -639,6 +639,19 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
     match = regexp.exec(args);
     while (match) {
         let result: string = match[1];
+
+        // It is quite common to encounter the following pattern:
+        //  `test -f 'sourceFile.c' || echo './'`sourceFile.c
+        // Until we implement the correct approach (to query live the test command)
+        // we can just ignore it and consider the second option of the OR
+        // (by removing './'`). Even if this is hacky, it is worth it
+        // because the pattern is encountered very often and this is a short term workaround.
+        let idx: number = args.lastIndexOf(result);
+        let str: string = args.substring(idx - 10, idx);
+        if (str === "' || echo ") {
+            result = result.substring(5, result.length);
+        }
+
         if (result) {
             result = result.trim();
             files.push(result);
