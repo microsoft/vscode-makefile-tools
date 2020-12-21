@@ -454,17 +454,29 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
     // - when the switch value contains a '=', the right half can be also quoted by ', ", ` or '"..."'
     //   and should be able to not stop at space when inside the quote characters.
     //    (example): -DMY_DEFINE='"SOME_VALUE"'
-    let regexpStr: string = '(^|\\s+)' + // start of line or any amount of space character
-                            '\\\'?' + // optional quoting around the whole construct (prefix, switch name and value)
-                            // prefix, switch name, separator between switch name and switch value
+
+    function anythingBetweenQuotes(fullyQuoted: boolean): string {
+        let anythingBetweenReverseQuote: string = '\\`[^\\`]*?\\`';
+        let anythingBetweenSingleQuote: string = "\\'[^\\']*?\\'";
+        let anythingBetweenDoubleQuote: string = '\\"[^\\"]*?\\"';
+
+        // If the switch is fully quoted with ', like ('-DMY_DEFINE="MyValue"'), don't allow single quotes
+        // inside the switch value.
+        // One example of what can be broken if we don't do this: gcc '-DDEF1=' '-DDef2=val2'
+        // in which case DEF1 would be seen as DEF1=' ' instead of empty =
+        let str: string = anythingBetweenReverseQuote + '|' + anythingBetweenDoubleQuote + (fullyQuoted ? "" : '|' + anythingBetweenSingleQuote);
+        return str;
+    }
+
+    function mainPattern(fullyQuoted: boolean): string {
+        let pattern: string = 
+                            // prefix and switch name
                             '(' +
-                                '\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*)' +
+                                  '\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*)' +
                             ')' +
-                            // the switch value
+                            // switch value
                             '(' +
-                                '\\`[^\\`]*?\\`|' + // anything between `
-                                '\\\'[^\\\']*?\\\'|' + // anything between '
-                                '\\"[^\\"]*?\\"|' + // anything between "
+                                anythingBetweenQuotes(fullyQuoted) + '|' +
                                 // not fully quoted switch value scenarios
                                 '(' +
                                     // the left side (or whole value if no '=' is following)
@@ -474,25 +486,35 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
                                     '(' +
                                         '=' + // separator between switch value left side and right side
                                         '(' +
-                                            '\\`[^\\`]*?\\`|' + // anything between `
-                                            '\\\'[^\\\']*?\\\'|' + // anything between '
-                                            '\\"[^\\"]*?\\"|' + // anything between "
+                                            anythingBetweenQuotes(fullyQuoted) + '|' +
                                             '[^\\s]+' +  // not quoted right side of switch value
-                                                          // equal is actually allowed (example gcc switch: -fmacro-prefix-map=./= )
-                                        ')' +
-                                    ')?' +
+                                                         // equal is actually allowed (example gcc switch: -fmacro-prefix-map=./= )
+                                        ')?' + // right side of '=' is optional, meaning we can define as nothing, like: -DMyDefine=
+                                    ')?' + // = is also optional (simple define)
                                 ')' +
-                            ')\\\'?';
+                            ')';
+
+        return pattern;
+    }
+
+    let regexpStr: string = '(' + '^|\\s+' + ')' + // start of line or any amount of space character
+                            '(' +
+                                '(' + "\\'" + mainPattern(true) + "\\'" + ')' + "|" + // switch if fully quoted
+                                '(' + mainPattern(false) + ')' + // switch if not fully quoted
+                            ')';
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null;
     let results: string[] = [];
 
     match = regexp.exec(args);
     while (match) {
-        let result: string = match[6];
+        let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 18;
+        let result: string = match[matchIndex];
         if (result) {
             result = result.trim();
             results.push(result);
+        } else {
+            logger.message("Temporary message. To be deleted at the last commit of this PR.");
         }
         match = regexp.exec(args);
     }
