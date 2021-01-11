@@ -546,7 +546,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         if (!util.checkFileExistsSync(makefileUsed)) {
             vscode.window.showErrorMessage("Makefile entry point not found.");
             logger.message("The makefile entry point was not found. " +
-                           "Make sure it exists at the location defined by makefile.makePath or makefile.configurations[].makePath " +
+                           "Make sure it exists at the location defined by makefile.makefilePath or makefile.configurations[].makefilePath " +
                            "or in the root of the workspace.");
 
             const telemetryProperties: telemetry.Properties = {

@@ -49,7 +49,7 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
         // Skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target.
         // Additionally, if makefile.phonyOnlyTargets is true, include only targets
         // succeeded by "#  Phony target (prerequisite of .PHONY).".
-        let regexpTargetStr: string = "^(?!\\n?[#\\.])(?<!^\\n?# Not a target:\\s*)\\s*(\\S+):\\s+";
+        let regexpTargetStr: string = "^(?!\\n?[#\\.])(?<!^\\n?# Not a target:\\s*)\\s*(\\S+[^:]):\\s+";
         if (configuration.getPhonyOnlyTargets()) {
          regexpTargetStr += ".*\\s+(?=#  Phony target \\(prerequisite of \\.PHONY\\)\\.)";
         }
@@ -1417,3 +1417,4 @@ function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion
       return undefined;
     }
   }
+  
