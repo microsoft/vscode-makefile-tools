@@ -317,6 +317,30 @@ export function removeQuotes(str: string): string {
     return str;
 }
 
+// Remove only he quotes that are surrounding the given string.
+export function removeSurroundingQuotes(str: string): string {
+    str = str.trim();
+    if (str.startsWith('"') && str.endsWith('"')) {
+        str = str.substring(1, str.length - 1);
+    }
+
+    return str;
+}
+
+// Escape every character of the given string.
+// Used when constructing a regular expression from file names which can contain
+// special characters.
+// To avoid more complicated character analysis, we can escape all characters
+// because escaping a non special character is a no-op.
+export function escapeString(str: string): string {
+    let escapedString: string = "";
+    for (let i: number = 0; i < str.length; i++) {
+        escapedString += '\\';
+        escapedString += str[i];
+    }
+    return escapedString;
+}
+
 export function elapsedTimeSince(start: number): number {
     return (Date.now() - start ) / 1000;
 }

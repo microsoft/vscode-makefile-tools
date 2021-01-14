@@ -873,7 +873,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
         return retc;
     } catch (e) {
-        logger.message(e.message);
+        logger.message(`Exception thrown during the configure process: ${e.message}`);
+        retc = ConfigureBuildReturnCodeTypes.other;
         return e.errno;
     } finally {
         let provider: cpptools.CustomConfigurationProvider = extension.getCppConfigurationProvider().getCustomConfigurationProvider();

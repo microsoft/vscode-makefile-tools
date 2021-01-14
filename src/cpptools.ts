@@ -126,7 +126,8 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     }
 
     public logConfigurationProviderItem(filePath: cpp.SourceFileConfigurationItem, fromCache: boolean = false): void {
-        logger.message("Sending configuration " + (fromCache ? "(from cache) " : "") + "for file " + filePath.uri.toString() + " -----------------------------------", "Normal", false);
+        let uriObj: any = filePath.uri;
+        logger.message("Sending configuration " + (fromCache ? "(from cache) " : "") + "for file " + uriObj["path"] + " -----------------------------------", "Normal", false);
         logger.message("    Defines: " + filePath.configuration.defines.join(";"), "Verbose", false);
         logger.message("    Includes: " + filePath.configuration.includePath.join(";"), "Verbose", false);
         if (filePath.configuration.forcedInclude) {

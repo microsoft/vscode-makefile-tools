@@ -511,7 +511,7 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
         let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 18;
         let result: string = match[matchIndex];
         if (result) {
-            result = result.trim();
+            result = util.removeSurroundingQuotes(result);
             results.push(result);
         } else {
             logger.message("Temporary message. To be deleted at the last commit of this PR.");
@@ -675,7 +675,13 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
         }
 
         if (result) {
-            result = result.trim();
+            result = util.removeSurroundingQuotes(result);
+
+            // Debug message to identify easier the scenarios where source files have inner quotes.
+            if (result.includes('"')) {
+                logger.message(`File argument ${result} contains quotes.`, "Debug");
+            }
+
             files.push(result);
         }
         match = regexp.exec(args);
@@ -954,143 +960,148 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             }
 
             let line: string = dryRunOutputLines[index];
+
+            statusCallback("Parsing for launch targets: inspecting for link commands");
+            currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
+            currentPath = currentPathHistory[currentPathHistory.length - 1];
+
+            // A target binary is usually produced by the linker with the /out or /o switch,
+            // but there are several scenarios (for win32 Microsoft cl.exe)
+            // when the compiler is producing an output binary directly (via the /Fe switch)
+            // or indirectly (based on some naming default rules in the absence of /Fe)
+            let linkerTargetBinary: string | undefined;
+            let compilerTargetBinary: string | undefined;
+
+            if (process.platform === "win32") {
+                let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
+                if (compilerTool) {
+                    // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
+                    // Note: no need to worry about the DLL case that this extension doesn't support yet
+                    // since a compiler can produce implicitly only an executable.
+
+                    if (path.basename(compilerTool.fullPath).startsWith("cl")) {
+                        if (!isSwitchPassedInArguments(compilerTool.arguments, ["c", "P", "E", "EP"])) {
+                            logger.message("Found compiler command:\n" + line, "Verbose", false);
+
+                            // First read the value of the /Fe switch (for cl.exe)
+                            compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
+
+                            // Then assume first object file base name (defined with /Fo) + exe
+                            // The binary is produced in the same folder where the compiling operation takes place,
+                            // and not in an eventual different obj path.
+                            // Note: /Fo is not allowed on multiple sources compilations so there will be only one if found
+                            if (!compilerTargetBinary) {
+                                let objFile: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fo"]);
+                                if (objFile) {
+                                    let parsedObjPath: path.ParsedPath = path.parse(objFile);
+                                    compilerTargetBinary = parsedObjPath.name + ".exe";
+                                    logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
+                                        compilerTargetBinary + " from the first object passed in with /Fo", "Verbose", false);
+                                }
+                            } else {
+                                logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose", false);
+                            }
+
+                            // Then assume first source file base name + exe.
+                            // The binary is produced in the same folder where the compiling operation takes place,
+                            // and not in an eventual different source path.
+                            if (!compilerTargetBinary) {
+                                let srcFiles: string[] | undefined = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
+                                if (srcFiles.length >= 1) {
+                                    let parsedSourcePath: path.ParsedPath = path.parse(srcFiles[0]);
+                                    compilerTargetBinary = parsedSourcePath.name + ".exe";
+                                    logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
+                                        compilerTargetBinary + " from the first source file passed in", "Verbose", false);
+                                }
+                            }
+                        }
+                    }
+
+                    if (compilerTargetBinary) {
+                        compilerTargetBinary = util.makeFullPath(compilerTargetBinary, currentPath);
+                    }
+                }
+            }
+
+            let linkerTool: ToolInvocation | undefined = parseLineAsTool(line, linkers, currentPath);
+            if (linkerTool) {
+                // TODO: implement launch support for DLLs and LIBs, besides executables.
+                if (!isSwitchPassedInArguments(linkerTool.arguments, ["dll", "lib", "shared"])) {
+                    // Gcc/Clang tools can also perform linking so don't parse any output binary
+                    // if there are switches passed in to cause early stop of compilation: -c, -E, -S
+                    // (-o will not point to an executable)
+                    // Also, the ld switches -r and -Ur do not produce executables.
+                    if (!isSwitchPassedInArguments(linkerTool.arguments, ["c", "E", "S", "r", "Ur"])) {
+                        linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
+                        logger.message("Found linker command: " + line, "Verbose", false);
+
+                        if (!linkerTargetBinary) {
+                            // For Microsoft link.exe, the default output binary takes the base name
+                            // of the first file (obj, lib, etc...) that is passed to the linker.
+                            // The binary is produced in the same folder where the linking operation takes place,
+                            // and not in an eventual different obj/lib path.
+                            if (process.platform === "win32" && path.basename(linkerTool.fullPath).startsWith("link")) {
+                                let files: string[] = parseFilesFromToolArguments(linkerTool.arguments, ["obj", "lib"]);
+                                if (files.length >= 1) {
+                                    let parsedPath: path.ParsedPath = path.parse(files[0]);
+                                    let targetBinaryFromFirstObjLib: string = parsedPath.name + ".exe";
+                                    logger.message("The link command is not producing a target binary explicitly. Assuming " +
+                                        targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose", false);
+                                    linkerTargetBinary = targetBinaryFromFirstObjLib;
+                                }
+                            } else {
+                                // The default output binary from a linking operation is usually a.out on linux/mac,
+                                // produced in the same folder where the toolset is run.
+                                logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose", false);
+                                linkerTargetBinary = "a.out";
+                            }
+                        }
+                    }
+
+                    if (linkerTargetBinary) {
+                        // Until we implement a more robust link target analysis
+                        // (like query-ing for the executable attributes),
+                        // we can safely assume that a ".la" file produced by libtool
+                        // is a library and not an executable binary.
+                        if (linkerTargetBinary.endsWith(".la") && dryRunOutputLines[index - 1] === "LIBTOOL_PATTERN") {
+                            linkerTargetBinary = undefined;
+                        } else {
+                            linkerTargetBinary = util.removeSurroundingQuotes(linkerTargetBinary);
+                            logger.message("Producing target binary: " + linkerTargetBinary, "Verbose", false);
+                            linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
+                        }
+                    }
+                }
+            }
+
+            // It is not possible to have compilerTargetBinary and linkerTargetBinary both defined,
+            // because a dry-run output line cannot be a compilation and an explicit link at the same time.
+            // (cl.exe with /link switch is split into two lines - cl.exe and link.exe - during dry-run preprocessing).
+            // Also for gcc/clang, -o switch or the default output will be a .o in the presence of -c and an executable otherwise.
+            let targetBinary: string | undefined = linkerTargetBinary || compilerTargetBinary;
+
             // Some "$" (without following open paranthesis) are still left in the preprocessed output,
             // because the configuraion provider parser may lose valid compilation lines otherwise.
-            // But the launch targets parser should ignore any dollar because the extension can't resolve
-            // these anyway.
-            if (!line.includes("$")) {
-                statusCallback("Parsing for launch targets: inspecting for link commands");
-                currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
-                currentPath = currentPathHistory[currentPathHistory.length - 1];
+            // Additionally, for linker commands, ignore any dollar if present in the target binary name.
+            // We need to ignore the $ anywhere else in the linker command line so that we don't lose
+            // valid target binaries.
+            if (targetBinary && !targetBinary.includes("$")) {
+                targetBinaries.push(targetBinary);
 
-                // A target binary is usually produced by the linker with the /out or /o switch,
-                // but there are several scenarios (for win32 Microsoft cl.exe)
-                // when the compiler is producing an output binary directly (via the /Fe switch)
-                // or indirectly (based on some naming default rules in the absence of /Fe)
-                let linkerTargetBinary: string | undefined;
-                let compilerTargetBinary: string | undefined;
+                // Include limited launch configuration, when only the binary is known,
+                // in which case the execution path is defaulting to binary containing folder.
+                // It is more likely that an invocation would succeed from that location
+                // as opposed from any other (like the root) because of eventual dependencies
+                // that very likely to be built in the same place.
+                // and there are no args.
+                let launchConfiguration: configuration.LaunchConfiguration = {
+                    binaryPath: targetBinary,
+                    cwd: path.parse(targetBinary).dir,
+                    binaryArgs: []
+                };
 
-                if (process.platform === "win32") {
-                    let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
-                    if (compilerTool) {
-                        // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
-                        // Note: no need to worry about the DLL case that this extension doesn't support yet
-                        // since a compiler can produce implicitly only an executable.
-
-                        if (path.basename(compilerTool.fullPath).startsWith("cl")) {
-                            if (!isSwitchPassedInArguments(compilerTool.arguments, ["c", "P", "E", "EP"])) {
-                                logger.message("Found compiler command:\n" + line, "Verbose", false);
-
-                                // First read the value of the /Fe switch (for cl.exe)
-                                compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
-
-                                // Then assume first object file base name (defined with /Fo) + exe
-                                // The binary is produced in the same folder where the compiling operation takes place,
-                                // and not in an eventual different obj path.
-                                // Note: /Fo is not allowed on multiple sources compilations so there will be only one if found
-                                if (!compilerTargetBinary) {
-                                    let objFile: string | undefined = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fo"]);
-                                    if (objFile) {
-                                        let parsedObjPath: path.ParsedPath = path.parse(objFile);
-                                        compilerTargetBinary = parsedObjPath.name + ".exe";
-                                        logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                            compilerTargetBinary + " from the first object passed in with /Fo", "Verbose", false);
-                                    }
-                                } else {
-                                    logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose", false);
-                                }
-
-                                // Then assume first source file base name + exe.
-                                // The binary is produced in the same folder where the compiling operation takes place,
-                                // and not in an eventual different source path.
-                                if (!compilerTargetBinary) {
-                                    let srcFiles: string[] | undefined = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
-                                    if (srcFiles.length >= 1) {
-                                        let parsedSourcePath: path.ParsedPath = path.parse(srcFiles[0]);
-                                        compilerTargetBinary = parsedSourcePath.name + ".exe";
-                                        logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                            compilerTargetBinary + " from the first source file passed in", "Verbose", false);
-                                    }
-                                }
-                            }
-                        }
-
-                        if (compilerTargetBinary) {
-                            compilerTargetBinary = util.makeFullPath(compilerTargetBinary, currentPath);
-                        }
-                    }
-                }
-
-                let linkerTool: ToolInvocation | undefined = parseLineAsTool(line, linkers, currentPath);
-                if (linkerTool) {
-                    // TODO: implement launch support for DLLs and LIBs, besides executables.
-                    if (!isSwitchPassedInArguments(linkerTool.arguments, ["dll", "lib", "shared"])) {
-                        // Gcc/Clang tools can also perform linking so don't parse any output binary
-                        // if there are switches passed in to cause early stop of compilation: -c, -E, -S
-                        // (-o will not point to an executable)
-                        // Also, the ld switches -r and -Ur do not produce executables.
-                        if (!isSwitchPassedInArguments(linkerTool.arguments, ["c", "E", "S", "r", "Ur"])) {
-                            linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
-                            logger.message("Found linker command: " + line, "Verbose", false);
-
-                            if (!linkerTargetBinary) {
-                                // For Microsoft link.exe, the default output binary takes the base name
-                                // of the first file (obj, lib, etc...) that is passed to the linker.
-                                // The binary is produced in the same folder where the linking operation takes place,
-                                // and not in an eventual different obj/lib path.
-                                if (process.platform === "win32" && path.basename(linkerTool.fullPath).startsWith("link")) {
-                                    let files: string[] = parseFilesFromToolArguments(linkerTool.arguments, ["obj", "lib"]);
-                                    if (files.length >= 1) {
-                                        let parsedPath: path.ParsedPath = path.parse(files[0]);
-                                        let targetBinaryFromFirstObjLib: string = parsedPath.name + ".exe";
-                                        logger.message("The link command is not producing a target binary explicitly. Assuming " +
-                                            targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose", false);
-                                        linkerTargetBinary = targetBinaryFromFirstObjLib;
-                                    }
-                                } else {
-                                    // The default output binary from a linking operation is usually a.out on linux/mac,
-                                    // produced in the same folder where the toolset is run.
-                                    logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose", false);
-                                    linkerTargetBinary = "a.out";
-                                }
-                            }
-                        }
-
-                        if (linkerTargetBinary) {
-                            // Until we implement a more robust link target analysis
-                            // (like query-ing for the executable attributes),
-                            // we can safely assume that a ".la" file produced by libtool
-                            // is a library and not an executable binary.
-                            if (linkerTargetBinary.endsWith(".la") && dryRunOutputLines[index - 1] === "LIBTOOL_PATTERN") {
-                                linkerTargetBinary = undefined;
-                            } else {
-                                logger.message("Producing target binary: " + linkerTargetBinary, "Verbose", false);
-                                linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
-                            }
-                        }
-                    }
-                }
-
-                // It is not possible to have compilerTargetBinary and linkerTargetBinary both defined,
-                // because a dry-run output line cannot be a compilation and an explicit link at the same time.
-                // (cl.exe with /link switch is split into two lines - cl.exe and link.exe - during dry-run preprocessing).
-                // Also for gcc/clang, -o switch or the default output will be a .o in the presence of -c and an executable otherwise.
-                let targetBinary: string | undefined = linkerTargetBinary || compilerTargetBinary;
-                if (targetBinary) {
-                    targetBinaries.push(targetBinary);
-
-                    // Include limited launch configuration, when only the binary is known,
-                    // in which case the execution path is defaulting to workspace root folder
-                    // and there are no args.
-                    let launchConfiguration: configuration.LaunchConfiguration = {
-                        binaryPath: targetBinary,
-                        cwd: vscode.workspace.rootPath || "",
-                        binaryArgs: []
-                    };
-
-                    logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose", false);
-                    onFoundLaunchConfiguration(launchConfiguration);
-                }
+                logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose", false);
+                onFoundLaunchConfiguration(launchConfiguration);
             }
 
             index++;
@@ -1142,9 +1153,9 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
         let parsedPath: path.ParsedPath = path.parse(target);
         if (!targetBinariesNames.includes(parsedPath.name)) {
             if (process.platform === "win32" && parsedPath.ext === "exe") {
-                targetBinariesNames.push(parsedPath.name);
+                targetBinariesNames.push(util.escapeString(parsedPath.name));
             } else {
-                targetBinariesNames.push(parsedPath.base);
+                targetBinariesNames.push(util.escapeString(parsedPath.base));
             }
         }
     });
@@ -1161,8 +1172,8 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             let line: string = dryRunOutputLines[index];
             // Some "$" (without following open paranthesis) are still left in the preprocessed output,
             // because the configuraion provider parser may lose valid compilation lines otherwise.
-            // But the launch targets parser should ignore any dollar because the extension can't resolve
-            // these anyway.
+            // But the binary invocations parser should ignore any dollar because the extension can't resolve
+            // these anyway, wherever they are (current folder, binary name or arguments).
             if (!line.includes("$")) {
                 statusCallback("Parsing for launch targets: inspecting built binary invocations");
                 currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
