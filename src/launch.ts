@@ -150,6 +150,8 @@ export class Launcher implements vscode.Disposable {
             program: '${command:makefile.launchTargetPath}',
             MIMode: miMode,
             miDebuggerPath: miDebuggerPath,
+            console: "internalConsole",
+            internalConsoleOptions: "openOnSessionStart",
             stopAtEntry: currentLaunchConfiguration.stopAtEntry || defaultLaunchConfiguration?.stopAtEntry,
             symbolSearchPath: currentLaunchConfiguration.symbolSearchPath || defaultLaunchConfiguration?.symbolSearchPath
         };
@@ -245,7 +247,7 @@ export class Launcher implements vscode.Disposable {
 
         // Log the message for high verbosity only because the output channel will become visible over the terminal,
         // even if the terminal show() is called after the logger show().
-        logger.message("Running command '" + terminalCommand + "' in the terminal from location '" + this.launchTargetDirectory() + "'", "Debug", false);
+        logger.message("Running command '" + terminalCommand + "' in the terminal from location '" + this.launchTargetDirectory() + "'", "Debug");
         return terminalCommand;
     }
 

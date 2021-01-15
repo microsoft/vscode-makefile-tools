@@ -170,6 +170,8 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
+    logger.showOutputChannel();
+
     // Same start time for build and an eventual configure.
     let buildStartTime: number = Date.now();
 
@@ -270,12 +272,12 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
         let stdout: any = (result: string): void => {
-            logger.messageNoCR(result, "Normal", false);
+            logger.messageNoCR(result, "Normal");
             progress.report({increment: 1, message: "..."});
         };
 
         let stderr: any = (result: string): void => {
-            logger.messageNoCR(result, "Normal", false);
+            logger.messageNoCR(result, "Normal");
         };
 
         const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr);
@@ -489,6 +491,8 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
+    logger.showOutputChannel();
+
     let preConfigureStartTime: number = Date.now();
 
     let scriptFile: string | undefined = configuration.getPreConfigureScript();
@@ -609,13 +613,13 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     try {
         let stdout: any = (result: string): void => {
             progress.report({increment: 1, message: "..."});
-            logger.messageNoCR(result, "Normal", false);
+            logger.messageNoCR(result, "Normal");
         };
 
         let someErr: boolean = false;
         let stderr: any = (result: string): void => {
             someErr = true;
-            logger.messageNoCR(result, "Normal", false);
+            logger.messageNoCR(result, "Normal");
         };
 
         const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr);
@@ -768,6 +772,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     if (blockedByOp(Operations.configure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
+
+    logger.showOutputChannel();
 
     // Same start time for configure and an eventual pre-configure.
     let configureStartTime: number = Date.now();

@@ -20,7 +20,7 @@
             "env": {
                 "MAKEFILE_TOOLS_TESTING": "1"
             },
-            "preLaunchTask": "mycompile",
+            "preLaunchTask": "compile",
         },
         {
             "name": "Launch Extension",
@@ -35,7 +35,7 @@
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
-            "preLaunchTask": "mycompile",
+            "preLaunchTask": "compile",
         },
         {
             "name": "Node Attach",

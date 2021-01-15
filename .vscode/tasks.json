@@ -2,9 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "mycompile",
+            "label": "compile",
             "type": "npm",
-            "script": "mycompile",
+            "script": "compile",
             "problemMatcher": [
                 "$tsc-watch"
             ],
