@@ -6,19 +6,8 @@ All notable changes to the "vscode-makefile-tools" extension will be documented 
 - Activate in the presence of GNUmakefile in the root as well.
 - Add ignoreDirectoryCommands setting for when the extension should analyze only the output of make -C
   and not commands written in plain, like cd, pushd, popd.
-- Fix configuration item bug when there are special characters (+, ", etc) in the source file path.
-- Show the ouput channel at creation time and when operations begin, as opposed o every written message.
-- Fix various bugs with incorrect return codes for preconfigure and configure operations.
-- Fix various parsing bugs related to: 
-    - build targets
-    - parsing compilers, linkers and binary invocations from command lines
-    - lazy versus greedy
-    - exe extension for windows
-    - inner and outer quotes
-    - $ sign in various relevant compiler/linker arguments
-    - escaped characters in the compilers/linkers command lines
 - Additional support for CCache, Libtool
-- Hacky (temporary) support for common scenarios of backquotes in compiler/linker command lines.
+- Initial support for common scenarios of backquotes in compiler/linker command lines.
 - Fix bug when a .la library is considered executable for debug/launch.
 - Change CWD for binary targets from the project root into the location where they are built.
 - Repo compilation script changes
