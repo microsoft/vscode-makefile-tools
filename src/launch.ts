@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Launch support: debug and run in terminal
 
 import * as configuration from './configuration';
@@ -273,7 +276,6 @@ export class Launcher implements vscode.Disposable {
                 status: status
             };
             telemetry.logEvent("run", telemetryProperties);
-    
             this.launchTerminal.show();
         }
 

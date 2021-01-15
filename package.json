@@ -529,10 +529,10 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "yarn mycompile",
-        "mycompile": "tsc -p ./",
+        "vscode:prepublish": "yarn compile",
+        "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
-        "pretest": "yarn mycompile",
+        "pretest": "yarn compile",
         "test": "node ./out/src/test/runTest.js"
     },
     "devDependencies": {

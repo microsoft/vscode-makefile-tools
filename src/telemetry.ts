@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Telemetry.ts
 
 import * as configuration from './configuration';

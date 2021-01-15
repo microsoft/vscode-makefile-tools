@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Support for integration with CppTools Custom Configuration Provider
 
 import * as configuration from './configuration';
@@ -77,7 +80,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         }
 
         let map: Map<string, cpp.SourceFileConfigurationItem> = this.fileIndex;
-        provider.fileIndex.forEach(function(value, key) {
+        provider.fileIndex.forEach(function(value, key): void {
             map.set(key, value);
         });
 

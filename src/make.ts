@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // Support for make operations
 
 import * as configuration from './configuration';
@@ -73,7 +76,6 @@ export enum TriggeredBy {
     configureAfterTargetChange = "settings (configureAfterCommand), command pallette (setBuildTarget)",
     configureBeforeLaunchTargetChange = "configureDirty (before launch target change), settings (configureAfterCommand)",
 }
-
 
 let fileIndex: Map<string, cpp.SourceFileConfigurationItem> = new Map<string, cpp.SourceFileConfigurationItem>();
 let workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = { browsePath: [] };
@@ -323,7 +325,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     //     1. makefile.buildLog provided by the user in settings
     //     2. configuration cache (the previous dryrun output): makefile.configurationCachePath
     //     3. the make dryrun output if (2) is missing
-    // We do not use buildLog for build targets analysis because 
+    // We do not use buildLog for build targets analysis because
     // we can afford to invoke make -pRrq (very quick even on large projects).
     let buildLog: string | undefined = configuration.getConfigurationBuildLog();
     if (buildLog && !forTargets) {
@@ -419,7 +421,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
                                                     ((recursive) ? " (recursive)" : "") +
                                                     ((forTargets) ? " (for targets specifically)" : "" +
                                                     "...")});
-            
+
             heartBeat = Date.now();
         };
 
@@ -429,7 +431,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         };
 
         const heartBeatTimeout: number = 30; // half minute. TODO: make this a setting
-        let timeout = setInterval(function () { 
+        let timeout: NodeJS.Timeout = setInterval(function (): void {
             let elapsedHeartBit: number = util.elapsedTimeSince(heartBeat);
             if (elapsedHeartBit > heartBeatTimeout) {
                 vscode.window.showWarningMessage("Dryrun timeout. See Makefile Tools Output Channel for details.");
@@ -454,7 +456,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         // (for example if targets are out of date). We can ignore the return code for this
         // because it "can't fail". It represents only display of database and no targets are actually run.
         // try syntax error
-        if (result.returnCode !== ConfigureBuildReturnCodeTypes.success && forTargets !== true) {
+        if (result.returnCode !== ConfigureBuildReturnCodeTypes.success && !forTargets) {
             logger.message("The make dry-run command failed.");
             logger.message("IntelliSense may work only partially or not at all.");
             logger.message(stderrStr);
@@ -650,12 +652,12 @@ interface ConfigurationCache {
     buildTargets: string[];
     launchTargets: string[];
     customConfigurationProvider: {
-        workspaceBrowse: cpp.WorkspaceBrowseConfiguration,
-        fileIndex: Array<[string, {
+        workspaceBrowse: cpp.WorkspaceBrowseConfiguration;
+        fileIndex: [string, {
             uri: string | vscode.Uri;
-            configuration: cpp.SourceFileConfiguration;        
-        }]>
-    }
+            configuration: cpp.SourceFileConfiguration;
+        }][];
+    };
 }
 
 interface ConfigureSubphasesStatus {
@@ -704,12 +706,12 @@ function analyzeConfigureSubphases(stats: ConfigureSubphasesStatus): number {
 }
 
 interface ConfigureSubphaseStatus {
-    retc: ConfigureBuildReturnCodeTypes,
-    elapsed: number
+    retc: ConfigureBuildReturnCodeTypes;
+    elapsed: number;
 }
 interface ConfigureSubphaseStatusItem {
-    name: string,
-    status: ConfigureSubphaseStatus
+    name: string;
+    status: ConfigureSubphaseStatus;
 }
 
 // Process a list of possible undefined status properties and return an array
@@ -794,8 +796,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     let configurationCachePath: string | undefined = configuration.getConfigurationCachePath();
     if (configurationCachePath && util.checkFileExistsSync(configurationCachePath)) {
         readCache = true;
-    }; 
-    
+    }
+
     // Identify for telemetry whether:
     //   - this configure will need to double the workload, if it needs to analyze the build targets separately.
     //   - this configure will need to reset the build target to the default, which will need a reconfigure.
@@ -920,7 +922,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
             telemetryMeasures[phase.name + ".exitCode"] = phase.status.retc;
             telemetryMeasures[phase.name + ".elapsed"] = phase.status.elapsed;
         });
-    
+
         // Report if this configure ran also a pre-configure and how long it took.
         if (preConfigureExitCode !== undefined) {
             telemetryProperties.preConfigureExitCode = preConfigureExitCode.toString();
@@ -1021,7 +1023,6 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
         };
     }
 
-
     let startTime: number = Date.now();
     let targets: string[] = [];
 
@@ -1101,7 +1102,7 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
             compilerPath: undefined,
             standard: undefined,
             windowsSdkVersion: undefined
-        }
+        };
         setCustomConfigurationProvider(provider);
 
         extension.updateCppToolsProvider();
@@ -1127,7 +1128,7 @@ export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vs
         progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
     };
 
-    return await parser.preprocessDryRunOutput(cancel, dryrunOutput, onStatus);
+    return parser.preprocessDryRunOutput(cancel, dryrunOutput, onStatus);
 }
 
 export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken): Promise<ConfigureSubphaseStatus> {
@@ -1141,7 +1142,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
     let startTime: number = Date.now();
     let elapsedTime: number;
 
-    await util.scheduleTask(() => {extension.registerCppToolsProvider()});
+    await util.scheduleTask(() => {extension.registerCppToolsProvider(); });
     let cachePath: string | undefined = configuration.getConfigurationCachePath();
     if (cachePath) {
         let content: string | undefined = util.readFile(cachePath);
