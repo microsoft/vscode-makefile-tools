@@ -161,13 +161,13 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // Line with the resolved command, from which the extension can parse a valid source code path.
     // This line is present only in the build log, immediately following the above line.
     // libtool: compile:  gcc -DHAVE_CONFIG_H -I./include -I./include -DGC_PTHREAD_START_STANDALONE -fexceptions -Wall -Wextra -Wpedantic -Wno-long-long -g -O2 -fno-strict-aliasing -MT cord/libcord_la-cordxtra.lo -MD -MP -MF cord/.deps/libcord_la-cordxtra.Tpo -c cord/cordxtra.c  -fPIC -DPIC -o cord/.libs/libcord_la-cordxtra.o
-        preprocessTasks.push(function () {
+    preprocessTasks.push(function () {
         regexp = /libtool: compile:|libtool: link:/mg;
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\nLIBTOOL_PATTERN\n");
     });
 
     // Process some more makefile output weirdness
-    // When --mode=compile or --mode-link are present in a line, we can ignore anything that is before
+    // When --mode=compile or --mode=link are present in a line, we can ignore anything that is before
     // and all that is after is a normal complete compiler or link command.
     // Replace these patterns with end of line so that the parser will see only the right half.
     preprocessTasks.push(function () {
@@ -180,7 +180,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // Don't remove lines with $ without paranthesis, there are valid compilation lines that would be ignored otherwise.
     preprocessTasks.push(function () {
       regexp = /.*\$\(.*/mg;
-      preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "SomethingGood");
+      preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "");
     });
 
     // Extract the link command
@@ -679,7 +679,7 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 
             // Debug message to identify easier the scenarios where source files have inner quotes.
             if (result.includes('"')) {
-                logger.message(`File argument ${result} contains quotes.`, "Debug");
+                logger.message(`File argument that contains quotes: \`${result}\``, "Debug");
             }
 
             files.push(result);

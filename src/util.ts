@@ -327,16 +327,17 @@ export function removeSurroundingQuotes(str: string): string {
     return str;
 }
 
-// Escape every character of the given string.
 // Used when constructing a regular expression from file names which can contain
-// special characters.
-// To avoid more complicated character analysis, we can escape all characters
-// because escaping a non special character is a no-op.
+// special characters (+, ", ...etc...).
+const escapeChars: RegExp = /[\\\^\$\*\+\?\{\}\(\)\.\!\=\|\[\]\ \/]/;  // characters that should be escaped.
 export function escapeString(str: string): string {
     let escapedString: string = "";
-    for (let i: number = 0; i < str.length; i++) {
-        escapedString += '\\';
-        escapedString += str[i];
+    for (const char of str) {
+        if (char.match(escapeChars)) {
+            escapedString += `\\${char}`;
+        } else {
+            escapedString += char;
+        }
     }
     return escapedString;
 }
