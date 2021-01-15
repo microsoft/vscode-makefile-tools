@@ -44,6 +44,7 @@ export enum ConfigureBuildReturnCodeTypes {
     cancelled = -2,
     notFound = -3,
     outOfDate = -4,
+    other = -5
 }
 
 export enum Operations {
@@ -269,12 +270,12 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
         let stdout: any = (result: string): void => {
-            logger.messageNoCR(result);
+            logger.messageNoCR(result, "Normal", false);
             progress.report({increment: 1, message: "..."});
         };
 
         let stderr: any = (result: string): void => {
-            logger.messageNoCR(result);
+            logger.messageNoCR(result, "Normal", false);
         };
 
         const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, vscode.workspace.rootPath || "", stdout, stderr);
@@ -608,16 +609,31 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     try {
         let stdout: any = (result: string): void => {
             progress.report({increment: 1, message: "..."});
-            logger.messageNoCR(result);
+            logger.messageNoCR(result, "Normal", false);
         };
 
+        let someErr: boolean = false;
         let stderr: any = (result: string): void => {
-            logger.messageNoCR(result);
+            someErr = true;
+            logger.messageNoCR(result, "Normal", false);
         };
 
         const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr);
         if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
-            logger.message("The pre-configure succeeded.");
+            if (someErr) {
+                // Depending how the preconfigure scripts (and any inner called sub-scripts) are written,
+                // it may happen that the final error code returned by them to be succesful even if
+                // previous steps reported errors.
+                // Until a better error code analysis, simply warn wih a logger message and turn the successful
+                // return code into ConfigureBuildReurnCodeTypes.other, which would let us know in telemetry
+                // of this specific situation.
+                result.returnCode = ConfigureBuildReturnCodeTypes.other;
+                logger.message("The pre-configure script returned success code " +
+                               "but somewhere during the preconfigure process there were errors reported. " +
+                               "Double check the preconfigure output in the Makefile Tools channel.");
+            } else {
+                logger.message("The pre-configure succeeded.");
+            }
         } else {
             logger.message("The pre-configure script failed. This project may not configure successfully.");
         }
@@ -859,7 +875,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
         return retc;
     } catch (e) {
-        logger.message(e.message);
+        logger.message(`Exception thrown during the configure process: ${e.message}`);
+        retc = ConfigureBuildReturnCodeTypes.other;
         return e.errno;
     } finally {
         let provider: cpptools.CustomConfigurationProvider = extension.getCppConfigurationProvider().getCustomConfigurationProvider();

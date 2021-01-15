@@ -245,7 +245,7 @@ export class Launcher implements vscode.Disposable {
 
         // Log the message for high verbosity only because the output channel will become visible over the terminal,
         // even if the terminal show() is called after the logger show().
-        logger.message("Running command '" + terminalCommand + "' in the terminal from location '" + this.launchTargetDirectory() + "'", "Debug");
+        logger.message("Running command '" + terminalCommand + "' in the terminal from location '" + this.launchTargetDirectory() + "'", "Debug", false);
         return terminalCommand;
     }
 

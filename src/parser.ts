@@ -23,8 +23,8 @@ import * as vscode from 'vscode';
 // todo: any other scenarios of aliases and symlinks
 // that would make parseLineAsTool to not match the regular expression,
 // therefore wrongly skipping over compilation lines?
-const compilers: string[] = ["clang\\+\\+", "clang-cl", "clang-cpp", "clang", "gcc", "gpp", "cpp", "icc", "cc", "icl", "cl", "g\\+\\+", "c\\+\\+"];
-const linkers: string[] = ["ilink", "link", "ld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
+const compilers: string[] = ["ccache", "clang\\+\\+", "clang-cl", "clang-cpp", "clang", "gcc", "gpp", "cpp", "icc", "cc", "icl", "cl", "g\\+\\+", "c\\+\\+"];
+const linkers: string[] = ["ccache", "ilink", "link", "ld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
 const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 const chunkSize: number = 100;
@@ -52,7 +52,7 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
         // Skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target.
         // Additionally, if makefile.phonyOnlyTargets is true, include only targets
         // succeeded by "#  Phony target (prerequisite of .PHONY).".
-        let regexpTargetStr: string = "^(?!\\n?[#\\.])(?<!^\\n?# Not a target:\\s*)\\s*(\\S+):\\s+";
+        let regexpTargetStr: string = "^(?!\\n?[#\\.])(?<!^\\n?# Not a target:\\s*)\\s*(\\S+[^:]):\\s+";
         if (configuration.getPhonyOnlyTargets()) {
          regexpTargetStr += ".*\\s+(?=#  Phony target \\(prerequisite of \\.PHONY\\)\\.)";
         }
@@ -138,16 +138,6 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         }
     });
 
-    // Split multiple commands concatenated by '&&'
-    preprocessTasks.push(function (): void {
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
-    });
-
-    // Split multiple commands concatenated by ";"
-    preprocessTasks.push(function (): void {
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
-    });
-
     // Sometimes the ending of lines ends up being a mix and match of \n and \r\n.
     // Make it uniform to \n to ease other processing later.
     preprocessTasks.push(function (): void {
@@ -162,23 +152,41 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, " ");
     });
 
-    // Process some more makefile output weirdness
-    // When --mode=compile or --mode-link are present in a line, we can ignore anything that is before
-    // and all that is after is a normal complete compiler or link command.
-    // Replace these patterns with end of line so that the parser will see only the right half.
-    preprocessTasks.push(function (): void {
-        regexp = /--mode=compile|--mode-link/mg;
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\n");
+    // In case we parse a build log (as opposed to a dryrun log) for a project using libtool,
+    // capture the compiler commands reported by the libtool output.
+    // They may be redundant with the corresponding line from the dryrun (which is present in the build log as well)
+    // but in case of $ variables and commands invoked on the fly, the second time all are resolved/expanded
+    // and we can actually send good IntelliSense information for a good source code URL.
+    // For such a case, look at MONO (git clone https://github.com/mono/mono.git), for source code cordxtra.c
+    // Line with the original command, containing a 'test' command to determine on the fly the source code path.
+    // This line is present in the dryrun and also in the build log. Can't easily parse the correct source code path.
+    // /bin/bash ./libtool  --tag=CC   --mode=compile gcc -DHAVE_CONFIG_H   -I./include -I./include  -DGC_PTHREAD_START_STANDALONE    -fexceptions -Wall -Wextra -Wpedantic -Wno-long-long -g -O2 -fno-strict-aliasing  -MT cord/libcord_la-cordxtra.lo -MD -MP -MF cord/.deps/libcord_la-cordxtra.Tpo -c -o cord/libcord_la-cordxtra.lo `test -f 'cord/cordxtra.c' || echo './'`cord/cordxtra.c
+    // Line with the resolved command, from which the extension can parse a valid source code path.
+    // This line is present only in the build log, immediately following the above line.
+    // libtool: compile:  gcc -DHAVE_CONFIG_H -I./include -I./include -DGC_PTHREAD_START_STANDALONE -fexceptions -Wall -Wextra -Wpedantic -Wno-long-long -g -O2 -fno-strict-aliasing -MT cord/libcord_la-cordxtra.lo -MD -MP -MF cord/.deps/libcord_la-cordxtra.Tpo -c cord/cordxtra.c  -fPIC -DPIC -o cord/.libs/libcord_la-cordxtra.o
+    preprocessTasks.push(function () {
+        regexp = /libtool: compile:|libtool: link:/mg;
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\nLIBTOOL_PATTERN\n");
     });
 
-    // Remove lines with $ since they come from unexpanded yet variables. The extension can't do anything yet
+    // Process some more makefile output weirdness
+    // When --mode=compile or --mode=link are present in a line, we can ignore anything that is before
+    // and all that is after is a normal complete compiler or link command.
+    // Replace these patterns with end of line so that the parser will see only the right half.
+    preprocessTasks.push(function () {
+        regexp = /--mode=compile|--mode=link/mg;
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\nLIBTOOL_PATTERN\n");
+    });
+
+    // Remove lines with $() since they come from unexpanded yet variables. The extension can't do anything yet
     // about them anyway and also there will be a correspondent line in the dryrun with these variables expanded.
-    preprocessTasks.push(function (): void {
-      regexp = /.*\$.*/mg;
+    // Don't remove lines with $ without paranthesis, there are valid compilation lines that would be ignored otherwise.
+    preprocessTasks.push(function () {
+      regexp = /.*\$\(.*/mg;
       preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "");
     });
 
-  // Extract the link command
+    // Extract the link command
     // Keep the /link switch to the cl command because otherwise we will see compiling without /c
     // and we will deduce some other output binary based on its /Fe or /Fo or first source given,
     // instead of the output binary defined via the link operation (which will be parsed on the next line).
@@ -191,6 +199,19 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         if (process.platform === "win32") {
             preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ \/link /g, "/link \n link.exe ");
         }
+    });
+
+    // The splitting of multiple commands is better to be done at the end.
+    // Oherwise, this scenario interferes with the line ending '\' in some cases
+    // (see MAKE repo, ar.c compiler command, for example).
+    // Split multiple commands concatenated by '&&'
+    preprocessTasks.push(function () {
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
+    });
+
+    // Split multiple commands concatenated by ";"
+    preprocessTasks.push(function () {
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
     });
 
     // Loop through all the configure preprocess tasks, checking for cancel.
@@ -247,15 +268,16 @@ interface ToolInvocation {
 function parseLineAsTool(
     line: string,
     toolNames: string[],
-    currentPath: string
+    currentPath: string,
+    isCompilerOrLinker: boolean = true
 ): ToolInvocation | undefined {
     // To avoid hard-coding (and ever maintaining) in the tools list
     // the various compilers/linkers that can have versions, prefixes or suffixes
     // in their names, include a crafted regex around each tool name.
     // Any number of prefix or suffix text, separated by '-'.
     let versionedToolNames: string[] = [];
-    const prefixRegex: string = "(([a-zA-Z0-9-_.]*-)*";
-    const suffixRegex: string = "(-[a-zA-Z0-9-_.]*)*)";
+    const prefixRegex: string = isCompilerOrLinker ? "(([a-zA-Z0-9-_.]*-)*" : "";
+    const suffixRegex: string = isCompilerOrLinker ? "(-[a-zA-Z0-9-_.]*)*)" : "";
     toolNames.forEach(tool => {
         // Check if the user defined this tool as to be excluded
         if (!configuration.getExcludeCompilerNames()?.includes(tool)) {
@@ -435,17 +457,29 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
     // - when the switch value contains a '=', the right half can be also quoted by ', ", ` or '"..."'
     //   and should be able to not stop at space when inside the quote characters.
     //    (example): -DMY_DEFINE='"SOME_VALUE"'
-    let regexpStr: string = '(^|\\s+)' + // start of line or any amount of space character
-                            '\\\'?' + // optional quoting around the whole construct (prefix, switch name and value)
-                            // prefix, switch name, separator between switch name and switch value
+
+    function anythingBetweenQuotes(fullyQuoted: boolean): string {
+        let anythingBetweenReverseQuote: string = '\\`[^\\`]*?\\`';
+        let anythingBetweenSingleQuote: string = "\\'[^\\']*?\\'";
+        let anythingBetweenDoubleQuote: string = '\\"[^\\"]*?\\"';
+
+        // If the switch is fully quoted with ', like ('-DMY_DEFINE="MyValue"'), don't allow single quotes
+        // inside the switch value.
+        // One example of what can be broken if we don't do this: gcc '-DDEF1=' '-DDef2=val2'
+        // in which case DEF1 would be seen as DEF1=' ' instead of empty =
+        let str: string = anythingBetweenReverseQuote + '|' + anythingBetweenDoubleQuote + (fullyQuoted ? "" : '|' + anythingBetweenSingleQuote);
+        return str;
+    }
+
+    function mainPattern(fullyQuoted: boolean): string {
+        let pattern: string = 
+                            // prefix and switch name
                             '(' +
-                                '\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*)' +
+                                  '\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*)' +
                             ')' +
-                            // the switch value
+                            // switch value
                             '(' +
-                                '\\`[^\\`]*?\\`|' + // anything between `
-                                '\\\'[^\\\']*?\\\'|' + // anything between '
-                                '\\"[^\\"]*?\\"|' + // anything between "
+                                anythingBetweenQuotes(fullyQuoted) + '|' +
                                 // not fully quoted switch value scenarios
                                 '(' +
                                     // the left side (or whole value if no '=' is following)
@@ -455,25 +489,35 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
                                     '(' +
                                         '=' + // separator between switch value left side and right side
                                         '(' +
-                                            '\\`[^\\`]*?\\`|' + // anything between `
-                                            '\\\'[^\\\']*?\\\'|' + // anything between '
-                                            '\\"[^\\"]*?\\"|' + // anything between "
+                                            anythingBetweenQuotes(fullyQuoted) + '|' +
                                             '[^\\s]+' +  // not quoted right side of switch value
-                                                          // equal is actually allowed (example gcc switch: -fmacro-prefix-map=./= )
-                                        ')' +
-                                    ')?' +
+                                                         // equal is actually allowed (example gcc switch: -fmacro-prefix-map=./= )
+                                        ')?' + // right side of '=' is optional, meaning we can define as nothing, like: -DMyDefine=
+                                    ')?' + // = is also optional (simple define)
                                 ')' +
-                            ')\\\'?';
+                            ')';
+
+        return pattern;
+    }
+
+    let regexpStr: string = '(' + '^|\\s+' + ')' + // start of line or any amount of space character
+                            '(' +
+                                '(' + "\\'" + mainPattern(true) + "\\'" + ')' + "|" + // switch if fully quoted
+                                '(' + mainPattern(false) + ')' + // switch if not fully quoted
+                            ')';
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null;
     let results: string[] = [];
 
     match = regexp.exec(args);
     while (match) {
-        let result: string = match[6];
+        let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 18;
+        let result: string = match[matchIndex];
         if (result) {
-            result = result.trim();
+            result = util.removeSurroundingQuotes(result);
             results.push(result);
+        } else {
+            logger.message("Temporary message. To be deleted at the last commit of this PR.");
         }
         match = regexp.exec(args);
     }
@@ -620,8 +664,27 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
     match = regexp.exec(args);
     while (match) {
         let result: string = match[1];
+
+        // It is quite common to encounter the following pattern:
+        //  `test -f 'sourceFile.c' || echo './'`sourceFile.c
+        // Until we implement the correct approach (to query live the test command)
+        // we can just ignore it and consider the second option of the OR
+        // (by removing './'`). Even if this is hacky, it is worth it
+        // because the pattern is encountered very often and this is a short term workaround.
+        let idx: number = args.lastIndexOf(result);
+        let str: string = args.substring(idx - 10, idx);
+        if (str === "' || echo ") {
+            result = result.substring(5, result.length);
+        }
+
         if (result) {
-            result = result.trim();
+            result = util.removeSurroundingQuotes(result);
+
+            // Debug message to identify easier the scenarios where source files have inner quotes.
+            if (result.includes('"')) {
+                logger.message(`File argument that contains quotes: \`${result}\``, "Debug");
+            }
+
             files.push(result);
         }
         match = regexp.exec(args);
@@ -640,7 +703,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
     let lastCurrentPath: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
     let newCurrentPath: string = "";
 
-    if (line.startsWith('cd -')) {
+    if (line.startsWith('cd -') && !configuration.getIgnoreDirectoryCommands()) {
         // Swap the last two current paths in the history.
         if (lastCurrentPath) {
             currentPathHistory.pop();
@@ -648,17 +711,18 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
 
         let lastCurrentPath2: string = (currentPathHistory.length > 0) ? currentPathHistory.pop() || "" : lastCurrentPath;
 
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("CD- command: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose");
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("CD- command: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose", false);
         currentPathHistory.push(lastCurrentPath);
         currentPathHistory.push(lastCurrentPath2);
-    } else if (line.startsWith('popd') || line.includes('Leaving directory')) {
+    } else if ((line.startsWith('popd') && !configuration.getIgnoreDirectoryCommands()) ||
+               line.includes('Leaving directory')) {
         let lastCurrentPath: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
         currentPathHistory.pop();
         let lastCurrentPath2: string = (currentPathHistory.length > 0) ? currentPathHistory[currentPathHistory.length - 1] : "";
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("POPD command or end of MAKE -C: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose");
-    } else if (line.startsWith('cd')) {
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("POPD command or end of MAKE -C: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose", false);
+    } else if (line.startsWith('cd') && !configuration.getIgnoreDirectoryCommands()) {
         newCurrentPath = util.makeFullPath(line.slice(3), lastCurrentPath);
 
         // For "cd-" (which toggles between the last 2 current paths),
@@ -671,13 +735,13 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         }
 
         currentPathHistory.push(newCurrentPath);
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("CD command: entering directory " + newCurrentPath, "Verbose");
-    } else if (line.startsWith('pushd')) {
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("CD command: entering directory " + newCurrentPath, "Verbose", false);
+    } else if (line.startsWith('pushd') && !configuration.getIgnoreDirectoryCommands()) {
         newCurrentPath = util.makeFullPath(line.slice(6), lastCurrentPath);
         currentPathHistory.push(newCurrentPath);
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose");
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose", false);
     } else if (line.includes('Entering directory')) { // equivalent to pushd
         // The make switch print-directory wraps the folder in various ways.
         let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['`\"])(.*)['`\"]");
@@ -687,8 +751,8 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
             newCurrentPath = "Could not parse directory";
         }
 
-        logger.message("Analyzing line: " + line, "Verbose");
-        logger.message("MAKE -C: entering directory " + newCurrentPath, "Verbose");
+        logger.message("Analyzing line: " + line, "Verbose", false);
+        logger.message("MAKE -C: entering directory " + newCurrentPath, "Verbose", false);
         currentPathHistory.push(newCurrentPath);
     }
 
@@ -717,7 +781,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
         return make.ConfigureBuildReturnCodeTypes.cancelled;
     }
 
-    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.');
+    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.', "Normal", false);
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -745,7 +809,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
             let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
             if (compilerTool) {
-                logger.message("Found compiler command: " + line, "Verbose");
+                logger.message("Found compiler command: " + line, "Verbose", false);
 
                 // Compiler path is either what the makefile provides or found in the PATH environment variable or empty
                 let compilerFullPath: string = compilerTool.fullPath || "";
@@ -920,7 +984,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
                     if (path.basename(compilerTool.fullPath).startsWith("cl")) {
                         if (!isSwitchPassedInArguments(compilerTool.arguments, ["c", "P", "E", "EP"])) {
-                            logger.message("Found compiler command:\n" + line, "Verbose");
+                            logger.message("Found compiler command:\n" + line, "Verbose", false);
 
                             // First read the value of the /Fe switch (for cl.exe)
                             compilerTargetBinary = parseSingleSwitchFromToolArguments(compilerTool.arguments, ["Fe"]);
@@ -935,10 +999,10 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                                     let parsedObjPath: path.ParsedPath = path.parse(objFile);
                                     compilerTargetBinary = parsedObjPath.name + ".exe";
                                     logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                        compilerTargetBinary + " from the first object passed in with /Fo", "Verbose");
+                                        compilerTargetBinary + " from the first object passed in with /Fo", "Verbose", false);
                                 }
                             } else {
-                                logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose");
+                                logger.message("Producing target binary with /Fe: " + compilerTargetBinary, "Verbose", false);
                             }
 
                             // Then assume first source file base name + exe.
@@ -950,7 +1014,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                                     let parsedSourcePath: path.ParsedPath = path.parse(srcFiles[0]);
                                     compilerTargetBinary = parsedSourcePath.name + ".exe";
                                     logger.message("The compiler command is not producing a target binary explicitly. Assuming " +
-                                        compilerTargetBinary + " from the first source file passed in", "Verbose");
+                                        compilerTargetBinary + " from the first source file passed in", "Verbose", false);
                                 }
                             }
                         }
@@ -972,7 +1036,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                     // Also, the ld switches -r and -Ur do not produce executables.
                     if (!isSwitchPassedInArguments(linkerTool.arguments, ["c", "E", "S", "r", "Ur"])) {
                         linkerTargetBinary = parseSingleSwitchFromToolArguments(linkerTool.arguments, ["out", "o"]);
-                        logger.message("Found linker command: " + line, "Verbose");
+                        logger.message("Found linker command: " + line, "Verbose", false);
 
                         if (!linkerTargetBinary) {
                             // For Microsoft link.exe, the default output binary takes the base name
@@ -985,22 +1049,30 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                                     let parsedPath: path.ParsedPath = path.parse(files[0]);
                                     let targetBinaryFromFirstObjLib: string = parsedPath.name + ".exe";
                                     logger.message("The link command is not producing a target binary explicitly. Assuming " +
-                                        targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose");
+                                        targetBinaryFromFirstObjLib + " based on first object passed in", "Verbose", false);
                                     linkerTargetBinary = targetBinaryFromFirstObjLib;
                                 }
                             } else {
                                 // The default output binary from a linking operation is usually a.out on linux/mac,
                                 // produced in the same folder where the toolset is run.
-                                logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose");
+                                logger.message("The link command is not producing a target binary explicitly. Assuming a.out", "Verbose", false);
                                 linkerTargetBinary = "a.out";
                             }
-                        } else {
-                            logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
                         }
                     }
 
                     if (linkerTargetBinary) {
-                        linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
+                        // Until we implement a more robust link target analysis
+                        // (like query-ing for the executable attributes),
+                        // we can safely assume that a ".la" file produced by libtool
+                        // is a library and not an executable binary.
+                        if (linkerTargetBinary.endsWith(".la") && dryRunOutputLines[index - 1] === "LIBTOOL_PATTERN") {
+                            linkerTargetBinary = undefined;
+                        } else {
+                            linkerTargetBinary = util.removeSurroundingQuotes(linkerTargetBinary);
+                            logger.message("Producing target binary: " + linkerTargetBinary, "Verbose", false);
+                            linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
+                        }
                     }
                 }
             }
@@ -1010,19 +1082,28 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             // (cl.exe with /link switch is split into two lines - cl.exe and link.exe - during dry-run preprocessing).
             // Also for gcc/clang, -o switch or the default output will be a .o in the presence of -c and an executable otherwise.
             let targetBinary: string | undefined = linkerTargetBinary || compilerTargetBinary;
-            if (targetBinary) {
+
+            // Some "$" (without following open paranthesis) are still left in the preprocessed output,
+            // because the configuraion provider parser may lose valid compilation lines otherwise.
+            // Additionally, for linker commands, ignore any dollar if present in the target binary name.
+            // We need to ignore the $ anywhere else in the linker command line so that we don't lose
+            // valid target binaries.
+            if (targetBinary && !targetBinary.includes("$")) {
                 targetBinaries.push(targetBinary);
 
                 // Include limited launch configuration, when only the binary is known,
-                // in which case the execution path is defaulting to workspace root folder
+                // in which case the execution path is defaulting to binary containing folder.
+                // It is more likely that an invocation would succeed from that location
+                // as opposed from any other (like the root) because of eventual dependencies
+                // that very likely to be built in the same place.
                 // and there are no args.
                 let launchConfiguration: configuration.LaunchConfiguration = {
                     binaryPath: targetBinary,
-                    cwd: vscode.workspace.rootPath || "",
+                    cwd: path.parse(targetBinary).dir,
                     binaryArgs: []
                 };
 
-                logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
+                logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose", false);
                 onFoundLaunchConfiguration(launchConfiguration);
             }
 
@@ -1066,12 +1147,19 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
     currentPath = vscode.workspace.rootPath || "";
     currentPathHistory = [currentPath];
 
-    // Make also an array with only the base file names of the found target binaries.
+    // Since an executable can be called without its extension,
+    // on Windows only and only for extensions 'exe',
+    // create a new array with target binaries names
+    // to ensure we parse right these binaries invocation right.
     let targetBinariesNames: string[] = [];
     targetBinaries.forEach(target => {
         let parsedPath: path.ParsedPath = path.parse(target);
         if (!targetBinariesNames.includes(parsedPath.name)) {
-            targetBinariesNames.push(parsedPath.name);
+            if (process.platform === "win32" && parsedPath.ext === "exe") {
+                targetBinariesNames.push(util.escapeString(parsedPath.name));
+            } else {
+                targetBinariesNames.push(util.escapeString(parsedPath.base));
+            }
         }
     });
 
@@ -1085,41 +1173,64 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             }
 
             let line: string = dryRunOutputLines[index];
+            // Some "$" (without following open paranthesis) are still left in the preprocessed output,
+            // because the configuraion provider parser may lose valid compilation lines otherwise.
+            // But the binary invocations parser should ignore any dollar because the extension can't resolve
+            // these anyway, wherever they are (current folder, binary name or arguments).
+            if (!line.includes("$")) {
+                statusCallback("Parsing for launch targets: inspecting built binary invocations");
+                currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
+                currentPath = currentPathHistory[currentPathHistory.length - 1];
 
-            statusCallback("Parsing for launch targets: inspecting built binary invocations");
-            currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
-            currentPath = currentPathHistory[currentPathHistory.length - 1];
+                // Currently, the target binary invocation will not be identified if the line does not start with it,
+                // because we need to be able to reject matches like "link.exe /out:mybinary.exe".
+                // See comment in parseLineAsTool about not understanding well what it is that prepends
+                // the target binary tool, unless we treat it as a path and verify its location on disk.
+                // Because of this limitation, the extension might not present to the user
+                // all the scenarios of arguments defined in the makefile for this target binary.
+                // TODO: identify and parse properly all the valid scenarios of invoking a taget binary in a makefile:
+                //       - @if (not) exist binary binary arg1 arg2 arg3
+                //         (because an "@if exist" is not resolved by the dry-run and appears in the output)
+                //       - cmd /c binary arg1 arg2 arg3
+                //       - start binary
+                let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath, false);
 
-            // Currently, the target binary invocation will not be identified if the line does not start with it,
-            // because we need to be able to reject matches like "link.exe /out:mybinary.exe".
-            // See comment in parseLineAsTool about not understanding well what it is that prepends
-            // the target binary tool, unless we treat it as a path and verify its location on disk.
-            // Because of this limitation, the extension might not present to the user
-            // all the scenarios of arguments defined in the makefile for this target binary.
-            // TODO: identify and parse properly all the valid scenarios of invoking a taget binary in a makefile:
-            //       - @if (not) exist binary binary arg1 arg2 arg3
-            //         (because an "@if exist" is not resolved by the dry-run and appears in the output)
-            //       - cmd /c binary arg1 arg2 arg3
-            //       - start binary
-            let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath);
-            if (targetBinaryTool) {
-                logger.message("Found binary execution command: " + line, "Verbose");
-                // Include complete launch configuration: binary, execution path and args
-                // are known from parsing the dry-run
-                let splitArgs: string[] = targetBinaryTool.arguments ? targetBinaryTool.arguments.split(" ") : [];
-                if (splitArgs.length > 0) {
-                    splitArgs = filterTargetBinaryArgs(splitArgs);
+                // If the found target binary invocation does not happen from a location
+                // where it was built previously, don't include it as a launch target.
+                // We can debug only what was built. Also, it's quite common to run
+                // tools from the path during the build and we shouldn't launch those.
+                if (targetBinaryTool) {
+                    let foundTargetBinary: boolean = false;
+                    targetBinaries.forEach(target => {
+                        if (target === targetBinaryTool?.fullPath) {
+                            foundTargetBinary = true;
+                        }
+                    });
+
+                    if (!foundTargetBinary) {
+                        targetBinaryTool = undefined;
+                    }
                 }
 
-                let launchConfiguration: configuration.LaunchConfiguration = {
-                    binaryPath: targetBinaryTool.fullPath,
-                    cwd: currentPath,
-                    // TODO: consider optionally quoted arguments
-                    binaryArgs: splitArgs
-                };
+                if (targetBinaryTool) {
+                    logger.message("Found binary execution command: " + line, "Verbose", false);
+                    // Include complete launch configuration: binary, execution path and args
+                    // are known from parsing the dry-run
+                    let splitArgs: string[] = targetBinaryTool.arguments ? targetBinaryTool.arguments.split(" ") : [];
+                    if (splitArgs.length > 0) {
+                        splitArgs = filterTargetBinaryArgs(splitArgs);
+                    }
 
-                logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose");
-                onFoundLaunchConfiguration(launchConfiguration);
+                    let launchConfiguration: configuration.LaunchConfiguration = {
+                        binaryPath: targetBinaryTool.fullPath,
+                        cwd: currentPath,
+                        // TODO: consider optionally quoted arguments
+                        binaryArgs: splitArgs
+                    };
+
+                    logger.message("Adding launch configuration:\n" + configuration.launchConfigurationToString(launchConfiguration), "Verbose", false);
+                    onFoundLaunchConfiguration(launchConfiguration);
+                }
             }
 
             index++;
@@ -1259,12 +1370,12 @@ function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefi
     } else if (language === "cpp") {
         standard = parseCppStandard(std, canUseGnu);
         if (!standard) {
-            logger.message(`Unknown C++ standard control flag: ${std}`);
+            logger.message(`Unknown C++ standard control flag: ${std}`, "Normal", false);
         }
     } else if (language === "c") {
         standard = parseCStandard(std, canUseGnu);
         if (!standard) {
-            logger.message(`Unknown C standard control flag: ${std}`);
+            logger.message(`Unknown C standard control flag: ${std}`, "Normal", false);
         }
     } else if (language === undefined) {
         standard = parseCppStandard(std, canUseGnu);
@@ -1272,10 +1383,10 @@ function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefi
             standard = parseCStandard(std, canUseGnu);
         }
         if (!standard) {
-            logger.message(`Unknown standard control flag: ${std}`);
+            logger.message(`Unknown standard control flag: ${std}`, "Normal", false);
         }
     } else {
-        logger.message("Unknown language");
+        logger.message("Unknown language", "Normal", false);
     }
 
     return standard;
@@ -1320,3 +1431,4 @@ function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion
       return undefined;
     }
   }
+  
