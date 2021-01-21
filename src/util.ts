@@ -237,6 +237,18 @@ export function dropNulls<T>(items: (T | null | undefined)[]): T[] {
 
 // Helper to reinterpret one relative path (to the given current path) printed by make as full path
 export function makeFullPath(relPath: string, curPath: string | undefined): string {
+    // Tricky path formatting for mingw (and possibly other subsystems - cygwin?, ...),
+    // causing the absolute path calculation to be wrong.
+    // For process.platform "win32", an undefined process.env.MSYSTEM guarantees pure windows
+    // and no formatting is necessary.
+    if (process.platform === "win32" && process.env.MSYSTEM !== undefined) {
+        relPath = formatMingW(relPath);
+
+        if (curPath && path.isAbsolute(curPath)) {
+            curPath = formatMingW(curPath);
+        }
+    }
+
     let fullPath: string = relPath;
 
     if (!path.isAbsolute(fullPath) && curPath) {
@@ -258,12 +270,10 @@ export function makeFullPaths(relPaths: string[], curPath: string | undefined): 
 }
 
 export function formatMingW(path : string) : string {
-    //path = path.replace(/\//g, '\\');
     path = path.replace(/\\/g, '/');
     path = path.replace(':', '');
 
     if (!path.startsWith('\\') && !path.startsWith('/')) {
-        //path = '\\' + path;
         path = '/' + path;
     }
 

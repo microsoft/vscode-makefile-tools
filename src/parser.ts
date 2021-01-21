@@ -324,9 +324,14 @@ function parseLineAsTool(
         toolNameInMakefile += ".exe";
     }
 
+    // Quotes are not needed either for the compiler path or the current path.
+    // checkFileExists works just fine without quotes,
+    // but makeFullPath gets confused sometimes for some quotes scenarios.
+    currentPath = util.removeQuotes(currentPath);
     toolPathInMakefile = toolPathInMakefile.trimLeft();
+    toolPathInMakefile = util.removeQuotes(toolPathInMakefile);
+
     let toolFullPath: string = util.makeFullPath(toolPathInMakefile + toolNameInMakefile, currentPath);
-    toolFullPath = util.removeQuotes(toolFullPath);
     let toolFound: boolean = util.checkFileExistsSync(toolFullPath);
 
     // Reject a regexp match that doesn't have a real path before the tool invocation,
@@ -665,14 +670,20 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 
         // It is quite common to encounter the following pattern:
         //  `test -f 'sourceFile.c' || echo './'`sourceFile.c
+        // or `test -f 'sourceFile.c' || echo '../../../libwally-core/src/'`sourceFile.c
         // Until we implement the correct approach (to query live the test command)
         // we can just ignore it and consider the second option of the OR
-        // (by removing './'`). Even if this is hacky, it is worth it
-        // because the pattern is encountered very often and this is a short term workaround.
+        // (by removing the quotes while preserving the relative path).
+        // Even if this is hacky, it is worth it because the pattern is encountered very often
+        // and this is a short term workaround.
         let idx: number = args.lastIndexOf(result);
-        let str: string = args.substring(idx - 10, idx);
-        if (str === "' || echo ") {
-            result = result.substring(5, result.length);
+        let echo: string = "' || echo ";
+        let str: string = args.substring(idx - echo.length, idx);
+        if (str === echo) {
+            // not to use util.removeQuotes because that also removes double quotes "
+            // and doesn't remove back quotes `.
+            result = result.replace(/\'/mg, "");
+            result = result.replace(/\`/mg, "");
         }
 
         if (result) {
