@@ -360,12 +360,12 @@ export function launchConfigurationToString(configuration: LaunchConfiguration):
 // Helper used to construct a minimal launch configuration object
 // (only cwd, binary path and arguments) from a string that respects
 // the syntax of its quick pick.
-export function stringToLaunchConfiguration(str: string): LaunchConfiguration | undefined {
+export async function stringToLaunchConfiguration(str: string): Promise<LaunchConfiguration | undefined> {
     let regexp: RegExp = /(.*)\>(.*)\((.*)\)/mg;
     let match: RegExpExecArray | null = regexp.exec(str);
 
     if (match) {
-        let fullPath: string = util.makeFullPath(match[2], match[1]);
+        let fullPath: string = await util.makeFullPath(match[2], match[1]);
         let splitArgs: string[] = (match[3] === "") ? [] : match[3].split(",");
 
         return {
@@ -528,7 +528,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
                 telemetry.logEvent("makeNotFound", telemetryProperties);
             }
         } else {
-            if (!util.toolPathInEnv(path.parse(configurationMakeCommand).name)) {
+            if (!util.toolPathInEnv(path.parse(configurationMakeCommand).base)) {
                 vscode.window.showErrorMessage("Make not found.");
                 logger.message("Make was not given any path in settings and is also not found on the environment path.");
 
@@ -1241,12 +1241,12 @@ export async function selectTarget(): Promise<void> {
 // the given binary in the exact same way more than once), incorporate also the containing target
 // name in the syntax (or, since in theory one can write a makefile target to run the same binary
 // in the same way more than once, add some number suffix).
-export function setLaunchConfigurationByName(launchConfigurationName: string) : void {
+export async function setLaunchConfigurationByName(launchConfigurationName: string) : Promise<void> {
     // Find the matching entry in the array of launch configurations
     // or generate a new entry in settings if none are found.
     currentLaunchConfiguration = getLaunchConfiguration(launchConfigurationName);
     if (!currentLaunchConfiguration) {
-        currentLaunchConfiguration = stringToLaunchConfiguration(launchConfigurationName);
+        currentLaunchConfiguration = await stringToLaunchConfiguration(launchConfigurationName);
         if (currentLaunchConfiguration) {
             launchConfigurations.push(currentLaunchConfiguration);
             let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
@@ -1323,7 +1323,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
             };
             telemetry.logEvent("stateChanged", telemetryProperties);
 
-            setLaunchConfigurationByName(chosen);
+            await setLaunchConfigurationByName(chosen);
 
             // Refresh telemetry for this new launch configuration
             // (this will find the corresponding item in the makefile.launchConfigurations array

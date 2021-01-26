@@ -1309,7 +1309,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     if (currentLaunchConfigurationStr !== "" &&
         !configuration.getLaunchTargets().includes(currentLaunchConfigurationStr)) {
             logger.message(`Current launch configuration ${currentLaunchConfigurationStr} is no longer present in the available list.`);
-            configuration.setLaunchConfigurationByName("");
+            await configuration.setLaunchConfigurationByName("");
     }
 
     // Configure build targets only if necessary:

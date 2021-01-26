@@ -136,14 +136,15 @@ export class MakefileToolsExtension {
         // cummulativeBrowsePath incorporates all the files and the includes paths
         // of all the compiler invocations of the current configuration
         customConfigProviderItem.files.forEach(filePath => {
+            let uri: vscode.Uri = vscode.Uri.file(filePath);
             let sourceFileConfigurationItem: cpp.SourceFileConfigurationItem = {
-                uri: vscode.Uri.file(filePath),
+                uri,
                 configuration,
             };
 
             // These are the configurations processed during the current configure.
             // Store them in the 'delta' file index instead of the final one.
-            provider.fileIndex.set(path.normalize(filePath), sourceFileConfigurationItem);
+            provider.fileIndex.set(path.normalize(uri.fsPath), sourceFileConfigurationItem);
             extension.getCppConfigurationProvider().logConfigurationProviderItem(sourceFileConfigurationItem);
 
             let folder: string = path.dirname(filePath);
@@ -231,7 +232,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return launcher.launchTargetDirectory();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetFileName', () => {
+      telemetry.logEvent("launchTargetFileName");
+      return launcher.launchTargetFileName();
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
         telemetry.logEvent("launchTargetArgs");
         return launcher.launchTargetArgs();
     }));

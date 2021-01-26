@@ -235,67 +235,55 @@ export function dropNulls<T>(items: (T | null | undefined)[]): T[] {
     return items.filter(item => (item !== null && item !== undefined)) as T[];
 }
 
+// Convert a posix path (/home/dir1/dir2/file.ext) into windows path,
+// by calling the cygpah which comes installed with MSYS/MinGW environments
+// and which is also aware of the drive under which /home/ is placed.
+// result: c:\msys64\home\dir1\dir2\file.ext
+// Called usually for Windows subsystems: MinGW, CygWin.
+export async function cygpath(pathStr: string): Promise<string> {
+   let windowsPath: string = pathStr;
+
+   let stdout: any = (result: string): void => {
+      windowsPath = result.replace(/\n/mg, ""); // remove the end of line
+  };
+
+  await spawnChildProcess("cygpath", [pathStr, "-w"], "", stdout);
+  return windowsPath;
+}
+
 // Helper to reinterpret one relative path (to the given current path) printed by make as full path
-export function makeFullPath(relPath: string, curPath: string | undefined): string {
-    // Tricky path formatting for mingw (and possibly other subsystems - cygwin?, ...),
-    // causing the absolute path calculation to be wrong.
-    // For process.platform "win32", an undefined process.env.MSYSTEM guarantees pure windows
-    // and no formatting is necessary.
-    if (process.platform === "win32" && process.env.MSYSTEM !== undefined) {
-        relPath = formatMingW(relPath);
-
-        if (curPath && path.isAbsolute(curPath)) {
-            curPath = formatMingW(curPath);
-        }
-    }
-
+export async function makeFullPath(relPath: string, curPath: string | undefined): Promise<string> {
     let fullPath: string = relPath;
 
     if (!path.isAbsolute(fullPath) && curPath) {
         fullPath = path.join(curPath, relPath);
     }
 
+    if (process.platform === "win32" && process.env.MSYSTEM !== undefined) {
+       // invoke cygpath to find out where the posix home drive resides on the windows file system.
+       fullPath = await cygpath(fullPath);
+    }
+
     return fullPath;
 }
 
 // Helper to reinterpret the relative paths (to the given current path) printed by make as full paths
-export function makeFullPaths(relPaths: string[], curPath: string | undefined): string[] {
-    let fullPaths: string[] = [];
+export async function makeFullPaths(relPaths: string[], curPath: string | undefined): Promise<string[]> {
+   let fullPaths: string[] = [];
 
-    relPaths.forEach(p => {
-        fullPaths.push(makeFullPath(p, curPath));
-    });
+   for (const p of relPaths) {
+      let fullPath: string = await makeFullPath(p, curPath);
+      fullPaths.push(fullPath);
+   }
 
-    return fullPaths;
+   return fullPaths;
 }
 
-export function formatMingW(path : string) : string {
-    path = path.replace(/\\/g, '/');
-    path = path.replace(':', '');
-
-    if (!path.startsWith('\\') && !path.startsWith('/')) {
-        path = '/' + path;
-    }
-
-    return path;
-}
 // Helper to reinterpret one full path as relative to the given current path
 export function makeRelPath(fullPath: string, curPath: string | undefined): string {
     let relPath: string = fullPath;
 
     if (path.isAbsolute(fullPath) && curPath) {
-        // Tricky path formatting for mingw (and possibly other subsystems - cygwin?, ...),
-        // causing the relative path calculation to be wrong.
-        // For process.platform "win32", an undefined process.env.MSYSTEM guarantees pure windows
-        // and no formatting is necessary.
-        if (process.platform === "win32" && process.env.MSYSTEM !== undefined) {
-            fullPath = formatMingW(fullPath);
-
-            if (path.isAbsolute(curPath)) {
-                curPath = formatMingW(curPath);
-            }
-        }
-
         relPath = path.relative(curPath, fullPath);
     }
 

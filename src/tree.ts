@@ -55,8 +55,8 @@ export class LaunchTargetNode extends BaseNode {
 
     // Keep the tree node label as short as possible.
     // The binary path is the most important component of a launch target.
-    getShortLaunchTargetName(completeLaunchTargetName: string): string {
-        let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.stringToLaunchConfiguration(completeLaunchTargetName);
+    async getShortLaunchTargetName(completeLaunchTargetName: string): Promise<string> {
+        let launchConfiguration: configuration.LaunchConfiguration | undefined = await configuration.stringToLaunchConfiguration(completeLaunchTargetName);
         let shortName: string;
 
         if (!launchConfiguration) {
@@ -79,13 +79,13 @@ export class LaunchTargetNode extends BaseNode {
         super(`launchTarget:${targetName}`);
 
         // Show the complete launch target name as tooltip and the short name as label
-        this._name = this.getShortLaunchTargetName(targetName);
+        this._name = targetName;
         this._toolTip = targetName;
     }
 
-    update(targetName: string): void {
+    async update(targetName: string): Promise<void> {
         // Show the complete launch target name as tooltip and the short name as label
-        this._name = this.getShortLaunchTargetName(targetName);
+        this._name = await this.getShortLaunchTargetName(targetName);
         this._toolTip = targetName;
     }
 
