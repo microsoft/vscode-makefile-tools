@@ -168,10 +168,10 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
         return [this._currentConfigurationItem, this._currentBuildTargetItem, this._currentLaunchTargetItem];
     }
 
-    update(configuration: string, buildTarget: string, launchTarget: string): void {
+    async update(configuration: string, buildTarget: string, launchTarget: string): Promise<void> {
         this._currentConfigurationItem.update(configuration);
         this._currentBuildTargetItem.update(buildTarget);
-        this._currentLaunchTargetItem.update(launchTarget);
+        await this._currentLaunchTargetItem.update(launchTarget);
 
         this._changeEvent.fire(null);
     }
@@ -186,8 +186,8 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
         this._changeEvent.fire(null);
     }
 
-    updateLaunchTarget(launchTarget: string): void {
-        this._currentLaunchTargetItem.update(launchTarget);
+    async updateLaunchTarget(launchTarget: string): Promise<void> {
+        await this._currentLaunchTargetItem.update(launchTarget);
         this._changeEvent.fire(null);
     }
 }

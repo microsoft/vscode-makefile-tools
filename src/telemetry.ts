@@ -31,9 +31,9 @@ export function activate(): void {
     }
 }
 
-export function deactivate(): void {
+export async function deactivate(): Promise<void> {
     if (telemetryReporter) {
-        telemetryReporter.dispose();
+        await telemetryReporter.dispose();
     }
 }
 

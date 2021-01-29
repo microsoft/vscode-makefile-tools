@@ -418,7 +418,8 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
             // what switch they are looking for. This helper first identifies anything
             // that looks like a switch and then calls parseMultipleSwitchFromToolArguments
             // which knows how to parse complex scenarios of spaces, quotes and other characters.
-            let swiValues: string[] = parseMultipleSwitchFromToolArguments(partialArgs, swi);
+            // Don't allow parseMultipleSwitchFromToolArguments to remove surrounding quotes for switch values.
+            let swiValues: string[] = parseMultipleSwitchFromToolArguments(partialArgs, swi, false);
 
             // If no values are found, it means the switch has simple syntax.
             // Add this to the array.
@@ -431,7 +432,6 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
                 let index3: number = partialArgs.indexOf(value) + value.length;
                 let finalSwitch: string = partialArgs.substring(0, index3);
 
-                // Remove the switch prefix because it's not needed by CppTools (SourceFileConfiguration.compilerArgs).
                 finalSwitch = finalSwitch.trim();
                 switches.push(finalSwitch);
             });
@@ -447,7 +447,10 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
 // in the tool command line (example -I or -D for compiler)
 // and returns an array of the values passed via that switch
 // todo: refactor common parts in parseMultipleSwitchFromToolArguments and parseSingleSwitchFromToolArguments
-function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[] {
+// removeSurroundingQuotes: needs to be false when called from parseAnySwitchFromToolArguments,
+// and true otherwise. We need to analyze more scenarios before setting in stone a particular algorithm
+// regarding the decision to remove or not to remove them.
+function parseMultipleSwitchFromToolArguments(args: string, sw: string, removeSurroundingQuotes: boolean = true): string[] {
     // - '-' or '/' or '--' as switch prefix
     // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
     //   to reject a case where a part of a path looks like a switch with its value
@@ -519,7 +522,9 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
         let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 18;
         let result: string = match[matchIndex];
         if (result) {
-            result = util.removeSurroundingQuotes(result);
+           if (removeSurroundingQuotes) {
+              result = util.removeSurroundingQuotes(result);
+           }
             results.push(result);
         }
         match = regexp.exec(args);
@@ -674,14 +679,12 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
         // Until we implement the correct approach (to query live the test command)
         // we can just ignore it and consider the second option of the OR
         // (by removing the quotes while preserving the relative path).
-        // Even if this is hacky, it is worth it because the pattern is encountered very often
-        // and this is a short term workaround.
+        // This is a short term workaround.
         let idx: number = args.lastIndexOf(result);
         let echo: string = "' || echo ";
         let str: string = args.substring(idx - echo.length, idx);
         if (str === echo) {
             // not to use util.removeQuotes because that also removes double quotes "
-            // and doesn't remove back quotes `.
             result = result.replace(/\'/mg, "");
             result = result.replace(/\`/mg, "");
         }
@@ -916,7 +919,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
             break;
         }
 
-        await util.scheduleTask(doParsingChunk);
+        await util.scheduleTaskAsync(doParsingChunk);
     }
 
     return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;
@@ -1130,7 +1133,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             return make.ConfigureBuildReturnCodeTypes.cancelled;
         }
 
-        await util.scheduleTask(doLinkCommandsParsingChunk);
+        await util.scheduleTaskAsync(doLinkCommandsParsingChunk);
     }
 
     // If no binaries are found to be built, there is no point in parsing for invoking targets
@@ -1256,7 +1259,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             break;
         }
 
-        await util.scheduleTask(doBinaryInvocationsParsingChunk);
+        await util.scheduleTaskAsync(doBinaryInvocationsParsingChunk);
     }
 
     return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;

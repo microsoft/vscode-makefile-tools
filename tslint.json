@@ -85,6 +85,7 @@
             "check-whitespace"
         ],
         "one-variable-per-declaration": true,
+        "no-floating-promises": [true, "PromisedAssertion"],
         "prefer-method-signature": true,
         "prefer-object-spread": true,
         "prefer-while": true,
@@ -100,7 +101,6 @@
             "call-signature"
         ],
         "typedef-whitespace": true,
-        "typeof-compare": true,
         "unified-signatures": true,
         "use-default-type-parameter": true,
         "use-isnan": true,

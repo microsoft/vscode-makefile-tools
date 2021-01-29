@@ -124,6 +124,11 @@ export function toolPathInEnv(name: string): string | undefined {
 
     return envPathSplit.find(p => {
         let fullPath: string = path.join(p, path.basename(name));
+        // Often a path is added by the user to the PATH environment variable with surrounding quotes,
+        // especially on Windows where they get automatically added after TAB.
+        // These quotes become inner (not surrounding) quotes after we append various file names or do oher processing,
+        // making file sysem stats fail. Safe to remove here.
+        fullPath = removeQuotes(fullPath);
         if (checkFileExistsSync(fullPath)) {
             return fullPath;
         }
@@ -301,29 +306,32 @@ export function makeRelPaths(fullPaths: string[], curPath: string | undefined): 
     return fullPaths;
 }
 
-// Helper to remove any " or ' from the middle of a path
+// Helper to remove any quotes(", ' or `) from a given string
 // because many file operations don't work properly with paths
 // having quotes in the middle.
-// Don't add here a pair of quotes surrounding the whole result string,
-// this will be done when needed at other call sites.
 export function removeQuotes(str: string): string {
-    if (str.includes('"')) {
-        str = str.replace(/"/g, "");
+   const quotesStr: string[] = ["'", '"', "`"];
+   for (const p in quotesStr) {
+      if (str.includes(quotesStr[p])) {
+         let regExpStr: string = `${quotesStr[p]}`;
+         let regExp: RegExp = RegExp(regExpStr, 'g');
+         str = str.replace(regExp, "");
     }
-
-    if (str.includes("'")) {
-        str = str.replace(/'/g, "");
-    }
+   }
 
     return str;
 }
 
-// Remove only he quotes that are surrounding the given string.
+// Remove only the quotes (", ' or `) that are surrounding the given string.
 export function removeSurroundingQuotes(str: string): string {
-    str = str.trim();
-    if (str.startsWith('"') && str.endsWith('"')) {
-        str = str.substring(1, str.length - 1);
-    }
+    let result: string = str.trim();
+    const quotesStr: string[] = ["'", '"', "`"];
+    for (const p in quotesStr) {
+      if (result.startsWith(quotesStr[p]) && result.endsWith(quotesStr[p])) {
+         result = result.substring(1, str.length - 1);
+         return result;
+     }
+   }
 
     return str;
 }
@@ -462,6 +470,20 @@ export function scheduleTask<T>(task: () => T): Promise<T> {
             }
         });
     });
+}
+
+// Async version of scheduleTask
+export async function scheduleTaskAsync<T>(task: () => Promise<T>): Promise<T> {
+   return new Promise<T>((resolve, reject) => {
+       setImmediate(async () => {
+           try {
+               const result: T = await task();
+               resolve(result);
+           } catch (e) {
+               reject(e);
+           }
+       });
+   });
 }
 
 export function thisExtension(): vscode.Extension<any> {

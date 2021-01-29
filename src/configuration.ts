@@ -758,13 +758,13 @@ export async function initFromStateAndSettings(): Promise<void> {
 
     analyzeConfigureParams();
 
-    extension._projectOutlineProvider.update(extension.getState().buildConfiguration || "unset",
+    await extension._projectOutlineProvider.update(extension.getState().buildConfiguration || "unset",
                                              extension.getState().buildTarget || "unset",
                                              extension.getState().launchConfiguration || "unset");
 
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
-    vscode.window.onDidChangeActiveTextEditor(e => {
+    vscode.window.onDidChangeActiveTextEditor(async e => {
         let language: string = "";
         if (e) {
             language = e.document.languageId;
@@ -795,7 +795,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                     if ((extension.getCompletedConfigureInSession())
                         && !make.blockedByOp(make.Operations.configure, false)) {
                         logger.message("Configuring after settings or makefile changes...");
-                        make.configure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
+                        await make.configure(make.TriggeredBy.configureAfterEditorFocusChange); // this sets configureDirty back to false if it succeeds
                     }
                 }
 
@@ -1270,7 +1270,7 @@ export async function setLaunchConfigurationByName(launchConfigurationName: stri
         statusBar.setLaunchConfiguration("No launch configuration set");
     }
 
-    extension._projectOutlineProvider.updateLaunchTarget(launchConfigurationName);
+    await extension._projectOutlineProvider.updateLaunchTarget(launchConfigurationName);
 }
 
 // Fill a drop-down with all the launch configurations found for binaries built by the makefile
