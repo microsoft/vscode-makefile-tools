@@ -71,7 +71,7 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             make.prepareBuildTarget("execute_Arch3");
 
-            configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)");
+            await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)");
 
             let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
             let launchConfiguration: configuration.LaunchConfiguration | undefined;
@@ -130,7 +130,7 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             make.prepareBuildTarget("all");
 
-            configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
+            await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">8cc()");
 
             let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
             let launchConfiguration: configuration.LaunchConfiguration | undefined;
@@ -191,7 +191,7 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             make.prepareBuildTarget("bin/foo.o");
 
-            configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
+            await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/foo.o()");
 
             let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
             let launchConfiguration: configuration.LaunchConfiguration | undefined;
@@ -252,7 +252,7 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             make.prepareBuildTarget("tvmi");
 
-            configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");
+            await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/tvmi()");
 
             let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
             let launchConfiguration: configuration.LaunchConfiguration | undefined;

@@ -164,7 +164,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // Line with the resolved command, from which the extension can parse a valid source code path.
     // This line is present only in the build log, immediately following the above line.
     // libtool: compile:  gcc -DHAVE_CONFIG_H -I./include -I./include -DGC_PTHREAD_START_STANDALONE -fexceptions -Wall -Wextra -Wpedantic -Wno-long-long -g -O2 -fno-strict-aliasing -MT cord/libcord_la-cordxtra.lo -MD -MP -MF cord/.deps/libcord_la-cordxtra.Tpo -c cord/cordxtra.c  -fPIC -DPIC -o cord/.libs/libcord_la-cordxtra.o
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         regexp = /libtool: compile:|libtool: link:/mg;
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\nLIBTOOL_PATTERN\n");
     });
@@ -173,7 +173,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // When --mode=compile or --mode=link are present in a line, we can ignore anything that is before
     // and all that is after is a normal complete compiler or link command.
     // Replace these patterns with end of line so that the parser will see only the right half.
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         regexp = /--mode=compile|--mode=link/mg;
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "\nLIBTOOL_PATTERN\n");
     });
@@ -181,7 +181,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // Remove lines with $() since they come from unexpanded yet variables. The extension can't do anything yet
     // about them anyway and also there will be a correspondent line in the dryrun with these variables expanded.
     // Don't remove lines with $ without paranthesis, there are valid compilation lines that would be ignored otherwise.
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
       regexp = /.*\$\(.*/mg;
       preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "");
     });
@@ -205,12 +205,12 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // Oherwise, this scenario interferes with the line ending '\' in some cases
     // (see MAKE repo, ar.c compiler command, for example).
     // Split multiple commands concatenated by '&&'
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/ && /g, "\n");
     });
 
     // Split multiple commands concatenated by ";"
-    preprocessTasks.push(function () {
+    preprocessTasks.push(function (): void {
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
     });
 
@@ -265,12 +265,12 @@ interface ToolInvocation {
 // TODO: handle the following corner cases:
 //     - quotes only around directory (file name outside quotes)
 //     - path containing "toolName(no extension) " in the middle
-function parseLineAsTool(
+async function parseLineAsTool(
     line: string,
     toolNames: string[],
     currentPath: string,
     isCompilerOrLinker: boolean = true
-): ToolInvocation | undefined {
+): Promise<ToolInvocation | undefined> {
     // To avoid hard-coding (and ever maintaining) in the tools list
     // the various compilers/linkers that can have versions, prefixes or suffixes
     // in their names, include a crafted regex around each tool name.
@@ -324,9 +324,14 @@ function parseLineAsTool(
         toolNameInMakefile += ".exe";
     }
 
+    // Quotes are not needed either for the compiler path or the current path.
+    // checkFileExists works just fine without quotes,
+    // but makeFullPath gets confused sometimes for some quotes scenarios.
+    currentPath = util.removeQuotes(currentPath);
     toolPathInMakefile = toolPathInMakefile.trimLeft();
-    let toolFullPath: string = util.makeFullPath(toolPathInMakefile + toolNameInMakefile, currentPath);
-    toolFullPath = util.removeQuotes(toolFullPath);
+    toolPathInMakefile = util.removeQuotes(toolPathInMakefile);
+
+    let toolFullPath: string = await util.makeFullPath(toolPathInMakefile + toolNameInMakefile, currentPath);
     let toolFound: boolean = util.checkFileExistsSync(toolFullPath);
 
     // Reject a regexp match that doesn't have a real path before the tool invocation,
@@ -413,7 +418,8 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
             // what switch they are looking for. This helper first identifies anything
             // that looks like a switch and then calls parseMultipleSwitchFromToolArguments
             // which knows how to parse complex scenarios of spaces, quotes and other characters.
-            let swiValues: string[] = parseMultipleSwitchFromToolArguments(partialArgs, swi);
+            // Don't allow parseMultipleSwitchFromToolArguments to remove surrounding quotes for switch values.
+            let swiValues: string[] = parseMultipleSwitchFromToolArguments(partialArgs, swi, false);
 
             // If no values are found, it means the switch has simple syntax.
             // Add this to the array.
@@ -426,7 +432,6 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
                 let index3: number = partialArgs.indexOf(value) + value.length;
                 let finalSwitch: string = partialArgs.substring(0, index3);
 
-                // Remove the switch prefix because it's not needed by CppTools (SourceFileConfiguration.compilerArgs).
                 finalSwitch = finalSwitch.trim();
                 switches.push(finalSwitch);
             });
@@ -442,7 +447,10 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
 // in the tool command line (example -I or -D for compiler)
 // and returns an array of the values passed via that switch
 // todo: refactor common parts in parseMultipleSwitchFromToolArguments and parseSingleSwitchFromToolArguments
-function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[] {
+// removeSurroundingQuotes: needs to be false when called from parseAnySwitchFromToolArguments,
+// and true otherwise. We need to analyze more scenarios before setting in stone a particular algorithm
+// regarding the decision to remove or not to remove them.
+function parseMultipleSwitchFromToolArguments(args: string, sw: string, removeSurroundingQuotes: boolean = true): string[] {
     // - '-' or '/' or '--' as switch prefix
     // - before each switch, we allow only for one or more spaces/tabs OR begining of line,
     //   to reject a case where a part of a path looks like a switch with its value
@@ -472,7 +480,7 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
     }
 
     function mainPattern(fullyQuoted: boolean): string {
-        let pattern: string = 
+        let pattern: string =
                             // prefix and switch name
                             '(' +
                                   '\\/' + sw + '(:|=|\\s*)|-' + sw + '(:|=|\\s*)|--' + sw + '(:|=|\\s*)' +
@@ -514,7 +522,9 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string): string[
         let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 18;
         let result: string = match[matchIndex];
         if (result) {
-            result = util.removeSurroundingQuotes(result);
+           if (removeSurroundingQuotes) {
+              result = util.removeSurroundingQuotes(result);
+           }
             results.push(result);
         }
         match = regexp.exec(args);
@@ -665,14 +675,18 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 
         // It is quite common to encounter the following pattern:
         //  `test -f 'sourceFile.c' || echo './'`sourceFile.c
+        // or `test -f 'sourceFile.c' || echo '../../../libwally-core/src/'`sourceFile.c
         // Until we implement the correct approach (to query live the test command)
         // we can just ignore it and consider the second option of the OR
-        // (by removing './'`). Even if this is hacky, it is worth it
-        // because the pattern is encountered very often and this is a short term workaround.
+        // (by removing the quotes while preserving the relative path).
+        // This is a short term workaround.
         let idx: number = args.lastIndexOf(result);
-        let str: string = args.substring(idx - 10, idx);
-        if (str === "' || echo ") {
-            result = result.substring(5, result.length);
+        let echo: string = "' || echo ";
+        let str: string = args.substring(idx - echo.length, idx);
+        if (str === echo) {
+            // not to use util.removeQuotes because that also removes double quotes "
+            result = result.replace(/\'/mg, "");
+            result = result.replace(/\`/mg, "");
         }
 
         if (result) {
@@ -694,7 +708,7 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
 // Helper that identifies system commands (cd, cd -, pushd, popd) and make.exe change directory switch (-C)
 // to calculate the effect on the current path, also remembering the transition in the history stack.
 // The current path is always the last one into the history.
-function currentPathAfterCommand(line: string, currentPathHistory: string[]): string[] {
+async function currentPathAfterCommand(line: string, currentPathHistory: string[]): Promise<string[]> {
     line = line.trimLeft();
     line = line.trimRight();
 
@@ -721,7 +735,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         logger.message("Analyzing line: " + line, "Verbose");
         logger.message("POPD command or end of MAKE -C: leaving directory " + lastCurrentPath + " and entering directory " + lastCurrentPath2, "Verbose");
     } else if (line.startsWith('cd') && !configuration.getIgnoreDirectoryCommands()) {
-        newCurrentPath = util.makeFullPath(line.slice(3), lastCurrentPath);
+        newCurrentPath = await util.makeFullPath(line.slice(3), lastCurrentPath);
 
         // For "cd-" (which toggles between the last 2 current paths),
         // we must always keep one previous current path in the history.
@@ -736,7 +750,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         logger.message("Analyzing line: " + line, "Verbose");
         logger.message("CD command: entering directory " + newCurrentPath, "Verbose");
     } else if (line.startsWith('pushd') && !configuration.getIgnoreDirectoryCommands()) {
-        newCurrentPath = util.makeFullPath(line.slice(6), lastCurrentPath);
+        newCurrentPath = await util.makeFullPath(line.slice(6), lastCurrentPath);
         currentPathHistory.push(newCurrentPath);
         logger.message("Analyzing line: " + line, "Verbose");
         logger.message("PUSHD command: entering directory " + newCurrentPath, "Verbose");
@@ -744,7 +758,7 @@ function currentPathAfterCommand(line: string, currentPathHistory: string[]): st
         // The make switch print-directory wraps the folder in various ways.
         let match: RegExpMatchArray | null = line.match("(.*)(Entering directory ['`\"])(.*)['`\"]");
         if (match) {
-            newCurrentPath = util.makeFullPath(match[3], lastCurrentPath) || "";
+            newCurrentPath = await util.makeFullPath(match[3], lastCurrentPath) || "";
         } else {
             newCurrentPath = "Could not parse directory";
         }
@@ -792,7 +806,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
     let numberOfLines: number = dryRunOutputLines.length;
     let index: number = 0;
     let done: boolean = false;
-    function doParsingChunk(): void {
+    async function doParsingChunk(): Promise<void> {
         let chunkIndex: number = 0;
         while (index < numberOfLines && chunkIndex <= chunkSize) {
             if (cancel.isCancellationRequested) {
@@ -802,10 +816,10 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
             let line: string = dryRunOutputLines[index];
 
             statusCallback("Parsing for IntelliSense");
-            currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
+            currentPathHistory = await currentPathAfterCommand(line, currentPathHistory);
             currentPath = currentPathHistory[currentPathHistory.length - 1];
 
-            let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
+            let compilerTool: ToolInvocation | undefined = await parseLineAsTool(line, compilers, currentPath);
             if (compilerTool) {
                 logger.message("Found compiler command: " + line, "Verbose");
 
@@ -823,10 +837,10 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                 // Parse and log the includes, forced includes and the defines
                 let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
-                includes = util.makeFullPaths(includes, currentPath);
+                includes = await util.makeFullPaths(includes, currentPath);
                 let forcedIncludes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'FI');
                 forcedIncludes = forcedIncludes.concat(parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'include'));
-                forcedIncludes = util.makeFullPaths(forcedIncludes, currentPath);
+                forcedIncludes = await util.makeFullPaths(forcedIncludes, currentPath);
 
                 let defines: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'D');
 
@@ -843,7 +857,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                 // Parse the source files
                 let files: string[] = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
-                files = util.makeFullPaths(files, currentPath);
+                files = await util.makeFullPaths(files, currentPath);
 
                 // The language represented by this compilation command
                 let language: util.Language;
@@ -905,7 +919,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
             break;
         }
 
-        await util.scheduleTask(doParsingChunk);
+        await util.scheduleAsyncTask(doParsingChunk);
     }
 
     return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;
@@ -953,7 +967,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
     let numberOfLines: number = dryRunOutputLines.length;
     let index: number = 0;
     let done: boolean = false;
-    let doLinkCommandsParsingChunk: (() => void) = () => {
+    let doLinkCommandsParsingChunk: (() => Promise<void>) = async () => {
         let chunkIndex: number = 0;
         while (index < numberOfLines && chunkIndex <= chunkSize) {
             if (cancel.isCancellationRequested) {
@@ -963,7 +977,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             let line: string = dryRunOutputLines[index];
 
             statusCallback("Parsing for launch targets: inspecting for link commands");
-            currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
+            currentPathHistory = await currentPathAfterCommand(line, currentPathHistory);
             currentPath = currentPathHistory[currentPathHistory.length - 1];
 
             // A target binary is usually produced by the linker with the /out or /o switch,
@@ -974,7 +988,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             let compilerTargetBinary: string | undefined;
 
             if (process.platform === "win32") {
-                let compilerTool: ToolInvocation | undefined = parseLineAsTool(line, compilers, currentPath);
+                let compilerTool: ToolInvocation | undefined = await parseLineAsTool(line, compilers, currentPath);
                 if (compilerTool) {
                     // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
                     // Note: no need to worry about the DLL case that this extension doesn't support yet
@@ -1019,12 +1033,12 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                     }
 
                     if (compilerTargetBinary) {
-                        compilerTargetBinary = util.makeFullPath(compilerTargetBinary, currentPath);
+                        compilerTargetBinary = await util.makeFullPath(compilerTargetBinary, currentPath);
                     }
                 }
             }
 
-            let linkerTool: ToolInvocation | undefined = parseLineAsTool(line, linkers, currentPath);
+            let linkerTool: ToolInvocation | undefined = await parseLineAsTool(line, linkers, currentPath);
             if (linkerTool) {
                 // TODO: implement launch support for DLLs and LIBs, besides executables.
                 if (!isSwitchPassedInArguments(linkerTool.arguments, ["dll", "lib", "shared"])) {
@@ -1069,7 +1083,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                         } else {
                             linkerTargetBinary = util.removeSurroundingQuotes(linkerTargetBinary);
                             logger.message("Producing target binary: " + linkerTargetBinary, "Verbose");
-                            linkerTargetBinary = util.makeFullPath(linkerTargetBinary, currentPath);
+                            linkerTargetBinary = await util.makeFullPath(linkerTargetBinary, currentPath);
                         }
                     }
                 }
@@ -1119,7 +1133,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             return make.ConfigureBuildReturnCodeTypes.cancelled;
         }
 
-        await util.scheduleTask(doLinkCommandsParsingChunk);
+        await util.scheduleAsyncTask(doLinkCommandsParsingChunk);
     }
 
     // If no binaries are found to be built, there is no point in parsing for invoking targets
@@ -1163,7 +1177,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
     index = 0;
     done = false;
-    let doBinaryInvocationsParsingChunk: (() => void) = () => {
+    let doBinaryInvocationsParsingChunk: (() => Promise<void>) = async () => {
         let chunkIndex: number = 0;
         while (index < numberOfLines && chunkIndex <= chunkSize) {
             if (cancel.isCancellationRequested) {
@@ -1177,7 +1191,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             // these anyway, wherever they are (current folder, binary name or arguments).
             if (!line.includes("$")) {
                 statusCallback("Parsing for launch targets: inspecting built binary invocations");
-                currentPathHistory = currentPathAfterCommand(line, currentPathHistory);
+                currentPathHistory = await currentPathAfterCommand(line, currentPathHistory);
                 currentPath = currentPathHistory[currentPathHistory.length - 1];
 
                 // Currently, the target binary invocation will not be identified if the line does not start with it,
@@ -1191,7 +1205,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                 //         (because an "@if exist" is not resolved by the dry-run and appears in the output)
                 //       - cmd /c binary arg1 arg2 arg3
                 //       - start binary
-                let targetBinaryTool: ToolInvocation | undefined = parseLineAsTool(line, targetBinariesNames, currentPath);
+                let targetBinaryTool: ToolInvocation | undefined = await parseLineAsTool(line, targetBinariesNames, currentPath);
 
                 // If the found target binary invocation does not happen from a location
                 // where it was built previously, don't include it as a launch target.
@@ -1245,7 +1259,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             break;
         }
 
-        await util.scheduleTask(doBinaryInvocationsParsingChunk);
+        await util.scheduleAsyncTask(doBinaryInvocationsParsingChunk);
     }
 
     return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;
@@ -1429,4 +1443,3 @@ function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion
       return undefined;
     }
   }
-  

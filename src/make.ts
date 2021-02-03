@@ -643,7 +643,7 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
         }
 
         // Apply the environment produced by running the pre-configure script.
-        applyEnvironment(util.readFile(wrapScriptOutFile));
+        await applyEnvironment(util.readFile(wrapScriptOutFile));
 
         return result.returnCode;
     } catch (error) {
@@ -1148,7 +1148,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
     let startTime: number = Date.now();
     let elapsedTime: number;
 
-    await util.scheduleTask(() => {extension.registerCppToolsProvider(); });
+    await util.scheduleAsyncTask(async () => {await extension.registerCppToolsProvider(); });
     let cachePath: string | undefined = configuration.getConfigurationCachePath();
     if (cachePath) {
         let content: string | undefined = util.readFile(cachePath);
@@ -1207,7 +1207,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
             // IntelliSense should be available by now for all files.
             // Don't await for this logging step. This may produce some interleaved output
             // but it will still be readable.
-            util.scheduleTask(() => {
+            await util.scheduleTask(() => {
                 extension.getCppConfigurationProvider().logConfigurationProviderComplete();
             });
         } else {
@@ -1309,7 +1309,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     if (currentLaunchConfigurationStr !== "" &&
         !configuration.getLaunchTargets().includes(currentLaunchConfigurationStr)) {
             logger.message(`Current launch configuration ${currentLaunchConfigurationStr} is no longer present in the available list.`);
-            configuration.setLaunchConfigurationByName("");
+            await configuration.setLaunchConfigurationByName("");
     }
 
     // Configure build targets only if necessary:

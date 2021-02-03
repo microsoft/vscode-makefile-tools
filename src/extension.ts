@@ -136,14 +136,15 @@ export class MakefileToolsExtension {
         // cummulativeBrowsePath incorporates all the files and the includes paths
         // of all the compiler invocations of the current configuration
         customConfigProviderItem.files.forEach(filePath => {
+            let uri: vscode.Uri = vscode.Uri.file(filePath);
             let sourceFileConfigurationItem: cpp.SourceFileConfigurationItem = {
-                uri: vscode.Uri.file(filePath),
+                uri,
                 configuration,
             };
 
             // These are the configurations processed during the current configure.
             // Store them in the 'delta' file index instead of the final one.
-            provider.fileIndex.set(path.normalize(filePath), sourceFileConfigurationItem);
+            provider.fileIndex.set(path.normalize(uri.fsPath), sourceFileConfigurationItem);
             extension.getCppConfigurationProvider().logConfigurationProviderItem(sourceFileConfigurationItem);
 
             let folder: string = path.dirname(filePath);
@@ -185,40 +186,40 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     telemetry.activate();
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', () => {
-        configuration.setNewConfiguration();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', async () => {
+        await configuration.setNewConfiguration();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildTarget', () => {
-        configuration.selectTarget();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildTarget', async () => {
+       await configuration.selectTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', () => {
-        make.buildTarget(make.TriggeredBy.buildTarget, configuration.getCurrentTarget() || "", false);
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', async () => {
+        await make.buildTarget(make.TriggeredBy.buildTarget, configuration.getCurrentTarget() || "", false);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanTarget', () => {
-        make.buildTarget(make.TriggeredBy.buildCleanTarget, configuration.getCurrentTarget() || "", true);
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanTarget', async () => {
+        await make.buildTarget(make.TriggeredBy.buildCleanTarget, configuration.getCurrentTarget() || "", true);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildAll', () => {
-        make.buildTarget(make.TriggeredBy.buildAll, "all", false);
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildAll', async () => {
+        await make.buildTarget(make.TriggeredBy.buildAll, "all", false);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanAll', () => {
-        make.buildTarget(make.TriggeredBy.buildCleanAll, "all", true);
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildCleanAll', async () => {
+        await make.buildTarget(make.TriggeredBy.buildCleanAll, "all", true);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfiguration', () => {
-        configuration.selectLaunchConfiguration();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfiguration', async () => {
+        await configuration.selectLaunchConfiguration();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchDebug', () => {
-        launcher.debugCurrentTarget();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchDebug', async () => {
+        await launcher.debugCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchRun', () => {
-        launcher.runCurrentTarget();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchRun', async () => {
+        await launcher.runCurrentTarget();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetPath', () => {
@@ -231,7 +232,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return launcher.launchTargetDirectory();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetFileName', () => {
+      telemetry.logEvent("launchTargetFileName");
+      return launcher.launchTargetFileName();
+  }));
+
+  context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
         telemetry.logEvent("launchTargetArgs");
         return launcher.launchTargetArgs();
     }));
@@ -241,16 +247,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return launcher.launchTargetArgsConcat();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', () => {
-        make.configure(make.TriggeredBy.configure);
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', async () => {
+        await make.configure(make.TriggeredBy.configure);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.cleanConfigure', () => {
-        make.cleanConfigure(make.TriggeredBy.cleanConfigure);
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.cleanConfigure', async () => {
+        await make.cleanConfigure(make.TriggeredBy.cleanConfigure);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.preConfigure', () => {
-        make.preConfigure(make.TriggeredBy.preconfigure);
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.preConfigure', async () => {
+        await make.preConfigure(make.TriggeredBy.preconfigure);
     }));
 
     // Reset state - useful for troubleshooting.
@@ -336,7 +342,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 export async function deactivate(): Promise<void> {
     vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is de-activated');
 
-    telemetry.deactivate();
+    await telemetry.deactivate();
 
     const items : any = [
         extension,
