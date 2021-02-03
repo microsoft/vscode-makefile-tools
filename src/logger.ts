@@ -6,7 +6,6 @@
 import * as fs from 'fs';
 import * as configuration from './configuration';
 import * as vscode from 'vscode';
-import { makeFullPath } from './util';
 
 let makeOutputChannel: vscode.OutputChannel | undefined;
 
