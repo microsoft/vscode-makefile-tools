@@ -919,7 +919,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
             break;
         }
 
-        await util.scheduleTaskAsync(doParsingChunk);
+        await util.scheduleAsyncTask(doParsingChunk);
     }
 
     return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;
@@ -1133,7 +1133,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             return make.ConfigureBuildReturnCodeTypes.cancelled;
         }
 
-        await util.scheduleTaskAsync(doLinkCommandsParsingChunk);
+        await util.scheduleAsyncTask(doLinkCommandsParsingChunk);
     }
 
     // If no binaries are found to be built, there is no point in parsing for invoking targets
@@ -1259,7 +1259,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
             break;
         }
 
-        await util.scheduleTaskAsync(doBinaryInvocationsParsingChunk);
+        await util.scheduleAsyncTask(doBinaryInvocationsParsingChunk);
     }
 
     return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;

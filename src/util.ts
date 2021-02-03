@@ -473,7 +473,7 @@ export function scheduleTask<T>(task: () => T): Promise<T> {
 }
 
 // Async version of scheduleTask
-export async function scheduleTaskAsync<T>(task: () => Promise<T>): Promise<T> {
+export async function scheduleAsyncTask<T>(task: () => Promise<T>): Promise<T> {
    return new Promise<T>((resolve, reject) => {
        setImmediate(async () => {
            try {

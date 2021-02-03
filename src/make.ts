@@ -1148,7 +1148,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
     let startTime: number = Date.now();
     let elapsedTime: number;
 
-    await util.scheduleTaskAsync(async () => {await extension.registerCppToolsProvider(); });
+    await util.scheduleAsyncTask(async () => {await extension.registerCppToolsProvider(); });
     let cachePath: string | undefined = configuration.getConfigurationCachePath();
     if (cachePath) {
         let content: string | undefined = util.readFile(cachePath);
