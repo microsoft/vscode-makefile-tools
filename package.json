@@ -417,12 +417,30 @@
                     "scope": "resource"
                 },
                 "makefile.phonyOnlyTargets": {
-                  "type": "boolean",
-                  "default": false,
-                  "description": "Display only the phony targets",
-                  "scope": "resource"
-              }
-          }
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Display only the phony targets",
+                    "scope": "resource"
+                },
+                "makefile.saveBeforeBuildOrConfigure": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Save opened files before building or configuring",
+                    "scope": "resource"
+                },
+                "makefile.buildBeforeLaunch": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Build the current target before launch (debug/run)",
+                    "scope": "resource"
+                },
+                "makefile.clearOutputBeforeBuild": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Clear the output channel at the beginning of a build",
+                    "scope": "resource"
+                }
+            }
         },
         "viewsContainers": {
             "activitybar": [

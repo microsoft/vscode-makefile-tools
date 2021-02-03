@@ -16,7 +16,8 @@ export enum LaunchStatuses {
     success = "success",
     blocked = "blocked by (pre)configure or build",
     noLaunchConfigurationSet = "no launch configuration set by the user",
-    launchTargetsListEmpty = "launch targets list empty"
+    launchTargetsListEmpty = "launch targets list empty",
+    buildFailed = "build failed",
 }
 
 let launcher: Launcher;
@@ -184,6 +185,29 @@ export class Launcher implements vscode.Disposable {
         if (make.blockedByOp(op)) {
             return LaunchStatuses.blocked;
         }
+
+        if (configuration.getBuildBeforeLaunch()) {
+            let currentBuildTarget: string = configuration.getCurrentTarget() || "";
+            logger.message(`Building current target before launch: "${currentBuildTarget}"`);
+            let buildSuccess: boolean = (await make.buildTarget(make.TriggeredBy.buildTarget, currentBuildTarget, false)) === make.ConfigureBuildReturnCodeTypes.success;
+            if (!buildSuccess) {
+                logger.message(`Building target "${currentBuildTarget}" failed.`);
+                let noButton: string = "No";
+                const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>("Build failed. Do you want to continue anyway?",
+                {
+                    title: "Yes",
+                    isCloseAffordance: false,
+                },
+                {
+                    title: noButton,
+                    isCloseAffordance: true
+                });
+
+                if (chosen === undefined || chosen.title === noButton) {
+                    return LaunchStatuses.buildFailed;
+                }
+             }
+         }
 
         let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (!currentLaunchConfiguration) {

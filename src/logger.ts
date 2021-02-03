@@ -6,6 +6,7 @@
 import * as fs from 'fs';
 import * as configuration from './configuration';
 import * as vscode from 'vscode';
+import { makeFullPath } from './util';
 
 let makeOutputChannel: vscode.OutputChannel | undefined;
 
@@ -35,6 +36,12 @@ function loggingLevelApplies(messageVerbosity: string | undefined): boolean {
 export function showOutputChannel(): void {
     if (makeOutputChannel) {
         makeOutputChannel.show(true);
+    }
+}
+
+export function clearOutputChannel(): void {
+    if (makeOutputChannel) {
+        makeOutputChannel.clear();
     }
 }
 
