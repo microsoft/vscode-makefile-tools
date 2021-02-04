@@ -38,6 +38,12 @@ export function showOutputChannel(): void {
     }
 }
 
+export function clearOutputChannel(): void {
+    if (makeOutputChannel) {
+        makeOutputChannel.clear();
+    }
+}
+
 //TODO: implement more verbosity levels for the output log
 export function message(message: string, loggingLevel?: string): void {
     // Print the message only if the intended logging level matches the settings

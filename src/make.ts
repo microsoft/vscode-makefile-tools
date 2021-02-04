@@ -44,7 +44,8 @@ export enum ConfigureBuildReturnCodeTypes {
     cancelled = -2,
     notFound = -3,
     outOfDate = -4,
-    other = -5
+    other = -5,
+    saveFailed = -6,
 }
 
 export enum Operations {
@@ -75,6 +76,7 @@ export enum TriggeredBy {
     configureBeforeTargetChange = "configure dirty (before target change), settings (configureAfterCommand)",
     configureAfterTargetChange = "settings (configureAfterCommand), command pallette (setBuildTarget)",
     configureBeforeLaunchTargetChange = "configureDirty (before launch target change), settings (configureAfterCommand)",
+    launch = "Launch (debug/run)",
 }
 
 let fileIndex: Map<string, cpp.SourceFileConfigurationItem> = new Map<string, cpp.SourceFileConfigurationItem>();
@@ -129,6 +131,33 @@ export function blockedByOp(op: Operations, showPopup: boolean = true): Operatio
     return blocker;
 }
 
+async function saveAll(): Promise<boolean>  {
+    if (configuration.getSaveBeforeBuildOrConfigure()) {
+        logger.message("Saving opened files before build.");
+        let saveSuccess: boolean = await vscode.workspace.saveAll();
+        if (saveSuccess) {
+            return true;
+        } else {
+            logger.message("Saving opened files failed.");
+            let yesButton: string = "Yes";
+            let noButton: string = "No";
+            const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>("Saving opened files failed. Do you want to continue anyway?",
+            {
+                title: yesButton,
+                isCloseAffordance: false,
+            },
+            {
+                title: noButton,
+                isCloseAffordance: true
+            });
+
+            return chosen !== undefined && chosen.title === yesButton;
+        }
+    } else {
+        return true;
+    }
+}
+
 export function prepareBuildTarget(target: string, clean: boolean = false): string[] {
     let makeArgs: string[] = [];
     // Prepend the target to the arguments given in the configurations json.
@@ -170,7 +199,12 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
+    if (!saveAll()) {
+        return ConfigureBuildReturnCodeTypes.saveFailed;
+    }
+
     logger.showOutputChannel();
+    logger.clearOutputChannel();
 
     // Same start time for build and an eventual configure.
     let buildStartTime: number = Date.now();
@@ -771,6 +805,10 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
     if (blockedByOp(Operations.configure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
+    }
+
+    if (!saveAll()) {
+        return ConfigureBuildReturnCodeTypes.saveFailed;
     }
 
     logger.showOutputChannel();

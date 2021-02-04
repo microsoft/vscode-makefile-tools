@@ -718,6 +718,33 @@ export function readPhonyOnlyTargets(): void {
     logger.message(`Only .PHONY targets: ${phonyOnlyTargets}`);
 }
 
+let saveBeforeBuildOrConfigure: boolean | undefined;
+export function getSaveBeforeBuildOrConfigure(): boolean | undefined { return saveBeforeBuildOrConfigure; }
+export function setSaveBeforeBuildOrConfigure(save: boolean): void { saveBeforeBuildOrConfigure = save; }
+export function readSaveBeforeBuildOrConfigure(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    saveBeforeBuildOrConfigure = workspaceConfiguration.get<boolean>("saveBeforeBuildOrConfigure");
+    logger.message(`Save before build or configure: ${saveBeforeBuildOrConfigure}`);
+}
+
+let buildBeforeLaunch: boolean | undefined;
+export function getBuildBeforeLaunch(): boolean | undefined { return buildBeforeLaunch; }
+export function setBuildBeforeLaunch(build: boolean): void { buildBeforeLaunch = build; }
+export function readBuildBeforeLaunch(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    buildBeforeLaunch = workspaceConfiguration.get<boolean>("buildBeforeLaunch");
+    logger.message(`Build before launch: ${buildBeforeLaunch}`);
+}
+
+let clearOutputBeforeBuild: boolean | undefined;
+export function getClearOutputBeforeBuild(): boolean | undefined { return clearOutputBeforeBuild; }
+export function setClearOutputBeforeBuild(clear: boolean): void { clearOutputBeforeBuild = clear; }
+export function readClearOutputBeforeBuild(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    clearOutputBeforeBuild = workspaceConfiguration.get<boolean>("clearOutputBeforeBuild");
+    logger.message(`Clear output before build: ${clearOutputBeforeBuild}`);
+}
+
 // This setting is useful for some repos where directory changing commands (cd, push, pop)
 // are missing or printed more than once, resulting in associating some IntelliSense information
 // with the wrong file or even with a non existent URL.
@@ -754,6 +781,9 @@ export async function initFromStateAndSettings(): Promise<void> {
     readConfigureOnEdit();
     readConfigureAfterCommand();
     readPhonyOnlyTargets();
+    readSaveBeforeBuildOrConfigure();
+    readBuildBeforeLaunch();
+    readClearOutputBeforeBuild();
     readIgnoreDirectoryCommands();
 
     analyzeConfigureParams();
@@ -1049,6 +1079,27 @@ export async function initFromStateAndSettings(): Promise<void> {
             let updatedPhonyOnlyTargets : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedPhonyOnlyTargets !== phonyOnlyTargets) {
                 readPhonyOnlyTargets();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "saveBeforeBuildOrConfigure";
+            let updatedSaveBeforeBuildOrConfigure : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            if (updatedSaveBeforeBuildOrConfigure !== saveBeforeBuildOrConfigure) {
+                readSaveBeforeBuildOrConfigure();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "buildBeforeLaunch";
+            let updatedBuildBeforeLaunch : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            if (updatedBuildBeforeLaunch !== buildBeforeLaunch) {
+                readBuildBeforeLaunch();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "clearOutputBeforeBuild";
+            let updatedClearOutputBeforeBuild : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            if (updatedClearOutputBeforeBuild !== clearOutputBeforeBuild) {
+                readClearOutputBeforeBuild();
                 updatedSettingsSubkeys.push(subKey);
             }
 
