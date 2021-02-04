@@ -724,7 +724,7 @@ export function setSaveBeforeBuildOrConfigure(save: boolean): void { saveBeforeB
 export function readSaveBeforeBuildOrConfigure(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     saveBeforeBuildOrConfigure = workspaceConfiguration.get<boolean>("saveBeforeBuildOrConfigure");
-    logger.message(`Save before build: ${saveBeforeBuildOrConfigure}`);
+    logger.message(`Save before build or configure: ${saveBeforeBuildOrConfigure}`);
 }
 
 let buildBeforeLaunch: boolean | undefined;

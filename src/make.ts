@@ -140,13 +140,14 @@ async function saveAll(): Promise<boolean>  {
         } else {
             logger.message("Saving opened files failed.");
             let yesButton: string = "Yes";
+            let noButton: string = "No";
             const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>("Saving opened files failed. Do you want to continue anyway?",
             {
                 title: yesButton,
                 isCloseAffordance: false,
             },
             {
-                title: "No",
+                title: noButton,
                 isCloseAffordance: true
             });
 

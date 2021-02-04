@@ -193,9 +193,10 @@ export class Launcher implements vscode.Disposable {
             if (!buildSuccess) {
                 logger.message(`Building target "${currentBuildTarget}" failed.`);
                 let noButton: string = "No";
+                let yesButton: string = "Yes";
                 const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>("Build failed. Do you want to continue anyway?",
                 {
-                    title: "Yes",
+                    title: yesButton,
                     isCloseAffordance: false,
                 },
                 {
