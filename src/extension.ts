@@ -222,14 +222,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         await launcher.runCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetPah', () => {
-        telemetry.logEvent("getLaunchTargetPah");
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetPath', () => {
+        telemetry.logEvent("getLaunchTargetPath");
         return launcher.getLaunchTargetPath();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetPah', () => {
-      telemetry.logEvent("launchTargetPah");
-      return launcher.launchTargetPah();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetPath', () => {
+      telemetry.logEvent("launchTargetPath");
+      return launcher.launchTargetPath();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetDirectory', () => {

@@ -37,7 +37,7 @@ export class Launcher implements vscode.Disposable {
     // Command property accessible from launch.json:
     // calls getLaunchTargetPath after triggering a build of the current target,
     // if makefile.buildBeforeLaunch allows it.
-    public async launchTargetPah(): Promise<string> {
+    public async launchTargetPath(): Promise<string> {
         if (configuration.getBuildBeforeLaunch()) {
             await make.buildTarget(make.TriggeredBy.launch, configuration.getCurrentTarget() || "");
         }
@@ -181,7 +181,7 @@ export class Launcher implements vscode.Disposable {
             request: 'launch',
             cwd: '${command:makefile.getLaunchTargetDirectory}',
             args,
-            program: '${command:makefile.getLaunchTargetPah}',
+            program: '${command:makefile.getLaunchTargetPath}',
             MIMode: miMode,
             miDebuggerPath: miDebuggerPath,
             console: "internalConsole",
