@@ -222,29 +222,39 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         await launcher.runCurrentTarget();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetPath', () => {
-        telemetry.logEvent("launchTargetPath");
-        return launcher.launchTargetPath();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetPah', () => {
+        telemetry.logEvent("getLaunchTargetPah");
+        return launcher.getLaunchTargetPath();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetDirectory', () => {
-        telemetry.logEvent("launchTargetDirectory");
-        return launcher.launchTargetDirectory();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetPah', () => {
+      telemetry.logEvent("launchTargetPah");
+      return launcher.launchTargetPah();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetDirectory', () => {
+        telemetry.logEvent("getLaunchTargetDirectory");
+        return launcher.getLaunchTargetDirectory();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetFileName', () => {
+      telemetry.logEvent("getLaunchTargetFileName");
+      return launcher.getLaunchTargetFileName();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetFileName', () => {
       telemetry.logEvent("launchTargetFileName");
       return launcher.launchTargetFileName();
-  }));
-
-  context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
-        telemetry.logEvent("launchTargetArgs");
-        return launcher.launchTargetArgs();
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgsConcat', () => {
-        telemetry.logEvent("launchTargetArgsConcat");
-        return launcher.launchTargetArgsConcat();
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetArgs', () => {
+        telemetry.logEvent("getLaunchTargetArgs");
+        return launcher.getLaunchTargetArgs();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetArgsConcat', () => {
+        telemetry.logEvent("getLaunchTargetArgsConcat");
+        return launcher.getLaunchTargetArgsConcat();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', async () => {
