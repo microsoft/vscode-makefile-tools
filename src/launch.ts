@@ -52,11 +52,32 @@ export class Launcher implements vscode.Disposable {
       if (launchConfiguration) {
           return path.parse(launchConfiguration.binaryPath).name;
       } else {
-          return vscode.workspace.rootPath || "";
+          return "";
       }
-  }
+    }
 
-  // Command property accessible from launch.json:
+    // Command property accessible from launch.json:
+    // the file name of the current target binary, without path or extension,
+    // after triggering a build of the current target.
+    public async buildAndLaunchTargetFileName(): Promise<string> {
+      if (configuration.getBuildBeforeLaunch()) {
+         await make.buildTarget(make.TriggeredBy.launch, configuration.getCurrentTarget() || "");
+      }
+
+      return this.launchTargetFileName();
+    }
+
+    // Command property accessible from launch.json:
+    // the full path of the target binary, after triggering a build of the current target.
+    public async buildAndLaunchTargetPath(): Promise<string> {
+      if (configuration.getBuildBeforeLaunch()) {
+         await make.buildTarget(make.TriggeredBy.launch, configuration.getCurrentTarget() || "");
+      }
+
+      return this.launchTargetPath();
+    }
+
+    // Command property accessible from launch.json:
     // the arguments sent to the target binary, returned as array of string
     // This is used by the debug/terminal VS Code APIs.
     public launchTargetArgs(): string[] {

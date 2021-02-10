@@ -235,9 +235,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetFileName', () => {
       telemetry.logEvent("launchTargetFileName");
       return launcher.launchTargetFileName();
-  }));
+    }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildAndLaunchTargetPath', () => {
+      telemetry.logEvent("buildAndLaunchTargetPath");
+      return launcher.buildAndLaunchTargetPath();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.buildAndLaunchTargetFileName', () => {
+      telemetry.logEvent("buildAndLaunchTargetFileName");
+      return launcher.buildAndLaunchTargetFileName();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.launchTargetArgs', () => {
         telemetry.logEvent("launchTargetArgs");
         return launcher.launchTargetArgs();
     }));
