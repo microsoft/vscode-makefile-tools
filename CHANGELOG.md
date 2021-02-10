@@ -14,8 +14,8 @@ All notable changes to the "vscode-makefile-tools" extension will be documented 
     - makefile.launchTargetArgs --> makefile.getLaunchTargetArgs
     - makefile.launchTargetArgsConcat --> makefile.getLaunchTargetArgsConcat
 - Add new launch commands, that trigger a build when makefile.buildBeforeLaunch allows:
-    - makefile.getLaunchTargetPath
-    - makefile.getLaunchTargetFileName
+    - makefile.launchTargetPath
+    - makefile.launchTargetFileName
 
 ## 0.1.3
 - Activate in the presence of GNUmakefile in the root as well.
