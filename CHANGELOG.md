@@ -2,6 +2,21 @@
 
 All notable changes to the "vscode-makefile-tools" extension will be documented in this file.
 
+## 0.1.4
+- Various bug fixes for MSYS/MinGW related to paths, strings, regular expressions and file system APIs
+- Fix source file paths in the backtick pattern
+- Fix cases of not finding an existing MAKE executable in the path
+- Add new settings: makefile.saveBeforeBuild and makefile.buildBeforeLaunch
+- Rename launch commands:
+    - makefile.launchTargetPath --> makefile.getLaunchTargetPath
+    - makefile.launchTargetDirectory --> makefile.getLaunchTargetDirectory
+    - makefile.launchTargetFileName --> makefile.getLaunchTargetFileName
+    - makefile.launchTargetArgs --> makefile.getLaunchTargetArgs
+    - makefile.launchTargetArgsConcat --> makefile.getLaunchTargetArgsConcat
+- Add new launch commands, that trigger a build when makefile.buildBeforeLaunch allows:
+    - makefile.getLaunchTargetPath
+    - makefile.getLaunchTargetFileName
+
 ## 0.1.3
 - Activate in the presence of GNUmakefile in the root as well.
 - Add ignoreDirectoryCommands setting for when the extension should analyze only the output of make -C
