@@ -94,6 +94,10 @@ export function setCustomConfigurationProvider(provider: cpptools.CustomConfigur
     workspaceBrowseConfiguration = provider.workspaceBrowse;
 }
 
+let compileCommands: parser.CompileCommand[] = [];
+export function clearCompileCommands() { compileCommands = []; }
+export function addCompileCommand(compileCommand: parser.CompileCommand) { compileCommands.push(compileCommand); }
+
 // Identifies and logs whether an operation should be prevented from running.
 // So far, the only blocking scenarios are if an ongoing configure, pre-configure or build
 // is blocking other new similar operations and setter commands (selection of new configurations, targets, etc...)
@@ -703,6 +707,7 @@ interface ConfigureSubphasesStatus {
     generateParseContent?: ConfigureSubphaseStatus;
     preprocessParseContent?: ConfigureSubphaseStatus;
     parseIntelliSense?: ConfigureSubphaseStatus;
+    generateCompileCommands?: ConfigureSubphaseStatus;
     parseLaunch?: ConfigureSubphaseStatus;
     dryrunTargets?: ConfigureSubphaseStatus;
     parseTargets?: ConfigureSubphaseStatus;
@@ -842,6 +847,9 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         readCache = true;
     }
 
+    let compileCommandsPath: string | undefined = configuration.getCompileCommandsPath();
+    let exportCompileCommandsFile: boolean | undefined = configuration.getExportCompileCommandsFile();
+
     // Identify for telemetry whether:
     //   - this configure will need to double the workload, if it needs to analyze the build targets separately.
     //   - this configure will need to reset the build target to the default, which will need a reconfigure.
@@ -938,6 +946,12 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         // but not if the configure was cancelled.
         if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
             util.writeFile(configurationCachePath, JSON.stringify(ConfigurationCache));
+        }
+
+        // Export the compile_commands.json file if the option is enabled.
+        if (exportCompileCommandsFile && compileCommandsPath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
+            // Pretty print the output for easier inspection
+            util.writeFile(compileCommandsPath, JSON.stringify(compileCommands, undefined, 4));
         }
 
         let newBuildTarget: string | undefined = configuration.getCurrentTarget();
@@ -1158,6 +1172,29 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
     };
 }
 
+async function generateCompileCommands(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
+                                       dryRunOutput: string, recursive: boolean = false): Promise<ConfigureSubphaseStatus> {
+    if (cancel.isCancellationRequested) {
+        return {
+            retc: ConfigureBuildReturnCodeTypes.cancelled,
+            elapsed: 0
+        };
+    }
+
+    let startTime: number = Date.now();
+    let onStatus: any = (status: string): void => {
+        progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
+    };
+
+    clearCompileCommands();
+    let retc: number = await parser.parseCompileCommands(cancel, dryRunOutput, onStatus, addCompileCommand);
+
+    return {
+        retc,
+        elapsed: util.elapsedTimeSince(startTime)
+    };
+}
+
 export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
                                        dryrunOutput: string, recursive: boolean = false): Promise<parser.PreprocessDryRunOutputReturnType> {
     if (cancel.isCancellationRequested) {
@@ -1330,6 +1367,14 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         return subphaseStats;
     }
     logger.message(`Parsing for IntelliSense elapsed time: ${subphaseStats.parseIntelliSense.elapsed}`);
+
+    // Generate compile_commands.json
+    logger.message("Parsing to generate compile_commands.json.");
+    subphaseStats.generateCompileCommands = await generateCompileCommands(progress, cancel, preprocessedDryrunOutput, recursiveDoConfigure);
+    if (subphaseStats.generateCompileCommands.retc === ConfigureBuildReturnCodeTypes.cancelled) {
+        return subphaseStats;
+    }
+    logger.message(`Parsing to generate compile_commands.json elapsed time: ${subphaseStats.generateCompileCommands.elapsed}`);
 
     // Configure launch targets as parsed from the makefile
     // (and not as read from settings via makefile.launchConfigurations).

@@ -439,6 +439,17 @@
                     "default": true,
                     "description": "Clear the output channel at the beginning of a build",
                     "scope": "resource"
+                },
+                "makefile.exportCompileCommandsFile": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable generation and exporting of compile_commands.json"
+                },
+                "makefile.compileCommandsPath": {
+                    "type": "string",
+                    "default": "compile_commands.json",
+                    "description": "The path to the compilation database file",
+                    "scope": "resource"
                 }
             }
         },

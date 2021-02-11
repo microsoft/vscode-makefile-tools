@@ -925,6 +925,91 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
     return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;
 }
 
+// Structure used to describe a compilation command. Reference documentation is
+// hosted here https://clang.llvm.org/docs/JSONCompilationDatabase.html
+export interface CompileCommand {
+    directory: string;
+    file: string;
+    command: string;
+    arguments?: string[];
+    output?: string;
+};
+
+// Parse the output of the make dry-run command in order to create a
+// CompilationCommand entry for each file, to be able to generate a
+// compile_commands.json file.
+export async function parseCompileCommands(cancel: vscode.CancellationToken,
+                                           dryRunOutputStr: string,
+                                           statusCallback: (message: string) => void,
+                                           onFoundCompileCommandsItem: (compileCommand: CompileCommand) => void): Promise<number> {
+    if (cancel.isCancellationRequested) {
+        return make.ConfigureBuildReturnCodeTypes.cancelled;
+    }
+
+    logger.message('Parsing dry-run output to generate compile_commands.json database.', "Normal");
+
+    // Current path starts with workspace root and can be modified
+    // with prompt commands like cd, cd-, pushd/popd or with -C make switch
+    let currentPath: string = vscode.workspace.rootPath || "";
+    let currentPathHistory: string[] = [currentPath];
+
+    // Read the dry-run output line by line, searching for compilers and directory changing commands
+    // to construct information for the CppTools custom configuration
+    let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
+    let numberOfLines: number = dryRunOutputLines.length;
+    let index: number = 0;
+    let done: boolean = false;
+
+    async function doParsingChunk(): Promise<void> {
+        let chunkIndex: number = 0;
+        while (index < numberOfLines && chunkIndex <= chunkSize) {
+            if (cancel.isCancellationRequested) {
+                break;
+            }
+
+            let line: string = dryRunOutputLines[index];
+
+            statusCallback("Generating compile_commands.json");
+            currentPathHistory = await currentPathAfterCommand(line, currentPathHistory);
+            currentPath = currentPathHistory[currentPathHistory.length - 1];
+
+            let compilerTool: ToolInvocation | undefined = await parseLineAsTool(line, compilers, currentPath);
+            if (compilerTool) {
+                logger.message("Found compiler command: " + line, "Verbose");
+
+                // Parse the source files
+                let files: string[] = parseFilesFromToolArguments(compilerTool.arguments, sourceFileExtensions);
+                files = await util.makeFullPaths(files, currentPath);
+
+                files.forEach(file => {
+                    onFoundCompileCommandsItem({
+                        directory: currentPath,
+                        command: line,
+                        file: file
+                    });
+                });
+            }
+
+            index++;
+            if (index === numberOfLines) {
+                done = true;
+            }
+
+            chunkIndex++;
+        } // while loop
+    } // doParsingChunk function
+
+    while (!done) {
+        if (cancel.isCancellationRequested) {
+            break;
+        }
+
+        await util.scheduleAsyncTask(doParsingChunk);
+    }
+
+    return cancel.isCancellationRequested ? make.ConfigureBuildReturnCodeTypes.cancelled : make.ConfigureBuildReturnCodeTypes.success;
+}
+
 // Target binaries arguments special handling
 function filterTargetBinaryArgs(args: string[]): string[] {
     let processedArgs: string[] = [];

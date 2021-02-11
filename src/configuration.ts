@@ -275,6 +275,29 @@ export function readConfigurationCachePath(): void {
     logger.message(`Configurations cached at ${configurationCachePath}`);
 }
 
+let compileCommandsPath: string | undefined;
+export function getCompileCommandsPath(): string | undefined { return compileCommandsPath; }
+export function setCompileCommandsPath(path: string): void { compileCommandsPath = path; }
+export function readCompileCommandsPath(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+
+    compileCommandsPath = workspaceConfiguration.get<string>("compileCommandsPath");
+    if (compileCommandsPath) {
+        compileCommandsPath = util.resolvePathToRoot(compileCommandsPath);
+    }
+
+    logger.message(`compile_commands.json path: ${compileCommandsPath}`);
+}
+
+let exportCompileCommandsFile: boolean | undefined;
+export function getExportCompileCommandsFile(): boolean | undefined { return exportCompileCommandsFile; }
+export function setExportCompileCommandsFile(value: boolean): void { exportCompileCommandsFile = value; }
+export function readExportCompileCommandsFile(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    exportCompileCommandsFile = workspaceConfiguration.get<boolean>("exportCompileCommandsFile");
+    logger.message(`Export compile_commands.json: ${exportCompileCommandsFile}`);
+}
+
 let additionalCompilerNames: string[] | undefined;
 export function getAdditionalCompilerNames(): string[] | undefined { return additionalCompilerNames; }
 export function setAdditionalCompilerNames(compilerNames: string[]): void { additionalCompilerNames = compilerNames; }
@@ -785,6 +808,8 @@ export async function initFromStateAndSettings(): Promise<void> {
     readBuildBeforeLaunch();
     readClearOutputBeforeBuild();
     readIgnoreDirectoryCommands();
+    readExportCompileCommandsFile();
+    readCompileCommandsPath();
 
     analyzeConfigureParams();
 
@@ -1107,6 +1132,23 @@ export async function initFromStateAndSettings(): Promise<void> {
             let updatedIgnoreDirectoryCommands : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedIgnoreDirectoryCommands !== ignoreDirectoryCommands) {
                 readIgnoreDirectoryCommands();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "exportCompileCommandsFile";
+            let updatedExportCompileCommandsFile: boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            if (updatedExportCompileCommandsFile !== exportCompileCommandsFile) {
+                readExportCompileCommandsFile();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "compileCommandsPath";
+            let updatedCompileCommandsPath: string | undefined = workspaceConfiguration.get<string>(subKey);
+            if (updatedCompileCommandsPath) {
+                updatedCompileCommandsPath = util.resolvePathToRoot(updatedCompileCommandsPath);
+            }
+            if (updatedCompileCommandsPath !== compileCommandsPath) {
+                readCompileCommandsPath();
                 updatedSettingsSubkeys.push(subKey);
             }
 
