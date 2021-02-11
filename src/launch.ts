@@ -25,7 +25,7 @@ let launcher: Launcher;
 export class Launcher implements vscode.Disposable {
     // Command property accessible from launch.json:
     // the full path of the target binary currently set for launch
-    public launchTargetPath(): string {
+    public getLaunchTargetPath(): string {
         let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.binaryPath;
@@ -35,8 +35,19 @@ export class Launcher implements vscode.Disposable {
     }
 
     // Command property accessible from launch.json:
+    // calls getLaunchTargetPath after triggering a build of the current target,
+    // if makefile.buildBeforeLaunch allows it.
+    public async launchTargetPath(): Promise<string> {
+        if (configuration.getBuildBeforeLaunch()) {
+            await make.buildTarget(make.TriggeredBy.launch, configuration.getCurrentTarget() || "");
+        }
+
+        return this.getLaunchTargetPath();
+    }
+
+    // Command property accessible from launch.json:
     // the full path from where the target binary is to be launched
-    public launchTargetDirectory(): string {
+    public getLaunchTargetDirectory(): string {
         let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.cwd;
@@ -47,19 +58,30 @@ export class Launcher implements vscode.Disposable {
 
     // Command property accessible from launch.json:
     // the file name of the current target binary, without path or extension.
-    public launchTargetFileName(): string {
-      let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
-      if (launchConfiguration) {
-          return path.parse(launchConfiguration.binaryPath).name;
-      } else {
-          return vscode.workspace.rootPath || "";
-      }
-  }
+    public getLaunchTargetFileName(): string {
+        let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
+        if (launchConfiguration) {
+            return path.parse(launchConfiguration.binaryPath).name;
+        } else {
+            return "";
+        }
+    }
 
-  // Command property accessible from launch.json:
+    // Command property accessible from launch.json:
+    // calls getLaunchTargetFileName after triggering a build of the current target,
+    // if makefile.buildBeforeLaunch allows it.
+    public async launchTargetFileName(): Promise<string> {
+        if (configuration.getBuildBeforeLaunch()) {
+            await make.buildTarget(make.TriggeredBy.launch, configuration.getCurrentTarget() || "");
+        }
+
+        return this.getLaunchTargetFileName();
+    }
+
+    // Command property accessible from launch.json:
     // the arguments sent to the target binary, returned as array of string
     // This is used by the debug/terminal VS Code APIs.
-    public launchTargetArgs(): string[] {
+    public getLaunchTargetArgs(): string[] {
         let launchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
         if (launchConfiguration) {
             return launchConfiguration.binaryArgs;
@@ -80,8 +102,8 @@ export class Launcher implements vscode.Disposable {
     // 4 arguments: tool, arg1, arg2, arg3
     // TODO: investigate how we can define string array arguments
     // for the target binary in launch.json
-    public launchTargetArgsConcat(): string {
-        return this.launchTargetArgs().join(" ");
+    public getLaunchTargetArgsConcat(): string {
+        return this.getLaunchTargetArgs().join(" ");
     }
 
     // Invoke a VS Code debugging session passing it all the information
@@ -105,7 +127,7 @@ export class Launcher implements vscode.Disposable {
     //      (this is true for systems older than Catalina).
     // Additionally, cppvsdbg ignores miMode and miDebuggerPath.
     public prepareDebugCurrentTarget(currentLaunchConfiguration: configuration.LaunchConfiguration): vscode.DebugConfiguration {
-        let args: string[] = this.launchTargetArgs();
+        let args: string[] = this.getLaunchTargetArgs();
 
         let compilerPath : string | undefined = extension.extension.getCompilerFullPath();
         let parsedObjPath : path.ParsedPath | undefined = compilerPath ? path.parse(compilerPath) : undefined;
@@ -157,9 +179,9 @@ export class Launcher implements vscode.Disposable {
             type: dbg,
             name: `Debug My Program`,
             request: 'launch',
-            cwd: '${command:makefile.launchTargetDirectory}',
+            cwd: this.getLaunchTargetDirectory(),
             args,
-            program: '${command:makefile.launchTargetPath}',
+            program: this.getLaunchTargetPath(),
             MIMode: miMode,
             miDebuggerPath: miDebuggerPath,
             console: "internalConsole",
@@ -169,9 +191,9 @@ export class Launcher implements vscode.Disposable {
         };
 
         logger.message("Created the following debug config:\n   type = " + debugConfig.type +
-                       "\n   cwd = " + debugConfig.cwd + " (= " + this.launchTargetDirectory() + ")" +
+                       "\n   cwd = " + debugConfig.cwd + " (= " + this.getLaunchTargetDirectory() + ")" +
                        "\n   args = " + args.join(" ") +
-                       "\n   program = " + debugConfig.program + " (= " + this.launchTargetPath() + ")" +
+                       "\n   program = " + debugConfig.program + " (= " + this.getLaunchTargetPath() + ")" +
                        "\n   MIMode = " + debugConfig.MIMode +
                        "\n   miDebuggerPath = " + debugConfig.miDebuggerPath +
                        "\n   stopAtEntry = " + debugConfig.stopAtEntry +
@@ -278,12 +300,12 @@ export class Launcher implements vscode.Disposable {
     // from the current launch configuration
     public prepareRunCurrentTarget(): string {
         // Add a pair of quotes just in case there is a space in the binary path
-        let terminalCommand: string = '"' + this.launchTargetPath() + '" ';
-        terminalCommand += this.launchTargetArgs().join(" ");
+        let terminalCommand: string = '"' + this.getLaunchTargetPath() + '" ';
+        terminalCommand += this.getLaunchTargetArgs().join(" ");
 
         // Log the message for high verbosity only because the output channel will become visible over the terminal,
         // even if the terminal show() is called after the logger show().
-        logger.message("Running command '" + terminalCommand + "' in the terminal from location '" + this.launchTargetDirectory() + "'", "Debug");
+        logger.message("Running command '" + terminalCommand + "' in the terminal from location '" + this.getLaunchTargetDirectory() + "'", "Debug");
         return terminalCommand;
     }
 
@@ -297,7 +319,7 @@ export class Launcher implements vscode.Disposable {
             terminalOptions.shellPath = 'C:\\Windows\\System32\\cmd.exe';
         }
 
-        terminalOptions.cwd = this.launchTargetDirectory();
+        terminalOptions.cwd = this.getLaunchTargetDirectory();
 
         if (!this.launchTerminal) {
             this.launchTerminal = vscode.window.createTerminal(terminalOptions);
