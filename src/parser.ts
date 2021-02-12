@@ -801,12 +801,12 @@ export interface CompileCommand {
 export async function parseCustomConfigProvider(cancel: vscode.CancellationToken, dryRunOutputStr: string,
                                                 statusCallback: (message: string) => void,
                                                 onFoundCustomConfigProviderItem: (customConfigProviderItem: CustomConfigProviderItem) => void,
-												onFoundCompileCommandsItem: (compileCommand: CompileCommand) => void): Promise<number> {
+                                                onFoundCompileCommandsItem: (compileCommand: CompileCommand) => void): Promise<number> {
     if (cancel.isCancellationRequested) {
         return make.ConfigureBuildReturnCodeTypes.cancelled;
     }
 
-    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.', "Normal");
+    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider and compile_commands.json generation.', "Normal");
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -917,9 +917,9 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                     });
                 }
 
-				// Generate a CompileCommands entry for each file, to be able
-				// to generate a compile_commands.json file.
-				files.forEach(file => {
+                // Generate a CompileCommands entry for each file, to be able
+                // to generate a compile_commands.json file.
+                files.forEach(file => {
                     onFoundCompileCommandsItem({
                         directory: currentPath,
                         command: line,
