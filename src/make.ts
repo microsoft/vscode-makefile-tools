@@ -707,7 +707,6 @@ interface ConfigureSubphasesStatus {
     generateParseContent?: ConfigureSubphaseStatus;
     preprocessParseContent?: ConfigureSubphaseStatus;
     parseIntelliSense?: ConfigureSubphaseStatus;
-    generateCompileCommands?: ConfigureSubphaseStatus;
     parseLaunch?: ConfigureSubphaseStatus;
     dryrunTargets?: ConfigureSubphaseStatus;
     parseTargets?: ConfigureSubphaseStatus;
@@ -1142,11 +1141,17 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
         extension.buildCustomConfigurationProvider(customConfigProviderItem);
     };
 
+	let onFoundCompileCommandsItem: any = (compileCommand: parser.CompileCommand): void => {
+		addCompileCommand(compileCommand);
+	}
+
     // Empty the cummulative browse path before we start a new parse for custom configuration.
     // We can empty even if the configure is not clean, because the new browse paths will be appended
     // to the previous browse paths.
     extension.clearCummulativeBrowsePath();
-    let retc: number = await parser.parseCustomConfigProvider(cancel, dryRunOutput, onStatus, onFoundCustomConfigProviderItem);
+	// Clear the previous compilation command database
+	clearCompileCommands();
+    let retc: number = await parser.parseCustomConfigProvider(cancel, dryRunOutput, onStatus, onFoundCustomConfigProviderItem, onFoundCompileCommandsItem);
     if (retc !== ConfigureBuildReturnCodeTypes.cancelled) {
         // If this configure is clean, overwrite the final file index, otherwise merge with it.
         let provider: cpptools.CustomConfigurationProvider = getDeltaCustomConfigurationProvider();
@@ -1165,29 +1170,6 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
 
         extension.updateCppToolsProvider();
     }
-
-    return {
-        retc,
-        elapsed: util.elapsedTimeSince(startTime)
-    };
-}
-
-async function generateCompileCommands(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
-                                       dryRunOutput: string, recursive: boolean = false): Promise<ConfigureSubphaseStatus> {
-    if (cancel.isCancellationRequested) {
-        return {
-            retc: ConfigureBuildReturnCodeTypes.cancelled,
-            elapsed: 0
-        };
-    }
-
-    let startTime: number = Date.now();
-    let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
-    };
-
-    clearCompileCommands();
-    let retc: number = await parser.parseCompileCommands(cancel, dryRunOutput, onStatus, addCompileCommand);
 
     return {
         retc,
@@ -1367,14 +1349,6 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         return subphaseStats;
     }
     logger.message(`Parsing for IntelliSense elapsed time: ${subphaseStats.parseIntelliSense.elapsed}`);
-
-    // Generate compile_commands.json
-    logger.message("Parsing to generate compile_commands.json.");
-    subphaseStats.generateCompileCommands = await generateCompileCommands(progress, cancel, preprocessedDryrunOutput, recursiveDoConfigure);
-    if (subphaseStats.generateCompileCommands.retc === ConfigureBuildReturnCodeTypes.cancelled) {
-        return subphaseStats;
-    }
-    logger.message(`Parsing to generate compile_commands.json elapsed time: ${subphaseStats.generateCompileCommands.elapsed}`);
 
     // Configure launch targets as parsed from the makefile
     // (and not as read from settings via makefile.launchConfigurations).
