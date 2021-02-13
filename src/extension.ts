@@ -137,9 +137,11 @@ export class MakefileToolsExtension {
         // of all the compiler invocations of the current configuration
         customConfigProviderItem.files.forEach(filePath => {
             let uri: vscode.Uri = vscode.Uri.file(filePath);
-            let sourceFileConfigurationItem: cpp.SourceFileConfigurationItem = {
+            let compileCommand: parser.CompileCommand = customConfigProviderItem.compileCommands.find(command => command.file === filePath)!;
+            let sourceFileConfigurationItem: cpptools.SourceFileConfigurationItem = {
                 uri,
                 configuration,
+                compileCommand
             };
 
             // These are the configurations processed during the current configure.

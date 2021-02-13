@@ -1139,9 +1139,6 @@ export async function initFromStateAndSettings(): Promise<void> {
             let updatedExportCompileCommandsFile: boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedExportCompileCommandsFile !== exportCompileCommandsFile) {
                 readExportCompileCommandsFile();
-                // This will trigger a reread from the filesystem of the existing
-                // compile_commands.json
-                make.clearCompileCommands();
                 updatedSettingsSubkeys.push(subKey);
             }
 
@@ -1152,9 +1149,6 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
             if (updatedCompileCommandsPath !== compileCommandsPath) {
                 readCompileCommandsPath();
-                // This will trigger a reread from the filesystem of the existing
-                // compile_commands.json
-                make.clearCompileCommands();
                 updatedSettingsSubkeys.push(subKey);
             }
 

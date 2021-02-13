@@ -771,18 +771,6 @@ async function currentPathAfterCommand(line: string, currentPathHistory: string[
     return currentPathHistory;
 }
 
-export interface CustomConfigProviderItem {
-    defines: string[];
-    includes: string[];
-    forcedIncludes: string[];
-    standard: util.StandardVersion;
-    intelliSenseMode: util.IntelliSenseMode;
-    compilerFullPath: string;
-    compilerArgs: string[];
-    files: string[];
-    windowsSDKVersion?: string;
-}
-
 // Structure used to describe a compilation command. Reference documentation is
 // hosted here https://clang.llvm.org/docs/JSONCompilationDatabase.html
 export interface CompileCommand {
@@ -793,6 +781,19 @@ export interface CompileCommand {
     output?: string;
 }
 
+export interface CustomConfigProviderItem {
+    defines: string[];
+    includes: string[];
+    forcedIncludes: string[];
+    standard: util.StandardVersion;
+    intelliSenseMode: util.IntelliSenseMode;
+    compilerFullPath: string;
+    compilerArgs: string[];
+    files: string[];
+    windowsSDKVersion?: string;
+    compileCommands: CompileCommand[];
+}
+
 // Parse the output of the make dry-run command in order to provide CppTools
 // with information about includes, defines, compiler path....etc...
 // as needed by CustomConfigurationProvider. In addition generate a
@@ -800,8 +801,7 @@ export interface CompileCommand {
 // a compile_commands.json file.
 export async function parseCustomConfigProvider(cancel: vscode.CancellationToken, dryRunOutputStr: string,
                                                 statusCallback: (message: string) => void,
-                                                onFoundCustomConfigProviderItem: (customConfigProviderItem: CustomConfigProviderItem) => void,
-                                                onFoundCompileCommandsItem: (compileCommand: CompileCommand) => void): Promise<number> {
+                                                onFoundCustomConfigProviderItem: (customConfigProviderItem: CustomConfigProviderItem) => void): Promise<number> {
     if (cancel.isCancellationRequested) {
         return make.ConfigureBuildReturnCodeTypes.cancelled;
     }
@@ -896,8 +896,19 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                 if (language) {
                         // More standard validation and defaults, in the context of the whole command.
                     let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
+
+                    // Generate compilation command
+                    let compileCommands: CompileCommand[] = [];
+                    files.forEach(file => {
+                        compileCommands.push({
+                            file: file,
+                            directory: currentPath,
+                            command: line
+                        });
+                    });
+
                     if (ext.extension) {
-                        onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion });
+                        onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion, compileCommands });
                     }
                 } else {
                     // If the compiler command is mixing c and c++ source files, send a custom configuration for each of the source files separately,
@@ -911,21 +922,19 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                         // More standard validation and defaults, in the context of each source file.
                         let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
+
+                        // Generate compilation command
+                        let compileCommands: CompileCommand[] = [{
+                            file: file,
+                            directory: currentPath,
+                            command: line
+                        }];
+
                         if (ext.extension) {
-                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion });
+                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion, compileCommands });
                         }
                     });
                 }
-
-                // Generate a CompileCommands entry for each file, to be able
-                // to generate a compile_commands.json file.
-                files.forEach(file => {
-                    onFoundCompileCommandsItem({
-                        directory: currentPath,
-                        command: line,
-                        file: file
-                    });
-                });
             } // if (compilerTool) {
 
             index++;

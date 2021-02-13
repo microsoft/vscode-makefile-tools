@@ -79,7 +79,7 @@ export enum TriggeredBy {
     launch = "Launch (debug/run)",
 }
 
-let fileIndex: Map<string, cpp.SourceFileConfigurationItem> = new Map<string, cpp.SourceFileConfigurationItem>();
+let fileIndex: Map<string, cpptools.SourceFileConfigurationItem> = new Map<string, cpptools.SourceFileConfigurationItem>();
 let workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = { browsePath: [] };
 export function getDeltaCustomConfigurationProvider(): cpptools.CustomConfigurationProvider {
     let provider: cpptools.CustomConfigurationProvider = {
@@ -93,13 +93,6 @@ export function setCustomConfigurationProvider(provider: cpptools.CustomConfigur
     fileIndex = provider.fileIndex;
     workspaceBrowseConfiguration = provider.workspaceBrowse;
 }
-
-let compileCommands: Map<string, parser.CompileCommand> = new Map<string, parser.CompileCommand>();
-export function clearCompileCommands() { compileCommands = new Map<string, parser.CompileCommand>(); }
-export function addCompileCommand(compileCommand: parser.CompileCommand) {
-    compileCommands.set(compileCommand.file, compileCommand);
-}
-export function isCompileCommandsEmpty() { return compileCommands.size === 0; }
 
 // Identifies and logs whether an operation should be prevented from running.
 // So far, the only blocking scenarios are if an ongoing configure, pre-configure or build
@@ -701,6 +694,7 @@ interface ConfigurationCache {
         fileIndex: [string, {
             uri: string | vscode.Uri;
             configuration: cpp.SourceFileConfiguration;
+            compileCommand: parser.CompileCommand;
         }][];
     };
 }
@@ -952,12 +946,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
         // Export the compile_commands.json file if the option is enabled.
         if (exportCompileCommandsFile && compileCommandsPath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
-            if (!isCompileCommandsEmpty()) {
-                // Pretty print the output for easier inspection
-                util.writeFile(compileCommandsPath, JSON.stringify(Array.from(compileCommands.values()), undefined, 4));
-            } else {
-                logger.message("The configuration was successful but produced an empty compile_commands.json. Discarding it");
-            }
+            let compileCommands: parser.CompileCommand[] = ConfigurationCache.customConfigurationProvider.fileIndex.map(([, {compileCommand}]) => compileCommand);
+            util.writeFile(compileCommandsPath, JSON.stringify(compileCommands, undefined, 4));
         }
 
         let newBuildTarget: string | undefined = configuration.getCurrentTarget();
@@ -1127,35 +1117,6 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
     };
 }
 
-// Tries to load a preexisting compile_commands.json.
-function tryLoadingCompileCommandsFromFile(): boolean {
-    let compileCommandsPath: string | undefined = configuration.getCompileCommandsPath();
-    if (compileCommandsPath) {
-        clearCompileCommands();
-
-        let content: string | undefined = util.readFile(compileCommandsPath);
-        if (content) {
-            try {
-                logger.message(`Reading previous compile_commands.json: ${compileCommandsPath}`);
-                let compileCommandsList: parser.CompileCommand[] = JSON.parse(content);
-                compileCommandsList.forEach(compileCommand => {
-                    addCompileCommand(compileCommand);
-                });
-            } catch (e) {
-                logger.message("An error occured while parsing the previous compile_commands.json");
-                return false;
-            }
-        } else {
-            // If there is no compile_commands.json and we request to build one
-            // the configuration needs to be clean
-            logger.message(`There is no previous compile_commands.json at ${compileCommandsPath}`);
-            return false;
-        }
-    }
-
-    return true;
-}
-
 async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.CancellationToken,
                               dryRunOutput: string, recursive: boolean = false): Promise<ConfigureSubphaseStatus> {
     if (cancel.isCancellationRequested) {
@@ -1177,16 +1138,11 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
         extension.buildCustomConfigurationProvider(customConfigProviderItem);
     };
 
-    let onFoundCompileCommandsItem: any = (compileCommand: parser.CompileCommand): void => {
-        addCompileCommand(compileCommand);
-    }
-
     // Empty the cummulative browse path before we start a new parse for custom configuration.
     // We can empty even if the configure is not clean, because the new browse paths will be appended
     // to the previous browse paths.
     extension.clearCummulativeBrowsePath();
-    // The compileCommands have already been cleared if necessary
-    let retc: number = await parser.parseCustomConfigProvider(cancel, dryRunOutput, onStatus, onFoundCustomConfigProviderItem, onFoundCompileCommandsItem);
+    let retc: number = await parser.parseCustomConfigProvider(cancel, dryRunOutput, onStatus, onFoundCustomConfigProviderItem);
     if (retc !== ConfigureBuildReturnCodeTypes.cancelled) {
         // If this configure is clean, overwrite the final file index, otherwise merge with it.
         let provider: cpptools.CustomConfigurationProvider = getDeltaCustomConfigurationProvider();
@@ -1281,7 +1237,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
                     extension.getCppConfigurationProvider().setCustomConfigurationProvider({
                         workspaceBrowse: configurationCache.customConfigurationProvider.workspaceBrowse,
                         // Trick to read a map from json
-                        fileIndex: new Map<string, cpp.SourceFileConfigurationItem>(configurationCache.customConfigurationProvider.fileIndex)
+                        fileIndex: new Map<string, cpptools.SourceFileConfigurationItem>(configurationCache.customConfigurationProvider.fileIndex)
                     });
                 });
 
@@ -1351,26 +1307,6 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
         }
     } else {
         logger.message("Loading configurations from cache is not necessary.", "Verbose");
-    }
-
-    // Before generating the dryrun output, if compile_commands.json generation
-    // is requested, but the compileCommands variable is empty (possibly because
-    // of some error that interrupted a previous config or some error while
-    // reading the old file) we need to request a clean configuration.
-    let exportCompileCommandsFile: boolean | undefined = configuration.getExportCompileCommandsFile();
-    if (exportCompileCommandsFile) {
-        if (getConfigureIsClean()) {
-            // No need to do any more checks, the compileCommands are going to
-            // be overwritten anyways
-            clearCompileCommands();
-        } else if (isCompileCommandsEmpty()) {
-            if (!tryLoadingCompileCommandsFromFile()) {
-                // More detailed log has been printed already
-                logger.message("Running clean configure instead.");
-                setConfigureIsInBackground(false);
-                setConfigureIsClean(true);
-            }
-        }
     }
 
     // This generates the dryrun output (saving it on disk) or reads an alternative build log.

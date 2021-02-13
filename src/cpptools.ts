@@ -6,14 +6,19 @@
 import * as configuration from './configuration';
 import * as logger from './logger';
 import * as make from './make';
+import * as parser from './parser';
 import * as path from 'path';
 import * as util from './util';
 import * as vscode from 'vscode';
 import * as cpp from 'vscode-cpptools';
 
+export interface SourceFileConfigurationItem extends cpp.SourceFileConfigurationItem {
+    readonly compileCommand: parser.CompileCommand;
+}
+
 export interface CustomConfigurationProvider {
     workspaceBrowse: cpp.WorkspaceBrowseConfiguration;
-    fileIndex: Map<string, cpp.SourceFileConfigurationItem>;
+    fileIndex: Map<string, SourceFileConfigurationItem>;
 }
 
 export class CppConfigurationProvider implements cpp.CustomConfigurationProvider {
@@ -22,13 +27,13 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 
     private workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = { browsePath: [] };
 
-    private getConfiguration(uri: vscode.Uri): cpp.SourceFileConfigurationItem | undefined {
+    private getConfiguration(uri: vscode.Uri): SourceFileConfigurationItem | undefined {
         const norm_path: string = path.normalize(uri.fsPath);
 
         // First look in the file index computed during the last configure.
         // If nothing is found and there is a configure running right now,
         // try also the temporary index of the current configure.
-        let sourceFileConfiguration: cpp.SourceFileConfigurationItem | undefined = this.fileIndex.get(norm_path);
+        let sourceFileConfiguration: SourceFileConfigurationItem | undefined = this.fileIndex.get(norm_path);
         if (!sourceFileConfiguration && make.getIsConfiguring()) {
             sourceFileConfiguration = make.getDeltaCustomConfigurationProvider().fileIndex.get(norm_path);
             logger.message(`Configuration for file ${norm_path} was not found. Searching in the current configure temporary file index.`);
@@ -79,7 +84,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
             };
         }
 
-        let map: Map<string, cpp.SourceFileConfigurationItem> = this.fileIndex;
+        let map: Map<string, SourceFileConfigurationItem> = this.fileIndex;
         provider.fileIndex.forEach(function(value, key): void {
             map.set(key, value);
         });
@@ -114,7 +119,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 
     public dispose(): void { }
 
-    private fileIndex = new Map<string, cpp.SourceFileConfigurationItem>();
+    private fileIndex = new Map<string, SourceFileConfigurationItem>();
 
     public logConfigurationProviderBrowse(): void {
         logger.message("Sending Workspace Browse Configuration: -----------------------------------", "Verbose");
@@ -128,7 +133,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
         logger.message("----------------------------------------------------------------------------", "Verbose");
     }
 
-    public logConfigurationProviderItem(filePath: cpp.SourceFileConfigurationItem, fromCache: boolean = false): void {
+    public logConfigurationProviderItem(filePath: SourceFileConfigurationItem, fromCache: boolean = false): void {
         let uriObj: vscode.Uri = <vscode.Uri>filePath.uri;
         logger.message("Sending configuration " + (fromCache ? "(from cache) " : "") + "for file " + uriObj.fsPath + " -----------------------------------", "Normal");
         logger.message("    Defines: " + filePath.configuration.defines.join(";"), "Verbose");
