@@ -13,7 +13,3 @@ Supported commands for substitution:
 |`makefile.getLaunchTargetArgsConcat`|A string describing the arguments of the current launch target concatenated in a single string and separated by space.|
 |`makefile.launchTargetPath`|The full path to the target executable, including the filename. If `makefile.buildBeforeRun` is true, invoking this substitution will also start a build.|
 |`makefile.launchTargetFileName`|The name of the target executable file without any path or extension information. If `makefile.buildBeforeRun` is true, invoking this substitution will also start a build.|
-
-# Variable substitution
-
-Variable substitution is not yet implemented and it will be supported in a future release.
