@@ -11,7 +11,7 @@
 | c-lightning | [https://github.com/ElementsProject/lightning.git](https://github.com/ElementsProject/lightning.git) | ./configure | | always-make is long (triggers reconfigure) | Yes |
 | Cmake | [https://github.com/Kitware/CMake.git ](https://github.com/Kitware/CMake.git%C2%A0) | ./bootstrap | | doesn't detect launch targets because the linker commands are too cryptic, with or without V=1 | Yes |
 | CPython | [https://github.com/python/cpython.git](https://github.com/python/cpython.git)| ./configure || | Yes |
-| ctypes.sh | [https://github.com/taviso/ctypes.sh.git](https://github.com/taviso/ctypes.sh.git) | ./autogen.sh && ./configure | | Yes |
+| ctypes.sh | [https://github.com/taviso/ctypes.sh.git](https://github.com/taviso/ctypes.sh.git) | ./autogen.sh && ./configure | | | Yes |
 | CURL | [https://github.com/curl/curl.git](https://github.com/curl/curl.git) | autoreconf -fiv && ./configure | | configure takes very long (even with always-make or buildLog workarounds)<br><br>https://github.com/microsoft/vscode-makefile-tools/issues/93 | Yes |
 | dpdk | [https://github.com/DPDK/dpdk.git](https://github.com/DPDK/dpdk.git)| | | | No. Doesn't work because make calls into meson, ninja which don't provide useful output to parse |
 | dtwmcmd | [https://github.com/cdesktopenv/dtwmcmd.git](https://github.com/cdesktopenv/dtwmcmd.git) | /.configure | | | Yes |
@@ -27,7 +27,7 @@
 | Greenplum Database (GPDB) | [https://github.com/greenplum-db/gpdb.git](https://github.com/greenplum-db/gpdb.git) | ./configure --without-readline --without-zstd | | always-make is long (triggers reconfigure) | Yes |
 | imgui | [https://github.com/ocornut/imgui.git](https://github.com/ocornut/imgui.git)| | | Create one wrapping makefile in root:<br>all:<br>   $(MAKE) -C ./examples/example\_sdl\_metal/<br>   $(MAKE) -C ./examples/example\_glfw\_metal/<br>   $(MAKE) -C ./examples/example\_glfw\_opengl2/<br>   $(MAKE) -C ./examples/example\_null/<br>   $(MAKE) -C ./examples/example\_glfw\_opengl3/<br>   $(MAKE) -C ./examples/example\_emscripten\_opengl3/<br>   $(MAKE) -C ./examples/example\_sdl\_opengl2/<br>   $(MAKE) -C ./examples/example\_glut\_opengl2/<br>   $(MAKE) -C ./examples/example\_sdl\_opengl3/<br><br>Change \` back tick with shell command in many of these leaf makefiles. Example:<br>#  CXXFLAGS += \`sdl2-config --cflags\`<br>   CXXFLAGS += $(shell sdl2-config --cflags) | Yes |
 | Jemalloc | [https://github.com/jemalloc/jemalloc.git](https://github.com/jemalloc/jemalloc.git) | ./autogen.sh && ./configure | | [https://github.com/microsoft/vscode-makefile-tools/issues/96](https://github.com/microsoft/vscode-makefile-tools/issues/96)| Yes |
-| Lbrycrd | [https://github.com/lbryio/lbrycrd.git](https://github.com/lbryio/lbrycrd.git) | ./autogen.sh && ./configure --with-incompatible-bdb | The build needs V=1 to produce useful output for the extension.<br>Always-make is slow (triggers reconfigure). | Yes |
+| Lbrycrd | [https://github.com/lbryio/lbrycrd.git](https://github.com/lbryio/lbrycrd.git) | ./autogen.sh && ./configure --with-incompatible-bdb | The build needs V=1 to produce useful output for the extension.<br>Always-make is slow (triggers reconfigure). | | Yes |
 | libass | [https://github.com/libass/libass.git](https://github.com/libass/libass.git) | ./autogen.sh && ./configure | | [https://github.com/microsoft/vscode-makefile-tools/issues/96](https://github.com/microsoft/vscode-makefile-tools/issues/96) | Yes |
 | libav | [https://github.com/libav/libav.git](https://github.com/libav/libav.git) | ./configure | | [https://github.com/microsoft/vscode-makefile-tools/issues/97](https://github.com/microsoft/vscode-makefile-tools/issues/97) | Yes |
 | libsvm | [https://github.com/cjlin1/libsvm.git](https://github.com/cjlin1/libsvm.git) | | | | Yes |
@@ -49,7 +49,7 @@
 | PHP | [https://github.com/php/php-src.git](https://github.com/php/php-src.git) | ./buildconf && ./configure | | | Yes |
 | PostgresSQL | [https://github.com/postgres/postgres.git](https://github.com/postgres/postgres.git) | ./configure | | Headers squiggles without a real build before configure.<br>One file compiled many times differently (src/common/ip.c) during the all or default makefile target. | Yes |
 | qemu | [https://github.com/qemu/qemu.git](https://github.com/qemu/qemu.git) | ./configure | | | Yes |
-| Recommender | [https://github.com/GHamrouni/Recommender.git](https://github.com/GHamrouni/Recommender.git) | | | Yes |
+| Recommender | [https://github.com/GHamrouni/Recommender.git](https://github.com/GHamrouni/Recommender.git) | | | | Yes |
 | Redis | [https://github.com/redis/redis.git](https://github.com/redis/redis.git)| | | | Yes |
 | Sample Makefile for C++ | [https://github.com/remonbonbon/makefile-example.git](https://github.com/remonbonbon/makefile-example.git) | | | | Yes |
 | scummvm | [https://github.com/scummvm/scummvm.git](https://github.com/scummvm/scummvm.git) | ./configure --disable-all-engines --enable-engine=director --enable-asan | |the build log has no compilation/linker commands (with or without V=1) dryrun works fine  | Yes |
