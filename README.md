@@ -13,10 +13,21 @@ find it.
 folder. If this is the case, you will need to manually activate it by running one of the `Makefile:` commands
 from VS Code's command palette.
 
+### Pre-configuring your project
+If you need any environment variables to be set or any terminal operations to be run before configure/build
+(like the usual `./autogen.sh`, `./configure` or `vcvarsall.bat`), you need to launch VSCode from a terminal
+that is already set up according to your project requirements OR you can point the `makefile.preConfigureSript`
+setting to a batch script file and invoke it at any time via the command `makefile.preconfigure` in the pallette.
+By seting `makefile.alwaysPreConfigure` to true, you don't need to run the pre-configure command separately.
+The extension is going to invoke the script before every configure operation.
+
 ### Configuring your project
 By default, the extension will attempt to use a `make` program that resides within your $PATH to configure
 the project.  If you use a different flavor of the make tool or if it is not in your $PATH, use the
 `makefile.makePath` setting to instruct the extension where to find it.
+
+The extension can also avoid running the `make` program when it configures your project, if you point the
+`makefile.buildLog` setting to the output of a build.
 
 Now, you are ready to configure your project. If you normally just run `make` in the terminal to
 configure/build your project, you shouldn't need to do anything else at this point besides accept the prompt
