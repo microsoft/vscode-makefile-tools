@@ -1,15 +1,9 @@
-# VS Code Makefile Tools - early preview
+# VS Code Makefile Tools
 
 This extension provides IntelliSense configurations to the VS Code C/C++ Extension for Makefile projects.
 It also provides convenient commands to build, debug, and run your targets.
 
 # Getting Started
-
-### Installation
-To install the extension, go to the [Actions](https://github.com/microsoft/vscode-makefile-tools/actions)
-tab or the [Releases](https://github.com/microsoft/vscode-makefile-tools/releases) page and download the
-most recent build of the VSIX.  Once downloaded, use the "Install from VSIX..." command in VS Code to select
-and install the extension.
 
 ### Activating the extension
 The extension will activate when it finds a Makefile in your `${workspaceFolder}`. If your Makefile does not
@@ -57,13 +51,21 @@ command to start debugging or running the target without a debugger attached.
 If you need to pass additional arguments to your targets, update the `makefile.launchConfigurations` by adding
 the `binaryArgs` property to the configuration.
 
+# Troubleshooting
+
+We documented the settings and configurations needed for a select number of repositories that we have
+tested. The document can be found here: [docs/repositories.md](./docs/repositories.md). Contributions to this
+document (e.g. for additional repositories that we have not tested) are welcome.
+
+A more in-depth troubleshooting guide can be found here: [docs/troubleshooting.md](./docs/troubleshooting.md)
+
 # Feedback and Suggestions
 
-Let us know what you think! If you are having trouble with the extension, please
+We'd love to hear what you think! If you are having trouble with the extension, please
 [open an issue](https://github.com/microsoft/vscode-makefile-tools/issues/new).
 
-Since we don't have any other feedback channels available yet, you can also open an issue to report what you
-like about the extension or which features are the most useful to you.
+You can also leave us a rating on the VS Code Marketplace and let us know what you like about the extension
+or would like to see improved.
 
 # Contributing
 
