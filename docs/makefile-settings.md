@@ -1,16 +1,6 @@
-# Configure Makefile Tools settings
+# Command substitution
 
-Makefile Tools supports a variety of settings that can be set at the user, or workspace, level via VSCode's `settings.json` file. This topic covers the available options and how they are used.
-
-## Makefile settings
-
-There is no variable substitution available for the Makefile Tools settings and we plan to implement such support in a future release.
-
-### Command substitution
-
-Makefile Tools can expand VS Code commands. For example, you can expand the path to the launch target by using the syntax `${command:makefile.launchTargetPath}`
-
-Be careful with long-running commands because it isn't specified when, or how many times, Makefile Tools will execute a command for a given expansion.
+Makefile Tools can expand VS Code commands when invoked in `launch.json` and `tasks.json` with this syntax: `${command:makefile.launchTargetPath}`.
 
 Supported commands for substitution:
 
@@ -24,7 +14,6 @@ Supported commands for substitution:
 |`makefile.launchTargetPath`|The full path to the target executable, including the filename. If `makefile.buildBeforeRun` is true, invoking this substitution will also start a build.|
 |`makefile.launchTargetFileName`|The name of the target executable file without any path or extension information. If `makefile.buildBeforeRun` is true, invoking this substitution will also start a build.|
 
-## Next steps
+# Variable substitution
 
-- Learn about [user vs. workspace settings](https://code.visualstudio.com/docs/getstarted/settings)
-- Explore the [Makefile Tools documentation](../README.md)
+Variable substitution is not yet implemented and it will be supported in a future release.
