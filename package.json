@@ -2,7 +2,7 @@
     "name": "makefile-tools",
     "displayName": "Makefile Tools",
     "description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
-    "version": "0.1.4",
+    "version": "0.2.0",
     "publisher": "ms-vscode",
     "preview": true,
     "icon": "res/makefile-logo.png",
