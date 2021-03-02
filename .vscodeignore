@@ -15,4 +15,5 @@ out/src/test/**
 .vscodeignore
 tsconfig.json
 tslint.json
+*.log
 *.vsix
