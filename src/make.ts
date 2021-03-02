@@ -76,7 +76,7 @@ export enum TriggeredBy {
     configureBeforeTargetChange = "configure dirty (before target change), settings (configureAfterCommand)",
     configureAfterTargetChange = "settings (configureAfterCommand), command pallette (setBuildTarget)",
     configureBeforeLaunchTargetChange = "configureDirty (before launch target change), settings (configureAfterCommand)",
-    launch = "Launch (debug/run)",
+    launch = "Launch (debug|run)",
 }
 
 let fileIndex: Map<string, cpp.SourceFileConfigurationItem> = new Map<string, cpp.SourceFileConfigurationItem>();
