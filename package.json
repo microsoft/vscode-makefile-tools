@@ -578,5 +578,8 @@
         "vscode-cpptools": "^4.0.1",
         "vscode-extension-telemetry": "^0.1.2",
         "vscode-jsonrpc": "^3.6.2"
+    },
+    "resolutions": {
+        "**/mkdirp/minimist": "^0.2.1"
     }
 }
