@@ -427,13 +427,36 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
                 swiValues.push(swi);
             }
 
+            // If values are found, they can be indeed values for the preceding switch
+            // but they can also be just file paths scattered through the analyzed command line.
+            // Since we don't know in detail which switch of which compiler expects a value or not
+            // (there was no need yet to implement such hard to maintain table of info)
+            // then anything in between 2 switches is seen by parseMultipleSwitchFromToolArguments
+            // as a switch value. Over here, where we prepare compilerArgs for CppTools,
+            // we know that CppTools expects even mutiple args as separate entries,
+            // exactly as the shell would see them in the command line.
+            // So we can safely split here the first switch and what we see as its value,
+            // as long as these 2 are separated by space. If the switch value is connected
+            // to the switch then we don't split.
             swiValues.forEach(value => {
                 // The end of the current switch value
-                let index3: number = partialArgs.indexOf(value) + value.length;
-                let finalSwitch: string = partialArgs.substring(0, index3);
+                let indexValue: number = partialArgs.indexOf(value);
+                let indexSwitch: number = partialArgs.indexOf(swi);
+                let endValue: number = indexValue + value.length;
+                let endSwitch: number = indexSwitch + swi.length;
 
-                finalSwitch = finalSwitch.trim();
-                switches.push(finalSwitch);
+                // If the value doesn't start immediately after the switch,
+                // it means that they are separated by a space like character
+                // so we can split and send both as different compilerArgs entries.
+                if (indexValue > endSwitch) {
+                    let finalSwitch1: string = partialArgs.substring(0, endSwitch);
+                    let finalSwitch2: string = partialArgs.substring(indexValue, endValue);
+                    switches.push(finalSwitch1.trim());
+                    switches.push(finalSwitch2.trim());
+                } else {
+                    let finalSwitch: string = partialArgs.substring(0, endValue);
+                    switches.push(finalSwitch.trim());
+                }
             });
         }
 
