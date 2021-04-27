@@ -77,6 +77,18 @@ export function tmpDir(): string {
     }
 }
 
+export function parseCompilerArgsScriptFile(): string {
+    let scriptFile: string = path.join(tmpDir(), "parseCompilerArgs");
+
+    if (process.platform === "win32") {
+        scriptFile += ".bat";
+    } else {
+        scriptFile += ".sh";
+    }
+
+    return scriptFile;
+}
+
 // Evaluate whether a string looks like a path or not,
 // without using fs.stat, since dry-run may output tools
 // that are not found yet at certain locations,
