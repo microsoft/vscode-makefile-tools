@@ -102,7 +102,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     }
 
     public async provideFolderBrowseConfiguration(_uri: vscode.Uri): Promise<cpp.WorkspaceBrowseConfiguration> {
-        if (_uri.fsPath !== vscode.workspace.rootPath) {
+        if (_uri.fsPath !== util.getWorkspaceRoot()) {
             logger.message("Makefile Tools supports single root for now.");
         }
 

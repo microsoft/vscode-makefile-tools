@@ -462,14 +462,12 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
     if (process.platform === 'win32') {
         runCommand = "cmd";
         scriptArgs.push("/c");
-        scriptArgs.push(parseCompilerArgsScriptFile);
+        scriptArgs.push(`""${parseCompilerArgsScriptFile}" ${compilerArgRegions}"`);
     } else {
         runCommand = "/bin/bash";
         scriptArgs.push("-c");
-        scriptArgs.push(`"source ${parseCompilerArgsScriptFile}"`);
+        scriptArgs.push(`"source '${parseCompilerArgsScriptFile}' ${compilerArgRegions}"`);
     }
-
-    scriptArgs.push(compilerArgRegions);
 
     try {
         let stdout: any = (result: string): void => {
@@ -485,12 +483,13 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
 
         let stderr: any = (result: string): void => {
             logger.messageNoCR(`Error while running the compiler args parser script '${parseCompilerArgsScriptFile}'` +
-                               `for regions "${compilerArgRegions}": "${result}"`, "Normal");
+                `for regions "${compilerArgRegions}": "${result}"`, "Normal");
         };
 
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, vscode.workspace.rootPath || "", stdout, stderr);
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), stdout, stderr);
         if (result.returnCode !== 0) {
-            logger.messageNoCR(`The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode}`, "Normal");        }
+            logger.messageNoCR(`The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode}`, "Normal");
+        }
     } catch (error) {
         logger.message(error);
     }
@@ -852,7 +851,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
-    let currentPath: string = vscode.workspace.rootPath || "";
+    let currentPath: string = util.getWorkspaceRoot();
     let currentPathHistory: string[] = [currentPath];
 
     // Read the dry-run output line by line, searching for compilers and directory changing commands
@@ -1010,7 +1009,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
-    let currentPath: string = vscode.workspace.rootPath || "";
+    let currentPath: string = util.getWorkspaceRoot();
     let currentPathHistory: string[] = [currentPath];
 
     // array of full path executables built by this makefile
@@ -1212,7 +1211,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
     // Reset the current path since we are going to analyze path transitions again
     // with this second pass through the dry-run output lines,
     // while building the launch custom provider data.
-    currentPath = vscode.workspace.rootPath || "";
+    currentPath = util.getWorkspaceRoot();
     currentPathHistory = [currentPath];
 
     // Since an executable can be called without its extension,

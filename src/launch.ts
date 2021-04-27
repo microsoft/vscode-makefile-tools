@@ -52,7 +52,7 @@ export class Launcher implements vscode.Disposable {
         if (launchConfiguration) {
             return launchConfiguration.cwd;
         } else {
-            return vscode.workspace.rootPath || "";
+            return util.getWorkspaceRoot();
         }
     }
 
