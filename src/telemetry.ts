@@ -94,7 +94,7 @@ function filterSetting(value: any, key: string, defaultValue: string) : string {
     if (!value) {
         return "undefined";
     } else if (value === defaultValue) {
-        return defaultValue;
+        return "default";
     }
 
     return "...";
