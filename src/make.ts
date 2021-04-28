@@ -203,6 +203,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
         return ConfigureBuildReturnCodeTypes.saveFailed;
     }
 
+    logger.showOutputChannel();
     logger.clearOutputChannel();
 
     // Same start time for build and an eventual configure.
