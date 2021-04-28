@@ -629,12 +629,12 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     let wrapScriptOutFile: string = wrapScriptFile + ".out";
     let wrapScriptContent: string;
     if (process.platform === "win32") {
-        wrapScriptContent = `call ${scriptFile}\r\n`;
-        wrapScriptContent += `set > ${wrapScriptOutFile}`;
+        wrapScriptContent = `call "${scriptFile}"\r\n`;
+        wrapScriptContent += `set > "${wrapScriptOutFile}"`;
         wrapScriptFile += ".bat";
     } else {
-        wrapScriptContent = `source ${scriptFile}\n`;
-        wrapScriptContent += `printenv > ${wrapScriptOutFile}`;
+        wrapScriptContent = `source '${scriptFile}'\n`;
+        wrapScriptContent += `printenv > '${wrapScriptOutFile}'`;
         wrapScriptFile += ".sh";
     }
 
