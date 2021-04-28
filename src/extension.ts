@@ -322,7 +322,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Delete the extension log file, if exists
     let extensionLog : string | undefined = configuration.getExtensionLog();
     if (extensionLog && util.checkFileExistsSync(extensionLog)) {
-        fs.unlinkSync(extensionLog);
+        util.deleteFileSync(extensionLog);
+    }
+
+    // Delete the script that is created by this extension in the temporary folder
+    // with the purpose of spliting a compilation command fragment into switch arguments
+    // as the shell sees them. See more about this script in parser.ts, parseAnySwitchFromToolArguments.
+    // We need to delete this file occasionally to ensure that the extension will not use indefinitely
+    // an eventual old version, especially because for performance reasons we don't create this file
+    // every time we use it (the configure process creates it every time it's not found on disk).
+    // Deleting this script here ensures that every new VSCode instance will operate on up to date script functionality.
+    let parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
+    if (util.checkFileExistsSync(parseCompilerArgsScript)) {
+        util.deleteFileSync(parseCompilerArgsScript);
     }
 
     // Read configuration info from settings

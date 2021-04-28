@@ -141,7 +141,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // Sometimes the ending of lines ends up being a mix and match of \n and \r\n.
     // Make it uniform to \n to ease other processing later.
     preprocessTasks.push(function (): void {
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\\r\\n/mg, "\n");
+        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\r\n/mg, "\n");
     });
 
     // Some compiler/linker commands are split on multiple lines.
@@ -364,20 +364,31 @@ async function parseLineAsTool(
 // The result is passed to IntelliSense custom configuration provider as compilerArgs.
 // excludeArgs helps with narrowing down the search, when we know for sure that we're not
 // interested in some switches. For example, -D, -I, -FI, -include, -std are treated separately.
-function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): string[] {
+// Once we identified what looks to be the switches in the given command line, for each region
+// between two consecutive switches we let the shell parse it into arguments via a script invocation
+// (instead of us using other parser helpers in this module) to be in sync with how CppTools
+// expects the compiler arguments to be passed in.
+async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): Promise<string[]> {
     // Identify the non value part of the switch: prefix, switch name
     // and what may separate this from an eventual switch value
     let switches: string[] = [];
     let regExpStr: string = "(^|\\s+)(--|-" +
-                            // On Win32 allow '/' as switch prefix as well,
-                            // otherwise it conflicts with path character
-                            (process.platform === "win32" ? "|\\/" : "") +
-                            ")([a-zA-Z0-9_]+)";
+        // On Win32 allow '/' as switch prefix as well,
+        // otherwise it conflicts with path character
+        (process.platform === "win32" ? "|\\/" : "") +
+        ")([a-zA-Z0-9_]+)";
     let regexp: RegExp = RegExp(regExpStr, "mg");
     let match1: RegExpExecArray | null;
     let match2: RegExpExecArray | null;
     let index1: number = -1;
     let index2: number = -1;
+
+    // This contains all the compilation command fragments in between two different consecutive switches
+    // (except the ones we plan to ignore, specified by excludeArgs).
+    // Once this function is done concatenating into compilerArgRegions,
+    // we call the compiler args parsing script once for the whole list of regions
+    // (as opposed to invoking it for each fragment separately).
+    let compilerArgRegions: string = "";
 
     // With every loop iteration we need 2 switch matches so that we analyze the text
     // that is between them. If the current match is the last one, then we will analyze
@@ -414,30 +425,73 @@ function parseAnySwitchFromToolArguments(args: string, excludeArgs: string[]): s
         }
 
         if (!exclude) {
-            // The other parser helpers differ from this one by the fact that they know
-            // what switch they are looking for. This helper first identifies anything
-            // that looks like a switch and then calls parseMultipleSwitchFromToolArguments
-            // which knows how to parse complex scenarios of spaces, quotes and other characters.
-            // Don't allow parseMultipleSwitchFromToolArguments to remove surrounding quotes for switch values.
-            let swiValues: string[] = parseMultipleSwitchFromToolArguments(partialArgs, swi, false);
-
-            // If no values are found, it means the switch has simple syntax.
-            // Add this to the array.
-            if (swiValues.length === 0) {
-                swiValues.push(swi);
-            }
-
-            swiValues.forEach(value => {
-                // The end of the current switch value
-                let index3: number = partialArgs.indexOf(value) + value.length;
-                let finalSwitch: string = partialArgs.substring(0, index3);
-
-                finalSwitch = finalSwitch.trim();
-                switches.push(finalSwitch);
-            });
+            compilerArgRegions += partialArgs;
         }
 
         match1 = match2;
+    }
+
+    let parseCompilerArgsScriptFile: string = util.parseCompilerArgsScriptFile();
+    let parseCompilerArgsScriptContent: string;
+    if (process.platform === "win32") {
+        // There is a potential problem with the windows version of the script:
+        // A fragment like "-sw1,-sw2,-sw3" gets split by comma and a fragment like
+        // "-SwDef=Val" is split by equal. Opened GitHub issue
+        // https://github.com/microsoft/vscode-makefile-tools/issues/149.
+        // For now, these scenarios don't happen on windows (the comma syntax is linux only
+        // and the equal syntax is encountered for defines and c/c++ standard which are parsed
+        // separately, not via this script invocation).
+        parseCompilerArgsScriptContent = `@echo off\r\n`;
+        parseCompilerArgsScriptContent += `for %%i in (%*) do echo %%i \r\n`;
+    } else {
+        parseCompilerArgsScriptContent = `#!/bin/bash \n`;
+        parseCompilerArgsScriptContent += `while (( "$#" )); do \n`;
+        parseCompilerArgsScriptContent += `  echo $1 \n`;
+        parseCompilerArgsScriptContent += `  shift \n`;
+        parseCompilerArgsScriptContent += `done \n`;
+    }
+
+    // Create the script only when not found. The extension makes sure to delete it regularly
+    // (at project load time).
+    if (!util.checkFileExistsSync(parseCompilerArgsScriptFile)) {
+        util.writeFile(parseCompilerArgsScriptFile, parseCompilerArgsScriptContent);
+    }
+
+    let scriptArgs: string[] = [];
+    let runCommand: string;
+    if (process.platform === 'win32') {
+        runCommand = "cmd";
+        scriptArgs.push("/c");
+        scriptArgs.push(`""${parseCompilerArgsScriptFile}" ${compilerArgRegions}"`);
+    } else {
+        runCommand = "/bin/bash";
+        scriptArgs.push("-c");
+        scriptArgs.push(`"source '${parseCompilerArgsScriptFile}' ${compilerArgRegions}"`);
+    }
+
+    try {
+        let stdout: any = (result: string): void => {
+            let results: string[] = result.replace(/\r\n/mg, "\n").split("\n");
+            // In case of concatenated separators, the shell sees different empty arguments
+            // which we can remove (most common is more spaces not being seen as a single space).
+            results.forEach(res => {
+                if (res !== "") {
+                    switches.push(res.trim());
+                }
+            });
+        };
+
+        let stderr: any = (result: string): void => {
+            logger.messageNoCR(`Error while running the compiler args parser script '${parseCompilerArgsScriptFile}'` +
+                `for regions "${compilerArgRegions}": "${result}"`, "Normal");
+        };
+
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), stdout, stderr);
+        if (result.returnCode !== 0) {
+            logger.messageNoCR(`The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode}`, "Normal");
+        }
+    } catch (error) {
+        logger.message(error);
     }
 
     return switches;
@@ -797,7 +851,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
-    let currentPath: string = vscode.workspace.rootPath || "";
+    let currentPath: string = util.getWorkspaceRoot();
     let currentPathHistory: string[] = [currentPath];
 
     // Read the dry-run output line by line, searching for compilers and directory changing commands
@@ -806,6 +860,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
     let numberOfLines: number = dryRunOutputLines.length;
     let index: number = 0;
     let done: boolean = false;
+
     async function doParsingChunk(): Promise<void> {
         let chunkIndex: number = 0;
         while (index < numberOfLines && chunkIndex <= chunkSize) {
@@ -833,7 +888,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                 // Exclude switches that are being processed separately (I, FI, include, D, std)
                 // and switches that don't affect IntelliSense but are causing errors.
                 let compilerArgs: string[] = [];
-                compilerArgs = parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std", "MF"]);
+                compilerArgs = await parseAnySwitchFromToolArguments(compilerTool.arguments, ["I", "FI", "include", "D", "std", "MF"]);
 
                 // Parse and log the includes, forced includes and the defines
                 let includes: string[] = parseMultipleSwitchFromToolArguments(compilerTool.arguments, 'I');
@@ -954,7 +1009,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch
-    let currentPath: string = vscode.workspace.rootPath || "";
+    let currentPath: string = util.getWorkspaceRoot();
     let currentPathHistory: string[] = [currentPath];
 
     // array of full path executables built by this makefile
@@ -1156,7 +1211,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
     // Reset the current path since we are going to analyze path transitions again
     // with this second pass through the dry-run output lines,
     // while building the launch custom provider data.
-    currentPath = vscode.workspace.rootPath || "";
+    currentPath = util.getWorkspaceRoot();
     currentPathHistory = [currentPath];
 
     // Since an executable can be called without its extension,

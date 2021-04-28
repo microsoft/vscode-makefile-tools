@@ -578,7 +578,7 @@ export function getBuildLogForConfiguration(configuration: string | undefined): 
         logger.message('Found build log path setting "' + configurationBuildLog + '" defined for configuration "' + configuration);
 
         if (!path.isAbsolute(configurationBuildLog)) {
-            configurationBuildLog = path.join(vscode.workspace.rootPath || "", configurationBuildLog);
+            configurationBuildLog = path.join(util.getWorkspaceRoot(), configurationBuildLog);
             logger.message('Resolving build log path to "' + configurationBuildLog + '"');
         }
 
