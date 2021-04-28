@@ -478,13 +478,14 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
     // Name of the make tool can be defined as makePath in makefile.configurations or as makefile.makePath.
     // When none defined, default to "make".
-    configurationMakeCommand = makeParsedPathConfigurations?.name || makeParsedPathSettings?.name || "make";
+    configurationMakeCommand = makeParsedPathConfigurations?.base || makeParsedPathSettings?.base || "make";
+    let configurationMakeCommandExtension: string | undefined = makeParsedPathConfigurations?.ext || makeParsedPathSettings?.ext;
 
     // Prepend the directory path, if defined in either makefile.configurations or makefile.makePath (first has priority).
     let configurationCommandPath: string = makeParsedPathConfigurations?.dir || makeParsedPathSettings?.dir || "";
     configurationMakeCommand = path.join(configurationCommandPath, configurationMakeCommand);
-    // Add the ".exe" extension on windows, otherwise the file search APIs don't find it.
-    if (process.platform === "win32") {
+    // Add the ".exe" extension on windows if no extension was specified, otherwise the file search APIs don't find it.
+    if (process.platform === "win32" && configurationMakeCommandExtension === undefined) {
         configurationMakeCommand += ".exe";
     }
 
