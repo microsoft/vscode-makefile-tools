@@ -203,7 +203,6 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
         return ConfigureBuildReturnCodeTypes.saveFailed;
     }
 
-    logger.showOutputChannel();
     logger.clearOutputChannel();
 
     // Same start time for build and an eventual configure.
@@ -293,6 +292,11 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                 telemetry.logEvent("build", telemetryProperties, telemetryMeasures);
 
                 cancelBuild = false;
+
+                if (retc !== ConfigureBuildReturnCodeTypes.success) {
+                  logger.showOutputChannel();
+                }
+
                 return retc;
             },
         );
@@ -525,8 +529,6 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
-    logger.showOutputChannel();
-
     let preConfigureStartTime: number = Date.now();
 
     let scriptFile: string | undefined = configuration.getPreConfigureScript();
@@ -588,6 +590,11 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
                 telemetry.logEvent("preConfigure", telemetryProperties, telemetryMeasures);
 
                 cancelPreConfigure = false;
+
+                if (retc !== ConfigureBuildReturnCodeTypes.success) {
+                  logger.showOutputChannel();
+                }
+
                 return retc;
             },
         );
@@ -637,11 +644,11 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     if (process.platform === 'win32') {
         runCommand = "cmd";
         scriptArgs.push("/c");
-        scriptArgs.push(wrapScriptFile);
+        scriptArgs.push(`"${wrapScriptFile}"`);
     } else {
         runCommand = "/bin/bash";
         scriptArgs.push("-c");
-        scriptArgs.push(`"source ${wrapScriptFile}"`);
+        scriptArgs.push(`"source '${wrapScriptFile}"'`);
     }
 
     try {
@@ -810,8 +817,6 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     if (!saveAll()) {
         return ConfigureBuildReturnCodeTypes.saveFailed;
     }
-
-    logger.showOutputChannel();
 
     // Same start time for configure and an eventual pre-configure.
     let configureStartTime: number = Date.now();
@@ -990,6 +995,10 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         // Cancelled configures reach this point too, because of the finally construct.
         if (retc !== ConfigureBuildReturnCodeTypes.cancelled) {
             extension.setCompletedConfigureInSession(true);
+        }
+
+        if (retc !== ConfigureBuildReturnCodeTypes.success) {
+           logger.showOutputChannel();
         }
     }
 }

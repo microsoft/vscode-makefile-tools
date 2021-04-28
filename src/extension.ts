@@ -315,6 +315,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return vscode.commands.executeCommand("makefile.setBuildConfiguration");
     }));
 
+    logger.showOutputChannel();
+
     configuration.readLoggingLevel();
     configuration.readExtensionOutputFolder();
     configuration.readExtensionLog();

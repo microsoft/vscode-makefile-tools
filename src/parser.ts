@@ -353,7 +353,8 @@ async function parseLineAsTool(
     }
 
     return {
-        pathInMakefile: toolPathInMakefile,
+        // don't use join and neither paths/filenames processed above if we want to keep the exact text in the makefile
+        pathInMakefile: match[1] + match[2],
         fullPath: toolFullPath,
         arguments: match[match.length - 1],
         found: toolFound
@@ -875,6 +876,14 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
             currentPath = currentPathHistory[currentPathHistory.length - 1];
 
             let compilerTool: ToolInvocation | undefined = await parseLineAsTool(line, compilers, currentPath);
+
+            // If ccache wraps the compiler, parse again the remaining command line and we should obtain
+            // the real compiler name.
+            if (compilerTool && path.parse(compilerTool.pathInMakefile).name.endsWith("ccache")) {
+               line = line.replace(`${compilerTool.pathInMakefile}`, "");
+               compilerTool = await parseLineAsTool(line, compilers, currentPath);
+            }
+
             if (compilerTool) {
                 logger.message("Found compiler command: " + line, "Verbose");
 
