@@ -158,20 +158,18 @@ async function saveAll(): Promise<boolean>  {
     }
 }
 
-export function prepareBuildTarget(target: string, clean: boolean = false): string[] {
+export function prepareBuildTarget(target: string): string[] {
     let makeArgs: string[] = [];
+
     // Prepend the target to the arguments given in the configurations json.
     // If a clean build is desired, "clean" should precede the target.
-    if (clean) {
-        makeArgs.push("clean");
-    }
     if (target) {
         makeArgs.push(target);
     }
 
     makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
 
-    logger.message("Building the current target. Command: " + configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));
+    logger.message(`Building target "${target}" with command: "` + configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + '"');
     return makeArgs;
 }
 
@@ -264,7 +262,15 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                 });
 
                 setIsBuilding(true);
-                let retc: number = await doBuildTarget(progress, target, clean);
+                if (clean) {
+                    // We don't need to track the return code for 'make "clean"'.
+                    // We want to proceed with the 'make "target"' step anyway.
+                    // The relevant return code for telemetry will be the second one.
+                    // If the clean step fails, doBuildTarget will print an error message in the log.
+                    await doBuildTarget(progress, "clean");
+                }
+
+                let retc: number = await doBuildTarget(progress, target);
 
                 // We need to know whether this build was cancelled by the user
                 // more than the real exit code of the make process in this circumstance.
@@ -306,8 +312,8 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
     }
 }
 
-export async function doBuildTarget(progress: vscode.Progress<{}>, target: string, clean: boolean = false): Promise<number> {
-    let makeArgs: string[] = prepareBuildTarget(target, clean);
+export async function doBuildTarget(progress: vscode.Progress<{}>, target: string): Promise<number> {
+    let makeArgs: string[] = prepareBuildTarget(target);
     try {
         // Append without end of line since there is one already included in the stdout/stderr fragments
         let stdout: any = (result: string): void => {
@@ -1357,8 +1363,8 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
     // By this point, configuration.getLaunchTargets() contains a complete list (old and new).
     let currentLaunchConfiguration: configuration.LaunchConfiguration | undefined = configuration.getCurrentLaunchConfiguration();
     let currentLaunchConfigurationStr: string | undefined = currentLaunchConfiguration ? configuration.launchConfigurationToString(currentLaunchConfiguration) : "";
-    if (currentLaunchConfigurationStr !== "" &&
-        !configuration.getLaunchTargets().includes(currentLaunchConfigurationStr)) {
+    if (currentLaunchConfigurationStr !== "" && currentLaunchConfiguration &&
+        !configuration.getLaunchConfigurations().includes(currentLaunchConfiguration)) {
             logger.message(`Current launch configuration ${currentLaunchConfigurationStr} is no longer present in the available list.`);
             await configuration.setLaunchConfigurationByName("");
     }

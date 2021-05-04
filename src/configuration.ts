@@ -380,9 +380,11 @@ export async function stringToLaunchConfiguration(str: string): Promise<LaunchCo
 
 let currentLaunchConfiguration: LaunchConfiguration | undefined;
 export function getCurrentLaunchConfiguration(): LaunchConfiguration | undefined { return currentLaunchConfiguration; }
-export function setCurrentLaunchConfiguration(configuration: LaunchConfiguration): void {
+export async function setCurrentLaunchConfiguration(configuration: LaunchConfiguration): Promise<void> {
     currentLaunchConfiguration = configuration;
-    statusBar.setLaunchConfiguration(launchConfigurationToString(currentLaunchConfiguration));
+    let launchConfigStr: string = launchConfigurationToString(currentLaunchConfiguration);
+    statusBar.setLaunchConfiguration(launchConfigStr);
+    await extension._projectOutlineProvider.updateLaunchTarget(launchConfigStr);
 }
 
 function getLaunchConfiguration(name: string): LaunchConfiguration | undefined {
@@ -397,21 +399,33 @@ function getLaunchConfiguration(name: string): LaunchConfiguration | undefined {
 // Read the identifier from workspace state storage, then find the corresponding object
 // in the launch configurations array from settings.
 // Also update the status bar item.
-function readCurrentLaunchConfiguration(): void {
+async function readCurrentLaunchConfiguration(): Promise<void> {
     readLaunchConfigurations();
     let currentLaunchConfigurationName: string | undefined = extension.getState().launchConfiguration;
     if (currentLaunchConfigurationName) {
         currentLaunchConfiguration = getLaunchConfiguration(currentLaunchConfigurationName);
     }
 
+    let launchConfigStr : string = "No launch configuration set.";
     if (currentLaunchConfiguration) {
-        let launchConfigStr: string = launchConfigurationToString(currentLaunchConfiguration);
+        launchConfigStr = launchConfigurationToString(currentLaunchConfiguration);
         logger.message(`Reading current launch configuration "${launchConfigStr}" from the workspace state.`);
-        statusBar.setLaunchConfiguration(launchConfigStr);
     } else {
-        logger.message("No current launch configuration is set in the workspace state.");
-        statusBar.setLaunchConfiguration("No launch configuration set.");
+        // A null launch configuration after a non empty launch configuration string name
+        // means that the name stored in the project state does not match any of the entries in settings.
+        // This typically happens after the user modifies manually "makefile.launchConfigurations"
+        // in the .vscode/settings.json, specifically the entry that corresponds to the current launch configuration.
+        // Make sure to unset the launch configuration in this scenario.
+        if (currentLaunchConfigurationName !== undefined && currentLaunchConfigurationName !== "") {
+            logger.message(`Launch configuration "${currentLaunchConfigurationName}" is no longer defined in settings "makefile.launchConfigurations".`);
+            await setLaunchConfigurationByName("");
+        } else {
+            logger.message("No current launch configuration is set in the workspace state.");
+        }
     }
+
+    statusBar.setLaunchConfiguration(launchConfigStr);
+    await extension._projectOutlineProvider.updateLaunchTarget(launchConfigStr);
 }
 
 export interface DefaultLaunchConfiguration {
@@ -485,7 +499,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     let configurationCommandPath: string = makeParsedPathConfigurations?.dir || makeParsedPathSettings?.dir || "";
     configurationMakeCommand = path.join(configurationCommandPath, configurationMakeCommand);
     // Add the ".exe" extension on windows if no extension was specified, otherwise the file search APIs don't find it.
-    if (process.platform === "win32" && configurationMakeCommandExtension === undefined) {
+    if (process.platform === "win32" && configurationMakeCommandExtension === "") {
         configurationMakeCommand += ".exe";
     }
 
@@ -776,7 +790,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     readCurrentMakefileConfiguration();
     readMakefileConfigurations();
     readCurrentTarget();
-    readCurrentLaunchConfiguration();
+    await readCurrentLaunchConfiguration();
     readDefaultLaunchConfiguration();
     readConfigureOnOpen();
     readConfigureOnEdit();
@@ -868,7 +882,7 @@ export async function initFromStateAndSettings(): Promise<void> {
             if (!util.areEqual(updatedLaunchConfigurations, launchConfigurations)) {
                 // Changing a launch configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
-                readCurrentLaunchConfiguration(); // this gets a refreshed view of all launch configurations
+                await readCurrentLaunchConfiguration(); // this gets a refreshed view of all launch configurations
                 // and also updates the current one in case it was affected
                 updatedSettingsSubkeys.push(subKey);
             }
@@ -1353,7 +1367,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
 
     // In the quick pick, include also any makefile.launchConfigurations entries,
     // as long as they exist on disk and without allowing duplicates.
-    let launchTargetsNames: string[] = launchTargets;
+    let launchTargetsNames: string[] = [...launchTargets];
     launchConfigurations.forEach(launchConfiguration => {
         if (util.checkFileExistsSync(launchConfiguration.binaryPath)) {
             launchTargetsNames.push(launchConfigurationToString(launchConfiguration));
