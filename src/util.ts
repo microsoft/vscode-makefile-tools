@@ -183,7 +183,8 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
     };
 
     try {
-        const result: SpawnProcessResult = await spawnChildProcess('pgrep', ['-P', pid.toString()], getWorkspaceRoot(), stdout);
+        // pgrep should run on english, regardless of the system setting.
+        const result: SpawnProcessResult = await spawnChildProcess('pgrep', ['-P', pid.toString()], getWorkspaceRoot(), true, stdout);
         if (!!stdoutStr.length) {
             children = stdoutStr.split('\n').map((line: string) => Number.parseInt(line));
 
@@ -210,21 +211,56 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
     }
 }
 
+// Environment variables helpers (inspired from CMake Tools utils).
+export interface EnvironmentVariables { [key: string]: string; }
+
+export function normalizeEnvironmentVarname(varname: string): string {
+    return process.platform === 'win32' ? varname.toUpperCase() : varname;
+}
+
+export function mergeEnvironment(...env: EnvironmentVariables[]): EnvironmentVariables {
+    return env.reduce((acc, vars) => {
+        if (process.platform === 'win32') {
+            // Env vars on windows are case insensitive, so we take the ones from
+            // active env and overwrite the ones in our current process env
+            const norm_vars: EnvironmentVariables = Object.getOwnPropertyNames(vars).reduce<EnvironmentVariables>((acc2, key: string) => {
+                acc2[normalizeEnvironmentVarname(key)] = vars[key];
+                return acc2;
+            }, {});
+            return {...acc, ...norm_vars};
+        } else {
+            return {...acc, ...vars};
+        }
+    }, {});
+}
+
 export interface SpawnProcessResult {
     returnCode: number;
     signal: string;
 }
 
 // Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
+// forceEnglish is true when the caller relies on parsing english words from the output.
 export function spawnChildProcess(
-    process: string,
+    processName: string,
     args: string[],
     workingDirectory: string,
+    forceEnglish: boolean,
     stdoutCallback?: (stdout: string) => void,
     stderrCallback?: (stderr: string) => void): Promise<SpawnProcessResult> {
 
+    const localeOverride: EnvironmentVariables = {
+        LANG: "C",
+        LC_ALL: "C"
+    };
+
+    // Use english language for this process regardless of the system setting.
+    const environment: EnvironmentVariables = (forceEnglish) ? localeOverride : {};
+    const finalEnvironment: EnvironmentVariables = mergeEnvironment(process.env as EnvironmentVariables, environment);
+
     return new Promise<SpawnProcessResult>((resolve, reject) => {
-        const child: child_process.ChildProcess = child_process.spawn(`"${process}"`, args, { cwd: workingDirectory, shell: true });
+        const child: child_process.ChildProcess = child_process.spawn(`"${processName}"`, args,
+                                                                      { cwd: workingDirectory, shell: true, env: finalEnvironment });
         make.setCurPID(child.pid);
 
         if (stdoutCallback) {
@@ -248,7 +284,7 @@ export function spawnChildProcess(
         });
 
         if (child.pid === undefined) {
-            reject(new Error(`Failed to spawn process: ${process} ${args}`));
+            reject(new Error(`Failed to spawn process: ${processName} ${args}`));
         }
     });
 }
@@ -270,7 +306,8 @@ export async function cygpath(pathStr: string): Promise<string> {
       windowsPath = result.replace(/\n/mg, ""); // remove the end of line
   };
 
-  await spawnChildProcess("cygpath", [pathStr, "-w"], "", stdout);
+  // Running cygpath can use the system locale.
+  await spawnChildProcess("cygpath", [pathStr, "-w"], "", false, stdout);
   return windowsPath;
 }
 
