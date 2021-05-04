@@ -410,7 +410,6 @@ async function readCurrentLaunchConfiguration(): Promise<void> {
     if (currentLaunchConfiguration) {
         launchConfigStr = launchConfigurationToString(currentLaunchConfiguration);
         logger.message(`Reading current launch configuration "${launchConfigStr}" from the workspace state.`);
-        statusBar.setLaunchConfiguration(launchConfigStr);
     } else {
         // A null launch configuration after a non empty launch configuration string name
         // means that the name stored in the project state does not match any of the entries in settings.
@@ -1368,8 +1367,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
 
     // In the quick pick, include also any makefile.launchConfigurations entries,
     // as long as they exist on disk and without allowing duplicates.
-    let launchTargetsNames: string[] = [];
-    launchTargetsNames = launchTargetsNames.concat(launchTargets);
+    let launchTargetsNames: string[] = [...launchTargets];
     launchConfigurations.forEach(launchConfiguration => {
         if (util.checkFileExistsSync(launchConfiguration.binaryPath)) {
             launchTargetsNames.push(launchConfigurationToString(launchConfiguration));
