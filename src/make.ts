@@ -319,7 +319,8 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
             logger.messageNoCR(result, "Normal");
         };
 
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, util.getWorkspaceRoot(), stdout, stderr);
+        // The build invocation should use the system locale.
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, util.getWorkspaceRoot(), false, stdout, stderr);
         if (result.returnCode !== ConfigureBuildReturnCodeTypes.success) {
             logger.message(`Target ${target} failed to build.`);
         } else {
@@ -485,7 +486,8 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
             }
         }, 5 * 1000);
 
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, util.getWorkspaceRoot(), stdout, stderr);
+        // The dry-run analysis should operate on english.
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, util.getWorkspaceRoot(), true, stdout, stderr);
         clearInterval(timeout);
         let elapsedTime: number = util.elapsedTimeSince(startTime);
         logger.message(`Generating dry-run elapsed time: ${elapsedTime}`);
@@ -664,7 +666,8 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
             logger.messageNoCR(result, "Normal");
         };
 
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), stdout, stderr);
+        // The preconfigure invocation should use the system locale.
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, stdout, stderr);
         if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
             if (someErr) {
                 // Depending how the preconfigure scripts (and any inner called sub-scripts) are written,

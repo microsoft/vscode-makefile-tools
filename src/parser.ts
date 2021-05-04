@@ -487,7 +487,8 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
                 `for regions "${compilerArgRegions}": "${result}"`, "Normal");
         };
 
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), stdout, stderr);
+        // Running the compiler arguments parsing script can use the system locale.
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, stdout, stderr);
         if (result.returnCode !== 0) {
             logger.messageNoCR(`The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode}`, "Normal");
         }
