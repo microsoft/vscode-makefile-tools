@@ -39,6 +39,9 @@ export interface MakefileConfiguration {
     // Don't include args in makePath
     makePath?: string;
 
+    // a folder path (full or relative) containing the entrypoint makefile
+    makeDirectory?: string;
+
     // options used in the build invocation
     // don't use more than one argument in a string
     makeArgs?: string[];
@@ -91,7 +94,7 @@ function readMakePath(): void {
     makePath = workspaceConfiguration.get<string>("makePath");
     // Don't resolve makePath to root, because make needs to be searched in the path too.
     if (!makePath) {
-        logger.message("No path to the make tool is defined in the settings file");
+        logger.message("No path to the make tool is defined in the settings file.");
     }
 }
 
@@ -106,9 +109,26 @@ function readMakefilePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makefilePath = workspaceConfiguration.get<string>("makefilePath");
     if (!makefilePath) {
-        logger.message("No path to the makefile is defined in the settings file");
+        logger.message("No path to the makefile is defined in the settings file.");
     } else {
         makefilePath = util.resolvePathToRoot(makefilePath);
+    }
+}
+
+let makeDirectory: string | undefined;
+export function getMakeDirectory(): string | undefined { return makeDirectory; }
+export function setMakeDirectory(dir: string): void { makeDirectory = dir; }
+// Read the make working directory path if defined in settings.
+// It represents a default to look for if no other makeDirectory is already provided
+// in makefile.configurations.makeDirectory.
+// TODO: validate and integrate with "-C [DIR_PATH]" passed in makefile.configurations.makeArgs.
+function readMakeDirectory(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    makeDirectory = workspaceConfiguration.get<string>("makeDirectory");
+    if (!makeDirectory) {
+        logger.message("No folder path to the makefile is defined in the settings file.");
+    } else {
+      makeDirectory = util.resolvePathToRoot(makeDirectory);
     }
 }
 
@@ -472,7 +492,8 @@ function analyzeConfigureParams(): void {
 }
 
 // Helper to find in the array of MakefileConfiguration which command/args correspond to a configuration name.
-// Higher level settings (like makefile.makePath or makefilePath) also have an additional effect on the final command.
+// Higher level settings (like makefile.makePath, makefile.makefilePath or makefile.makeDirectory)
+// also have an additional effect on the final command.
 export function getCommandForConfiguration(configuration: string | undefined): void {
     let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
         if (k.name === configuration) {
@@ -513,6 +534,14 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         // Some repos don't work when we automatically add -C, others don't work when we don't.
         // configurationMakeArgs.push("-C");
         // configurationMakeArgs.push(path.parse(makefileUsed).dir);
+    }
+
+    // Add the working directory path via the -C switch.
+    // makefile.configurations.makeDirectory overwrites makefile.makeDirectory.
+    let makeDirectoryUsed: string | undefined = makefileConfiguration?.makeDirectory || makeDirectory;
+    if (makeDirectoryUsed) {
+        configurationMakeArgs.push("-C");
+        configurationMakeArgs.push(`"${makeDirectoryUsed}"`);
     }
 
     if (configurationMakeCommand) {
@@ -556,24 +585,35 @@ export function getCommandForConfiguration(configuration: string | undefined): v
             }
         }
 
-        // Check for makefile path on disk. The default is 'makefile' in the root of the workspace.
-        // On linux/mac, it often is 'Makefile', so we have to verify we default to the right filename.
+        // Check for makefile path on disk: we search first for any makefile specified via the makefilePath setting,
+        // then via the makeDirectory setting and then in the root of the workspace. On linux/mac, it often is 'Makefile', so verify that we default to the right filename.
         if (!makefileUsed) {
-            makefileUsed = (util.checkFileExistsSync(util.resolvePathToRoot("./Makefile"))) ? "./Makefile" : "./makefile";
+            if (makeDirectoryUsed) {
+                makefileUsed = util.resolvePathToRoot(path.join(makeDirectoryUsed, "Makefile"));
+                if (!util.checkFileExistsSync(makefileUsed)) {
+                    makefileUsed = util.resolvePathToRoot(path.join(makeDirectoryUsed, "makefile"));
+                }
+            } else {
+                makefileUsed = util.resolvePathToRoot("./Makefile");
+                if (!util.checkFileExistsSync(makefileUsed)) {
+                    makefileUsed = util.resolvePathToRoot("./makefile");
+                }
+            }
         }
 
-        makefileUsed = util.resolvePathToRoot(makefileUsed);
         if (!util.checkFileExistsSync(makefileUsed)) {
             vscode.window.showErrorMessage("Makefile entry point not found.");
             logger.message("The makefile entry point was not found. " +
-                           "Make sure it exists at the location defined by makefile.makefilePath or makefile.configurations[].makefilePath " +
-                           "or in the root of the workspace.");
+                "Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, " +
+                "makefile.makeDirectory, makefile.configurations[].makeDirectory" +
+                "or in the root of the workspace.");
 
             const telemetryProperties: telemetry.Properties = {
                 reason: makefileUsed ?
-                        "not found at path given in settings" : // we may need more advanced ability to process settings
-                        "not found in workspace root" // insight into different project structures
+                    "not found at path given in settings" : // we may need more advanced ability to process settings
+                    "not found in workspace root" // insight into different project structures
             };
+
             telemetry.logEvent("makefileNotFound", telemetryProperties);
         }
     }
@@ -781,6 +821,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     readConfigurationCachePath();
     readMakePath();
     readMakefilePath();
+    readMakeDirectory();
     readBuildLog();
     readPreConfigureScript();
     readAlwaysPreConfigure();
@@ -854,7 +895,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     // Modifying any makefile should trigger an IntelliSense config provider update,
     // so make the dirty state true.
     // TODO: limit to makefiles relevant to this project, instead of any random makefile anywhere.
-    //       We can't listen only to the makefile pointed to by makefile.makefilePath,
+    //       We can't listen only to the makefile pointed to by makefile.makefilePath or makefile.makeDirectory,
     //       because that is only the entry point and can refer to other relevant makefiles.
     // TODO: don't trigger an update for any dummy save, verify how the content changed.
     vscode.workspace.onDidSaveTextDocument(e => {
@@ -1031,6 +1072,20 @@ export async function initFromStateAndSettings(): Promise<void> {
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakefilePath();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "makeDirectory";
+            let updatedMakeDirectory : string | undefined = workspaceConfiguration.get<string>(subKey);
+            if (updatedMakeDirectory) {
+                updatedMakeDirectory = util.resolvePathToRoot(updatedMakeDirectory);
+            }
+            if (updatedMakeDirectory !== makeDirectory) {
+                // A change in makefile.makeDirectory should trigger an IntelliSense update
+                // only if the extension is not currently reading from a build log.
+                extension.getState().configureDirty = extension.getState().configureDirty ||
+                                                      !buildLog || !util.checkFileExistsSync(buildLog);
+                readMakeDirectory();
                 updatedSettingsSubkeys.push(subKey);
             }
 

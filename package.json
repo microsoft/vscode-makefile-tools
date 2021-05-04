@@ -2,7 +2,7 @@
     "name": "makefile-tools",
     "displayName": "Makefile Tools",
     "description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "publisher": "ms-vscode",
     "preview": true,
     "icon": "res/makefile-logo.png",
@@ -220,6 +220,10 @@
                                 "type": "string",
                                 "description": "File path to the make command"
                             },
+                            "makeDirectory": {
+                              "type": "string",
+                              "description": "Folder path passed to make via the -C switch"
+                            },
                             "makeArgs": {
                                 "type": "array",
                                 "description": "Arguments to pass to the make command",
@@ -330,6 +334,11 @@
                     "default": "make",
                     "description": "The path to the make tool",
                     "scope": "resource"
+                },
+                "makefile.makeDirectory": {
+                  "type": "string",
+                  "description": "The folder path to be passed to make via the switch -C",
+                  "scope": "resource"
                 },
                 "makefile.makefilePath": {
                     "type": "string",

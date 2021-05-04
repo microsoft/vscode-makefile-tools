@@ -68,7 +68,7 @@ If the repository needs any special commands before make is successful:
 
 If there is no Makefile in the root:
 
-- Point  **makefile.makefilePath** or makefile.configurations.makefilePath to your Makefile. Depending how the makefile is written and how paths are defined, you may need to ask make to run from that folder of the makefile instead of from the root, in which case you need to define makefile.configurations.makeArgs to include the switch &quot;-C&quot;.
+- Point  **makefile.makefilePath** or makefile.configurations.makefilePath to your Makefile (if you use the "-f" make switch). If you prefer to use the switch "-C" you can point  **makefile.makeDirectory** or makefile.configurations.makeDirectory to the folder containing your makefile.
 - Manually activate the extension by either reloading the window or running any Makefile Tools command (like Configure) from the Command Palette
 
 Launch targets missing:
@@ -88,9 +88,9 @@ If your Build targets list is too long:
 
 - Use **makefile.phonyOnlyTargets** to filter out targets that the Makefile explicitly defines as Phony
 
-Watch out for tricky lines in dryrun/build logs that may cause crashes or hangs when the extension parses content:
+Watch out for tricky lines in dryrun/build logs that may cause crashes or infinite loops when the extension parses content:
 
-- many dashes in a row (---------------------) causes hang=infinite recursion according to regexp101.com
+- many dashes in a row (---------------------) causes infinite recursion according to regexp101.com
 - LK repository dryrun has 6000 char lines and many such lines in a row, each of them is very slow (takes hours)
 - Tip: disable MAKECONFIGHEADER in make/macros.mk, to avoid the enormous echo commands from being printed
   - This can be done under a make flag that can be tied to makefile.configurations.makeArgs to only avoid the echos when in dryrun mode
