@@ -2,7 +2,19 @@
 
 All notable changes to the "vscode-makefile-tools" extension will be documented in this file.
 
-## 0.1.4
+## 0.2.1
+- Add new makeDirectory setting (global and per configuration level) as an extra location to search for the makefile and to generate "make -C".
+- Fix the clean re-build for a project that has a default (empty "") build target.
+- Various bug fixes regarding:
+    - launch-targets/launch-configurations
+    - quoting of files/arguments sent to shell when running executables or scripts
+- Force English when running executables or scripts that need to parse English words from the execution output.
+- Show the output channel only when something errors.
+- Support compilers run through ccache.
+- Use "shell" arguments convention when parsing compilerArgs for CppTools.
+- Don't append the ".exe" extension suffix if the binary file already has an extension in the given path.
+
+## 0.2.0
 - Various bug fixes for MSYS/MinGW related to paths, strings, regular expressions and file system APIs
 - Fix source file paths in the backtick pattern
 - Fix cases of not finding an existing MAKE executable in the path
