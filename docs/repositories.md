@@ -57,7 +57,7 @@
 | SerenityOS | [https://github.com/SerenityOS/serenity.git](https://github.com/SerenityOS/serenity.git) | | Makefile not in root:<br>Define makefile.configurations.makefilePath to "./Base/home/anon/Source/little/Makefile" and define makefile.configurations.makeArgs to \["-C ./Base/home/anon/Source/little"\] | | Yes |
 | sled | [https://github.com/shinyblink/sled.git](https://github.com/shinyblink/sled.git) | | | | Yes |
 | Strace | [https://github.com/strace/strace.git](https://github.com/strace/strace.git) | ./bootstrap && ./configure | | build log cryptic even with V=1 | Yes |
-| swig | [https://github.com/swig/swig.git](https://github.com/swig/swig.git) | autogen and configure | | Always-make causes hang<br>https://github.com/microsoft/vscode-makefile-tools/issues/98 | Yes |
+| swig | [https://github.com/swig/swig.git](https://github.com/swig/swig.git) | autogen and configure | | Always-make causes infinite loop<br>https://github.com/microsoft/vscode-makefile-tools/issues/98 | Yes |
 | Tinyvm | [https://github.com/jakogut/tinyvm.git](https://github.com/jakogut/tinyvm.git)| | | | Yes |
 | TscanCode | [https://github.com/Tencent/TscanCode.git](https://github.com/Tencent/TscanCode.git)| | Makefile not in root, set makefile.configurations.makefilePath to "./trunk/Makefile"<br>and makefile.configurations.makeArgs" to \["-C ./trunk"\]| | Yes |
 | Tundra | [https://github.com/deplinenoise/tundra.git](https://github.com/deplinenoise/tundra.git) | | | | Yes |
