@@ -8,7 +8,7 @@ All notable changes to the "vscode-makefile-tools" extension will be documented 
 - Various bug fixes regarding:
     - launch-targets/launch-configurations
     - quoting of files/arguments sent to shell when running executables or scripts
-- Force english when running executables or scripts that need to parse english words from the execution output.
+- Force English when running executables or scripts that need to parse English words from the execution output.
 - Show the output channel only when something errors.
 - Support compilers run through ccache.
 - Use "shell" arguments convention when parsing compilerArgs for CppTools.
