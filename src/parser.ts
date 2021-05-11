@@ -439,9 +439,11 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
         // A fragment like "-sw1,-sw2,-sw3" gets split by comma and a fragment like
         // "-SwDef=Val" is split by equal. Opened GitHub issue
         // https://github.com/microsoft/vscode-makefile-tools/issues/149.
-        // For now, these scenarios don't happen on windows (the comma syntax is linux only
-        // and the equal syntax is encountered for defines and c/c++ standard which are parsed
-        // separately, not via this script invocation).
+        // These scenarios don't happen on pure windows but can be encountered in classic linux
+        // scenarios run under MSYS/MINGW.
+        // Until a better fix is implemented for 149, use a temporary marker that we replace from and into.
+        compilerArgRegions = compilerArgRegions.replace(/\,/mg, "DONT_USE_COMMA_AS_SEPARATOR");
+        compilerArgRegions = compilerArgRegions.replace(/\=/mg, "DONT_USE_EQUAL_AS_SEPARATOR");
         parseCompilerArgsScriptContent = `@echo off\r\n`;
         parseCompilerArgsScriptContent += `for %%i in (%*) do echo %%i \r\n`;
     } else {
@@ -472,6 +474,11 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
 
     try {
         let stdout: any = (result: string): void => {
+            if (process.platform === 'win32') {
+                // Restore the commas and equals that were hidden from the script invocation.
+                result = result.replace(/DONT_USE_COMMA_AS_SEPARATOR/mg, ",");
+                result = result.replace(/DONT_USE_EQUAL_AS_SEPARATOR/mg, "=");
+            }
             let results: string[] = result.replace(/\r\n/mg, "\n").split("\n");
             // In case of concatenated separators, the shell sees different empty arguments
             // which we can remove (most common is more spaces not being seen as a single space).
