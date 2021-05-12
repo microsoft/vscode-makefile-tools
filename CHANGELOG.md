@@ -2,6 +2,9 @@
 
 All notable changes to the "vscode-makefile-tools" extension will be documented in this file.
 
+## 0.2.2
+- Fix pre-configure script invocation, broken on Linux starting with Makefile Tools 0.2.1. [#170](https://github.com/microsoft/vscode-mkaefile-tools/issues/170) [@avrahamshukron](https://github.com/avrahamshukron)
+
 ## 0.2.1
 - Add new makeDirectory setting (global and per configuration level) as an extra location to search for the makefile and to generate "make -C".
 - Fix the clean re-build for a project that has a default (empty "") build target.
