@@ -657,7 +657,7 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     } else {
         runCommand = "/bin/bash";
         scriptArgs.push("-c");
-        scriptArgs.push(`"source '${wrapScriptFile}"'`);
+        scriptArgs.push(`"source '${wrapScriptFile}'"`);
     }
 
     try {
