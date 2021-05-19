@@ -289,15 +289,6 @@ export function readCompileCommandsPath(): void {
     logger.message(`compile_commands.json path: ${compileCommandsPath}`);
 }
 
-let exportCompileCommandsFile: boolean | undefined;
-export function getExportCompileCommandsFile(): boolean | undefined { return exportCompileCommandsFile; }
-export function setExportCompileCommandsFile(value: boolean): void { exportCompileCommandsFile = value; }
-export function readExportCompileCommandsFile(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    exportCompileCommandsFile = workspaceConfiguration.get<boolean>("exportCompileCommandsFile");
-    logger.message(`Export compile_commands.json: ${exportCompileCommandsFile}`);
-}
-
 let additionalCompilerNames: string[] | undefined;
 export function getAdditionalCompilerNames(): string[] | undefined { return additionalCompilerNames; }
 export function setAdditionalCompilerNames(compilerNames: string[]): void { additionalCompilerNames = compilerNames; }
@@ -808,7 +799,6 @@ export async function initFromStateAndSettings(): Promise<void> {
     readBuildBeforeLaunch();
     readClearOutputBeforeBuild();
     readIgnoreDirectoryCommands();
-    readExportCompileCommandsFile();
     readCompileCommandsPath();
 
     analyzeConfigureParams();
@@ -1132,13 +1122,6 @@ export async function initFromStateAndSettings(): Promise<void> {
             let updatedIgnoreDirectoryCommands : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
             if (updatedIgnoreDirectoryCommands !== ignoreDirectoryCommands) {
                 readIgnoreDirectoryCommands();
-                updatedSettingsSubkeys.push(subKey);
-            }
-
-            subKey = "exportCompileCommandsFile";
-            let updatedExportCompileCommandsFile: boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
-            if (updatedExportCompileCommandsFile !== exportCompileCommandsFile) {
-                readExportCompileCommandsFile();
                 updatedSettingsSubkeys.push(subKey);
             }
 

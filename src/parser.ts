@@ -791,7 +791,8 @@ export interface CustomConfigProviderItem {
     compilerArgs: string[];
     files: string[];
     windowsSDKVersion?: string;
-    compileCommands: CompileCommand[];
+    currentPath: string;
+    line: string;
 }
 
 // Parse the output of the make dry-run command in order to provide CppTools
@@ -897,18 +898,8 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                         // More standard validation and defaults, in the context of the whole command.
                     let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
 
-                    // Generate compilation command
-                    let compileCommands: CompileCommand[] = [];
-                    files.forEach(file => {
-                        compileCommands.push({
-                            file: file,
-                            directory: currentPath,
-                            command: line
-                        });
-                    });
-
                     if (ext.extension) {
-                        onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion, compileCommands });
+                        onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion, currentPath, line });
                     }
                 } else {
                     // If the compiler command is mixing c and c++ source files, send a custom configuration for each of the source files separately,
@@ -923,15 +914,8 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                         // More standard validation and defaults, in the context of each source file.
                         let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
 
-                        // Generate compilation command
-                        let compileCommands: CompileCommand[] = [{
-                            file: file,
-                            directory: currentPath,
-                            command: line
-                        }];
-
                         if (ext.extension) {
-                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion, compileCommands });
+                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion, currentPath, line });
                         }
                     });
                 }

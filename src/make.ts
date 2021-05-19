@@ -844,7 +844,6 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     }
 
     let compileCommandsPath: string | undefined = configuration.getCompileCommandsPath();
-    let exportCompileCommandsFile: boolean | undefined = configuration.getExportCompileCommandsFile();
 
     // Identify for telemetry whether:
     //   - this configure will need to double the workload, if it needs to analyze the build targets separately.
@@ -945,7 +944,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         }
 
         // Export the compile_commands.json file if the option is enabled.
-        if (exportCompileCommandsFile && compileCommandsPath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
+        if (compileCommandsPath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
             let compileCommands: parser.CompileCommand[] = ConfigurationCache.customConfigurationProvider.fileIndex.map(([, {compileCommand}]) => compileCommand);
             util.writeFile(compileCommandsPath, JSON.stringify(compileCommands, undefined, 4));
         }
