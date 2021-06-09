@@ -455,6 +455,12 @@
                     "default": true,
                     "description": "Clear the output channel at the beginning of a build",
                     "scope": "resource"
+                },
+                "makefile.compileCommandsPath": {
+                    "type": "string",
+                    "default": null,
+                    "description": "The path to the compilation database file",
+                    "scope": "resource"
                 }
             }
         },

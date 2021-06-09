@@ -79,7 +79,7 @@ export enum TriggeredBy {
     launch = "Launch (debug|run)",
 }
 
-let fileIndex: Map<string, cpp.SourceFileConfigurationItem> = new Map<string, cpp.SourceFileConfigurationItem>();
+let fileIndex: Map<string, cpptools.SourceFileConfigurationItem> = new Map<string, cpptools.SourceFileConfigurationItem>();
 let workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = { browsePath: [] };
 export function getDeltaCustomConfigurationProvider(): cpptools.CustomConfigurationProvider {
     let provider: cpptools.CustomConfigurationProvider = {
@@ -711,6 +711,7 @@ interface ConfigurationCache {
         fileIndex: [string, {
             uri: string | vscode.Uri;
             configuration: cpp.SourceFileConfiguration;
+            compileCommand: parser.CompileCommand;
         }][];
     };
 }
@@ -857,6 +858,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         readCache = true;
     }
 
+    let compileCommandsPath: string | undefined = configuration.getCompileCommandsPath();
+
     // Identify for telemetry whether:
     //   - this configure will need to double the workload, if it needs to analyze the build targets separately.
     //   - this configure will need to reset the build target to the default, which will need a reconfigure.
@@ -953,6 +956,12 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         // but not if the configure was cancelled.
         if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
             util.writeFile(configurationCachePath, JSON.stringify(ConfigurationCache));
+        }
+
+        // Export the compile_commands.json file if the option is enabled.
+        if (compileCommandsPath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
+            let compileCommands: parser.CompileCommand[] = ConfigurationCache.customConfigurationProvider.fileIndex.map(([, {compileCommand}]) => compileCommand);
+            util.writeFile(compileCommandsPath, JSON.stringify(compileCommands, undefined, 4));
         }
 
         let newBuildTarget: string | undefined = configuration.getCurrentTarget();
@@ -1246,7 +1255,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
                     extension.getCppConfigurationProvider().setCustomConfigurationProvider({
                         workspaceBrowse: configurationCache.customConfigurationProvider.workspaceBrowse,
                         // Trick to read a map from json
-                        fileIndex: new Map<string, cpp.SourceFileConfigurationItem>(configurationCache.customConfigurationProvider.fileIndex)
+                        fileIndex: new Map<string, cpptools.SourceFileConfigurationItem>(configurationCache.customConfigurationProvider.fileIndex)
                     });
                 });
 

@@ -834,6 +834,16 @@ async function currentPathAfterCommand(line: string, currentPathHistory: string[
     return currentPathHistory;
 }
 
+// Structure used to describe a compilation command. Reference documentation is
+// hosted here https://clang.llvm.org/docs/JSONCompilationDatabase.html
+export interface CompileCommand {
+    directory: string;
+    file: string;
+    command: string;
+    arguments?: string[];
+    output?: string;
+}
+
 export interface CustomConfigProviderItem {
     defines: string[];
     includes: string[];
@@ -844,11 +854,15 @@ export interface CustomConfigProviderItem {
     compilerArgs: string[];
     files: string[];
     windowsSDKVersion?: string;
+    currentPath: string;
+    line: string;
 }
 
 // Parse the output of the make dry-run command in order to provide CppTools
 // with information about includes, defines, compiler path....etc...
-// as needed by CustomConfigurationProvider
+// as needed by CustomConfigurationProvider. In addition generate a
+// CompileCommand entry for every file with a compiler invocation to build
+// a compile_commands.json file.
 export async function parseCustomConfigProvider(cancel: vscode.CancellationToken, dryRunOutputStr: string,
                                                 statusCallback: (message: string) => void,
                                                 onFoundCustomConfigProviderItem: (customConfigProviderItem: CustomConfigProviderItem) => void): Promise<number> {
@@ -955,8 +969,9 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                 if (language) {
                         // More standard validation and defaults, in the context of the whole command.
                     let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
+
                     if (ext.extension) {
-                        onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion });
+                        onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion, currentPath, line });
                     }
                 } else {
                     // If the compiler command is mixing c and c++ source files, send a custom configuration for each of the source files separately,
@@ -970,8 +985,9 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
 
                         // More standard validation and defaults, in the context of each source file.
                         let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
+
                         if (ext.extension) {
-                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion });
+                            onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion, currentPath, line });
                         }
                     });
                 }
