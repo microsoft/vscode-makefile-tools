@@ -807,7 +807,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
         return make.ConfigureBuildReturnCodeTypes.cancelled;
     }
 
-    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider and compile_commands.json generation.', "Normal");
+    logger.message('Parsing dry-run output for CppTools Custom Configuration Provider.', "Normal");
 
     // Current path starts with workspace root and can be modified
     // with prompt commands like cd, cd-, pushd/popd or with -C make switch

@@ -442,7 +442,7 @@
                 },
                 "makefile.compileCommandsPath": {
                     "type": "string",
-                    "default": ".vscode/compile_commands.json",
+                    "default": null,
                     "description": "The path to the compilation database file",
                     "scope": "resource"
                 }
