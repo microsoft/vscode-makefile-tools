@@ -1,194 +1,194 @@
 Pre-configuring...
-Script: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat"
+Script: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\.vscode\preconfigure.bat"
 
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>call "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat" 
+c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros>call "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\.vscode\preconfigure.bat" 
 The pre-configure succeeded.
 Setting configuration - InterestingSmallMakefile_windows_configDebug
 Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug
-Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Resolving build log path to "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
 Deduced command 'c:\some\other\fake\path.exe ' for configuration InterestingSmallMakefile_windows_configDebug
 Saving opened files before build.
-Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Preprocessing: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
 Preprocess elapsed time: 0
 Parsing for IntelliSense.
 Updating the CppTools IntelliSense Configuration Provider.
 Parsing dry-run output for CppTools Custom Configuration Provider.
-Analyzing line: # make: Entering directory `{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros'
-MAKE -C: entering directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros
+Analyzing line: # make: Entering directory `c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros'
+MAKE -C: entering directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros
 Found compiler command: cl .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=1 /c
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\main.cpp -----------------------------------
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\main.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=1
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++14
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\test1.cpp -----------------------------------
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\test1.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=1
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++14
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: cl		.\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=1 /c
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\test2.cpp -----------------------------------
+Found compiler command: cl		.\src\test2.cpp -I"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=1 /c
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\test2.cpp -----------------------------------
     Defines: MyDefine2;Debug;ARCH=1
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl"  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=2 /c
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\main.cpp -----------------------------------
+Found compiler command: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl"  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=2 /c
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\main.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=2
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++14
     IntelliSense Mode: msvc-x86
-    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe
+    Compiler Path: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\test1.cpp -----------------------------------
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\test1.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=2
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++14
     IntelliSense Mode: msvc-x86
-    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe
+    Compiler Path: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=2 /c
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\test2.cpp -----------------------------------
+Found compiler command: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe"  .\src\test2.cpp  -I"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=2 /c
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\test2.cpp -----------------------------------
     Defines: MyDefine2;Debug;ARCH=2
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: msvc-x86
-    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe
+    Compiler Path: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
 Found compiler command: "cl" .\src\main.cpp .\src\test1.cpp   /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	/DARCH=3 /c
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\main.cpp -----------------------------------
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\main.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=3
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++14
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\test1.cpp -----------------------------------
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\test1.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH=3
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++14
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: "cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=3 /c
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\test2.cpp -----------------------------------
+Found compiler command: "cl.exe"  .\src\test2.cpp  -I"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi /DARCH=3 /c
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\test2.cpp -----------------------------------
     Defines: MyDefine2;Debug;ARCH=3
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
 Found compiler command: cl .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DDebug /RTC /Od /Zi /std:c++14	 /c /DARCH_DEFINE=SIMPLE
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\main.cpp -----------------------------------
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\main.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH_DEFINE=SIMPLE
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++14
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\test1.cpp -----------------------------------
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\test1.cpp -----------------------------------
     Defines: MyDefine;Debug;ARCH_DEFINE=SIMPLE
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++14
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: cl .\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi  /c
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\test2.cpp -----------------------------------
+Found compiler command: cl .\src\test2.cpp -I"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DDebug /RTC /Od /Zi  /c
+Sending configuration for file c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\test2.cpp -----------------------------------
     Defines: MyDefine2;Debug
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
+    Includes: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: msvc-x64
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
     Windows SDK Version: 10.0.18362.0\
 ---------------------------------------------------------------------------------------------------
-Analyzing line: # make: Leaving directory `{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros'
-POPD command or end of MAKE -C: leaving directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros and entering directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+Analyzing line: # make: Leaving directory `c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros'
+POPD command or end of MAKE -C: leaving directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros and entering directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros
 Sending Workspace Browse Configuration: -----------------------------------
-    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\in c1;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\inc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc
+    Browse Path: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\in c1;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\inc;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src;c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\src\SubfolderLocalToSrc
     Standard: c++17
-    Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
+    Compiler Path: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: undefined
     Windows SDK Version: 10.0.18362.0\
 ----------------------------------------------------------------------------
 Parsing for IntelliSense elapsed time: 0
 Parsing for launch targets.
-Analyzing line: # make: Entering directory `{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros'
-MAKE -C: entering directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros
+Analyzing line: # make: Entering directory `c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros'
+MAKE -C: entering directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros
 Found linker command: link.exe /out:bin\InterestingSmallMakefile\ARCH1\Debug\main.exe intermediate\ARCH1\Debug\main.obj intermediate\ARCH1\Debug\test1.obj intermediate\ARCH1\Debug\test2.obj /DEBUG
 Producing target binary: bin\InterestingSmallMakefile\ARCH1\Debug\main.exe
 Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH1\Debug>main.exe()
+c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH1\Debug>main.exe()
 Found linker command: link /out:bin\InterestingSmallMakefile\ARCH2\Debug\main.exe intermediate\ARCH2\Debug\main.obj intermediate\ARCH2\Debug\test1.obj intermediate\ARCH2\Debug\test2.obj /DEBUG
 Producing target binary: bin\InterestingSmallMakefile\ARCH2\Debug\main.exe
 Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH2\Debug>main.exe()
-Found linker command: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\link" /out:"bin\InterestingSmallMakefile\ARC H3\Debug\main.exe" "intermediate\ARC H3\Debug\main.obj" "intermediate\ARC H3\Debug\test1.obj" "intermediate\ARC H3\Debug\test2.obj" /DEBUG
+c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH2\Debug>main.exe()
+Found linker command: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\link" /out:"bin\InterestingSmallMakefile\ARC H3\Debug\main.exe" "intermediate\ARC H3\Debug\main.obj" "intermediate\ARC H3\Debug\test1.obj" "intermediate\ARC H3\Debug\test2.obj" /DEBUG
 Producing target binary: bin\InterestingSmallMakefile\ARC H3\Debug\main.exe
 Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARC H3\Debug>main.exe()
+c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARC H3\Debug>main.exe()
 Found linker command: link.exe /out:simple/simple.exe main.obj test1.obj test2.obj /DEBUG
 Producing target binary: simple/simple.exe
 Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\simple>simple.exe()
-Analyzing line: # make: Leaving directory `{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros'
-POPD command or end of MAKE -C: leaving directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros and entering directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-Analyzing line: # make: Entering directory `{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros'
-MAKE -C: entering directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros
+c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\simple>simple.exe()
+Analyzing line: # make: Leaving directory `c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros'
+POPD command or end of MAKE -C: leaving directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros and entering directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros
+Analyzing line: # make: Entering directory `c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros'
+MAKE -C: entering directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros
 Found binary execution command: "bin\InterestingSmallMakefile\ARCH1\Debug"\main.exe str1a str1b str1c
 Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARCH1\Debug\main.exe(str1a,str1b,str1c)
+c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARCH1\Debug\main.exe(str1a,str1b,str1c)
 Found binary execution command: "bin\InterestingSmallMakefile\ARC H3\Debug\main.exe"  str3a str3b str3c
 Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c)
-Analyzing line: # make: Leaving directory `{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros'
-POPD command or end of MAKE -C: leaving directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros and entering directory {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-Found the following 6 new launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c);{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARCH1\Debug\main.exe(str1a,str1b,str1c);{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARC H3\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH1\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH2\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\simple>simple.exe()
-Complete list of launch targets: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c);{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARCH1\Debug\main.exe(str1a,str1b,str1c);{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARC H3\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH1\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH2\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\simple>simple.exe()
+c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c)
+Analyzing line: # make: Leaving directory `c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros'
+POPD command or end of MAKE -C: leaving directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros and entering directory c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros
+Found the following 6 new launch targets defined in the makefile: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c);c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARCH1\Debug\main.exe(str1a,str1b,str1c);c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARC H3\Debug>main.exe();c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH1\Debug>main.exe();c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH2\Debug>main.exe();c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\simple>simple.exe()
+Complete list of launch targets: c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c);c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARCH1\Debug\main.exe(str1a,str1b,str1c);c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARC H3\Debug>main.exe();c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH1\Debug>main.exe();c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH2\Debug>main.exe();c:\repos2\vscode-makefile-tools\src\test\fakeSuite\repros\simple>simple.exe()
 Parsing for launch targets elapsed time: 0
 Generating parse content for build targets.
-Parsing for build targets from: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Parsing for build targets from: "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
 Found the following 21 new build targets defined in the makefile: Arch1_main.exe;Arch2_main.exe;Arch3_main.exe;Execute_Arch1;Execute_Arch2;Execute_Arch3;all;buildArch1;buildArch2;buildArch3;builds;clean;create_dirs;create_dirs_Arch1;create_dirs_Arch2;create_dirs_Arch3;install;rebuild;runs;simple;simple/simple.exe
 Complete list of build targets: Arch1_main.exe;Arch2_main.exe;Arch3_main.exe;Execute_Arch1;Execute_Arch2;Execute_Arch3;all;buildArch1;buildArch2;buildArch3;builds;clean;create_dirs;create_dirs_Arch1;create_dirs_Arch2;create_dirs_Arch3;install;rebuild;runs;simple;simple/simple.exe
 Parsing build targets elapsed time: 0
@@ -202,45 +202,45 @@ dryrunTargets: return code = 0, elapsed time = 0
 parseTargets: return code = 0, elapsed time = 0
 Configure succeeded.
 Configure elapsed time: 0
-Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c) in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
-Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c)"
+Inserting a new entry for c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c) in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
+Setting current launch target "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c)"
 Created the following debug config:
    type = cppvsdbg
-   cwd = {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   cwd = c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros (= c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros)
    args = str3a str3b str3c
-   program = {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe)
+   program = c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe (= c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe)
    MIMode = undefined
    miDebuggerPath = undefined
    stopAtEntry = undefined
    symbolSearchPath = undefined
-Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe" str3a str3b str3c' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'
-Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch1\Debug\main.exe(str3a,str3b,str3c) in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
-Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch1\Debug\main.exe(str3a,str3b,str3c)"
+Running command '"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\ARC H3\Debug\main.exe" str3a str3b str3c' in the terminal from location 'c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros'
+Inserting a new entry for c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch1\Debug\main.exe(str3a,str3b,str3c) in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
+Setting current launch target "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch1\Debug\main.exe(str3a,str3b,str3c)"
 Created the following debug config:
    type = cppvsdbg
-   cwd = {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   cwd = c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros (= c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros)
    args = str3a str3b str3c
-   program = {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch1\Debug\main.exe (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch1\Debug\main.exe)
+   program = c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch1\Debug\main.exe (= c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch1\Debug\main.exe)
    MIMode = undefined
    miDebuggerPath = undefined
    stopAtEntry = undefined
    symbolSearchPath = undefined
-Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch1\Debug\main.exe" str3a str3b str3c' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'
-Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
-Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()"
+Running command '"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch1\Debug\main.exe" str3a str3b str3c' in the terminal from location 'c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros'
+Inserting a new entry for c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
+Setting current launch target "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()"
 Created the following debug config:
    type = cppvsdbg
-   cwd = {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   cwd = c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros (= c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros)
    args = 
-   program = {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch2\Debug\main.exe (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch2\Debug\main.exe)
+   program = c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch2\Debug\main.exe (= c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch2\Debug\main.exe)
    MIMode = undefined
    miDebuggerPath = undefined
    stopAtEntry = undefined
    symbolSearchPath = undefined
-Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch2\Debug\main.exe" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'
+Running command '"c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch2\Debug\main.exe" ' in the terminal from location 'c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros'
 Setting configuration - InterestingSmallMakefile_windows_configRelSize
 Found build log path setting "./InterestingSmallMakefile_windows_dryrunRelSize.log" defined for configuration "InterestingSmallMakefile_windows_configRelSize
-Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunRelSize.log"
+Resolving build log path to "c:\repos2\vscode-makefile-tools\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunRelSize.log"
 Deduced command 'c:\some\other\fake\make.exe OPT=RelSize' for configuration InterestingSmallMakefile_windows_configRelSize
 Setting configuration - InterestingSmallMakefile_windows_configRelSpeed
 Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration InterestingSmallMakefile_windows_configRelSpeed
