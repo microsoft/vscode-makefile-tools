@@ -8,7 +8,7 @@ import * as path from 'path';
 //import * as tests from 'vscode-test';
 import * as testRunner from 'vscode-test/out/runTest';
 
-/*async*/ function main() : void { //Promise<void> {
+async function main() : Promise<void> {
     try {
         // The folder containing the Extension Manifest package.json
         // Passed to `--extensionDevelopmentPath`
@@ -27,11 +27,9 @@ import * as testRunner from 'vscode-test/out/runTest';
             testRunnerPath: extensionTestsPath,
             testWorkspace: reproRootPath
         };
-        /*await*/ testRunner.runTests(myOpt);
+        await testRunner.runTests(myOpt);
     } catch (err) {
         console.error('Failed to run tests');
         process.exit(1);
     }
 }
-
-main();

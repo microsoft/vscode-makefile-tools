@@ -53,57 +53,73 @@ suite('Fake dryrun parsing', /*async*/() => {
     // to parse the dry-run logs obtained on those platforms.
     if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
         test('Interesting small makefile - windows', async() => {
-            let extensionLogPath: string | undefined = configuration.getExtensionLog();
-            // Cannot compare with a baseline if there is no extension log defined for this test
-            // Use makefile.extensionLog in test workspace settings.
-            // We could set this here, but would loose all the logging between the first loading
-            // of the repro project by the test framework and this entry to the test function,
-            // which would complicate the comparison with the baseline.
-            assert(extensionLogPath, "Please define an extension log for the test");
-            if (!extensionLogPath) {
-                return; // no need to run the remaining of the test
+            // Settings reset from the previous test run.
+            extension.getState().reset(false);
+
+            // We define extension log here as opposed to in the fake repro .vscode/settings.json
+            // because the logging produced at the first project load has too few important data to verify and much variations
+            // that are not worth to be processed when comparing with a baseline.
+            // Example: when running a test after incomplete debugging or after loading the fake repro project independently of the testing framework,
+            // which leaves the workspace state not clean, resulting in a different extension output log
+            // than without debugging/loading the project before.
+            // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
+            // because at project load time, there is no makefile log identified and no file is deleted on activation.
+            let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+            if (util.checkFileExistsSync(extensionLogPath)) {
+                util.deleteFileSync(extensionLogPath);
             }
+            configuration.setExtensionLog(extensionLogPath);
+
+            // Run a preconfigure script to include our tests "Program Files" path so that we always find a cl.exe
+            // from this extension repository instead of a real VS installation that happens to be in the path.
+            configuration.setPreConfigureScript(path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure.bat"));
+            await make.preConfigure(make.TriggeredBy.tests);
 
             configuration.prepareConfigurationsQuickPick();
             configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
+            const retc: number = await make.configure(make.TriggeredBy.tests, true);
 
-            configuration.setTargetByName("execute_Arch3");
+            configuration.setBuildBeforeLaunch(false);
+            const launchConfigurations: string[] = ["bin\\InterestingSmallMakefile\\ARC H3\\Debug\\main.exe(str3a,str3b,str3c)",
+                                                    "bin\\InterestingSmallMakefile\\arch1\\Debug\\main.exe(str3a,str3b,str3c)",
+                                                    "bin\\InterestingSmallMakefile\\arch2\\Debug\\main.exe()"];
+            for (const config of launchConfigurations) {
+                await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">" + config);
+                let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+                let launchConfiguration: configuration.LaunchConfiguration | undefined;
+                if (status === launch.LaunchStatuses.success) {
+                    launchConfiguration = configuration.getCurrentLaunchConfiguration();
+                }
 
-            make.prepareBuildTarget("execute_Arch3");
-
-            await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">bin/InterestingSmallMakefile/ARC H3/Debug/main.exe(str3a,str3b,str3c)");
-
-            let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
-            let launchConfiguration: configuration.LaunchConfiguration | undefined;
-            if (status === launch.LaunchStatuses.success) {
-                launchConfiguration = configuration.getCurrentLaunchConfiguration();
-            }
-
-            if (launchConfiguration) {
-                launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
-                launch.getLauncher().prepareRunCurrentTarget();
+                if (launchConfiguration) {
+                    launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
+                    launch.getLauncher().prepareRunCurrentTarget();
+                }
             }
 
             // A bit more coverage, "RelSize" and "RelSpeed" are set up
             // to exercise different combinations of pre-created build log and/or make tools.
+            // No configure is necessary to be run here, it is enough to look at what happens
+            // when changing a configuration.
             configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
             configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
 
-            // Settings reset for the next test run.
-            extension.getState().reset();
+            // InterestingSmallMakefile_windows_configRelSpeed constructs a more interesting build command.
+            configuration.setTargetByName("Execute_Arch3");
+            make.prepareBuildTarget("Execute_Arch3");
 
             // Compare the output log with the baseline
             // TODO: incorporate relevant diff snippets into the test log.
             // Until then, print into base and diff files for easier viewing
             // when the test fails.
             let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
-            let baselineLogPath: string = path.join(parsedPath.dir, "InterestingSmallMakefile_windows_baseline.out");
+            let baselineLogPath: string = path.join(parsedPath.dir, "../InterestingSmallMakefile_windows_baseline.out");
             let extensionLogContent: string = util.readFile(extensionLogPath) || "";
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-            fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-            fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+            // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+            // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }

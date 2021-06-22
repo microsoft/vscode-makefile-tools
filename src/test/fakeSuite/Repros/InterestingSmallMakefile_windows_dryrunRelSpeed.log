@@ -5,6 +5,7 @@
 # PARTICULAR PURPOSE.
 
 # This program built for i386-pc-mingw32
+# make: Entering directory `C:/Work/Projects/Makefiles/makefile33'
 if exist bin rmdir /s /q bin
 if exist out rmdir /s /q out
 if exist intermediate rmdir /s /q intermediate
@@ -12,7 +13,7 @@ if not exist out mkdir out
 if not exist bin\ARCH1\RelSpeed mkdir bin\ARCH1\RelSpeed
 if not exist intermediate\ARCH1\RelSpeed mkdir intermediate\ARCH1\RelSpeed
 cl .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSpeed /O2 /Od /Zi /std:c++14	/DARCH=1 /c
-cl		.\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=1 /c
+cl		.\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=1 /c
 copy main.obj intermediate\ARCH1\RelSpeed
 copy test1.obj intermediate\ARCH1\RelSpeed
 copy test2.obj intermediate\ARCH1\RelSpeed
@@ -20,8 +21,8 @@ del *.obj
 link.exe /out:bin\ARCH1\RelSpeed\main.exe intermediate\ARCH1\RelSpeed\main.obj intermediate\ARCH1\RelSpeed\test1.obj intermediate\ARCH1\RelSpeed\test2.obj /DEBUG
 if not exist bin\ARCH2\RelSpeed mkdir bin\ARCH2\RelSpeed
 if not exist intermediate\ARCH2\RelSpeed mkdir intermediate\ARCH2\RelSpeed
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl"  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSpeed /O2 /Od /Zi /std:c++14	/DARCH=2 /c
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=2 /c
+"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl"  .\src\main.cpp .\src\test1.cpp  /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSpeed /O2 /Od /Zi /std:c++14	/DARCH=2 /c
+"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=2 /c
 copy main.obj intermediate\ARCH2\RelSpeed
 copy test1.obj intermediate\ARCH2\RelSpeed
 copy test2.obj intermediate\ARCH2\RelSpeed
@@ -30,18 +31,21 @@ link /out:bin\ARCH2\RelSpeed\main.exe intermediate\ARCH2\RelSpeed\main.obj inter
 if not exist "bin\ARC H3\RelSpeed" mkdir "bin\ARC H3\RelSpeed"
 if not exist "intermediate\ARC H3\RelSpeed" mkdir "intermediate\ARC H3\RelSpeed"
 "cl" .\src\main.cpp .\src\test1.cpp   /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSpeed /O2 /Od /Zi /std:c++14	/DARCH=3 /c
-"cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=3 /c
+"cl.exe"  .\src\test2.cpp  -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi /DARCH=3 /c
 copy main.obj "intermediate\ARC H3\RelSpeed"
 copy test1.obj "intermediate\ARC H3\RelSpeed"
 copy test2.obj "intermediate\ARC H3\RelSpeed"
 del *.obj
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\link" /out:"bin\ARC H3\RelSpeed\main.exe" "intermediate\ARC H3\RelSpeed\main.obj" "intermediate\ARC H3\RelSpeed\test1.obj" "intermediate\ARC H3\RelSpeed\test2.obj" /DEBUG
+"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\link" /out:"bin\ARC H3\RelSpeed\main.exe" "intermediate\ARC H3\RelSpeed\main.obj" "intermediate\ARC H3\RelSpeed\test1.obj" "intermediate\ARC H3\RelSpeed\test2.obj" /DEBUG
 "bin\ARCH1\RelSpeed"\main.exe str1a str1b str1c
 bin\ARCH2\RelSpeed\main  str2a str2b str2c
 "bin\ARC H3\RelSpeed\main.exe"  str3a str3b str3c
 xcopy bin out /sdy
+cl .\src\main.cpp .\src\test1.cpp /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc /D MyDefine @cl.rsp /DRelSpeed /O2 /Od /Zi /std:c++14	 /c /DARCH_DEFINE=SIMPLE
+cl .\src\test2.cpp -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc /DMyDefine2 /DRelSpeed /O2 /Od /Zi  /c
+link.exe /out:simple/simple.exe main.obj test1.obj test2.obj /DEBUG
 
-# Make data base, printed on Fri Mar 13 00:18:11 2020
+# Make data base, printed on Sun Jun 13 22:49:28 2021
 
 # Variables
 
@@ -51,20 +55,18 @@ xcopy bin out /sdy
 ?F = $(notdir $?)
 # environment
 CommonProgramFiles = C:\Program Files (x86)\Common Files
-# makefile (from `makefile', line 38)
+# makefile (from `makefile', line 39)
 SRC_FILES1 = $(DIR_SRC)\main.cpp $(DIR_SRC)\test1.cpp
 # environment
 VCIDEInstallDir = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\
 # makefile
-MAKEFLAGS = pnkB -- $(MAKEOVERRIDES)
+MAKEFLAGS = wRrpnk -- $(MAKEOVERRIDES)
 # environment
 UCRTVersion = 10.0.18362.0
-# makefile (from `makefile', line 43)
+# makefile (from `makefile', line 44)
 FLAGS1 = $(INCLUDES1) /D MyDefine @cl.rsp $(EXTRA_FLAGS) /std:c++14	$(EXTRA_FLAGS2) /c
 # environment
-FrameworkVersion32 = v4.0.30319
-# default
-CWEAVE = cweave
+VCToolsInstallDir = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
 # makefile (from `makefile', line 16)
@@ -78,167 +80,111 @@ HOMEDRIVE = C:
 # automatic
 ^D = $(patsubst %/,%,$(dir $^))
 # makefile
-CURDIR := C:/Work/Projects/Makefiles/makefile3
+CURDIR := C:/Work/Projects/Makefiles/makefile33
 # default
 SHELL := sh.exe
-# default
-RM = rm -f
-# default
-CO = co
 # environment
 ProgramFiles(x86) = C:\Program Files (x86)
-# default
-PREPROCESS.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -F
 # environment
-VCToolsRedistDir = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.24.28127\
-# default
-LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)
-# default
-OUTPUT_OPTION = -o $@
+VCToolsRedistDir = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Redist\MSVC\14.27.29016\
+# environment
+CLion = C:\Program Files\JetBrains\CLion 202.5792.50\bin;
 # environment
 MSMPI_BIN = C:\Program Files\Microsoft MPI\Bin\
-# default
-COMPILE.cpp = $(COMPILE.cc)
 # environment
-PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.PY;.PYW
 # makefile (from `makefile', line 1)
 MAKEFILE_LIST :=  makefile
 # environment
 SystemRoot = C:\WINDOWS
 # environment
-__DOTNET_PREFERRED_BITNESS = 32
+__DOTNET_PREFERRED_BITNESS = 64
 # environment
 VSINSTALLDIR = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\
 # environment
 TMP = C:\Users\andris\AppData\Local\Temp
 # environment
-FrameworkDir = C:\Windows\Microsoft.NET\Framework\
+FrameworkDir = C:\WINDOWS\Microsoft.NET\Framework64\
 # makefile (from `makefile', line 13)
 DIR_OUT = out
-# default
-CC = cc
-# default
-COMPILE.f = $(FC) $(FFLAGS) $(TARGET_ARCH) -c
-# environment
-FrameworkDir32 = C:\Windows\Microsoft.NET\Framework\
 # environment
 SystemDrive = C:
 # environment
 CommonProgramFiles(x86) = C:\Program Files (x86)\Common Files
-# makefile (from `makefile', line 40)
+# makefile (from `makefile', line 41)
 SRC_FILES2 = $(DIR_SRC)\test2.cpp
-# default
-CHECKOUT,v = +$(if $(wildcard $@),,$(CO) $(COFLAGS) $< $@)
 # environment
-VSCMD_ARG_TGT_ARCH = x86
+__VSCMD_script_err_count = 0
+# makefile (from `makefile', line 45)
+FLAGS2 = $(INCLUDES2) /DMyDefine2 $(EXTRA_FLAGS) $(EXTRA_FLAGS2) /c
+# environment
+VSCMD_ARG_TGT_ARCH = x64
 # environment
 VS160COMNTOOLS = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\
-# default
-CPP = $(CC) -E
 # environment
 FrameworkVersion = v4.0.30319
-# default
-LINK.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
-# makefile (from `makefile', line 36)
+# makefile (from `makefile', line 37)
 DIR_INTERMEDIATE = $(DIR_INTERMEDIATE_ROOT)\$(ARCH)\$(OPT)
 # environment
-PATH = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\HostX86\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\VCPackages;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Team Tools\Performance Tools;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\vs2019\;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\;C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86;C:\Program Files (x86)\Windows Kits\10\bin\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\\MSBuild\Current\Bin;C:\Windows\Microsoft.NET\Framework\v4.0.30319;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\;C:\Program Files\Microsoft MPI\Bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Git\cmd;C:\Program Files (x86)\CMake\bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\PuTTY\;C:\Program Files\PowerShell\6\;C:\Users\andris\AppData\Local\CloudBuild;C:\Program Files\Conan\conan;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin;c:\Program Files (x86)\Ninja;C:\Users\andris\AppData\Roaming\npm;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja
-# default
-LD = ld
-# default
-TEXI2DVI = texi2dvi
+PATH = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\\Extensions\Microsoft\IntelliCode\CLI;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\bin\HostX64\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\VCPackages;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Team Tools\Performance Tools\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Team Tools\Performance Tools;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\vs2019\\x64;C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\vs2019\;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\;C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64;C:\Program Files (x86)\Windows Kits\10\bin\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\\MSBuild\Current\Bin;C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\;C:\Python39\Scripts\;C:\Python39\;C:\Program Files\Microsoft MPI\Bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\PuTTY\;C:\Program Files\PowerShell\6\;C:\Users\andris\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Program Files (x86)\LLVM\bin;C:\Program Files (x86)\dotnet\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\CMake\bin;C:\Program Files\Git\cmd;C:\Users\andris\AppData\Local\CloudBuild;C:\Program Files\Conan\conan;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Git\cmd;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin;c:\Program Files (x86)\Ninja;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;;C:\Program Files\JetBrains\CLion 202.5792.50\bin;;C:\Users\andris\.dotnet\tools;C:\Users\andris\AppData\Roaming\npm;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\Linux\bin\ConnectionManagerExe;"c:\Program Files (x86)\GnuWin32\bin";
 # environment
 Framework40Version = v4.0
-# default
-YACC = yacc
-# default
-COMPILE.mod = $(M2C) $(M2FLAGS) $(MODFLAGS) $(TARGET_ARCH)
 # environment
 PROCESSOR_ARCHITECTURE = x86
 # environment
 VSCMD_ARG_app_plat = Desktop
-# default
-LINK.r = $(FC) $(FFLAGS) $(RFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 # environment
 UniversalCRTSdkDir = C:\Program Files (x86)\Windows Kits\10\
 # environment
 USERPROFILE = C:\Users\andris
-# default
-LINT = lint
 # environment
 WindowsLibPath = C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.18362.0
 # makefile (from `makefile', line 15)
-INCLUDES2 = -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\Small_Interesting_Makefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc
-# default
-LINT.c = $(LINT) $(LINTFLAGS) $(CPPFLAGS) $(TARGET_ARCH)
+INCLUDES2 = -I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2"  -I"SubfolderLocalToWorkspace" -I "src\SubfolderLocalToSrc" /I. /Isrc
 # environment
 WindowsSdkVerBinPath = C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\
 # environment
 ALLUSERSPROFILE = C:\ProgramData
-# default
-LINK.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 # environment
 ComSpec = C:\WINDOWS\system32\cmd.exe
-# default
-YACC.y = $(YACC) $(YFLAGS)
 # environment
-VCToolsVersion = 14.24.28314
+VCToolsVersion = 14.27.29110
 # environment
 WindowsSDKLibVersion = 10.0.18362.0\
 # environment
 NUMBER_OF_PROCESSORS = 8
-# makefile (from `makefile', line 33)
+# makefile (from `makefile', line 34)
 DIR_BIN_ROOT = bin
 # environment
 CloudbuildToolsFlavor = GeneralPublic
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives
-# default
-TANGLE = tangle
 # environment
 DevEnvDir = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\
 # environment
 ProgramW6432 = C:\Program Files
-# default
-GET = get
 # automatic
 %F = $(notdir $%)
-# default
-COMPILE.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-# default
-CTANGLE = ctangle
 # environment
-__VSCMD_PREINIT_PATH = C:\Program Files\Microsoft MPI\Bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Git\cmd;C:\Program Files (x86)\CMake\bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\PuTTY\;C:\Program Files\PowerShell\6\;C:\Users\andris\AppData\Local\CloudBuild;C:\Program Files\Conan\conan;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin;c:\Program Files (x86)\Ninja;C:\Users\andris\AppData\Roaming\npm;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\andris\AppData\Local\Microsoft\WindowsApps
+__VSCMD_PREINIT_PATH = C:\Python39\Scripts\;C:\Python39\;C:\Program Files\Microsoft MPI\Bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files\PuTTY\;C:\Program Files\PowerShell\6\;C:\Users\andris\.dnx\bin;C:\Program Files\Microsoft DNX\Dnvm\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\LLVM\bin;C:\Program Files (x86)\LLVM\bin;C:\Program Files (x86)\dotnet\;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\CMake\bin;C:\Program Files\Git\cmd;C:\Users\andris\AppData\Local\CloudBuild;C:\Program Files\Conan\conan;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\Git\cmd;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin;c:\Program Files (x86)\Ninja;C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\andris\AppData\Local\Microsoft\WindowsApps;;C:\Program Files\JetBrains\CLion 202.5792.50\bin;;C:\Users\andris\.dotnet\tools;C:\Users\andris\AppData\Roaming\npm
 # command line
 OPT = RelSpeed
 # environment
 WindowsSdkDir = C:\Program Files (x86)\Windows Kits\10\
-# default
-.LIBPATTERNS = lib%.so lib%.a
 # environment
 COMPUTERNAME = ANDRIS
-# default
-LINK.C = $(LINK.cc)
-# default
-LINK.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_MACH)
 # environment
 USERDNSDOMAIN = redmond.corp.microsoft.com
-# default
-PREPROCESS.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -F
-# default
-LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 # environment
 ExtensionSdkDir = C:\Program Files (x86)\Microsoft SDKs\Windows Kits\10\ExtensionSDKs
 # environment
 USERNAME = andris
 # environment
 PUBLIC = C:\Users\Public
-# default
-LINK.s = $(CC) $(ASFLAGS) $(LDFLAGS) $(TARGET_MACH)
+# environment
+ChocolateyLastPathUpdate = 132585887079686429
 # environment
 CommonProgramW6432 = C:\Program Files\Common Files
-# makefile (from `makefile', line 8)
-LINK_FLAGS = /DEBUG
 # environment
 ProgramData = C:\ProgramData
 # environment
@@ -246,11 +192,13 @@ WindowsSDKVersion = 10.0.18362.0\
 # automatic
 -*-command-variables-*- := OPT=RelSpeed
 # environment
-VSCMD_VER = 16.4.5
+VSCMD_VER = 16.7.15
 # environment
-INCLUDE = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\cppwinrt
+INCLUDE = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\winrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\cppwinrt
 # environment
 LOGONSERVER = \\ANDRIS
+# environment
+Platform = x64
 # environment
 WindowsSdkBinPath = C:\Program Files (x86)\Windows Kits\10\bin\
 # environment
@@ -261,22 +209,14 @@ MAKELEVEL := 0
 MAKE = $(MAKE_COMMAND)
 # default
 MAKECMDGOALS := all
-# default
-AS = as
 # environment
-LIBPATH = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\ATLMFC\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\lib\x86\store\references;C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.18362.0;C:\Windows\Microsoft.NET\Framework\v4.0.30319;
-# default
-PREPROCESS.S = $(CC) -E $(CPPFLAGS)
+LIBPATH = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\ATLMFC\lib\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\lib\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\lib\x86\store\references;C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.18362.0;C:\Program Files (x86)\Windows Kits\10\References\10.0.18362.0;C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319
 # environment
 MAKEOVERRIDES = ${-*-command-variables-*-}
-# default
-COMPILE.p = $(PC) $(PFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 # default
 MAKE_VERSION := 3.81
 # environment
 NugetMachineInstallRoot = C:\NugetCache
-# default
-FC = f77
 # makefile
 .DEFAULT_GOAL := buildArch1
 # makefile (from `makefile', line 17)
@@ -290,52 +230,34 @@ DriverData = C:\Windows\System32\Drivers\DriverData
 # environment
 LOCALAPPDATA = C:\Users\andris\AppData\Local
 # default
-AR = ar
-# default
-ARFLAGS = rv
-# default
-WEAVE = weave
-# default
-MAKE_COMMAND := c:/Program Files (x86)/GnuWin32/bin/make
-# default
-LINK.cpp = $(LINK.cc)
+MAKE_COMMAND := make
 # environment
 PROCESSOR_ARCHITEW6432 = AMD64
-# default
-F77 = $(FC)
-# default
-COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 # environment
 OneDriveConsumer = C:\Users\andris\OneDrive
 # default
 .VARIABLES := 
-# default
-PC = pc
 # automatic
 *F = $(notdir $*)
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 142 Stepping 10, GenuineIntel
 # environment
 OS = Windows_NT
-# default
-COMPILE.def = $(M2C) $(M2FLAGS) $(DEFFLAGS) $(TARGET_ARCH)
-# default
-LEX = lex
+# environment
+__DOTNET_ADD_64BIT = 1
 # environment
 HOMEPATH = \Users\andris
 # environment
 PROMPT = $P$G
 # environment
-MFLAGS = -pnkB
+MFLAGS = -wRrpnk
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
 CommandPromptType = Native
-# default
-LEX.l = $(LEX) $(LFLAGS) -t
 # environment
-PSModulePath = C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
-# makefile (from `makefile', line 34)
+PSModulePath = C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules;C:\Program Files (x86)\Microsoft Azure Information Protection\Powershell
+# makefile (from `makefile', line 35)
 DIR_BIN = $(DIR_BIN_ROOT)\$(ARCH)\$(OPT)
 # makefile (from `makefile', line 18)
 EXE_NAME_NOEXT = main
@@ -343,24 +265,18 @@ EXE_NAME_NOEXT = main
 +D = $(patsubst %/,%,$(dir $+))
 # environment
 windir = C:\WINDOWS
-# default
-COMPILE.r = $(FC) $(FFLAGS) $(RFLAGS) $(TARGET_ARCH) -c
 # environment
 VisualStudioVersion = 16.0
 # automatic
 +F = $(notdir $+)
 # default
-M2C = m2c
-# default
-SUFFIXES := .out .a .ln .o .c .cc .C .cpp .p .f .F .r .y .l .s .S .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
+SUFFIXES := 
 # environment
 APPDATA = C:\Users\andris\AppData\Roaming
 # environment
-VSCMD_ARG_HOST_ARCH = x86
+VSCMD_ARG_HOST_ARCH = x64
 # environment
 TEMP = C:\Users\andris\AppData\Local\Temp
-# makefile (from `makefile', line 44)
-FLAGS2 = $(INCLUDES2) /DMyDefine2 $(EXTRA_FLAGS) $(EXTRA_FLAGS2) /c
 # environment
 WindowsSDK_ExecutablePath_x64 = C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\
 # environment
@@ -371,58 +287,44 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 OneDriveCommercial = C:\Users\andris\OneDrive - Microsoft
-# default
-CXX = g++
-# default
-COFLAGS = 
+# makefile (from `makefile', line 8)
+LINK_FLAGS = /DEBUG
 # environment
-LIB = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\ATLMFC\lib\x86;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\lib\x86;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\lib\um\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\ucrt\x86;C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x86;
-# makefile (from `makefile', line 35)
+LIB = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\ATLMFC\lib\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\lib\x64;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\lib\um\x64;C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\ucrt\x64;C:\Program Files (x86)\Windows Kits\10\lib\10.0.18362.0\um\x64
+# makefile (from `makefile', line 36)
 DIR_INTERMEDIATE_ROOT = intermediate
 # environment
-__DOTNET_ADD_32BIT = 1
-# environment
 UATDATA = C:\Windows\CCM\UATData\D9F8C395-CAB8-491d-B8AC-179A1FE1BE77
-# default
-COMPILE.C = $(COMPILE.cc)
 # automatic
 ^F = $(notdir $^)
-# default
-COMPILE.S = $(CC) $(ASFLAGS) $(CPPFLAGS) $(TARGET_MACH) -c
-# default
-LINK.F = $(FC) $(FFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+# environment
+FrameworkVersion64 = v4.0.30319
 # environment
 ProgramFiles = C:\Program Files (x86)
-# default
-COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# environment
+SESSIONNAME = Console
 # environment
 PROCESSOR_REVISION = 8e0a
-# default
-COMPILE.s = $(AS) $(ASFLAGS) $(TARGET_MACH)
 # environment
-VCToolsInstallDir = C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\
+VS140COMNTOOLS = C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\
+# environment
+FrameworkDIR64 = C:\WINDOWS\Microsoft.NET\Framework64
 # environment
 NETFXSDKDir = C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\
-# default
-MAKEINFO = makeinfo
 # environment
 WindowsSDK_ExecutablePath_x86 = C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\
+# environment
+ChocolateyInstall = C:\ProgramData\chocolatey
 # makefile (from `makefile', line 7)
 EXTRA_FLAGS = /DRelSpeed /O2 /Od /Zi
-# default
-TEX = tex
 # environment
 PROCESSOR_LEVEL = 6
-# default
-F77FLAGS = $(FFLAGS)
-# default
-LINK.f = $(FC) $(FFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 # makefile (from `makefile', line 14)
 INCLUDES1 = /I..\inc /I "..\in c1" /I"SubfolderLocalToWorkspace" /I "src\SubfolderLocalToSrc" /I. /Isrc
 # environment
 USERDOMAIN_ROAMINGPROFILE = REDMOND
 # variable set hash-table stats:
-# Load=188/1024=18%, Rehash=0, Collisions=52/478=11%
+# Load=137/1024=13%, Rehash=0, Collisions=29/453=6%
 
 # Pattern-specific Variable Values
 
@@ -430,332 +332,79 @@ USERDOMAIN_ROAMINGPROFILE = REDMOND
 
 # Directories
 
-# C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\vs2019\ (key C:/Program Files (x86)/Microsoft Visual Studio/Shared/Common/VSPerfCollectionTools/vs2019/, mtime 1581551715): 33 files, no impossibilities.
+# : could not be stat'd.
+# C:\Program Files\LLVM\bin (key C:/Program Files/LLVM/bin, mtime 1602164591): 110 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\vs2019\ (key C:/Program Files (x86)/Microsoft Visual Studio/Shared/Common/VSPerfCollectionTools/vs2019/, mtime 1601895955): 33 files, no impossibilities.
 # C:\Program Files\Conan\conan (key C:/Program Files/Conan/conan, mtime 1573155632): 41 files, no impossibilities.
-# RCS: could not be stat'd.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/TestWindow, mtime 1581552183): 43 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\ (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/, mtime 1581552181): 312 files, no impossibilities.
-# C:\WINDOWS\System32\WindowsPowerShell\v1.0\ (key C:/WINDOWS/System32/WindowsPowerShell/v1.0/, mtime 1552976452): 30 files, no impossibilities.
-# C:\WINDOWS\System32\Wbem (key C:/WINDOWS/System32/Wbem, mtime 1573781238): 170 files, no impossibilities.
-# . (key C:/Work/Projects/Makefiles/makefile3, mtime 1584083809): 50 files, 98 impossibilities.
-# C:\Program Files\nodejs\ (key C:/Program Files/nodejs/, mtime 1553834506): 11 files, no impossibilities.
-# SCCS: could not be stat'd.
-# C:\Windows\Microsoft.NET\Framework\v4.0.30319 (key C:/Windows/Microsoft.NET/Framework/v4.0.30319, mtime 1584036936): 404 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\VCPackages (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/VC/VCPackages, mtime 1581551751): 48 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\ (key C:/Program Files (x86)/Microsoft SDKs/Windows/v10.0A/bin/NETFX 4.8 Tools/x64/, mtime 1571960125): 31 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/TestWindow, mtime 1619053970): 46 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\ (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/, mtime 1621797444): 316 files, no impossibilities.
+# C:\ProgramData\chocolatey\bin (key C:/ProgramData/chocolatey/bin, mtime 1614118708): 13 files, no impossibilities.
+# C:\Program Files\JetBrains\CLion 202.5792.50\bin (key C:/Program Files/JetBrains/CLion 202.5792.50/bin, mtime 1592922991): 30 files, no impossibilities.
+# C:\WINDOWS\System32\WindowsPowerShell\v1.0\ (key C:/WINDOWS/System32/WindowsPowerShell/v1.0/, mtime 1603000864): 30 files, no impossibilities.
+# C:\WINDOWS\System32\Wbem (key C:/WINDOWS/System32/Wbem, mtime 1623352514): 170 files, no impossibilities.
+# . (key C:/Work/Projects/Makefiles/makefile33, mtime 1623649768): 73 files, no impossibilities.
+# C:\Program Files\nodejs\ (key C:/Program Files/nodejs/, mtime 1614118652): 11 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\VCPackages (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/VC/VCPackages, mtime 1619053981): 49 files, no impossibilities.
+# C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64 (key C:/Program Files (x86)/Windows Kits/10/bin/10.0.18362.0/x64, mtime 1614119284): 193 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\Shared\Common\VSPerfCollectionTools\vs2019\\x64 (key C:/Program Files (x86)/Microsoft Visual Studio/Shared/Common/VSPerfCollectionTools/vs2019/x64, mtime 1601895954): 18 files, no impossibilities.
 # C:\Program Files\Microsoft MPI\Bin\ (key C:/Program Files/Microsoft MPI/Bin/, mtime 1571956710): 6 files, no impossibilities.
-# C:\Program Files\dotnet\ (key C:/Program Files/dotnet/, mtime 1581551587): 13 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\HostX86\x86 (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.24.28314/bin/HostX86/x86, mtime 1581552178): 59 files, no impossibilities.
-# .\src\SCCS: could not be stat'd.
+# C:\Program Files (x86)\Windows Kits\10\bin\x64 (key C:/Program Files (x86)/Windows Kits/10/bin/x64, mtime 1583792059): 5 files, no impossibilities.
+# C:\Program Files\dotnet\ (key C:/Program Files/dotnet/, mtime 1623196534): 11 files, no impossibilities.
+# C:\WINDOWS\Microsoft.NET\Framework64\v4.0.30319 (key C:/WINDOWS/Microsoft.NET/Framework64/v4.0.30319, mtime 1623579007): 408 files, no impossibilities.
 # C:\Program Files\PowerShell\6\ (key C:/Program Files/PowerShell/6/, mtime 1571778579): 419 files, no impossibilities.
+# C:\Program Files\Microsoft SQL Server\120\Tools\Binn\ (key C:/Program Files/Microsoft SQL Server/120/Tools/Binn/, mtime 1588099737): 4 files, no impossibilities.
 # C:\WINDOWS\System32\OpenSSH\: could not be stat'd.
-# C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin (key C:/Users/andris/AppData/Local/Programs/Microsoft VS Code/bin, mtime 1583791732): 4 files, no impossibilities.
+# C:\Users\andris\AppData\Local\Programs\Microsoft VS Code\bin (key C:/Users/andris/AppData/Local/Programs/Microsoft VS Code/bin, mtime 1620925885): 4 files, no impossibilities.
 # C:\Program Files\PuTTY\ (key C:/Program Files/PuTTY/, mtime 1563861447): 12 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team Explorer, mtime 1581551550): 160 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\ (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/Tools/, mtime 1581551752): 46 files, no impossibilities.
+# "c:\Program Files (x86)\GnuWin32\bin": could not be stat'd.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/TeamFoundation/Team Explorer, mtime 1619053964): 167 files, no impossibilities.
+# C:\Program Files (x86)\LLVM\bin (key C:/Program Files (x86)/LLVM/bin, mtime 1602165389): 109 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\Tools\ (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/Tools/, mtime 1614390124): 47 files, no impossibilities.
 # C:\Program Files\Microsoft SQL Server\130\Tools\Binn\ (key C:/Program Files/Microsoft SQL Server/130/Tools/Binn/, mtime 1552126086): 4 files, no impossibilities.
-# C:\WINDOWS (key C:/WINDOWS, mtime 1583770022): 124 files, no impossibilities.
+# C:\WINDOWS (key C:/WINDOWS, mtime 1623612858): 128 files, no impossibilities.
 # C:\Users\andris\AppData\Roaming\npm (key C:/Users/andris/AppData/Roaming/npm, mtime 1582008961): 13 files, no impossibilities.
-# C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin (key C:/Users/andris/AppData/Local/Programs/Microsoft VS Code Insiders/bin, mtime 1565113799): 4 files, no impossibilities.
-# C:\Program Files (x86)\CMake\bin (key C:/Program Files (x86)/CMake/bin, mtime 1553846237): 8 files, no impossibilities.
-# .\src (key C:/Work/Projects/Makefiles/makefile3/src, mtime 1564607024): 7 files, no impossibilities.
+# C:\Users\andris\.dotnet\tools: could not be stat'd.
+# C:\Users\andris\AppData\Local\Programs\Microsoft VS Code Insiders\bin (key C:/Users/andris/AppData/Local/Programs/Microsoft VS Code Insiders/bin, mtime 1620757965): 4 files, no impossibilities.
 # C:\Users\andris\AppData\Local\CloudBuild (key C:/Users/andris/AppData/Local/CloudBuild, mtime 1574462677): 11 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Team Tools\Performance Tools (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Team Tools/Performance Tools, mtime 1581551717): 36 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\ (key C:/Program Files (x86)/Microsoft SDKs/Windows/v10.0A/bin/NETFX 4.8 Tools/, mtime 1571960125): 59 files, no impossibilities.
+# C:\Program Files\Microsoft DNX\Dnvm\ (key C:/Program Files/Microsoft DNX/Dnvm/, mtime 1588097480): 4 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Team Tools\Performance Tools (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Team Tools/Performance Tools, mtime 1619053975): 36 files, no impossibilities.
+# C:\Python39\ (key C:/Python39/, mtime 1614118829): 18 files, no impossibilities.
 # C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\ (key C:/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/, mtime 1554100743): 139 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin, mtime 1581552186): 6 files, no impossibilities.
-# .\src\RCS: could not be stat'd.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\Roslyn (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/bin/Roslyn, mtime 1581551665): 45 files, no impossibilities.
-# C:\Users\andris\AppData\Local\Microsoft\WindowsApps (key C:/Users/andris/AppData/Local/Microsoft/WindowsApps, mtime 1583312844): 16 files, no impossibilities.
-# C:\Program Files\Git\cmd (key C:/Program Files/Git/cmd, mtime 1552126845): 7 files, no impossibilities.
-# C:\WINDOWS\system32 (key C:/WINDOWS/system32, mtime 1584032440): 2941 files, no impossibilities.
+# C:\Program Files (x86)\dotnet\ (key C:/Program Files (x86)/dotnet/, mtime 1623196590): 8 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.27.29110\bin\HostX64\x64 (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Tools/MSVC/14.27.29110/bin/HostX64/x64, mtime 1619053984): 60 files, no impossibilities.
+# C:\Python39\Scripts\ (key C:/Python39/Scripts/, mtime 1614118831): 7 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\bin\Roslyn (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/bin/Roslyn, mtime 1614390105): 45 files, no impossibilities.
+# C:\Users\andris\AppData\Local\Microsoft\WindowsApps (key C:/Users/andris/AppData/Local/Microsoft/WindowsApps, mtime 1622830205): 18 files, no impossibilities.
+# C:\Program Files\Git\cmd (key C:/Program Files/Git/cmd, mtime 1619053992): 7 files, no impossibilities.
+# C:\WINDOWS\system32 (key C:/WINDOWS/system32, mtime 1623612720): 2971 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Team Tools\Performance Tools\x64 (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Team Tools/Performance Tools/x64, mtime 1614390113): 11 files, no impossibilities.
 # c:\Program Files (x86)\Ninja (key c:/Program Files (x86)/Ninja, mtime 1553294811): 3 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\\MSBuild\Current\Bin (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin, mtime 1581629204): 87 files, no impossibilities.
-# C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86 (key C:/Program Files (x86)/Windows Kits/10/bin/10.0.18362.0/x86, mtime 1572026988): 222 files, no impossibilities.
-# C:\Program Files (x86)\Windows Kits\10\bin\x86 (key C:/Program Files (x86)/Windows Kits/10/bin/x86, mtime 1583792065): 5 files, no impossibilities.
-# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja, mtime 1581552192): 3 files, no impossibilities.
+# C:\Users\andris\.dnx\bin: could not be stat'd.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\\MSBuild\Current\Bin (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/MSBuild/Current/Bin, mtime 1614390104): 95 files, no impossibilities.
+# C:\Program Files\CMake\bin (key C:/Program Files/CMake/bin, mtime 1616009063): 7 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\VC\Linux\bin\ConnectionManagerExe (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/VC/Linux/bin/ConnectionManagerExe, mtime 1601895918): 6 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\\Extensions\Microsoft\IntelliCode\CLI (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/Extensions/Microsoft/IntelliCode/CLI, mtime 1614390116): 36 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin, mtime 1601896051): 6 files, no impossibilities.
+# C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja (key C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja, mtime 1601896054): 3 files, no impossibilities.
 
-# 5601 files, 98 impossibilities in 43 directories.
+# 5996 files, no impossibilities in 55 directories.
 
 # Implicit Rules
 
-%.out:
-
-%.a:
-
-%.ln:
-
-%.o:
-
-%: %.o
-#  commands to execute (built-in):
-	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-%.c:
-
-%: %.c
-#  commands to execute (built-in):
-	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-%.ln: %.c
-#  commands to execute (built-in):
-	$(LINT.c) -C$* $<
-
-%.o: %.c
-#  commands to execute (built-in):
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
-
-%.cc:
-
-%: %.cc
-#  commands to execute (built-in):
-	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-%.o: %.cc
-#  commands to execute (built-in):
-	$(COMPILE.cc) $(OUTPUT_OPTION) $<
-
-%.cpp:
-
-%: %.cpp
-#  commands to execute (built-in):
-	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-%.o: %.cpp
-#  commands to execute (built-in):
-	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
-
-%.p:
-
-%: %.p
-#  commands to execute (built-in):
-	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-%.o: %.p
-#  commands to execute (built-in):
-	$(COMPILE.p) $(OUTPUT_OPTION) $<
-
-%.f:
-
-%: %.f
-#  commands to execute (built-in):
-	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-%.o: %.f
-#  commands to execute (built-in):
-	$(COMPILE.f) $(OUTPUT_OPTION) $<
-
-%.r:
-
-%: %.r
-#  commands to execute (built-in):
-	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-%.o: %.r
-#  commands to execute (built-in):
-	$(COMPILE.r) $(OUTPUT_OPTION) $<
-
-%.f: %.r
-#  commands to execute (built-in):
-	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
-
-%.y:
-
-%.ln: %.y
-#  commands to execute (built-in):
-	$(YACC.y) $< 
-	$(LINT.c) -C$* y.tab.c 
-	$(RM) y.tab.c
-
-%.c: %.y
-#  commands to execute (built-in):
-	$(YACC.y) $< 
-	mv -f y.tab.c $@
-
-%.l:
-
-%.ln: %.l
-#  commands to execute (built-in):
-	@$(RM) $*.c
-	$(LEX.l) $< > $*.c
-	$(LINT.c) -i $*.c -o $@
-	$(RM) $*.c
-
-%.c: %.l
-#  commands to execute (built-in):
-	@$(RM) $@ 
-	$(LEX.l) $< > $@
-
-%.r: %.l
-#  commands to execute (built-in):
-	$(LEX.l) $< > $@ 
-	mv -f lex.yy.r $@
-
-%.s:
-
-%: %.s
-#  commands to execute (built-in):
-	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-%.o: %.s
-#  commands to execute (built-in):
-	$(COMPILE.s) -o $@ $<
-
-%.mod:
-
-%: %.mod
-#  commands to execute (built-in):
-	$(COMPILE.mod) -o $@ -e $@ $^
-
-%.o: %.mod
-#  commands to execute (built-in):
-	$(COMPILE.mod) -o $@ $<
-
-%.sym:
-
-%.def:
-
-%.sym: %.def
-#  commands to execute (built-in):
-	$(COMPILE.def) -o $@ $<
-
-%.h:
-
-%.info:
-
-%.dvi:
-
-%.tex:
-
-%.dvi: %.tex
-#  commands to execute (built-in):
-	$(TEX) $<
-
-%.texinfo:
-
-%.info: %.texinfo
-#  commands to execute (built-in):
-	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
-
-%.dvi: %.texinfo
-#  commands to execute (built-in):
-	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
-
-%.texi:
-
-%.info: %.texi
-#  commands to execute (built-in):
-	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
-
-%.dvi: %.texi
-#  commands to execute (built-in):
-	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
-
-%.txinfo:
-
-%.info: %.txinfo
-#  commands to execute (built-in):
-	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
-
-%.dvi: %.txinfo
-#  commands to execute (built-in):
-	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
-
-%.w:
-
-%.c: %.w
-#  commands to execute (built-in):
-	$(CTANGLE) $< - $@
-
-%.tex: %.w
-#  commands to execute (built-in):
-	$(CWEAVE) $< - $@
-
-%.ch:
-
-%.web:
-
-%.p: %.web
-#  commands to execute (built-in):
-	$(TANGLE) $<
-
-%.tex: %.web
-#  commands to execute (built-in):
-	$(WEAVE) $<
-
-%.sh:
-
-%: %.sh
-#  commands to execute (built-in):
-	cat $< >$@ 
-	chmod a+x $@
-
-%.elc:
-
-%.el:
-
-(%): %
-#  commands to execute (built-in):
-	$(AR) $(ARFLAGS) $@ $<
-
-%.out: %
-#  commands to execute (built-in):
-	@rm -f $@ 
-	cp $< $@
-
-%.c: %.w %.ch
-#  commands to execute (built-in):
-	$(CTANGLE) $^ $@
-
-%.tex: %.w %.ch
-#  commands to execute (built-in):
-	$(CWEAVE) $^ $@
-
-%:: %,v
-#  commands to execute (built-in):
-	$(CHECKOUT,v)
-
-%:: RCS/%,v
-#  commands to execute (built-in):
-	$(CHECKOUT,v)
-
-%:: RCS/%
-#  commands to execute (built-in):
-	$(CHECKOUT,v)
-
-%:: s.%
-#  commands to execute (built-in):
-	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
-
-%:: SCCS/s.%
-#  commands to execute (built-in):
-	$(GET) $(GFLAGS) $(SCCS_OUTPUT_OPTION) $<
-
-# 75 implicit rules, 5 (6.7%) terminal.
+# No implicit rules.
 
 # Files
 
-# Not a target:
-.web.p:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(TANGLE) $<
-
-# Not a target:
-.l.r:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LEX.l) $< > $@ 
-	mv -f lex.yy.r $@
-
-# Not a target:
-.dvi:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
+simple: simple/simple.exe
+#  Implicit rule search has been done.
+#  Last modified 2021-04-28 14:24:41
+#  File has been updated.
+#  Successfully updated.
+# makefile (from `makefile', line 47)
+# ARCH = SIMPLE
+# variable set hash-table stats:
+# Load=1/32=3%, Rehash=0, Collisions=0/21=0%
 
 Arch3_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 #  Implicit rule search has not been done.
@@ -781,56 +430,24 @@ Arch3_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 # ? := .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=16/65=25%
-#  commands to execute (from `makefile', line 66):
+#  commands to execute (from `makefile', line 76):
 	"cl" $(SRC_FILES1)   $(FLAGS1)
 	"cl.exe"  $(SRC_FILES2)  $(FLAGS2)
 	copy main.obj "$(DIR_INTERMEDIATE)"
 	copy test1.obj "$(DIR_INTERMEDIATE)"
 	copy test2.obj "$(DIR_INTERMEDIATE)"
 	del *.obj
-	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\link" /out:"$(DIR_BIN)\$(EXE_NAME)" "$(DIR_INTERMEDIATE)\main.obj" "$(DIR_INTERMEDIATE)\test1.obj" "$(DIR_INTERMEDIATE)\test2.obj" $(LINK_FLAGS)
+	"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\link" /out:"$(DIR_BIN)\$(EXE_NAME)" "$(DIR_INTERMEDIATE)\main.obj" "$(DIR_INTERMEDIATE)\test1.obj" "$(DIR_INTERMEDIATE)\test2.obj" $(LINK_FLAGS)
 	
 
-all: clean create_dirs builds runs install
+all: clean create_dirs builds runs install simple
 #  Command-line target.
 #  Implicit rule search has been done.
 #  File does not exist.
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/228=0%
-
-# Not a target:
-.y.ln:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(YACC.y) $< 
-	$(LINT.c) -C$* y.tab.c 
-	$(RM) y.tab.c
-
-# Not a target:
-.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINK.o) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-# Not a target:
-.y:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.def.sym:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.def) -o $@ $<
+# Load=0/32=0%, Rehash=0, Collisions=0/248=0%
 
 create_dirs_Arch3:
 #  Implicit rule search has not been done.
@@ -856,7 +473,7 @@ create_dirs_Arch3:
 # ? := 
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=9/28=32%
-#  commands to execute (from `makefile', line 104):
+#  commands to execute (from `makefile', line 114):
 	@if not exist "$(DIR_BIN)" mkdir "$(DIR_BIN)"
 	@if not exist "$(DIR_INTERMEDIATE)" mkdir "$(DIR_INTERMEDIATE)"
 	
@@ -868,30 +485,6 @@ builds: buildArch1 buildArch2 buildArch3
 #  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/192=0%
-
-# Not a target:
-.p.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.p) $(OUTPUT_OPTION) $<
-
-# Not a target:
-.p:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINK.p) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-# Not a target:
-.txinfo.dvi:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
 
 create_dirs:
 #  Implicit rule search has not been done.
@@ -917,7 +510,7 @@ create_dirs:
 # ? := 
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=1/12=8%
-#  commands to execute (from `makefile', line 96):
+#  commands to execute (from `makefile', line 106):
 	@if not exist $(DIR_OUT) mkdir $(DIR_OUT)
 	
 
@@ -926,80 +519,6 @@ create_dirs:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-
-# Not a target:
-.l.ln:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	@$(RM) $*.c
-	$(LEX.l) $< > $*.c
-	$(LINT.c) -i $*.c -o $@
-	$(RM) $*.c
-
-# Not a target:
-.w.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(CTANGLE) $< - $@
-
-# Not a target:
-.texi.dvi:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
-
-# Not a target:
-.sh:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	cat $< >$@ 
-	chmod a+x $@
-
-# Not a target:
-.cc:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINK.cc) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-# Not a target:
-.cc.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.cc) $(OUTPUT_OPTION) $<
-
-# Not a target:
-.def:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.r.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.r) $(OUTPUT_OPTION) $<
-
-# Not a target:
-.r:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINK.r) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 rebuild: create_dirs builds runs install
 #  Implicit rule search has not been done.
@@ -1011,9 +530,9 @@ buildArch3: create_dirs_Arch3 Arch3_main.exe
 #  File does not exist.
 #  File has been updated.
 #  Successfully updated.
-# makefile (from `makefile', line 28)
-# EXTRA_FLAGS2 = /DARCH=3
 # makefile (from `makefile', line 29)
+# EXTRA_FLAGS2 = /DARCH=3
+# makefile (from `makefile', line 30)
 # ARCH = ARC H3
 # variable set hash-table stats:
 # Load=2/32=6%, Rehash=0, Collisions=1/79=1%
@@ -1021,7 +540,50 @@ buildArch3: create_dirs_Arch3 Arch3_main.exe
 # Not a target:
 makefile:
 #  Implicit rule search has been done.
-#  Last modified 2020-03-06 01:44:18
+#  Last modified 2021-05-19 15:21:03
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+Execute_Arch3: Arch3_main.exe
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `'
+#  Last modified -4
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := Execute_Arch3
+# makefile (from `makefile', line 97)
+# EXTRA_FLAGS2 = /DARCH=3
+# makefile (from `makefile', line 96)
+# RUN_FLAGS = str3a str3b str3c
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := Arch3_main.exe
+# automatic
+# | := 
+# automatic
+# < := Arch3_main.exe
+# makefile (from `makefile', line 98)
+# ARCH = ARC H3
+# automatic
+# ^ := Arch3_main.exe
+# automatic
+# ? := Arch3_main.exe
+# variable set hash-table stats:
+# Load=11/32=34%, Rehash=0, Collisions=6/19=32%
+#  commands to execute (from `makefile', line 100):
+	"$(DIR_BIN)\$(EXE_NAME)"  $(RUN_FLAGS)
+	
+
+# Not a target:
+.\src\main.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2021-05-07 09:23:55
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -1051,7 +613,7 @@ Arch1_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 # ? := .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=16/65=25%
-#  commands to execute (from `makefile', line 48):
+#  commands to execute (from `makefile', line 58):
 	cl $(SRC_FILES1) $(FLAGS1)
 	cl		$(SRC_FILES2) $(FLAGS2)
 	copy main.obj $(DIR_INTERMEDIATE)
@@ -1060,132 +622,6 @@ Arch1_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 	del *.obj
 	link.exe /out:$(DIR_BIN)\$(EXE_NAME) $(DIR_INTERMEDIATE)\main.obj $(DIR_INTERMEDIATE)\test1.obj $(DIR_INTERMEDIATE)\test2.obj $(LINK_FLAGS)
 	
-
-# Not a target:
-.a:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.elc:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.l.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	@$(RM) $@ 
-	$(LEX.l) $< > $@
-
-Execute_Arch3: Arch3_main.exe
-#  Implicit rule search has not been done.
-#  Implicit/static pattern stem: `'
-#  Last modified -4
-#  File has been updated.
-#  Successfully updated.
-# automatic
-# @ := Execute_Arch3
-# makefile (from `makefile', line 87)
-# EXTRA_FLAGS2 = /DARCH=3
-# makefile (from `makefile', line 86)
-# RUN_FLAGS = str3a str3b str3c
-# automatic
-# % := 
-# automatic
-# * := 
-# automatic
-# + := Arch3_main.exe
-# automatic
-# | := 
-# automatic
-# < := Arch3_main.exe
-# makefile (from `makefile', line 88)
-# ARCH = ARC H3
-# automatic
-# ^ := Arch3_main.exe
-# automatic
-# ? := Arch3_main.exe
-# variable set hash-table stats:
-# Load=11/32=34%, Rehash=0, Collisions=6/19=32%
-#  commands to execute (from `makefile', line 90):
-	"$(DIR_BIN)\$(EXE_NAME)"  $(RUN_FLAGS)
-	
-
-# Not a target:
-.out:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.r.f:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(PREPROCESS.r) $(OUTPUT_OPTION) $<
-
-# Not a target:
-.\src\main.cpp:
-#  Implicit rule search has been done.
-#  Last modified 2019-08-22 01:54:58
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-
-# Not a target:
-.texinfo.info:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
-
-# Not a target:
-.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINK.c) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-# Not a target:
-.w.tex:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(CWEAVE) $< - $@
-
-# Not a target:
-.c.ln:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINT.c) -C$* $<
-
-# Not a target:
-.s.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.s) -o $@ $<
-
-# Not a target:
-.s:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINK.s) $^ $(LOADLIBES) $(LDLIBS) -o $@
 
 create_dirs_Arch1:
 #  Implicit rule search has not been done.
@@ -1211,7 +647,7 @@ create_dirs_Arch1:
 # ? := 
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=9/28=32%
-#  commands to execute (from `makefile', line 98):
+#  commands to execute (from `makefile', line 108):
 	@if not exist $(DIR_BIN) mkdir $(DIR_BIN)
 	@if not exist $(DIR_INTERMEDIATE) mkdir $(DIR_INTERMEDIATE)
 	
@@ -1225,58 +661,7 @@ runs: Execute_Arch1 Execute_Arch2 Execute_Arch3
 # Load=0/32=0%, Rehash=0, Collisions=0/18=0%
 
 # Not a target:
-.texinfo.dvi:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(TEXI2DVI) $(TEXI2DVI_FLAGS) $<
-
-# Not a target:
-.SUFFIXES: .out .a .ln .o .c .cc .c .cpp .p .f .f .r .y .l .s .s .mod .sym .def .h .info .dvi .tex .texinfo .texi .txinfo .w .ch .web .sh .elc .el
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.el:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.texinfo:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.y.c:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(YACC.y) $< 
-	mv -f y.tab.c $@
-
-# Not a target:
-.web.tex:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(WEAVE) $<
-
-# Not a target:
-.texi.info:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
-
-# Not a target:
-.h:
+.SUFFIXES:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
@@ -1284,239 +669,11 @@ runs: Execute_Arch1 Execute_Arch2 Execute_Arch3
 # Not a target:
 .\src\test1.cpp:
 #  Implicit rule search has been done.
-#  Last modified 2019-08-13 15:14:28
+#  Last modified 2021-02-09 16:54:55
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-
-# Not a target:
-.tex.dvi:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(TEX) $<
-
-# Not a target:
-.cpp.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
-
-# Not a target:
-.cpp:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINK.cpp) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-clean:
-#  Implicit rule search has not been done.
-#  Implicit/static pattern stem: `'
-#  Last modified -4
-#  File has been updated.
-#  Successfully updated.
-# automatic
-# @ := clean
-# automatic
-# % := 
-# automatic
-# * := 
-# automatic
-# + := 
-# automatic
-# | := 
-# automatic
-# < := 
-# automatic
-# ^ := 
-# automatic
-# ? := 
-# variable set hash-table stats:
-# Load=8/32=25%, Rehash=0, Collisions=5/20=25%
-#  commands to execute (from `makefile', line 108):
-	@if exist $(DIR_BIN_ROOT) rmdir /s /q $(DIR_BIN_ROOT)
-	@if exist $(DIR_OUT) rmdir /s /q $(DIR_OUT)
-	@if exist $(DIR_INTERMEDIATE_ROOT) rmdir /s /q $(DIR_INTERMEDIATE_ROOT)
-	
-
-# Not a target:
-.ln:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.texi:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.txinfo:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.tex:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-buildArch1: create_dirs_Arch1 Arch1_main.exe
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has been updated.
-#  Successfully updated.
-# makefile (from `makefile', line 20)
-# EXTRA_FLAGS2 = /DARCH=1
-# makefile (from `makefile', line 21)
-# ARCH = ARCH1
-# variable set hash-table stats:
-# Load=2/32=6%, Rehash=0, Collisions=1/79=1%
-
-# Not a target:
-.txinfo.info:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(MAKEINFO) $(MAKEINFO_FLAGS) $< -o $@
-
-create_dirs_Arch2:
-#  Implicit rule search has not been done.
-#  Implicit/static pattern stem: `'
-#  Last modified -4
-#  File has been updated.
-#  Successfully updated.
-# automatic
-# @ := create_dirs_Arch2
-# automatic
-# % := 
-# automatic
-# * := 
-# automatic
-# + := 
-# automatic
-# | := 
-# automatic
-# < := 
-# automatic
-# ^ := 
-# automatic
-# ? := 
-# variable set hash-table stats:
-# Load=8/32=25%, Rehash=0, Collisions=9/28=32%
-#  commands to execute (from `makefile', line 101):
-	@if not exist $(DIR_BIN) mkdir $(DIR_BIN)
-	@if not exist $(DIR_INTERMEDIATE) mkdir $(DIR_INTERMEDIATE)
-	
-
-# Not a target:
-.info:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.ch:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-Execute_Arch1: Arch1_main.exe
-#  Implicit rule search has not been done.
-#  Implicit/static pattern stem: `'
-#  Last modified -4
-#  File has been updated.
-#  Successfully updated.
-# automatic
-# @ := Execute_Arch1
-# makefile (from `makefile', line 75)
-# EXTRA_FLAGS2 = /DARCH=1
-# makefile (from `makefile', line 74)
-# RUN_FLAGS = str1a str1b str1c
-# automatic
-# % := 
-# automatic
-# * := 
-# automatic
-# + := Arch1_main.exe
-# automatic
-# | := 
-# automatic
-# < := Arch1_main.exe
-# makefile (from `makefile', line 76)
-# ARCH = ARCH1
-# automatic
-# ^ := Arch1_main.exe
-# automatic
-# ? := Arch1_main.exe
-# variable set hash-table stats:
-# Load=11/32=34%, Rehash=0, Collisions=6/19=32%
-#  commands to execute (from `makefile', line 78):
-	"$(DIR_BIN)"\$(EXE_NAME) $(RUN_FLAGS)
-	
-
-# Not a target:
-.S.s:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(PREPROCESS.S) $< > $@
-
-# Not a target:
-.mod:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.mod) -o $@ -e $@ $^
-
-# Not a target:
-.\src\test2.cpp:
-#  Implicit rule search has been done.
-#  Last modified 2019-08-05 13:55:00
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-
-# Not a target:
-.mod.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.mod) -o $@ $<
-
-# Not a target:
-.F.f:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(PREPROCESS.F) $(OUTPUT_OPTION) $<
-
-# Not a target:
-.w:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.c.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.c) $(OUTPUT_OPTION) $<
 
 Arch2_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 #  Implicit rule search has not been done.
@@ -1542,9 +699,9 @@ Arch2_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 # ? := .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=16/65=25%
-#  commands to execute (from `makefile', line 57):
-	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl"  $(SRC_FILES1)  $(FLAGS1)
-	"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.24.28314\bin\Hostx86\x86\cl.exe"  $(SRC_FILES2)  $(FLAGS2)
+#  commands to execute (from `makefile', line 67):
+	"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl"  $(SRC_FILES1)  $(FLAGS1)
+	"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe"  $(SRC_FILES2)  $(FLAGS2)
 	copy main.obj $(DIR_INTERMEDIATE)
 	copy test1.obj $(DIR_INTERMEDIATE)
 	copy test2.obj $(DIR_INTERMEDIATE)
@@ -1552,51 +709,161 @@ Arch2_main.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
 	link /out:$(DIR_BIN)\$(EXE_NAME) $(DIR_INTERMEDIATE)\main.obj $(DIR_INTERMEDIATE)\test1.obj $(DIR_INTERMEDIATE)\test2.obj $(LINK_FLAGS)
 	
 
+clean:
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `'
+#  Last modified -4
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := clean
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := 
+# automatic
+# | := 
+# automatic
+# < := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=5/20=25%
+#  commands to execute (from `makefile', line 118):
+	@if exist $(DIR_BIN_ROOT) rmdir /s /q $(DIR_BIN_ROOT)
+	@if exist $(DIR_OUT) rmdir /s /q $(DIR_OUT)
+	@if exist $(DIR_INTERMEDIATE_ROOT) rmdir /s /q $(DIR_INTERMEDIATE_ROOT)
+	
+
+buildArch1: create_dirs_Arch1 Arch1_main.exe
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Successfully updated.
+# makefile (from `makefile', line 21)
+# EXTRA_FLAGS2 = /DARCH=1
+# makefile (from `makefile', line 22)
+# ARCH = ARCH1
+# variable set hash-table stats:
+# Load=2/32=6%, Rehash=0, Collisions=1/79=1%
+
+create_dirs_Arch2:
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `'
+#  Last modified -4
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := create_dirs_Arch2
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := 
+# automatic
+# | := 
+# automatic
+# < := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=9/28=32%
+#  commands to execute (from `makefile', line 111):
+	@if not exist $(DIR_BIN) mkdir $(DIR_BIN)
+	@if not exist $(DIR_INTERMEDIATE) mkdir $(DIR_INTERMEDIATE)
+	
+
+Execute_Arch1: Arch1_main.exe
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `'
+#  Last modified -4
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := Execute_Arch1
+# makefile (from `makefile', line 85)
+# EXTRA_FLAGS2 = /DARCH=1
+# makefile (from `makefile', line 84)
+# RUN_FLAGS = str1a str1b str1c
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := Arch1_main.exe
+# automatic
+# | := 
+# automatic
+# < := Arch1_main.exe
+# makefile (from `makefile', line 86)
+# ARCH = ARCH1
+# automatic
+# ^ := Arch1_main.exe
+# automatic
+# ? := Arch1_main.exe
+# variable set hash-table stats:
+# Load=11/32=34%, Rehash=0, Collisions=6/19=32%
+#  commands to execute (from `makefile', line 88):
+	"$(DIR_BIN)"\$(EXE_NAME) $(RUN_FLAGS)
+	
+
+# Not a target:
+.\src\test2.cpp:
+#  Implicit rule search has been done.
+#  Last modified 2020-03-20 12:41:23
+#  File has been updated.
+#  Successfully updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+
+simple/simple.exe: .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: `'
+#  Last modified -4
+#  File has been updated.
+#  Successfully updated.
+# automatic
+# @ := simple/simple.exe
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
+# automatic
+# | := 
+# automatic
+# < := .\src\main.cpp
+# automatic
+# ^ := .\src\main.cpp .\src\test1.cpp .\src\test2.cpp
+# automatic
+# ? := .\src\main.cpp
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=2/28=7%
+#  commands to execute (from `makefile', line 51):
+	cl $(SRC_FILES1) $(FLAGS1) /DARCH_DEFINE=SIMPLE
+	cl $(SRC_FILES2) $(FLAGS2)
+	link.exe /out:simple/simple.exe main.obj test1.obj test2.obj $(LINK_FLAGS)
+	
+
 buildArch2: create_dirs_Arch2 Arch2_main.exe
 #  Implicit rule search has been done.
 #  File does not exist.
 #  File has been updated.
 #  Successfully updated.
-# makefile (from `makefile', line 24)
-# EXTRA_FLAGS2 = /DARCH=2
 # makefile (from `makefile', line 25)
+# EXTRA_FLAGS2 = /DARCH=2
+# makefile (from `makefile', line 26)
 # ARCH = ARCH2
 # variable set hash-table stats:
 # Load=2/32=6%, Rehash=0, Collisions=1/79=1%
-
-# Not a target:
-.l:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.web:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.sym:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-
-# Not a target:
-.f:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(LINK.f) $^ $(LOADLIBES) $(LDLIBS) -o $@
-
-# Not a target:
-.f.o:
-#  Implicit rule search has not been done.
-#  Modification time never checked.
-#  File has not been updated.
-#  commands to execute (built-in):
-	$(COMPILE.f) $(OUTPUT_OPTION) $<
 
 install:
 #  Implicit rule search has not been done.
@@ -1622,7 +889,7 @@ install:
 # ? := 
 # variable set hash-table stats:
 # Load=8/32=25%, Rehash=0, Collisions=1/10=10%
-#  commands to execute (from `makefile', line 113):
+#  commands to execute (from `makefile', line 123):
 	xcopy bin out /sdy
 	
 
@@ -1634,9 +901,9 @@ Execute_Arch2: Arch2_main.exe
 #  Successfully updated.
 # automatic
 # @ := Execute_Arch2
-# makefile (from `makefile', line 81)
+# makefile (from `makefile', line 91)
 # EXTRA_FLAGS2 = /DARCH=2
-# makefile (from `makefile', line 80)
+# makefile (from `makefile', line 90)
 # RUN_FLAGS = str2a str2b str2c
 # automatic
 # % := 
@@ -1648,7 +915,7 @@ Execute_Arch2: Arch2_main.exe
 # | := 
 # automatic
 # < := Arch2_main.exe
-# makefile (from `makefile', line 82)
+# makefile (from `makefile', line 92)
 # ARCH = ARCH2
 # automatic
 # ^ := Arch2_main.exe
@@ -1656,12 +923,12 @@ Execute_Arch2: Arch2_main.exe
 # ? := Arch2_main.exe
 # variable set hash-table stats:
 # Load=11/32=34%, Rehash=0, Collisions=6/19=32%
-#  commands to execute (from `makefile', line 84):
+#  commands to execute (from `makefile', line 94):
 	$(DIR_BIN)\$(EXE_NAME_NOEXT)  $(RUN_FLAGS)
 	
 
 # files hash-table stats:
-# Load=83/1024=8%, Rehash=0, Collisions=394/1991=20%
+# Load=27/1024=3%, Rehash=0, Collisions=0/113=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -1673,5 +940,6 @@ Execute_Arch2: Arch2_main.exe
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Fri Mar 13 00:18:11 2020
+# Finished Make data base on Sun Jun 13 22:49:28 2021
 
+# make: Leaving directory `C:/Work/Projects/Makefiles/makefile33'

@@ -1,8 +1,9 @@
 {
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
     "makefile.buildLog": "./dummy_dryrun.log",
-    "makefile.extensionLog": "./MakefileTools.out",
     "makefile.makePath": "c:/some/other/fake/path",
+    "makefile.loggingLevel": "Debug",
+    "makefile.configureOnOpen": false,
     "makefile.configurations": [
         {
             "name": "InterestingSmallMakefile_windows_configDebug",
@@ -47,5 +48,21 @@
             "makePath": "make",
             "makeArgs": ["PEDANTIC=yes"]
         }
-    ]
+   ],
+   "makefile.launchConfigurations": [
+      {
+         "cwd": "c:\\repos2\\vscode-makefile-tools\\src\\test\\fakeSuite\\Repros",
+         "binaryPath": "c:\\repos2\\vscode-makefile-tools\\src\\test\\fakeSuite\\Repros\\bin\\InterestingSmallMakefile\\ARC H3\\Debug\\main.exe",
+         "binaryArgs": [
+            "str3a",
+            "str3b",
+            "str3c"
+         ]
+      },
+      {
+         "cwd": "c:\\repos2\\vscode-makefile-tools\\src\\test\\fakeSuite\\Repros",
+         "binaryPath": "c:\\repos2\\vscode-makefile-tools\\src\\test\\fakeSuite\\Repros\\bin\\InterestingSmallMakefile\\arch2\\Debug\\main.exe",
+         "binaryArgs": []
+      }
+   ],
 }

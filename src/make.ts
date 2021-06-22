@@ -77,6 +77,7 @@ export enum TriggeredBy {
     configureAfterTargetChange = "settings (configureAfterCommand), command pallette (setBuildTarget)",
     configureBeforeLaunchTargetChange = "configureDirty (before launch target change), settings (configureAfterCommand)",
     launch = "Launch (debug|run)",
+    tests = "Makefile Tools Regression Tests"
 }
 
 let fileIndex: Map<string, cpp.SourceFileConfigurationItem> = new Map<string, cpp.SourceFileConfigurationItem>();
@@ -375,8 +376,10 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     //     3. the make dryrun output if (2) is missing
     // We do not use buildLog for build targets analysis because
     // we can afford to invoke make -pRrq (very quick even on large projects).
+    // We make sure to give the regression tests suite a build log that already contains
+    // targets information because we want to avoid invoking make for now.
     let buildLog: string | undefined = configuration.getConfigurationBuildLog();
-    if (buildLog && !forTargets) {
+    if (buildLog && (!forTargets || process.env['MAKEFILE_TOOLS_TESTING'] === '1')) {
         parseContent = util.readFile(buildLog);
         if (parseContent) {
             parseFile = buildLog;
@@ -950,8 +953,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         };
 
         // Rewrite the configuration cache according to the last updates of the internal arrays,
-        // but not if the configure was cancelled.
-        if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
+        // but not if the configure was cancelled and not while running regression tests.
+        if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled && process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
             util.writeFile(configurationCachePath, JSON.stringify(ConfigurationCache));
         }
 

@@ -1372,8 +1372,8 @@ export async function setLaunchConfigurationByName(launchConfigurationName: stri
             launchConfigurations.push(currentLaunchConfiguration);
             let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
             workspaceConfiguration.update("launchConfigurations", launchConfigurations);
-            logger.message("Inserting a new entry for {0} in the array of makefile.launchConfigurations. " +
-                           "You may define any additional debug properties for it in settings.", launchConfigurationName);
+            logger.message(`Inserting a new entry for ${launchConfigurationName} in the array of makefile.launchConfigurations. ` +
+                           "You may define any additional debug properties for it in settings.");
         }
     }
 
