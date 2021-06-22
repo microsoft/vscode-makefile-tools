@@ -185,9 +185,8 @@ suite('Fake dryrun parsing', /*async*/() => {
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-            fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-            fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
-            const assertVal: boolean  = (extensionLogContent === baselineLogContent);
+            // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+            // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }
@@ -252,9 +251,8 @@ suite('Fake dryrun parsing', /*async*/() => {
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-            fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-            fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
-            const assertVal: boolean  = (extensionLogContent === baselineLogContent);
+            // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+            // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }
@@ -319,9 +317,8 @@ suite('Fake dryrun parsing', /*async*/() => {
             let baselineLogContent: string = util.readFile(baselineLogPath) || "";
             let extensionRootPath: string = path.resolve(__dirname, "../../../../");
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-            fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-            fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
-            const assertVal: boolean  = (extensionLogContent === baselineLogContent);
+            // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+            // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
             assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
         });
     }
