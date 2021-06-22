@@ -459,7 +459,8 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }
         dryrunFile = util.resolvePathToRoot(dryrunFile);
         logger.message(`Writing the dry-run output: ${dryrunFile}`);
-        util.writeFile(dryrunFile, configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + "\r\n");
+        const lineEnding: string = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
+        util.writeFile(dryrunFile, configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + lineEnding);
 
         let stdoutStr: string = "";
         let stderrStr: string = "";
@@ -467,7 +468,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
 
         let stdout: any = (result: string): void => {
             stdoutStr += result;
-            fs.appendFileSync(dryrunFile, `${result} \r\n`);
+            fs.appendFileSync(dryrunFile, `${result} ${lineEnding}`);
             progress.report({increment: 1, message: "Generating dry-run output" +
                                                     ((recursive) ? " (recursive)" : "") +
                                                     ((forTargets) ? " (for targets specifically)" : "" +
@@ -477,7 +478,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         };
 
         let stderr: any = (result: string): void => {
-            fs.appendFileSync(dryrunFile, `${result} \r\n`);
+            fs.appendFileSync(dryrunFile, `${result} ${lineEnding}`);
             stderrStr += result;
         };
 
