@@ -33,7 +33,6 @@ jobs:
           check-latest: true
 
       - name: Build the extension and run tests
-        with:
-          run: |
-            yarn run pretest
-            yarn run test
+        run: |
+          yarn run pretest
+          yarn run test
