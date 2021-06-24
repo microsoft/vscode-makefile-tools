@@ -25,6 +25,9 @@ async function main() : Promise<void> {
         let myOpt : testRunner.TestOptions = {
             extensionPath: extensionDevelopmentPath,
             testRunnerPath: extensionTestsPath,
+            testRunnerEnv: {
+                "MAKEFILE_TOOLS_TESTING": "1"
+            },
             testWorkspace: reproRootPath
         };
         await testRunner.runTests(myOpt);
