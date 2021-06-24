@@ -9,6 +9,7 @@
             "runtimeExecutable": "${execPath}",
             "args": [
                 "${workspaceFolder}/src/test/fakeSuite/Repros",
+                "--disable-workspace-trust",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/out/src/test/fakeSuite/index"
             ],
