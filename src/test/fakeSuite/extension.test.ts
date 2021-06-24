@@ -29,6 +29,7 @@
 
 import * as assert from 'assert';
 import * as configuration from '../../configuration';
+import {expect} from 'chai';
 import * as launch from '../../launch';
 import * as make from '../../make';
 import * as util from '../../util';
@@ -121,7 +122,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
             // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
             // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
-            assert(extensionLogContent !== baselineLogContent, "Extension log differs from baseline.");
+            expect(extensionLogContent).to.be.equal(baselineLogContent);
         });
     }
 
@@ -187,7 +188,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
             // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
             // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
-            assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
+            expect(extensionLogContent).to.be.equal(baselineLogContent);
         });
     }
 
@@ -253,7 +254,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
             // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
             // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
-            assert(extensionLogContent === baselineLogContent, "Extension log differs from baseline.");
+            expect(extensionLogContent).to.be.equal(baselineLogContent);
         });
     }
 
@@ -319,7 +320,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
             // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
             // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
-            assert(extensionLogContent !== baselineLogContent, "Extension log differs from baseline.");
+            expect(extensionLogContent).to.be.equal(baselineLogContent);
         });
     }
 });
