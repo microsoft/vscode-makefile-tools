@@ -36,3 +36,5 @@ async function main() : Promise<void> {
         process.exit(1);
     }
 }
+
+main();

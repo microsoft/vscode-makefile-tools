@@ -52,7 +52,14 @@ suite('Fake dryrun parsing', /*async*/() => {
     // TODO: mock various scenarios of VS environments without depending on what is installed.
     // TODO: adapt the makefile on mac/linux/mingw and add new tests in this suite
     // to parse the dry-run logs obtained on those platforms.
-    if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
+    let systemPlatform: string;
+    if (process.platform === "win32") {
+        systemPlatform = (process.env.MSYSTEM === undefined) ? "win32" : process.env.MSYSTEM;
+    } else {
+        systemPlatform = process.platform;
+    }
+
+    if (systemPlatform === "win32") {
         test('Interesting small makefile - windows', async() => {
             // Settings reset from the previous test run.
             extension.getState().reset(false);
@@ -127,9 +134,8 @@ suite('Fake dryrun parsing', /*async*/() => {
     }
 
     // dry-run logs for https://github.com/rui314/8cc.git
-    if (process.platform === "linux" ||
-        (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
-        test('8cc - linux - and mingw', async() => {
+    if (systemPlatform === "linux" || systemPlatform === "mingw") {
+        test(`8cc - ${systemPlatform}`, async() => {
             // Settings reset from the previous test run.
             extension.getState().reset(false);
             await configuration.initFromStateAndSettings();
@@ -193,9 +199,8 @@ suite('Fake dryrun parsing', /*async*/() => {
     }
 
     // dry-run logs for https://github.com/FidoProject/Fido.git
-    if (process.platform === "linux" ||
-        (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
-        test('Fido - linux', async() => {
+    if (systemPlatform === "linux" || systemPlatform === "mingw") {
+        test(`Fido - ${systemPlatform}`, async() => {
             // Settings reset from the previous test run.
             extension.getState().reset(false);
             await configuration.initFromStateAndSettings();
@@ -259,9 +264,8 @@ suite('Fake dryrun parsing', /*async*/() => {
     }
 
     // dry-run logs for https://github.com/jakogut/tinyvm.git
-    if (process.platform === "linux" ||
-        (process.platform === "win32" && process.env.MSYSTEM !== undefined)) {
-        test('tinyvm - linux', async() => {
+    if (systemPlatform === "linux" || systemPlatform === "mingw") {
+        test(`tinyvm - ${systemPlatform}`, async() => {
             // Settings reset from the previous test run.
             extension.getState().reset(false);
             await configuration.initFromStateAndSettings();
