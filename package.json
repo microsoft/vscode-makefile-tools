@@ -564,7 +564,7 @@
     },
     "scripts": {
         "vscode:prepublish": "yarn compile",
-        "compile": "tsc -p ./",
+        "compile": "yarn install && tsc -p ./",
         "watch": "tsc -watch -p ./",
         "pretest": "yarn compile",
         "test": "node ./out/src/test/runTest.js"
