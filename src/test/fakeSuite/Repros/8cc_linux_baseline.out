@@ -16,7 +16,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;main.o;main.c
@@ -26,7 +26,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;cpp.o;cpp.c
@@ -36,7 +36,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;debug.o;debug.c
@@ -46,7 +46,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;dict.o;dict.c
@@ -56,7 +56,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;gen.o;gen.c
@@ -66,7 +66,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;lex.o;lex.c
@@ -76,7 +76,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;vector.o;vector.c
@@ -86,7 +86,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;parse.o;parse.c
@@ -96,7 +96,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;buffer.o;buffer.c
@@ -106,7 +106,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;map.o;map.c
@@ -116,7 +116,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;error.o;error.c
@@ -126,7 +126,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;path.o;path.c
@@ -136,7 +136,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;file.o;file.c
@@ -146,7 +146,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;set.o;set.c
@@ -156,7 +156,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: BUILD_DIR='"/home/andris/git/8cc"'
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: gcc-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;encoding.o;encoding.c
@@ -164,7 +164,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
 Found compiler command: cc -o 8cc main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o 
 Sending Workspace Browse Configuration: -----------------------------------
     Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
-    Standard: gnu11
+    Standard: c11
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;encoding.o;encoding.c
 ----------------------------------------------------------------------------

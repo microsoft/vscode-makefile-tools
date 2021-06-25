@@ -17,7 +17,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_program.c;-o;libtvm/tvm_program.o
@@ -27,7 +27,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_lexer.c;-o;libtvm/tvm_lexer.o
@@ -37,7 +37,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm.c;-o;libtvm/tvm.o
@@ -47,7 +47,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_memory.c;-o;libtvm/tvm_memory.o
@@ -57,7 +57,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_htab.c;-o;libtvm/tvm_htab.o
@@ -67,7 +67,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_preprocessor.c;-o;libtvm/tvm_preprocessor.o
@@ -77,7 +77,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_parser.c;-o;libtvm/tvm_parser.o
@@ -87,7 +87,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_file.c;-o;libtvm/tvm_file.o
@@ -97,7 +97,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -ltvm;-Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-Llib/;-o;bin/tvmi
@@ -107,7 +107,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;tdb/main.c;-o;tdb/main.o
@@ -117,7 +117,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;tdb/tdb.c;-o;tdb/tdb.o
@@ -125,7 +125,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
 Found compiler command: clang tdb/main.o tdb/tdb.o -ltvm -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -Llib/ -o bin/tdb
 Sending Workspace Browse Configuration: -----------------------------------
     Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/src;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tdb
-    Standard: gnu11
+    Standard: c11
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
     Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;tdb/tdb.c;-o;tdb/tdb.o
 ----------------------------------------------------------------------------
