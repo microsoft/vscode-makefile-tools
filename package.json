@@ -567,7 +567,7 @@
         "compile": "yarn install && tsc -p ./",
         "watch": "tsc -watch -p ./",
         "pretest": "yarn compile",
-        "test": "node ./out/src/test/runTest.js"
+        "test": "yarn run pretest && node ./out/src/test/runTest.js"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",

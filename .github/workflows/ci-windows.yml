@@ -34,5 +34,4 @@ jobs:
 
       - name: Build the extension and run tests
         run: |
-          yarn run pretest
           yarn run test
