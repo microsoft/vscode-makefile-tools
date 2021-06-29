@@ -20,7 +20,8 @@
                 "${workspaceFolder}/out/src/test/**/*.js"
             ],
             "env": {
-                "MAKEFILE_TOOLS_TESTING": "1"
+                "MAKEFILE_TOOLS_TESTING": "1",
+                "WindowsSDKVersion": "12.3.45678.9\\"
             },
             "preLaunchTask": "compile",
         },

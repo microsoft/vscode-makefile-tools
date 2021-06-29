@@ -8,7 +8,7 @@ import * as path from 'path';
 //import * as tests from 'vscode-test';
 import * as testRunner from 'vscode-test/out/runTest';
 
-async function main() : Promise<void> {
+async function main(): Promise<void> {
     try {
         // The folder containing the Extension Manifest package.json
         // Passed to `--extensionDevelopmentPath`
@@ -30,7 +30,8 @@ async function main() : Promise<void> {
             ],
             testRunnerPath: extensionTestsPath,
             testRunnerEnv: {
-                "MAKEFILE_TOOLS_TESTING": "1"
+                "MAKEFILE_TOOLS_TESTING": "1",
+                "WindowsSDKVersion": "12.3.45678.9\\"
             },
             testWorkspace: reproRootPath
         };
