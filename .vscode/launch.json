@@ -9,6 +9,8 @@
             "runtimeExecutable": "${execPath}",
             "args": [
                 "${workspaceFolder}/src/test/fakeSuite/Repros",
+                "--disable-workspace-trust",
+                "--disable-extensions",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/out/src/test/fakeSuite/index"
             ],
@@ -18,7 +20,8 @@
                 "${workspaceFolder}/out/src/test/**/*.js"
             ],
             "env": {
-                "MAKEFILE_TOOLS_TESTING": "1"
+                "MAKEFILE_TOOLS_TESTING": "1",
+                "WindowsSDKVersion": "12.3.45678.9\\"
             },
             "preLaunchTask": "compile",
         },

@@ -1,8 +1,9 @@
 {
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
     "makefile.buildLog": "./dummy_dryrun.log",
-    "makefile.extensionLog": "./MakefileTools.out",
     "makefile.makePath": "c:/some/other/fake/path",
+    "makefile.loggingLevel": "Debug",
+    "makefile.configureOnOpen": false,
     "makefile.configurations": [
         {
             "name": "InterestingSmallMakefile_windows_configDebug",
@@ -47,5 +48,5 @@
             "makePath": "make",
             "makeArgs": ["PEDANTIC=yes"]
         }
-    ]
+   ]
 }

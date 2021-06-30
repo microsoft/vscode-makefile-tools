@@ -138,12 +138,6 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         }
     });
 
-    // Sometimes the ending of lines ends up being a mix and match of \n and \r\n.
-    // Make it uniform to \n to ease other processing later.
-    preprocessTasks.push(function (): void {
-        preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/\r\n/mg, "\n");
-    });
-
     // Some compiler/linker commands are split on multiple lines.
     // At the end of every intermediate line is at least a space, then a \ and end of line.
     // Concatenate all these lines to see clearly each command on one line.

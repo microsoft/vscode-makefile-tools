@@ -77,6 +77,7 @@ export enum TriggeredBy {
     configureAfterTargetChange = "settings (configureAfterCommand), command pallette (setBuildTarget)",
     configureBeforeLaunchTargetChange = "configureDirty (before launch target change), settings (configureAfterCommand)",
     launch = "Launch (debug|run)",
+    tests = "Makefile Tools Regression Tests"
 }
 
 let fileIndex: Map<string, cpptools.SourceFileConfigurationItem> = new Map<string, cpptools.SourceFileConfigurationItem>();
@@ -375,8 +376,10 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     //     3. the make dryrun output if (2) is missing
     // We do not use buildLog for build targets analysis because
     // we can afford to invoke make -pRrq (very quick even on large projects).
+    // We make sure to give the regression tests suite a build log that already contains
+    // targets information because we want to avoid invoking make for now.
     let buildLog: string | undefined = configuration.getConfigurationBuildLog();
-    if (buildLog && !forTargets) {
+    if (buildLog && (!forTargets || process.env['MAKEFILE_TOOLS_TESTING'] === '1')) {
         parseContent = util.readFile(buildLog);
         if (parseContent) {
             parseFile = buildLog;
@@ -456,7 +459,8 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }
         dryrunFile = util.resolvePathToRoot(dryrunFile);
         logger.message(`Writing the dry-run output: ${dryrunFile}`);
-        util.writeFile(dryrunFile, configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + "\r\n");
+        const lineEnding: string = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
+        util.writeFile(dryrunFile, configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + lineEnding);
 
         let stdoutStr: string = "";
         let stderrStr: string = "";
@@ -464,7 +468,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
 
         let stdout: any = (result: string): void => {
             stdoutStr += result;
-            fs.appendFileSync(dryrunFile, `${result} \r\n`);
+            fs.appendFileSync(dryrunFile, `${result} ${lineEnding}`);
             progress.report({increment: 1, message: "Generating dry-run output" +
                                                     ((recursive) ? " (recursive)" : "") +
                                                     ((forTargets) ? " (for targets specifically)" : "" +
@@ -474,7 +478,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         };
 
         let stderr: any = (result: string): void => {
-            fs.appendFileSync(dryrunFile, `${result} \r\n`);
+            fs.appendFileSync(dryrunFile, `${result} ${lineEnding}`);
             stderrStr += result;
         };
 
@@ -953,8 +957,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         };
 
         // Rewrite the configuration cache according to the last updates of the internal arrays,
-        // but not if the configure was cancelled.
-        if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
+        // but not if the configure was cancelled and not while running regression tests.
+        if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled && process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
             util.writeFile(configurationCachePath, JSON.stringify(ConfigurationCache));
         }
 

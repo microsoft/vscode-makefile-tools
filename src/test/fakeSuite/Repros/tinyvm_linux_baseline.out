@@ -1,212 +1,172 @@
+Pre-configuring...
+Script: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh"
+The pre-configure succeeded.
 Setting configuration - tinyvm_linux_pedantic
-Found command 'c:/some/other/fake/make PEDANTIC=yes' for configuration tinyvm_linux_pedantic
 Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log" for IntelliSense integration with CppTools...
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration tinyvm_linux_pedantic
+Saving opened files before build.
+Loading configurations from cache is not necessary.
+Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Preprocess elapsed time: 0
+Parsing for IntelliSense.
 Updating the CppTools IntelliSense Configuration Provider.
 Parsing dry-run output for CppTools Custom Configuration Provider.
-Sending Workspace Browse Configuration: -----------------------------------
-    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/src;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tdb
-    Standard: gnu11
-    Compiler Path: /usr/bin/clang
-----------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_program.c -o libtvm/tvm_program.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_program.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_program.c;-o;libtvm/tvm_program.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_lexer.c -o libtvm/tvm_lexer.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_lexer.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_lexer.c;-o;libtvm/tvm_lexer.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm.c -o libtvm/tvm.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm.c;-o;libtvm/tvm.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_memory.c -o libtvm/tvm_memory.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_memory.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_memory.c;-o;libtvm/tvm_memory.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_htab.c -o libtvm/tvm_htab.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_htab.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_htab.c;-o;libtvm/tvm_htab.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_preprocessor.c -o libtvm/tvm_preprocessor.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_preprocessor.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_preprocessor.c;-o;libtvm/tvm_preprocessor.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_parser.c -o libtvm/tvm_parser.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_parser.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_parser.c;-o;libtvm/tvm_parser.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c libtvm/tvm_file.c -o libtvm/tvm_file.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_file.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;libtvm/tvm_file.c;-o;libtvm/tvm_file.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang src/tvmi.c -ltvm -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -Llib/ -o bin/tvmi
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/src/tvmi.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -ltvm;-Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-Llib/;-o;bin/tvmi
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c tdb/main.c -o tdb/main.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tdb/main.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;tdb/main.c;-o;tdb/main.o
 ---------------------------------------------------------------------------------------------------
+Found compiler command: clang -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -c tdb/tdb.c -o tdb/tdb.o
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tdb/tdb.c -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
     Force Includes: 
-    Standard: gnu11
+    Standard: c11
     IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;tdb/tdb.c;-o;tdb/tdb.o
 ---------------------------------------------------------------------------------------------------
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log" for targets...
-Found the following build targets: tdb/main.o;libtvm/tvm_lexer.o;libtvm/tvm_memory.o;submodules;tdb/tdb.o;libtvm/tvm_htab.o;uninstall;mlibc;libtvm/tvm.o;libtvm;tdb;rebuild;libtvm/tvm_program.o;all;libtvm/tvm_file.o;clean;profile;tvmi;libtvm/tvm_parser.o;install;libtvm/tvm_preprocessor.o
-Setting target tvmi
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log" for IntelliSense integration with CppTools...
-Updating the CppTools IntelliSense Configuration Provider.
-Parsing dry-run output for CppTools Custom Configuration Provider.
+Found compiler command: clang tdb/main.o tdb/tdb.o -ltvm -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -Llib/ -o bin/tdb
 Sending Workspace Browse Configuration: -----------------------------------
-    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/src;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tdb
-    Standard: gnu11
-    Compiler Path: /usr/bin/clang
+    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/src;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tdb
+    Standard: c11
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/clang
+    Compiler Arguments: -Wall;-pipe;-Werror;-pedantic;-pedantic-errors;-O3;-c;tdb/tdb.c;-o;tdb/tdb.o
 ----------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_program.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_lexer.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_memory.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_htab.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_preprocessor.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_parser.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/libtvm/tvm_file.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/src/tvmi.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tdb/main.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tdb/tdb.c -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/include/
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: clang-x64
-    Compiler Path: /usr/bin/clang
----------------------------------------------------------------------------------------------------
-Building the current target. Command: c:/some/other/fake/make tvmi PEDANTIC=yes
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log" for launch configurations...
-Parsing dry-run output for Launch (debug/run) configuration.
-Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tdb();{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()
-Setting launch target "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()"
+Parsing for IntelliSense elapsed time: 0
+Parsing for launch targets.
+Found linker command: clang src/tvmi.c -ltvm -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -Llib/ -o bin/tvmi
+Producing target binary: bin/tvmi
+Adding launch configuration:
+{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin>tvmi()
+Found linker command: clang tdb/main.o tdb/tdb.o -ltvm -Wall -pipe -Iinclude/ -std=gnu11 -Werror -pedantic -pedantic-errors -O3 -Llib/ -o bin/tdb
+Producing target binary: bin/tdb
+Adding launch configuration:
+{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin>tdb()
+Found the following 2 launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin>tdb();{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin>tvmi()
+Complete list of launch targets: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin>tdb();{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin>tvmi()
+Parsing for launch targets elapsed time: 0
+Generating parse content for build targets.
+Parsing for build targets from: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Found the following 21 build targets defined in the makefile: all;clean;install;libtvm;libtvm/tvm.o;libtvm/tvm_file.o;libtvm/tvm_htab.o;libtvm/tvm_lexer.o;libtvm/tvm_memory.o;libtvm/tvm_parser.o;libtvm/tvm_preprocessor.o;libtvm/tvm_program.o;mlibc;profile;rebuild;submodules;tdb;tdb/main.o;tdb/tdb.o;tvmi;uninstall
+Complete list of build targets: all;clean;install;libtvm;libtvm/tvm.o;libtvm/tvm_file.o;libtvm/tvm_htab.o;libtvm/tvm_lexer.o;libtvm/tvm_memory.o;libtvm/tvm_parser.o;libtvm/tvm_preprocessor.o;libtvm/tvm_program.o;mlibc;profile;rebuild;submodules;tdb;tdb/main.o;tdb/tdb.o;tvmi;uninstall
+Parsing build targets elapsed time: 0
+Configure finished. The status for all the subphases that ran:
+generateParseContent: return code = 0, elapsed time = 0
+preprocessParseContent: return code = 0, elapsed time = 0
+parseIntelliSense: return code = 0, elapsed time = 0
+parseLaunch: return code = 0, elapsed time = 0
+dryrunTargets: return code = 0, elapsed time = 0
+parseTargets: return code = 0, elapsed time = 0
+Configure succeeded.
+Configure elapsed time: 0
+Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
+Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()"
 Created the following debug config:
    type = cppdbg
-   cwd = ${command:makefile.launchTargetDirectory} (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros)
+   cwd = {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros)
    args = 
-   program = ${command:makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/tvmi)
-   miMode = gdb
-   miDebuggerPath = /usr/bin/gdb
+   program = {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/tvmi (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/tvmi)
+   MIMode = lldb
+   miDebuggerPath = {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/lldb
+   stopAtEntry = undefined
+   symbolSearchPath = undefined
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/tvmi" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros'
+Setting target tvmi
+Building target "tvmi" with command: "c:/some/other/fake/make tvmi PEDANTIC=yes"

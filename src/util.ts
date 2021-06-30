@@ -407,7 +407,9 @@ export function escapeString(str: string): string {
 }
 
 export function elapsedTimeSince(start: number): number {
-    return (Date.now() - start) / 1000;
+    // Real elapsed times not useful in testing mode and we want to avoid diffs.
+    // We could alternatively disable the messages from being printed.
+    return (process.env['MAKEFILE_TOOLS_TESTING'] === '1') ? 0 : (Date.now() - start) / 1000;
 }
 
 // Helper to evaluate whether two settings (objects or simple types) represent the same content.

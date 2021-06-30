@@ -70,13 +70,15 @@ export class StateManager {
   }
 
   // Reset all the variables saved in the workspace state.
-  reset(): void {
+  reset(reloadWindow: boolean = true): void {
     this.buildConfiguration = undefined;
     this.buildTarget = undefined;
     this.launchConfiguration = undefined;
     this.ranConfigureInCodebaseLifetime = false;
     this.configureDirty = false;
 
-    vscode.commands.executeCommand('workbench.action.reloadWindow');
+    if (reloadWindow) {
+        vscode.commands.executeCommand('workbench.action.reloadWindow');
+    }
   }
 }
