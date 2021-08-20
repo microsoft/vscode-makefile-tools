@@ -303,7 +303,7 @@ async function parseLineAsTool(
         regexpStr += '|';
     }
 
-    regexpStr += versionedToolNames.join('|') + ')[\\s\\"]+(.*)$';
+    regexpStr += versionedToolNames.join('|') + ')(\\s|\\"\\s)(.*)$';
 
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null = regexp.exec(line);
