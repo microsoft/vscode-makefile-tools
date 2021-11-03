@@ -196,6 +196,25 @@
                 "title": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)"
             }
         ],
+        "problemMatchers": [
+            {
+              "name": "gcc",
+              "source": "gcc",
+              "owner": "makefile-tools",
+              "fileLocation": [
+                "autoDetect",
+                "${workspaceFolder}"
+              ],
+              "pattern": {
+                "regexp": "^(.*?):(\\d+):(\\d*):?\\s+(?:fatal\\s+)?(warning|error):\\s+(.*)$",
+                "file": 1,
+                "line": 2,
+                "column": 3,
+                "severity": 4,
+                "message": 5
+              }
+            }
+          ],
         "configuration": {
             "type": "object",
             "title": "makefile",
@@ -231,6 +250,14 @@
                                     "type": "string"
                                 },
                                 "default": []
+                            },
+                            "problemMatchers": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [],
+                                "description": "Problem matcher names to use when building the current target"
                             },
                             "buildLog": {
                                 "type": "string",
@@ -336,9 +363,9 @@
                     "scope": "resource"
                 },
                 "makefile.makeDirectory": {
-                  "type": "string",
-                  "description": "The folder path to be passed to make via the switch -C",
-                  "scope": "resource"
+                    "type": "string",
+                    "description": "The folder path to be passed to make via the switch -C",
+                    "scope": "resource"
                 },
                 "makefile.makefilePath": {
                     "type": "string",

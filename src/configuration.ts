@@ -46,6 +46,9 @@ export interface MakefileConfiguration {
     // don't use more than one argument in a string
     makeArgs?: string[];
 
+    // list of problem matcher names to be used when building the current target
+    problemMatchers?: string[];
+
     // a pre-generated build log, from which it is preffered to parse from,
     // instead of the dry-run output of the make tool
     buildLog?: string;
@@ -493,6 +496,10 @@ let configurationMakeArgs: string[] = [];
 export function getConfigurationMakeArgs(): string[] { return configurationMakeArgs; }
 export function setConfigurationMakeArgs(args: string[]): void { configurationMakeArgs = args; }
 
+let configurationProblemMatchers: string[] = [];
+export function getConfigurationProblemMatchers(): string[] { return configurationProblemMatchers; }
+export function setConfigurationProblemMatchers(problemMatchers: string[]): void { configurationProblemMatchers = problemMatchers; }
+
 let configurationBuildLog: string | undefined;
 export function getConfigurationBuildLog(): string | undefined { return configurationBuildLog; }
 export function setConfigurationBuildLog(name: string): void { configurationBuildLog = name; }
@@ -503,6 +510,7 @@ export function setConfigurationBuildLog(name: string): void { configurationBuil
 function analyzeConfigureParams(): void {
     getBuildLogForConfiguration(currentMakefileConfiguration);
     getCommandForConfiguration(currentMakefileConfiguration);
+    getProblemMatchersForConfiguration(currentMakefileConfiguration);
 }
 
 // Helper to find in the array of MakefileConfiguration which command/args correspond to a configuration name.
@@ -631,6 +639,17 @@ export function getCommandForConfiguration(configuration: string | undefined): v
             telemetry.logEvent("makefileNotFound", telemetryProperties);
         }
     }
+}
+
+// Helper to find in the array of MakefileConfiguration which problemMatchers correspond to a configuration name
+export function getProblemMatchersForConfiguration(configuration: string | undefined): void {
+    let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
+        if (k.name === configuration) {
+            return { ...k, keep: true };
+        }
+    });
+
+    configurationProblemMatchers = makefileConfiguration?.problemMatchers || [];
 }
 
 // Helper to find in the array of MakefileConfiguration which buildLog correspond to a configuration name
