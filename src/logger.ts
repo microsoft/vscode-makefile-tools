@@ -12,7 +12,6 @@ let makeOutputChannel: vscode.OutputChannel | undefined;
 function getOutputChannel(): vscode.OutputChannel {
     if (!makeOutputChannel) {
         makeOutputChannel = vscode.window.createOutputChannel("Makefile tools");
-        makeOutputChannel.show(true); // don't take focus
     }
 
     return makeOutputChannel;
