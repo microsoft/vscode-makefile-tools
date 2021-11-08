@@ -187,6 +187,7 @@ export class MakefileToolsExtension {
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     statusBar = ui.getUI();
+    await vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", "true");
     extension = new MakefileToolsExtension(context);
 
     telemetry.activate();
