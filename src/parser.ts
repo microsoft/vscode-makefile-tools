@@ -1455,12 +1455,9 @@ function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefi
     let canUseGnu: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v4);
     let standard: util.StandardVersion;
     if (!std) {
-        // Standard defaults when no std switch is given
-        if (language === "c") {
-            return "c11";
-        } else if (language === "cpp") {
-            return "c++17";
-        }
+        // Return an undefined standard default when no std switch is given
+        // so that CppTools query the compiler itself for these defaults.
+        return undefined;
     } else if (language === "cpp") {
         standard = parseCppStandard(std, canUseGnu);
         if (!standard) {
