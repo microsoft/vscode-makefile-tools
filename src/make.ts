@@ -318,19 +318,13 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
 export async function doBuildTarget(progress: vscode.Progress<{}>, target: string, clearTerminalOutput: boolean): Promise<number> {
     let makeArgs: string[] = prepareBuildTarget(target);
     try {
-        // Append without end of line since there is one already included in the stdout/stderr fragments
-        let stdout: any = (result: string): void => {
-            logger.messageNoCR(result, "Normal");
-            progress.report({increment: 1, message: "..."});
-        };
-
-        let stderr: any = (result: string): void => {
-            logger.messageNoCR(result, "Normal");
-        };
-
-        let myTaskCommand: string = `${configuration.getConfigurationMakeCommand()} ${makeArgs.join(" ")}`;
+        let myTaskCommand: vscode.ShellQuotedString = {value: configuration.getConfigurationMakeCommand(), quoting: vscode.ShellQuoting.Strong};
+        let myTaskArgs: vscode.ShellQuotedString[] = makeArgs.map(arg => {
+            return {value: arg, quoting: vscode.ShellQuoting.Strong};
+        });
+        let shellExec: vscode.ShellExecution = new vscode.ShellExecution(myTaskCommand, myTaskArgs);
         let myTask: vscode.Task = new vscode.Task({type: "shell", group: "build", label: makefileBuildTaskName},
-            vscode.TaskScope.Workspace, makefileBuildTaskName, "makefile", new vscode.ShellExecution(myTaskCommand));
+            vscode.TaskScope.Workspace, makefileBuildTaskName, "makefile", shellExec);
         
         myTask.problemMatchers = configuration.getConfigurationProblemMatchers();
         myTask.presentationOptions.clear = clearTerminalOutput;
