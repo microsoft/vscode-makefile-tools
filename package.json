@@ -694,6 +694,7 @@
         "chai-as-promised": "^7.1.1",
         "chai-string": "^1.5.0",
         "typescript": "^3.8.3",
+        "vsce": "^1.95.0",
         "vrsource-tslint-rules": "^6.0.0",
         "vscode": "^1.1.36",
         "vscode-test": "^0.4.1"
