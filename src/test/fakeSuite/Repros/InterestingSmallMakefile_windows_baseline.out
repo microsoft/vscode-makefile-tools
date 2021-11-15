@@ -41,7 +41,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\r
     Defines: MyDefine2;Debug;ARCH=1
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
     Force Includes: 
-    Standard: c++17
+    Standard: undefined
     IntelliSense Mode: msvc-x64
     Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
@@ -73,7 +73,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\r
     Defines: MyDefine2;Debug;ARCH=2
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
     Force Includes: 
-    Standard: c++17
+    Standard: undefined
     IntelliSense Mode: msvc-x86
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\hostx86\x86\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
@@ -105,7 +105,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\r
     Defines: MyDefine2;Debug;ARCH=3
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
     Force Includes: 
-    Standard: c++17
+    Standard: undefined
     IntelliSense Mode: msvc-x64
     Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
@@ -137,7 +137,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\r
     Defines: MyDefine2;Debug
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\InterestingSmallMakefile\inc2;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\SubfolderLocalToWorkspace;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src\SubfolderLocalToSrc;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\src
     Force Includes: 
-    Standard: c++17
+    Standard: undefined
     IntelliSense Mode: msvc-x64
     Compiler Path: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\CL\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\12.34.56789\bin\Hostx86\x86"\cl.exe
     Compiler Arguments: /RTC;/Od;/Zi;/c
