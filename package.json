@@ -2,7 +2,7 @@
     "name": "makefile-tools",
     "displayName": "Makefile Tools",
     "description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "publisher": "ms-vscode",
     "preview": true,
     "icon": "res/makefile-logo.png",
@@ -67,7 +67,6 @@
         "onCommand:makefile.outline.cleanConfigure",
         "onCommand:makefile.outline.preConfigure",
         "onCommand:makefile.resetState",
-        "onView:makefile.outline",
         "workspaceContains:makefile",
         "workspaceContains:Makefile",
         "workspaceContains:GNUmakefile"
@@ -196,6 +195,25 @@
                 "title": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)"
             }
         ],
+        "problemMatchers": [
+            {
+              "name": "gcc",
+              "source": "gcc",
+              "owner": "makefile-tools",
+              "fileLocation": [
+                "autoDetect",
+                "${workspaceFolder}"
+              ],
+              "pattern": {
+                "regexp": "^(.*?):(\\d+):(\\d*):?\\s+(?:fatal\\s+)?(warning|error):\\s+(.*)$",
+                "file": 1,
+                "line": 2,
+                "column": 3,
+                "severity": 4,
+                "message": 5
+              }
+            }
+          ],
         "configuration": {
             "type": "object",
             "title": "makefile",
@@ -231,6 +249,14 @@
                                     "type": "string"
                                 },
                                 "default": []
+                            },
+                            "problemMatchers": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [],
+                                "description": "Problem matcher names to use when building the current target"
                             },
                             "buildLog": {
                                 "type": "string",
@@ -336,9 +362,9 @@
                     "scope": "resource"
                 },
                 "makefile.makeDirectory": {
-                  "type": "string",
-                  "description": "The folder path to be passed to make via the switch -C",
-                  "scope": "resource"
+                    "type": "string",
+                    "description": "The folder path to be passed to make via the switch -C",
+                    "scope": "resource"
                 },
                 "makefile.makefilePath": {
                     "type": "string",
@@ -371,7 +397,11 @@
                 },
                 "makefile.dryrunSwitches": {
                     "type": "array",
-                    "default": ["--always-make", "--keep-going", "--print-directory"],
+                    "default": [
+                        "--always-make",
+                        "--keep-going",
+                        "--print-directory"
+                    ],
                     "description": "Arguments to pass to the dry-run make invocation",
                     "items": {
                         "type": "string"
@@ -469,6 +499,7 @@
                 {
                     "id": "makefile__viewContainer",
                     "title": "Makefile",
+                    "when": "makefile:fullFeatureSet",
                     "icon": "res/viewcontainer.svg"
                 }
             ]
@@ -477,11 +508,86 @@
             "makefile__viewContainer": [
                 {
                     "id": "makefile.outline",
+                    "when": "makefile:fullFeatureSet",
                     "name": ""
                 }
             ]
         },
         "menus": {
+            "commandPalette": [
+                {
+                    "command": "makefile.preConfigure",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.buildTarget",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.buildCleanTarget",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.buildAll",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.buildCleanAll",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.launchDebug",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.launchRun",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.setBuildConfiguration",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.setBuildTarget",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.setLaunchConfiguration",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.outline.preConfigure",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.outline.buildTarget",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.outline.buildCleanTarget",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.outline.launchDebug",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.outline.launchRun",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.outline.setBuildConfiguration",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.outline.setBuildTarget",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
+                    "command": "makefile.outline.setLaunchConfiguration",
+                    "when": "makefile:fullFeatureSet"
+                }
+            ],
             "view/title": [
                 {
                     "command": "makefile.outline.preConfigure",
@@ -500,12 +606,12 @@
                 },
                 {
                     "command": "makefile.outline.buildTarget",
-                    "when": "view == makefile.outline",
+                    "when": "makefile:fullFeatureSet",
                     "group": "navigation@1"
                 },
                 {
                     "command": "makefile.outline.buildCleanTarget",
-                    "when": "view == makefile.outline",
+                    "when": "makefile:fullFeatureSet",
                     "group": "1_makefileOutline@4"
                 },
                 {
@@ -537,12 +643,12 @@
                 },
                 {
                     "command": "makefile.outline.buildTarget",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
+                    "when": "makefile:fullFeatureSet",
                     "group": "1_stateActions@1"
                 },
                 {
                     "command": "makefile.outline.buildCleanTarget",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
+                    "when": "makefile:fullFeatureSet",
                     "group": "1_stateActions@2"
                 },
                 {
@@ -572,6 +678,7 @@
         "vscode:prepublish": "yarn compile",
         "compile": "yarn install && tsc -p ./",
         "watch": "tsc -watch -p ./",
+        "package": "vsce package --yarn -o makefile-tools.vsix",
         "pretest": "yarn compile",
         "test": "yarn run pretest && node ./out/src/test/runTest.js"
     },
@@ -588,6 +695,7 @@
         "chai-as-promised": "^7.1.1",
         "chai-string": "^1.5.0",
         "typescript": "^3.8.3",
+        "vsce": "^1.95.0",
         "vrsource-tslint-rules": "^6.0.0",
         "vscode": "^1.1.36",
         "vscode-test": "^0.4.1"
@@ -596,7 +704,7 @@
         "@types/glob": "^7.1.1",
         "glob": "^7.1.6",
         "module-alias": "^2.2.2",
-        "vscode-cpptools": "^4.0.1",
+        "vscode-cpptools": "^5.0.0",
         "vscode-extension-telemetry": "^0.1.2",
         "vscode-jsonrpc": "^3.6.2"
     },

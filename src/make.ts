@@ -193,6 +193,8 @@ let curPID: number = -1;
 export function getCurPID(): number { return curPID; }
 export function setCurPID(pid: number): void { curPID = pid; }
 
+const makefileBuildTaskName: string = "Makefile Tools Build Task";
+
 export async function buildTarget(triggeredBy: TriggeredBy, target: string, clean: boolean = false): Promise<number> {
     if (blockedByOp(Operations.build)) {
         return ConfigureBuildReturnCodeTypes.blocked;
@@ -201,9 +203,6 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
     if (!saveAll()) {
         return ConfigureBuildReturnCodeTypes.saveFailed;
     }
-
-    logger.showOutputChannel();
-    logger.clearOutputChannel();
 
     // Same start time for build and an eventual configure.
     let buildStartTime: number = Date.now();
@@ -250,28 +249,35 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                     logger.message("The user is cancelling the build...");
                     cancelBuild = true;
 
-                    // Kill make and all its children subprocesses.
-                    logger.message(`Attempting to kill the make process (PID = ${curPID}) and all its children subprocesses...`);
-                    await vscode.window.withProgress({
-                            location: vscode.ProgressLocation.Notification,
-                            title: "Cancelling build",
-                            cancellable: false,
-                        },
-                        async (progress) => {
-                            await util.killTree(progress, curPID);
-                        });
+                    // Kill the task that is used for building.
+                    // This will take care of all processes that were spawned.
+                    let myTask = vscode.tasks.taskExecutions.find(tsk => {
+                        if (tsk.task.name === makefileBuildTaskName) {
+                            return tsk;
+                        }
+                    });
+
+                    logger.message(`Killing task ${makefileBuildTaskName}.`);
+                    myTask?.terminate();
                 });
 
                 setIsBuilding(true);
+
+                // If required by the "makefile.clearOutputBeforeBuild" setting,
+                // we need to clear the terminal output when "make"-ing target "clean"
+                // (but not when "make"-ing the following intended target, so that we see both together)
+                // or when "make"-ing the intended target in case of a not-clean build.
+                let clearOutput: boolean = configuration.getClearOutputBeforeBuild() || false;
+
                 if (clean) {
                     // We don't need to track the return code for 'make "clean"'.
                     // We want to proceed with the 'make "target"' step anyway.
                     // The relevant return code for telemetry will be the second one.
-                    // If the clean step fails, doBuildTarget will print an error message in the log.
-                    await doBuildTarget(progress, "clean");
+                    // If the clean step fails, doBuildTarget will print an error message in the terminal.
+                    await doBuildTarget(progress, "clean", clearOutput);
                 }
 
-                let retc: number = await doBuildTarget(progress, target);
+                let retc: number = await doBuildTarget(progress, target, clearOutput && !clean);
 
                 // We need to know whether this build was cancelled by the user
                 // more than the real exit code of the make process in this circumstance.
@@ -301,10 +307,6 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
 
                 cancelBuild = false;
 
-                if (retc !== ConfigureBuildReturnCodeTypes.success) {
-                  logger.showOutputChannel();
-                }
-
                 return retc;
             },
         );
@@ -313,27 +315,39 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
     }
 }
 
-export async function doBuildTarget(progress: vscode.Progress<{}>, target: string): Promise<number> {
+export async function doBuildTarget(progress: vscode.Progress<{}>, target: string, clearTerminalOutput: boolean): Promise<number> {
     let makeArgs: string[] = prepareBuildTarget(target);
     try {
-        // Append without end of line since there is one already included in the stdout/stderr fragments
-        let stdout: any = (result: string): void => {
-            logger.messageNoCR(result, "Normal");
-            progress.report({increment: 1, message: "..."});
-        };
+        let myTaskCommand: vscode.ShellQuotedString = {value: configuration.getConfigurationMakeCommand(), quoting: vscode.ShellQuoting.Strong};
+        let myTaskArgs: vscode.ShellQuotedString[] = makeArgs.map(arg => {
+            return {value: arg, quoting: vscode.ShellQuoting.Strong};
+        });
+        let shellExec: vscode.ShellExecution = new vscode.ShellExecution(myTaskCommand, myTaskArgs);
+        let myTask: vscode.Task = new vscode.Task({type: "shell", group: "build", label: makefileBuildTaskName},
+            vscode.TaskScope.Workspace, makefileBuildTaskName, "makefile", shellExec);
+        
+        myTask.problemMatchers = configuration.getConfigurationProblemMatchers();
+        myTask.presentationOptions.clear = clearTerminalOutput;
+        myTask.presentationOptions.showReuseMessage = true;
 
-        let stderr: any = (result: string): void => {
-            logger.messageNoCR(result, "Normal");
-        };
+        await vscode.tasks.executeTask(myTask);
 
-        // The build invocation should use the system locale.
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, util.getWorkspaceRoot(), false, stdout, stderr);
-        if (result.returnCode !== ConfigureBuildReturnCodeTypes.success) {
+        const result: number = await(new Promise<number>(resolve => {
+            let disposable = vscode.tasks.onDidEndTaskProcess(e => {
+                if (e.execution.task.name === makefileBuildTaskName) {
+                    disposable.dispose();
+                    resolve(e.exitCode);
+                }
+            });
+        }));
+
+        if (result !== ConfigureBuildReturnCodeTypes.success) {
             logger.message(`Target ${target} failed to build.`);
         } else {
             logger.message(`Target ${target} built successfully.`);
         }
-        return result.returnCode;
+
+        return result;
     } catch (error) {
         // No need for notification popup, since the build result is visible already in the output channel
         logger.message(error);

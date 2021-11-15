@@ -842,8 +842,8 @@ export interface CustomConfigProviderItem {
     defines: string[];
     includes: string[];
     forcedIncludes: string[];
-    standard: util.StandardVersion;
-    intelliSenseMode: util.IntelliSenseMode;
+    standard?: util.StandardVersion;
+    intelliSenseMode?: util.IntelliSenseMode;
     compilerFullPath: string;
     compilerArgs: string[];
     files: string[];
@@ -1352,6 +1352,11 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
  * and target architecture parsed from compiler flags.
  */
 function getIntelliSenseMode(cppVersion: cpp.Version | undefined, compilerPath: string, targetArch: util.TargetArchitecture): util.IntelliSenseMode {
+    if (cppVersion && cppVersion >= cpp.Version.v5 && targetArch === undefined) {
+        // IntelliSenseMode is optional for CppTools v5+ and is determined by CppTools.
+        return undefined;
+    }
+
     const canUseArm: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v4);
     const compilerName: string = path.basename(compilerPath || "").toLocaleLowerCase();
     if (compilerName === 'cl.exe') {
@@ -1454,6 +1459,11 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
 function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefined, language: util.Language): util.StandardVersion {
     let canUseGnu: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v4);
     let standard: util.StandardVersion;
+    if (cppVersion && cppVersion >= cpp.Version.v5 && std === undefined) {
+        // C/C++ standard is optional for CppTools v5+ and is determined by CppTools.
+        return undefined;
+    }
+
     if (!std) {
         // Standard defaults when no std switch is given
         if (language === "c") {
@@ -1516,8 +1526,8 @@ function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion
       return isGnu ? 'gnu11' : 'c11';
     } else if (/(c|gnu)(17|18|iso9899:(2017|2018))/.test(std)) {
       if (canUseGnu) {
-        // cpptools supports 'c18' in same version it supports GNU std.
-        return isGnu ? 'gnu18' : 'c18';
+        // cpptools supports 'c17' in same version it supports GNU std.
+        return isGnu ? 'gnu17' : 'c17';
       } else {
         return 'c11';
       }
