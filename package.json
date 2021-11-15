@@ -596,7 +596,7 @@
         "@types/glob": "^7.1.1",
         "glob": "^7.1.6",
         "module-alias": "^2.2.2",
-        "vscode-cpptools": "^4.0.1",
+        "vscode-cpptools": "^5.0.0",
         "vscode-extension-telemetry": "^0.1.2",
         "vscode-jsonrpc": "^3.6.2"
     },
