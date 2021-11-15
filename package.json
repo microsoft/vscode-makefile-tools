@@ -678,6 +678,7 @@
         "vscode:prepublish": "yarn compile",
         "compile": "yarn install && tsc -p ./",
         "watch": "tsc -watch -p ./",
+        "package": "vsce package --yarn -o cmake-tools.vsix",
         "pretest": "yarn compile",
         "test": "yarn run pretest && node ./out/src/test/runTest.js"
     },
