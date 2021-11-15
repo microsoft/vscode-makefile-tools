@@ -41,7 +41,6 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
 
         if (!sourceFileConfiguration) {
             logger.message(`Configuration for file ${norm_path} was not found. CppTools will set a default configuration.`);
-            logger.showOutputChannel();
         }
 
         return sourceFileConfiguration;

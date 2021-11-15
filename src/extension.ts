@@ -105,7 +105,7 @@ export class MakefileToolsExtension {
 
     public async registerCppTools(): Promise<void> {
         if (!this.cppToolsAPI) {
-            this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v4);
+            this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v5);
         }
 
         if (this.cppToolsAPI) {
@@ -124,7 +124,7 @@ export class MakefileToolsExtension {
 
         const configuration: cpp.SourceFileConfiguration = {
             defines: customConfigProviderItem.defines,
-            standard: customConfigProviderItem.standard || "c++17",
+            standard: customConfigProviderItem.standard,
             includePath: customConfigProviderItem.includes,
             forcedInclude: customConfigProviderItem.forcedIncludes,
             intelliSenseMode: customConfigProviderItem.intelliSenseMode,
