@@ -25,7 +25,18 @@ jobs:
         with:
           node-version: '12'
           check-latest: true
-  
+      - name: Get Short SHA
+        id: get-short-sha
+        run: echo "::set-output name=sha::$(git rev-parse --short ${GITHUB_SHA})"
+
+      - name: Update the package version
+        uses: jacobtomlinson/gha-find-replace@master
+        with:
+          find: "\"version\": \"(\\d+\\.\\d+\\.\\d+)\""
+          replace: "\"version\": \"$1-${{ steps.get-short-sha.outputs.sha }}\""
+          include: "package.json"
+          exclude: ".git"
+
     # Runs a single command using the runners shell
       - name: Build the VSIX
         run: |
