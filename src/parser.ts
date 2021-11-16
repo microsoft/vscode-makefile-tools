@@ -303,7 +303,7 @@ async function parseLineAsTool(
         regexpStr += '|';
     }
 
-    regexpStr += versionedToolNames.join('|') + ')[\\s\\"]+(.*)$';
+    regexpStr += versionedToolNames.join('|') + ')(\\s|\\"\\s)(.*)$';
 
     let regexp: RegExp = RegExp(regexpStr, "mg");
     let match: RegExpExecArray | null = regexp.exec(line);
@@ -389,6 +389,14 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
     // that is between them. If the current match is the last one, then we will analyze
     // everything until the end of line.
     match1 = regexp.exec(args);
+
+    // Even if we don't find any arguments that have a switch syntax,
+    // consider the whole command line to parse into arguments
+    // (this case is encountered when we call this helper while we parse launch targets).
+    if (!match1) {
+       compilerArgRegions = args;
+    }
+
     while (match1) {
         // Marks the beginning of the current switch (prefix + name).
         // The exact switch prefix is needed when we call other parser helpers later
@@ -1310,7 +1318,7 @@ export async function parseLaunchConfigurations(cancel: vscode.CancellationToken
                     logger.message("Found binary execution command: " + line, "Verbose");
                     // Include complete launch configuration: binary, execution path and args
                     // are known from parsing the dry-run
-                    let splitArgs: string[] = targetBinaryTool.arguments ? targetBinaryTool.arguments.split(" ") : [];
+                    let splitArgs: string[] = targetBinaryTool.arguments ? await parseAnySwitchFromToolArguments(targetBinaryTool.arguments, []) : [];
                     if (splitArgs.length > 0) {
                         splitArgs = filterTargetBinaryArgs(splitArgs);
                     }
