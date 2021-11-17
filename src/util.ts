@@ -313,24 +313,38 @@ export async function cygpath(pathStr: string): Promise<string> {
 
 // Helper that transforms a posix path (used in various non windows environments on a windows system)
 // into a windows style path.
-export function transformNonWindowsPathToWindows(path: string): string {
+export async function ensureWindowsPath(path: string): Promise<string> {
    let winPath: string = path;
 
-   // Mount drives names like "cygdrive" or "mnt" can be ignored.
-   const mountDrives: string[] = ["cygdrive", "mnt"];
-   mountDrives.forEach(drv => {
-      if (winPath.startsWith(`/${drv}`)) {
-         winPath = winPath.substr(drv.length + 1);
+   if (process.env.MSYSTEM !== undefined) {
+      // When in MSYS/MinGW/CygWin environments, cygpath can help transform into a windows path
+      // that we know CppTools will use when querying us.
+      winPath = await cygpath(winPath);
+   } else {
+      // Even in a pure windows environment, there are tools that may report posix paths.
+      // Instead of searching a cygpath tool somewhere, do the most basic transformations:
+
+      // Mount drives names like "cygdrive" or "mnt" can be ignored.
+      const mountDrives: string[] = ["cygdrive", "mnt"];
+      for (const drv of mountDrives) {
+         if (winPath.startsWith(`/${drv}`)) {
+            winPath = winPath.substr(drv.length + 1);
+
+            // Exit the loop, because we don't want to remove anything else
+            // in case the path happens to follow with a subfolder with the same name
+            // as other mountable drives for various systems/environments.
+            break;
+         }
       }
-   });
 
-   // Remove the slash and add the : for the drive.
-   winPath = winPath.substr(1);
-   const driveEndIndex: number = winPath.search("/");
-   winPath = winPath.substring(0, driveEndIndex) + ":" + winPath.substr(driveEndIndex);
+      // Remove the slash and add the : for the drive.
+      winPath = winPath.substr(1);
+      const driveEndIndex: number = winPath.search("/");
+      winPath = winPath.substring(0, driveEndIndex) + ":" + winPath.substr(driveEndIndex);
 
-   // Replace / with \.
-   winPath = winPath.replace(/\//mg, "\\");
+      // Replace / with \.
+      winPath = winPath.replace(/\//mg, "\\");
+   }
 
    return winPath;
 }
@@ -343,21 +357,9 @@ export async function makeFullPath(relPath: string, curPath: string | undefined)
         fullPath = path.join(curPath, relPath);
     }
 
-    // For non win32, nothing else needed to process, we can return.
-    if (process.platform !== "win32") {
-      return fullPath;
-    }
-
-    // When in MSYS/MinGW/CygWin environments, cygpath can help transform into a windows path
-    // that we know CppTools will use when querying us.
-    if (process.env.MSYSTEM !== undefined) {
-       // invoke cygpath to find out where the posix home drive resides on the windows file system.
-       fullPath = await cygpath(fullPath);
-    } else if (fullPath.startsWith("/")) {
-       // When the given path doesn't look like standard windows,
-       // do the most common transformations: change / with \, add : for drive
-       // and ignore "mnt" and "cygdrive".
-       fullPath = transformNonWindowsPathToWindows(fullPath);
+    // For win32, ensure we have a windows style path.
+    if (process.platform === "win32" && fullPath.startsWith("/")) {
+      fullPath = await ensureWindowsPath(fullPath);
     }
 
     return fullPath;
