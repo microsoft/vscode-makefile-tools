@@ -311,6 +311,30 @@ export async function cygpath(pathStr: string): Promise<string> {
   return windowsPath;
 }
 
+// Helper that transforms a posix path (used in various non windows environments on a windows system)
+// into a windows style path.
+export function transformNonWindowsPathToWindows(path: string): string {
+   let winPath: string = path;
+
+   // Mount drives names like "cygdrive" or "mnt" can be ignored.
+   const mountDrives: string[] = ["cygdrive", "mnt"];
+   mountDrives.forEach(drv => {
+      if (winPath.startsWith(`/${drv}`)) {
+         winPath = winPath.substr(drv.length + 1);
+      }
+   });
+
+   // Remove the slash and add the : for the drive.
+   winPath = winPath.substr(1);
+   const driveEndIndex: number = winPath.search("/");
+   winPath = winPath.substring(0, driveEndIndex) + ":" + winPath.substr(driveEndIndex);
+
+   // Replace / with \.
+   winPath = winPath.replace(/\//mg, "\\");
+
+   return winPath;
+}
+
 // Helper to reinterpret one relative path (to the given current path) printed by make as full path
 export async function makeFullPath(relPath: string, curPath: string | undefined): Promise<string> {
     let fullPath: string = relPath;
@@ -319,9 +343,21 @@ export async function makeFullPath(relPath: string, curPath: string | undefined)
         fullPath = path.join(curPath, relPath);
     }
 
-    if (process.platform === "win32" && process.env.MSYSTEM !== undefined) {
+    // For non win32, nothing else needed to process, we can return.
+    if (process.platform !== "win32") {
+      return fullPath;
+    }
+
+    // When in MSYS/MinGW/CygWin environments, cygpath can help transform into a windows path
+    // that we know CppTools will use when querying us.
+    if (process.env.MSYSTEM !== undefined) {
        // invoke cygpath to find out where the posix home drive resides on the windows file system.
        fullPath = await cygpath(fullPath);
+    } else if (fullPath.startsWith("/")) {
+       // When the given path doesn't look like standard windows,
+       // do the most common transformations: change / with \, add : for drive
+       // and ignore "mnt" and "cygdrive".
+       fullPath = transformNonWindowsPathToWindows(fullPath);
     }
 
     return fullPath;
