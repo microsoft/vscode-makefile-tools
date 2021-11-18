@@ -476,13 +476,14 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         const lineEnding: string = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
         util.writeFile(dryrunFile, configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + lineEnding);
 
-        let stdoutStr: string = "";
+        let completeOutput: string = "";
         let stderrStr: string = "";
         let heartBeat: number = Date.now();
 
         let stdout: any = (result: string): void => {
-            stdoutStr += result;
-            fs.appendFileSync(dryrunFile, `${result} ${lineEnding}`);
+            const appendStr: string = `${result} ${lineEnding}`;
+            completeOutput += appendStr;
+            fs.appendFileSync(dryrunFile, appendStr);
             progress.report({increment: 1, message: "Generating dry-run output" +
                                                     ((recursive) ? " (recursive)" : "") +
                                                     ((forTargets) ? " (for targets specifically)" : "" +
@@ -492,8 +493,14 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         };
 
         let stderr: any = (result: string): void => {
-            fs.appendFileSync(dryrunFile, `${result} ${lineEnding}`);
-            stderrStr += result;
+            const appendStr: string = `${result} ${lineEnding}`;
+            fs.appendFileSync(dryrunFile, appendStr);
+            stderrStr += appendStr;
+
+            // Sometimes there is useful information coming via the stderr
+            // (one example is even a bug of the make tool, because it reports
+            // "Entering directory" on stderr instead of stdout causing various issues).
+            completeOutput += appendStr;
         };
 
         const heartBeatTimeout: number = 30; // half minute. TODO: make this a setting
@@ -517,7 +524,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         logger.message(`Generating dry-run elapsed time: ${elapsedTime}`);
 
         parseFile = dryrunFile;
-        parseContent = stdoutStr;
+        parseContent = completeOutput;
 
         // The error codes returned by the targets invocation (make -pRrq) mean something else
         // (for example if targets are out of date). We can ignore the return code for this
