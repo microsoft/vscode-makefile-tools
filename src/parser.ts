@@ -532,18 +532,30 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string, removeSu
     //    (example): -DMY_DEFINE='"SOME_VALUE"'
 
     function anythingBetweenQuotes(fullyQuoted: boolean): string {
-       // In regexp101:
-       // \\\"((?!\\\").)*\\\"|\"(\\\"|[^\"])*?[^\\\"]?\"
-        let anythingBetweenReverseQuote: string = '\\\\\\`((?!\\\\\\`).)*\\\\\\`|\\`(\\\\\\`|[^\\`])*?[^\\\\\\`]?\\`';
-        let anythingBetweenSingleQuote: string = "\\\\\\`((?!\\\\\\`).)*\\\\\\`|\\`(\\\\\\`|[^\\`])*?[^\\\\\\`]?\\`";
-        let anythingBetweenDoubleQuote: string = '\\\\\\"((?!\\\\\\").)*\\\\\\"|\\"(\\\\\\"|[^\\"])*?[^\\\\\\"]?\\"';
+      // The basic pattern for anything between quotes accepts equally single quote, double quote or back tick.
+      // One pattern that is accepted is to wrap between escaped quotes and allow inside anything (including non-escaped quotes) except escaped quotes.
+      // Another pattern that is accepted is to wrap between non-escaped quotes and allow inside anything (including escaped quotes) except non-escaped quotes.
+      // One problem with the "..." pattern is that a simple "\" (or anything ending with \") will not know if the backslash is part of the inside of quote-quote
+      // or together with the following quote represents a \" and needs to look forward for another ending quote.
+      // If there is another quote somewhere else later in the command line (another -D or a file name wrapped in quotes) everything until that first upcoming quote
+      // will be included.
+      // Example that doesn't work: -DSLASH_DEFINE="\" -DSOME_OTHER_SWITCH "drive:\folder\file.extension"
+      //                            SLASH_DEFINE is equal to '\" -DSOME_OTHER_SWITCH '
+      // Example that works: -DGIT_VERSION=" \" 1.2.3 \" "
+      //                      GIT_VERSION is equal to ' \" 1.2.3 '
+      // Unfortunately, we also can't identify this to log in the output channel for later analysis of more makefile switch and quoting user scenarios.
+      // Fortunately, we didn't encounter the last scenario, only the first.
+      function anythingBetweenQuotesBasicPattern(quoteChar: string): string {
+         return '\\\\\\' + quoteChar + "((?!\\\\\\" + quoteChar + ").)*\\\\\\" + quoteChar + "|" +  // \" anything(except \") \"
+                "\\" + quoteChar + "(\\\\\\" + quoteChar + "|[^\\" + quoteChar + "])*?[^\\\\\\" + quoteChar + "]?\\" + quoteChar; // " anything (except ") "
+      }
 
-        // If the switch is fully quoted with ', like ('-DMY_DEFINE="MyValue"'), don't allow single quotes
-        // inside the switch value.
-        // One example of what can be broken if we don't do this: gcc '-DDEF1=' '-DDef2=val2'
-        // in which case DEF1 would be seen as DEF1=' ' instead of empty =
-        let str: string = anythingBetweenReverseQuote + '|' + anythingBetweenDoubleQuote + (fullyQuoted ? "" : '|' + anythingBetweenSingleQuote);
-        return str;
+      // If the switch is fully quoted with ', like ('-DMY_DEFINE="MyValue"'), don't allow single quotes
+      // inside the switch value.
+      // One example of what can be broken if we don't do this: gcc '-DDEF1=' '-DDef2=val2'
+      // in which case DEF1 would be seen as DEF1=' ' instead of empty =
+      let str: string = anythingBetweenQuotesBasicPattern("`") + '|' + anythingBetweenQuotesBasicPattern('"') + (fullyQuoted ? "" : '|' + anythingBetweenQuotesBasicPattern("'"));
+      return str;
     }
 
     function mainPattern(fullyQuoted: boolean): string {
@@ -586,7 +598,7 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string, removeSu
 
     match = regexp.exec(args);
     while (match) {
-        let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 21;
+        let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 26;
         let result: string = match[matchIndex];
         if (result) {
            if (removeSurroundingQuotes) {
