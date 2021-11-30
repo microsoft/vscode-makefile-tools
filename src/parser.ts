@@ -428,7 +428,7 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
 
     let parseCompilerArgsScriptFile: string = util.parseCompilerArgsScriptFile();
     let parseCompilerArgsScriptContent: string;
-    if (process.platform === "win32") {
+    if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
         // There is a potential problem with the windows version of the script:
         // A fragment like "-sw1,-sw2,-sw3" gets split by comma and a fragment like
         // "-SwDef=Val" is split by equal. Opened GitHub issue
