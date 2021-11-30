@@ -149,7 +149,8 @@ suite('Fake dryrun parsing', /*async*/() => {
 
             // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
             // from this extension repository instead of a real installation which may vary from system to system.
-            configuration.setPreConfigureScript(path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure_nonwin.sh"));
+            const rootPath: string = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.path : "./";
+            configuration.setPreConfigureScript(path.posix.join(rootPath, ".vscode/preconfigure_nonwin.sh"));
             await make.preConfigure(make.TriggeredBy.tests);
 
             configuration.prepareConfigurationsQuickPick();
