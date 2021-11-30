@@ -63,6 +63,7 @@ export function writeFile(filePath: string, content: string): string | undefined
     try {
         fs.writeFileSync(filePath, content);
     } catch (e) {
+       logger.message("what???");
     }
 
     return undefined;
@@ -82,7 +83,7 @@ export function tmpDir(): string {
 export function parseCompilerArgsScriptFile(): string {
     let scriptFile: string = path.join(tmpDir(), "parseCompilerArgs");
 
-    if (process.platform === "win32") {
+    if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
         scriptFile += ".bat";
     } else {
         scriptFile += ".sh";

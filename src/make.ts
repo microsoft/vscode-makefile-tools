@@ -552,9 +552,10 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
         return ConfigureBuildReturnCodeTypes.notFound;
     }
 
-    if (!util.checkFileExistsSync(scriptFile)) {
+    const scriptFileWin: string = path.win32.join("./", scriptFile);
+    if (!util.checkFileExistsSync(scriptFileWin)) {
         vscode.window.showErrorMessage("Could not find pre-configure script.");
-        logger.message(`Could not find the given pre-configure script "${scriptFile}" on disk. `);
+        logger.message(`Could not find the given pre-configure script "${scriptFileWin}" on disk. `);
         return ConfigureBuildReturnCodeTypes.notFound;
     }
 
@@ -638,30 +639,37 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     // Create a temporary wrapper for the user pre-configure script so that we collect
     // in another temporary output file the environrment variables that were produced.
     let wrapScriptFile: string = path.join(util.tmpDir(), "wrapPreconfigureScript");
-    let wrapScriptOutFile: string = wrapScriptFile + ".out";
+    let wrapScriptFilePosix: string = wrapScriptFile.split(path.sep).join(path.posix.sep);
+    wrapScriptFilePosix = wrapScriptFilePosix.replace("C:", "/c");
+    let wrapScriptOutFile: string = path.posix.join("./", wrapScriptFilePosix) + ".out";
+    wrapScriptFilePosix += ".sh";
     let wrapScriptContent: string;
-    if (process.platform === "win32") {
+    if (process.platform === "win32" && process.env.MSYSTEM === undefined) {
         wrapScriptContent = `call "${scriptFile}"\r\n`;
         wrapScriptContent += `set > "${wrapScriptOutFile}"`;
         wrapScriptFile += ".bat";
     } else {
-        wrapScriptContent = `source '${scriptFile}'\n`;
-        wrapScriptContent += `printenv > '${wrapScriptOutFile}'`;
+         wrapScriptContent = `ls -al '${wrapScriptOutFile}'`;
+      //   wrapScriptContent = `source '${path.posix.join("./", scriptFile)}'\n`;
+      //   wrapScriptContent = `printenv > '${wrapScriptOutFile}'`;
         wrapScriptFile += ".sh";
     }
 
-    util.writeFile(wrapScriptFile, wrapScriptContent);
+    util.writeFile(path.win32.join("./", wrapScriptFile), wrapScriptContent);
+    const tmpWrap: string | undefined = util.readFile(wrapScriptFile);
 
     let scriptArgs: string[] = [];
     let runCommand: string;
-    if (process.platform === 'win32') {
+    if (process.platform === 'win32' && process.env.MSYSTEM === undefined) {
         runCommand = "cmd";
         scriptArgs.push("/c");
-        scriptArgs.push(`"${wrapScriptFile}"`);
+        //scriptArgs.push(`dir "${wrapScriptFile}"`);
+        scriptArgs.push(`"${wrapScriptFilePosix}"`);
     } else {
         runCommand = "/bin/bash";
         scriptArgs.push("-c");
-        scriptArgs.push(`"source '${wrapScriptFile}'"`);
+        //scriptArgs.push(`ls -al "${wrapScriptFile}"`);
+      //   scriptArgs.push(`"source '${wrapScriptFilePosix}'"`);
     }
 
     try {

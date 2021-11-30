@@ -1,289 +1,212 @@
-Resolving extension log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\MakefileTools.out"
-Found build log path setting "./dummy_dryrun.log"
-Resolving build log path to  "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log"
-No current configuration is defined in the settings file
-No target defined in the settings file
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log" for IntelliSense integration with CppTools...
-Updating the CppTools IntelliSense Configuration Provider.
-Parsing dry-run output for CppTools Custom Configuration Provider.
-Sending Workspace Browse Configuration: -----------------------------------
-    Browse Path: 
-    Standard: undefined
-    Compiler Path: undefined
-----------------------------------------------------------------------------
-Found the following configurations defined in makefile.configurations setting: InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
+Pre-configuring...
+Script: "${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure_nonwin.sh"
+
+${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>call "${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure_nonwin.sh" 
+
+${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>set  1>"C:\msys64\tmp\wrapPreconfigureScript.out" 
+The pre-configure succeeded.
 Setting configuration - 8cc_mingw
 Found build log path setting "./8cc_mingw_dryrun.log" defined for configuration "8cc_mingw
-Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log"
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log" for IntelliSense integration with CppTools...
+Resolving build log path to "${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log"
+Deduced command 'c:\some\other\fake\path.exe ' for configuration 8cc_mingw
+Saving opened files before build.
+Preprocessing: "${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log"
+Preprocess elapsed time: 0
+Parsing for IntelliSense.
 Updating the CppTools IntelliSense Configuration Provider.
 Parsing dry-run output for CppTools Custom Configuration Provider.
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o main.o main.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\main.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;main.o;main.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o cpp.o cpp.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\cpp.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;cpp.o;cpp.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o debug.o debug.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\debug.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;debug.o;debug.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o dict.o dict.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dict.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;dict.o;dict.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o gen.o gen.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\gen.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;gen.o;gen.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o lex.o lex.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\lex.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;lex.o;lex.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o vector.o vector.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\vector.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;vector.o;vector.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o parse.o parse.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\parse.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;parse.o;parse.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o buffer.o buffer.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\buffer.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;buffer.o;buffer.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o map.o map.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\map.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;map.o;map.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o error.o error.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\error.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;error.o;error.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o path.o path.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\path.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;path.o;path.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o file.o file.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\file.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;file.o;file.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o set.o set.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\set.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;set.o;set.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -Wall -Wno-strict-aliasing -std=gnu11 -g -I. -O0 -DBUILD_DIR='"/c/git/8cc"'   -c -o encoding.o encoding.c
+Sending configuration for file ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\encoding.c -----------------------------------
+    Defines: BUILD_DIR='"/c/git/8cc"'
+    Includes: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Force Includes: 
+    Standard: gnu11
+    IntelliSense Mode: msvc-x64
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;encoding.o;encoding.c
+---------------------------------------------------------------------------------------------------
+Found compiler command: cc -o 8cc main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o 
 Sending Workspace Browse Configuration: -----------------------------------
-    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Standard: undefined
-    Compiler Path: C:\msys64\usr\bin\cc.exe
+    Browse Path: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
+    Standard: gnu11
+    Compiler Path: C:\msys64\mingw64\bin\cc.exe
+    Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;encoding.o;encoding.c
 ----------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\main.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\cpp.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\debug.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dict.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\gen.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\lex.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\vector.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\parse.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\buffer.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\map.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\error.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\path.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\file.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\set.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\encoding.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log" for targets...
-Found the following build targets: path.o;cleanobj;parse.o;8cc;cpp.o;debug.o;test;gen.o;testtest;error.o;stage3;all;map.o;self;dict.o;file.o;runtests;encoding.o;set.o;vector.o;stage1;clean;lex.o;buffer.o;stage2;main.o;utiltest.o;utiltest;fulltest
-Setting target all
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log" for IntelliSense integration with CppTools...
-Updating the CppTools IntelliSense Configuration Provider.
-Parsing dry-run output for CppTools Custom Configuration Provider.
-Sending Workspace Browse Configuration: -----------------------------------
-    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Standard: undefined
-    Compiler Path: C:\msys64\usr\bin\cc.exe
-----------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\main.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\cpp.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\debug.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dict.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\gen.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\lex.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\vector.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\parse.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\buffer.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\map.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\error.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\path.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\file.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\set.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\encoding.c -----------------------------------
-    Defines: BUILD_DIR=
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
-    Force Includes: 
-    Standard: gnu11
-    IntelliSense Mode: msvc-x64
-    Compiler Path: C:\msys64\usr\bin\cc.exe
----------------------------------------------------------------------------------------------------
-Building the current target. Command: c:\some\other\fake\path all
-Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log" for launch configurations...
-Parsing dry-run output for Launch (debug/run) configuration.
-Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc()
-Setting launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc()"
+Parsing for IntelliSense elapsed time: 0
+Parsing for launch targets.
+Found linker command: cc -o 8cc main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o 
+Producing target binary: 8cc
+Adding launch configuration:
+${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc()
+Found the following 1 launch targets defined in the makefile: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc()
+Complete list of launch targets: ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc()
+Parsing for launch targets elapsed time: 0
+Generating parse content for build targets.
+Parsing for build targets from: "${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log"
+Found the following 30 build targets defined in the makefile: .PHONY;8cc;all;buffer.o;clean;cleanobj;cpp.o;debug.o;dict.o;encoding.o;error.o;file.o;fulltest;gen.o;lex.o;main.o;map.o;parse.o;path.o;runtests;self;set.o;stage1;stage2;stage3;test;testtest;utiltest;utiltest.o;vector.o
+Complete list of build targets: .PHONY;8cc;all;buffer.o;clean;cleanobj;cpp.o;debug.o;dict.o;encoding.o;error.o;file.o;fulltest;gen.o;lex.o;main.o;map.o;parse.o;path.o;runtests;self;set.o;stage1;stage2;stage3;test;testtest;utiltest;utiltest.o;vector.o
+Parsing build targets elapsed time: 0
+Configure finished. The status for all the subphases that ran:
+loadFromCache: return code = -3, elapsed time = 0
+generateParseContent: return code = 0, elapsed time = 0
+preprocessParseContent: return code = 0, elapsed time = 0
+parseIntelliSense: return code = 0, elapsed time = 0
+parseLaunch: return code = 0, elapsed time = 0
+dryrunTargets: return code = 0, elapsed time = 0
+parseTargets: return code = 0, elapsed time = 0
+Configure succeeded.
+Configure elapsed time: 0
+Inserting a new entry for ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
+Setting current launch target "${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc()"
 Created the following debug config:
    type = cppdbg
-   cwd = ${command:makefile.launchTargetDirectory} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
+   cwd = ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros (= ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros)
    args = 
-   program = ${command:makefile.launchTargetPath} (= {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc)
-   miMode = gdb
-   miDebuggerPath = C:\msys64\usr\bin\gdb.exe
-Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'
+   program = ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc (= ${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc)
+   MIMode = gdb
+   miDebuggerPath = C:\msys64\mingw64\bin\gdb.exe
+   stopAtEntry = undefined
+   symbolSearchPath = undefined
+Running command '"${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc" ' in the terminal from location '${REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'
+Setting target all
+Building target "all" with command: "c:\some\other\fake\path.exe all"
