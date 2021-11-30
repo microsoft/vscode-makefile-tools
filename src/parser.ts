@@ -492,14 +492,14 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
         };
 
         let stderr: any = (result: string): void => {
-            logger.messageNoCR(`Error while running the compiler args parser script '${parseCompilerArgsScriptFile}'` +
-                `for regions "${compilerArgRegions}": "${result}"`, "Normal");
+            logger.message(`Error while running the compiler args parser script '${parseCompilerArgsScriptFile}'` +
+                `for regions ("${compilerArgRegions})": "${result}"`, "Normal");
         };
 
         // Running the compiler arguments parsing script can use the system locale.
         const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, stdout, stderr);
         if (result.returnCode !== 0) {
-            logger.messageNoCR(`The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode}`, "Normal");
+            logger.message(`The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode} for regions (${compilerArgRegions})`, "Normal");
         }
     } catch (error) {
         logger.message(error);
@@ -532,9 +532,11 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string, removeSu
     //    (example): -DMY_DEFINE='"SOME_VALUE"'
 
     function anythingBetweenQuotes(fullyQuoted: boolean): string {
-        let anythingBetweenReverseQuote: string = '\\`[^\\`]*?\\`';
-        let anythingBetweenSingleQuote: string = "\\'[^\\']*?\\'";
-        let anythingBetweenDoubleQuote: string = '\\"[^\\"]*?\\"';
+       // In regexp101:
+       // \\\"((?!\\\").)*\\\"|\"(\\\"|[^\"])*?[^\\\"]?\"
+        let anythingBetweenReverseQuote: string = '\\\\\\`((?!\\\\\\`).)*\\\\\\`|\\`(\\\\\\`|[^\\`])*?[^\\\\\\`]?\\`';
+        let anythingBetweenSingleQuote: string = "\\\\\\`((?!\\\\\\`).)*\\\\\\`|\\`(\\\\\\`|[^\\`])*?[^\\\\\\`]?\\`";
+        let anythingBetweenDoubleQuote: string = '\\\\\\"((?!\\\\\\").)*\\\\\\"|\\"(\\\\\\"|[^\\"])*?[^\\\\\\"]?\\"';
 
         // If the switch is fully quoted with ', like ('-DMY_DEFINE="MyValue"'), don't allow single quotes
         // inside the switch value.
@@ -584,13 +586,15 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string, removeSu
 
     match = regexp.exec(args);
     while (match) {
-        let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 18;
+        let matchIndex: number = (match[2].startsWith("'") && match[2].endsWith("'")) ? 8 : 21;
         let result: string = match[matchIndex];
         if (result) {
            if (removeSurroundingQuotes) {
               result = util.removeSurroundingQuotes(result);
            }
             results.push(result);
+        } else {
+           logger.message(`!!!Double check matchIndex!!! Remove in last commit befor merge!!! args = ${args}`);
         }
         match = regexp.exec(args);
     }
