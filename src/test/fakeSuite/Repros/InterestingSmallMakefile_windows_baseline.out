@@ -8,6 +8,7 @@ Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
 Deduced command 'c:\some\other\fake\path.exe ' for configuration InterestingSmallMakefile_windows_configDebug
 Saving opened files before build.
+Loading configurations from cache is not necessary.
 Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
 Preprocess elapsed time: 0
 Parsing for IntelliSense.
@@ -193,7 +194,6 @@ Found the following 21 build targets defined in the makefile: Arch1_main.exe;Arc
 Complete list of build targets: Arch1_main.exe;Arch2_main.exe;Arch3_main.exe;Execute_Arch1;Execute_Arch2;Execute_Arch3;all;buildArch1;buildArch2;buildArch3;builds;clean;create_dirs;create_dirs_Arch1;create_dirs_Arch2;create_dirs_Arch3;install;rebuild;runs;simple;simple/simple.exe
 Parsing build targets elapsed time: 0
 Configure finished. The status for all the subphases that ran:
-loadFromCache: return code = -3, elapsed time = 0
 generateParseContent: return code = 0, elapsed time = 0
 preprocessParseContent: return code = 0, elapsed time = 0
 parseIntelliSense: return code = 0, elapsed time = 0
