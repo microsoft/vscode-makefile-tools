@@ -106,8 +106,8 @@ suite('Fake dryrun parsing', /*async*/() => {
       let baselineLogContent: string = util.readFile(baselineLogPath) || "";
       let extensionRootPath: string = path.resolve(__dirname, "../../../../");
       baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-      fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-      fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
       expect(extensionLogContent).to.be.equal(baselineLogContent);
   });
 
