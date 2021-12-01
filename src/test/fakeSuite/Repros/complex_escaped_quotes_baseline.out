@@ -35,28 +35,6 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: gcc -I\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/\" -I\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder\" -I \"../../\" -I \"../folder with space/subfolder\" -I\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/\" -I   \"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/\" "myfile.cpp"
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
-    Defines: 
-    Includes: \"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder\";\"../../\";\"../folder with space/subfolder\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/\"
-    Force Includes: 
-    Standard: c++17
-    IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
-    Compiler Arguments: 
-    Windows SDK Version: 12.3.45678.9\
----------------------------------------------------------------------------------------------------
-Found compiler command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/' '-I\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\"' -I\"..\" -I'\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\"' -I"\"../folder with space/\"" myfile.cpp -I '\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/"folder2 with space"/subfolder/\"' 
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/;\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\";\"..\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\";\"../folder with space/\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/"folder2 with space"/subfolder/\"
-    Force Includes: 
-    Standard: c++17
-    IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
-    Compiler Arguments: 
-    Windows SDK Version: 12.3.45678.9\
----------------------------------------------------------------------------------------------------
 Found compiler command: gcc "myfile.cpp" -DBETWEEN="some.value" -DBETWEEN_EMPTY="" -DBETWEEN_SPACE="some value" -DBETWEEN_INNER_QUOTE="some\"value" -DBETWEEN_INNER_QUOTE_SLASH="some\' /\"/ \` value" -DEND_WITH_BACKSLASH="value\"
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN="some.value";BETWEEN_EMPTY="";BETWEEN_SPACE="some value";BETWEEN_INNER_QUOTE="some\"value";BETWEEN_INNER_QUOTE_SLASH="some\' /\"/ \` value";END_WITH_BACKSLASH="value\"
@@ -90,10 +68,10 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/' '-I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder"' -I".." -I'"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/"' -I '"../folder with space/"' "myfile.cpp" -I '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"' 
+Found compiler command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/' '-I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder"' -I".." '-I "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/"' '-I "../folder with space/"' "myfile.cpp" -I `{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"` 
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..\folder with space\";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\'folder1 with space\'\"folder2 with space\"\subfolder\"
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
@@ -123,21 +101,10 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: gcc -I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/\' -I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder\' -I \'../../\' -I \'../folder with space/subfolder\' -I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/'folder with space'/subfolder/\' -I   \'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/\' "myfile.cpp"
+Found compiler command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/' -I"../folder with space/" myfile.cpp -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/' 
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
-    Includes: \'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder\';\'../../\';\'../folder with space/subfolder\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/'folder with space'/subfolder/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/\'
-    Force Includes: 
-    Standard: c++17
-    IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
-    Compiler Arguments: 
-    Windows SDK Version: 12.3.45678.9\
----------------------------------------------------------------------------------------------------
-Found compiler command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\'' -I\'..\' -I'\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\'' -I"\'../folder with space/\'" myfile.cpp -I '\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/\'' 
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\';\'..\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\';\'../folder with space/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/\'
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
@@ -178,10 +145,10 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\'' -I'..' -I'\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\'' -I '\'../folder with space/\'' "myfile.cpp" -I '\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/\'' 
+Found compiler command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/' -I '../folder with space/' "myfile.cpp" -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/' 
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\';{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\';\'../folder with space/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/\'
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
@@ -190,7 +157,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
 Sending Workspace Browse Configuration: -----------------------------------
-    Browse Path: \"../../\";\"../folder with space/\";\"../folder with space/subfolder\";\"..\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/"folder2 with space"/subfolder/\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/\";\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\";\'../../\';\'../folder with space/\';\'../folder with space/subfolder\';\'..\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/'folder with space'/subfolder/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/\';\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\';{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..\folder with space\";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\'folder1 with space\'\"folder2 with space\"\subfolder\";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder
+    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/";{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder
     Standard: c++17
     Compiler Path: gcc.exe
     Compiler Arguments: 
@@ -204,16 +171,6 @@ Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
 Found linker command: gcc '-DBETWEEN=\"some.value\"' -D'"BETWEEN_EMPTY"=\"\"' myfile.cpp -D'BETWEEN_SPACE=\"some value\"' -D "BETWEEN_INNER_QUOTE=\"some value\"" -DBETWEEN_INNER_QUOTE_SLASH='\"some\' /"/ \` value\"' 
-The link command is not producing a target binary explicitly. Assuming a.out
-Producing target binary: a.out
-Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc -I\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/\" -I\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder\" -I \"../../\" -I \"../folder with space/subfolder\" -I\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/\" -I   \"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/\" "myfile.cpp"
-The link command is not producing a target binary explicitly. Assuming a.out
-Producing target binary: a.out
-Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/' '-I\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\"' -I\"..\" -I'\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\"' -I"\"../folder with space/\"" myfile.cpp -I '\"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/"folder2 with space"/subfolder/\"' 
 The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
@@ -233,7 +190,7 @@ The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/' '-I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder"' -I".." -I'"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/"' -I '"../folder with space/"' "myfile.cpp" -I '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"' 
+Found linker command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/' '-I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder"' -I".." '-I "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/"' '-I "../folder with space/"' "myfile.cpp" -I `{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"` 
 The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
@@ -248,12 +205,7 @@ The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc -I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/\' -I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder\' -I \'../../\' -I \'../folder with space/subfolder\' -I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/'folder with space'/subfolder/\' -I   \'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/\' "myfile.cpp"
-The link command is not producing a target binary explicitly. Assuming a.out
-Producing target binary: a.out
-Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\'' -I\'..\' -I'\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\'' -I"\'../folder with space/\'" myfile.cpp -I '\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/\'' 
+Found linker command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/' -I"../folder with space/" myfile.cpp -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/' 
 The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
@@ -273,7 +225,7 @@ The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\'' -I'..' -I'\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/\'' -I '\'../folder with space/\'' "myfile.cpp" -I '\'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/\'' 
+Found linker command: gcc -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/' -I '../folder with space/' "myfile.cpp" -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/' 
 The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
@@ -329,28 +281,6 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: gcc /I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\\" /I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\" /I \"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir1\dir2\..\..\\" /I \"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\folder with space\subfolder\" /I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder with space\'\subfolder\\" /I   \"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder\\" "myfile.cpp"
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
-    Defines: 
-    Includes: \"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir1\dir2\..\..\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\folder with space\subfolder\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder with space\'\subfolder\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder\\"
-    Force Includes: 
-    Standard: c++17
-    IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
-    Compiler Arguments: 
-    Windows SDK Version: 12.3.45678.9\
----------------------------------------------------------------------------------------------------
-Found compiler command: gcc /I'{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder' '/I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\"' /I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\" /I'\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\\"' /I"\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\folder with space\\"" "myfile.cpp" /I '\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\'folder2 with space\'\subfolder\\"' 
-Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
-    Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder;\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\folder with space\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\'folder2 with space\'\subfolder\\"
-    Force Includes: 
-    Standard: c++17
-    IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
-    Compiler Arguments: 
-    Windows SDK Version: 12.3.45678.9\
----------------------------------------------------------------------------------------------------
 Found compiler command: gcc "myfile.cpp" /DBETWEEN='some.value' /DBETWEEN_EMPTY='' /DBETWEEN_SPACE='some value' /DBETWEEN_INNER_QUOTE='some\'value' /DBETWEEN_INNER_QUOTE_SLASH='some\' /\'/ \" value' /DEND_WITH_BACKSLASH='value\'
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN='some.value';BETWEEN_EMPTY='';BETWEEN_SPACE='some value';BETWEEN_INNER_QUOTE='some\'value';BETWEEN_INNER_QUOTE_SLASH='some\' /\'/ \" value';END_WITH_BACKSLASH='value\'
@@ -384,10 +314,10 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: gcc '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder"' '/I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder"' /I'".."' /I '"..\folder with space"' "myfile.cpp" ' /I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder" ' 
+Found compiler command: gcc '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder"' '/I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder"' /I'..' '/I "..\folder with space"' "myfile.cpp" ' /I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder" ' 
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..\folder with space";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
@@ -395,10 +325,10 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: gcc /I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder" /I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder" /I '".."' /I "..\folder with space\subfolder" /I   "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder" "myfile.cpp"
+Found compiler command: gcc /I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder" /I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder" /I `..` /I `..\folder with space\subfolder` /I   "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder" "myfile.cpp"
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
@@ -406,10 +336,10 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: gcc '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder"' '/I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder"' /I'".."' '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder \"with\" space\subfolder" ' /I '"..\folder with space"\subfolder' "myfile.cpp" '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder"' 
+Found compiler command: gcc '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder"' '/I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder"' '/I`..`' '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder \"with\" space\subfolder" ' /I '..\"folder with space"\subfolder' "myfile.cpp" '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder"' 
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
-    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..\folder with space"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder
+    Includes: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\"folder with space"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
@@ -418,7 +348,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
 Sending Workspace Browse Configuration: -----------------------------------
-    Browse Path: \"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder with space\'\subfolder\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\'folder2 with space\'\subfolder\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir1\dir2\..\..\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\folder with space\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\folder with space\subfolder\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder\\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\";\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\\";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..\folder with space";{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\"..\folder with space"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder
+    Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\"folder with space"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder
     Standard: c++17
     Compiler Path: gcc.exe
     Compiler Arguments: 
@@ -432,16 +362,6 @@ Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
 Found linker command: gcc '/DBETWEEN=\'some.value\'' /D"'BETWEEN_EMPTY'=\'\'" myfile.cpp /D'BETWEEN_SPACE=\'some value\'' /D "BETWEEN_INNER_QUOTE=\'some value\'" /DBETWEEN_INNER_QUOTE_SLASH='\'some\" /"/ \` value\'' 
-The link command is not producing a target binary explicitly. Assuming a.out
-Producing target binary: a.out
-Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc /I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\\" /I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\" /I \"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir1\dir2\..\..\\" /I \"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\folder with space\subfolder\" /I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder with space\'\subfolder\\" /I   \"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder\\" "myfile.cpp"
-The link command is not producing a target binary explicitly. Assuming a.out
-Producing target binary: a.out
-Adding launch configuration:
-{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc /I'{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder' '/I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\"' /I\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\" /I'\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\\"' /I"\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder\dir\..\folder with space\\"" "myfile.cpp" /I '\"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\'folder2 with space\'\subfolder\\"' 
 The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
@@ -461,17 +381,17 @@ The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder"' '/I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder"' /I'".."' /I '"..\folder with space"' "myfile.cpp" ' /I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder" ' 
+Found linker command: gcc '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder"' '/I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder"' /I'..' '/I "..\folder with space"' "myfile.cpp" ' /I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder" ' 
 The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc /I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder" /I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder" /I '".."' /I "..\folder with space\subfolder" /I   "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder" "myfile.cpp"
+Found linker command: gcc /I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder" /I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder" /I `..` /I `..\folder with space\subfolder` /I   "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder" "myfile.cpp"
 The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>a.out()
-Found linker command: gcc '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder"' '/I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder"' /I'".."' '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder \"with\" space\subfolder" ' /I '"..\folder with space"\subfolder' "myfile.cpp" '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder"' 
+Found linker command: gcc '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder"' '/I"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder"' '/I`..`' '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder \"with\" space\subfolder" ' /I '..\"folder with space"\subfolder' "myfile.cpp" '/I "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder"' 
 The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
