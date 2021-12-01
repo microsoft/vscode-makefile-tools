@@ -101,11 +101,13 @@ suite('Fake dryrun parsing', /*async*/() => {
       // Until then, print into base and diff files for easier viewing
       // when the test fails.
       let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
-      let baselineLogPath: string = path.join(parsedPath.dir, "../complex_escaped_quotes_baseline.out");
+      let baselineLogPath: string = path.join(parsedPath.dir, systemPlatform === "win32" ? "../complex_escaped_quotes_baseline.out" : "../complex_escaped_quotes_nonWin_baseline.out");
       let extensionLogContent: string = util.readFile(extensionLogPath) || "";
+      extensionLogContent = extensionLogContent.replace(/\r\n/mg, "\n");
       let baselineLogContent: string = util.readFile(baselineLogPath) || "";
       let extensionRootPath: string = path.resolve(__dirname, "../../../../");
       baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+      baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
       // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
       // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
       expect(extensionLogContent).to.be.equal(baselineLogContent);
