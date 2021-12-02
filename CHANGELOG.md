@@ -1,6 +1,19 @@
-# Change Log
+# What's New?
 
-All notable changes to the "vscode-makefile-tools" extension will be documented in this file.
+## 0.3.0
+Improvements:
+- Generate compile commands. [#104](https://github.com/microsoft/vscode-makefile-tools/issues/104) [@rapgenic](https://github.com/rapgenic)
+- Support for problem matchers. [#7](https://github.com/microsoft/vscode-makefile-tools/issues/7)
+
+Bug fixes:
+- Fix wrong extension activation for non makefile projects. [#181](https://github.com/microsoft/vscode-makefile-tools/issues/181)
+- Align defaults for C/C++ standard and IntelliSense mode to expectations in CMakeTools/CppTools. [#119](https://github.com/microsoft/vscode-makefile-tools/issues/119)
+- Fix parsing source file paths when in quotes. [#203](https://github.com/microsoft/vscode-makefile-tools/issues/203)
+- Don't show the Makefile Tools output channel automatically. [#115](https://github.com/microsoft/vscode-makefile-tools/issues/115)
+- Improve parsing of more complicated scenarios of quoting and escaping for -D and -I. [#169](https://github.com/microsoft/vscode-makefile-tools/issues/169)
+- Pass pre-configure environment to the build task. [PR #104](https://github.com/microsoft/vscode-makefile-tools/pull/239)
+- Complete the parsing input text with what is outputted on stderr as well, besides stdout. [PR #238](https://github.com/microsoft/vscode-makefile-tools/pull/238)
+- Fix paths processing for non-windows tools run on windows outside MinGW/CygWin environments. [#219](https://github.com/microsoft/vscode-makefile-tools/issues/219)
 
 ## 0.2.2
 - Fix pre-configure script invocation, broken on Linux starting with Makefile Tools 0.2.1. [#170](https://github.com/microsoft/vscode-makefile-tools/issues/170) [@avrahamshukron](https://github.com/avrahamshukron)
