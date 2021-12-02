@@ -3,8 +3,17 @@
     "makefile.buildLog": "./dummy_dryrun.log",
     "makefile.makePath": "c:/some/other/fake/path",
     "makefile.loggingLevel": "Debug",
+    "makefile.additionalCompilerNames": ["MyOwnFakeCompiler"],
     "makefile.configureOnOpen": false,
     "makefile.configurations": [
+        {
+            "name": "complex_escaped_quotes",
+            "buildLog": "./complex_escaped_quotes_dryrun.log"
+        },
+        {
+            "name": "complex_escaped_quotes_winOnly",
+            "buildLog": "./complex_escaped_quotes_winOnly_dryrun.log"
+        },
         {
             "name": "InterestingSmallMakefile_windows_configDebug",
             "buildLog": "./InterestingSmallMakefile_windows_dryrunDebug.log"

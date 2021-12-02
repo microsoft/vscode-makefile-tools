@@ -1,0 +1,22 @@
+# Various compiler command line fragments with interesting quoting and escaping scenarios to verify the extension's parser.
+
+# Wrapping with escaped double quotes (only applicable to -D. -I even if it parses the same, APIs like path making relative/absolute will fail.
+# and they are not used in real code bases).
+MyOwnFakeCompiler "myfile.cpp" -DBETWEEN=\"some.value\" -DBETWEEN_EMPTY=\"\" -DBETWEEN_SPACE=\"some value\" -DBETWEEN_INNER_QUOTE=\"some"value\" -DBETWEEN_INNER_QUOTE_SLASH=\"some\' /"/ \` value\" 
+MyOwnFakeCompiler '-DBETWEEN=\"some.value\"' -D'"BETWEEN_EMPTY"=\"\"' myfile.cpp -D'BETWEEN_SPACE=\"some value\"' -D "BETWEEN_INNER_QUOTE=\"some value\"" -DBETWEEN_INNER_QUOTE_SLASH='\"some\' /"/ \` value\"' 
+
+# Wrapping with double quotes (-I '" is not used in real code bases and also, even if the extension parses that the same as -D '", correctly,
+# path APIs for making absolute/relative will fail, so no use to test.
+MyOwnFakeCompiler "myfile.cpp" -DBETWEEN="some.value" -DBETWEEN_EMPTY="" -DBETWEEN_SPACE="some value" -DBETWEEN_INNER_QUOTE="some\"value" -DBETWEEN_INNER_QUOTE_SLASH="some\' /\"/ \` value" -DEND_WITH_BACKSLASH="value\"
+MyOwnFakeCompiler '-DBETWEEN="some.value"' -D'"BETWEEN_EMPTY"=""' myfile.cpp -D'BETWEEN_SPACE="some value"' -D 'BETWEEN_INNER_QUOTE="some value"' -DBETWEEN_INNER_QUOTE_SLASH='"some\' /\"/ \` value"' 
+MyOwnFakeCompiler -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/" -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder" -I "../../" -I "../folder with space/subfolder" -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/" -I   "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/" "myfile.cpp"
+MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/' '-I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder"' -I".." '-I "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/"' '-I "../folder with space/"' "myfile.cpp" -I `{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"` 
+
+# Repeat all of the above for single quotes
+MyOwnFakeCompiler "myfile.cpp" -DBETWEEN=\'some.value\' -DBETWEEN_EMPTY=\'\' -DBETWEEN_SPACE=\'some value\' -DBETWEEN_INNER_QUOTE=\'some'value\' -DBETWEEN_INNER_QUOTE_SLASH=\'some\" /'/ \` value\' 
+MyOwnFakeCompiler '-DBETWEEN=\'some.value\'' -D"'BETWEEN_EMPTY'=\'\'" myfile.cpp -D'BETWEEN_SPACE=\'some value\'' -D "BETWEEN_INNER_QUOTE=\'some value\'" -DBETWEEN_INNER_QUOTE_SLASH='\'some\" /"/ \` value\'' 
+MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/' -I"../folder with space/" myfile.cpp -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/' 
+MyOwnFakeCompiler "myfile.cpp" -DBETWEEN='some.value' -DBETWEEN_EMPTY='' -DBETWEEN_SPACE='some value' -DBETWEEN_INNER_QUOTE='some\'value' -DBETWEEN_INNER_QUOTE_SLASH='some\' /\'/ \" value' -DEND_WITH_BACKSLASH='value\'
+MyOwnFakeCompiler '-DBETWEEN=\'some.value\'' -D'\'BETWEEN_EMPTY\'=\'\'' myfile.cpp -D'BETWEEN_SPACE=\'some value\'' -D 'BETWEEN_INNER_QUOTE=\'some value\'' -DBETWEEN_INNER_QUOTE_SLASH='\'some\" /\'/ \` value\'' 
+MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder' -I '../../' -I '../folder with space/subfolder' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' -I   '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/' "myfile.cpp"
+MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/' -I '../folder with space/' "myfile.cpp" -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/' 
