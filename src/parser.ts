@@ -542,7 +542,7 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string, removeSu
       // Example that doesn't work: -DSLASH_DEFINE="\" -DSOME_OTHER_SWITCH "drive:\folder\file.extension"
       //                            SLASH_DEFINE is equal to '\" -DSOME_OTHER_SWITCH '
       // Example that works: -DGIT_VERSION=" \" 1.2.3 \" "
-      //                      GIT_VERSION is equal to ' \" 1.2.3 '
+      //                      GIT_VERSION is equal to ' \" 1.2.3 \" '
       // Unfortunately, we also can't identify this to log in the output channel for later analysis of more makefile switch and quoting user scenarios.
       // Fortunately, we didn't encounter the last scenario, only the first.
       function anythingBetweenQuotesBasicPattern(quoteChar: string): string {
@@ -605,8 +605,6 @@ function parseMultipleSwitchFromToolArguments(args: string, sw: string, removeSu
               result = util.removeSurroundingQuotes(result);
            }
             results.push(result);
-        } else {
-           logger.message(`!!!Double check matchIndex!!! Remove in last commit befor merge!!! args = ${args}`);
         }
         match = regexp.exec(args);
     }
