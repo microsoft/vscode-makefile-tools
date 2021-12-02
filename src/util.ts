@@ -314,6 +314,10 @@ export async function cygpath(pathStr: string): Promise<string> {
 // Helper that transforms a posix path (used in various non windows environments on a windows system)
 // into a windows style path.
 export async function ensureWindowsPath(path: string): Promise<string> {
+   if (process.platform !== "win32" || !path.startsWith("/")) {
+      return path;
+   }
+
    let winPath: string = path;
 
    if (process.env.MSYSTEM !== undefined) {
@@ -358,9 +362,7 @@ export async function makeFullPath(relPath: string, curPath: string | undefined)
     }
 
     // For win32, ensure we have a windows style path.
-    if (process.platform === "win32" && fullPath.startsWith("/")) {
-      fullPath = await ensureWindowsPath(fullPath);
-    }
+    fullPath = await ensureWindowsPath(fullPath);
 
     return fullPath;
 }
