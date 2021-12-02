@@ -60,6 +60,8 @@ suite('Fake dryrun parsing', /*async*/() => {
     }
 
     test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async() => {
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
       // Settings reset from the previous test run.
       extension.getState().reset(false);
       await configuration.initFromStateAndSettings();
@@ -78,10 +80,14 @@ suite('Fake dryrun parsing', /*async*/() => {
       }
       configuration.setExtensionLog(extensionLogPath);
 
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
       // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
       // from this extension repository instead of a real installation which may vary from system to system.
       configuration.setPreConfigureScript(path.join(vscode.workspace.rootPath || "./", systemPlatform === "win32" ? ".vscode/preconfigure.bat" : ".vscode/preconfigure_nonwin.sh"));
       await make.preConfigure(make.TriggeredBy.tests);
+
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 3 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
       configuration.prepareConfigurationsQuickPick();
       configuration.setConfigurationByName("complex_escaped_quotes");
@@ -90,11 +96,15 @@ suite('Fake dryrun parsing', /*async*/() => {
       // Compare log output only from a configure to see how we parse the quotes and escape characters in compiler command lines.
       let retc: number = await make.cleanConfigure(make.TriggeredBy.tests, true);
 
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 4 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
       // Additional windows msvc only testing.
       if (systemPlatform === "win32") {
          configuration.setConfigurationByName("complex_escaped_quotes_winOnly");
          retc = await make.cleanConfigure(make.TriggeredBy.tests, true);
       }
+
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 5 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
       // Compare the output log with the baseline
       // TODO: incorporate relevant diff snippets into the test log.
@@ -110,8 +120,13 @@ suite('Fake dryrun parsing', /*async*/() => {
       baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
       // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
       // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 6 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
       expect(extensionLogContent).to.be.equal(baselineLogContent);
-    });
+
+      console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 7 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+     });
 
     if (systemPlatform === "win32") {
         test('Interesting small makefile - windows', async() => {
