@@ -6,6 +6,14 @@
     "makefile.configureOnOpen": false,
     "makefile.configurations": [
         {
+            "name": "complex_escaped_quotes",
+            "buildLog": "./complex_escaped_quotes_dryrun.log"
+        },
+        {
+            "name": "complex_escaped_quotes_winOnly",
+            "buildLog": "./complex_escaped_quotes_winOnly_dryrun.log"
+        },
+        {
             "name": "InterestingSmallMakefile_windows_configDebug",
             "buildLog": "./InterestingSmallMakefile_windows_dryrunDebug.log"
         },
