@@ -251,7 +251,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
 
                     // Kill the task that is used for building.
                     // This will take care of all processes that were spawned.
-                    let myTask = vscode.tasks.taskExecutions.find(tsk => {
+                    let myTask: vscode.TaskExecution | undefined = vscode.tasks.taskExecutions.find(tsk => {
                         if (tsk.task.name === makefileBuildTaskName) {
                             return tsk;
                         }
@@ -322,10 +322,11 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         let myTaskArgs: vscode.ShellQuotedString[] = makeArgs.map(arg => {
             return {value: arg, quoting: vscode.ShellQuoting.Strong};
         });
-        let shellExec: vscode.ShellExecution = new vscode.ShellExecution(myTaskCommand, myTaskArgs);
+        let myTaskOptions: vscode.ShellExecutionOptions = {env: util.mergeEnvironment(process.env as util.EnvironmentVariables)};
+        let shellExec: vscode.ShellExecution = new vscode.ShellExecution(myTaskCommand, myTaskArgs, myTaskOptions);
         let myTask: vscode.Task = new vscode.Task({type: "shell", group: "build", label: makefileBuildTaskName},
-            vscode.TaskScope.Workspace, makefileBuildTaskName, "makefile", shellExec);
-        
+        vscode.TaskScope.Workspace, makefileBuildTaskName, "makefile", shellExec);
+
         myTask.problemMatchers = configuration.getConfigurationProblemMatchers();
         myTask.presentationOptions.clear = clearTerminalOutput;
         myTask.presentationOptions.showReuseMessage = true;
@@ -333,7 +334,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         await vscode.tasks.executeTask(myTask);
 
         const result: number = await(new Promise<number>(resolve => {
-            let disposable = vscode.tasks.onDidEndTaskProcess(e => {
+            let disposable: vscode.Disposable = vscode.tasks.onDidEndTaskProcess(e => {
                 if (e.execution.task.name === makefileBuildTaskName) {
                     disposable.dispose();
                     resolve(e.exitCode);
