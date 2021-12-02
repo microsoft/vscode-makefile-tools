@@ -3,6 +3,7 @@
     "makefile.buildLog": "./dummy_dryrun.log",
     "makefile.makePath": "c:/some/other/fake/path",
     "makefile.loggingLevel": "Debug",
+    "makefile.additionalCompilerNames": ["MyOwnFakeCompiler"],
     "makefile.configureOnOpen": false,
     "makefile.configurations": [
         {

@@ -21,7 +21,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
@@ -98,14 +98,14 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Force Includes: 
     Standard: c++17
     IntelliSense Mode: gcc-x64
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
 Sending Workspace Browse Configuration: -----------------------------------
     Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\"folder with space"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\"folder with space\"\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\\'folder1 with space\'\\`folder2 with space\`\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\folder\ with\ escaped\ space\subfolder
     Standard: c++17
-    Compiler Path: gcc.exe
+    Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\GitHub\compilers\gcc.exe
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ----------------------------------------------------------------------------
