@@ -259,8 +259,16 @@ export function spawnChildProcess(
     const finalEnvironment: EnvironmentVariables = mergeEnvironment(process.env as EnvironmentVariables, environment);
 
     return new Promise<SpawnProcessResult>((resolve, reject) => {
+        // Honor the "terminal.integrated.automationShell.<platform>" setting.
+        // According to documentation (and settings.json schema), the three allowed values for <platform> are "windows", "linux" and "osx".
+        // child_process.SpawnOptions accepts a string (which can be read from the above setting) or the boolean true to let VSCode pick a default
+        // based on where it is running.
+        let shellType: string | undefined;
+        let shellPlatform: string = (process.platform === "win32") ? "windows" : (process.platform === "linux") ? "linux" : "osx";
+        let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("terminal");
+        shellType = workspaceConfiguration.get<string>(`integrated.automationShell.${shellPlatform}`);
         const child: child_process.ChildProcess = child_process.spawn(`"${processName}"`, args,
-                                                                      { cwd: workingDirectory, shell: true, env: finalEnvironment });
+                                                                      { cwd: workingDirectory, shell: shellType || true, env: finalEnvironment });
         make.setCurPID(child.pid);
 
         if (stdoutCallback) {

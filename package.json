@@ -606,12 +606,12 @@
                 },
                 {
                     "command": "makefile.outline.buildTarget",
-                    "when": "makefile:fullFeatureSet",
+                    "when": "view == makefile.outline",
                     "group": "navigation@1"
                 },
                 {
                     "command": "makefile.outline.buildCleanTarget",
-                    "when": "makefile:fullFeatureSet",
+                    "when": "view == makefile.outline",
                     "group": "1_makefileOutline@4"
                 },
                 {
@@ -643,12 +643,12 @@
                 },
                 {
                     "command": "makefile.outline.buildTarget",
-                    "when": "makefile:fullFeatureSet",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
                     "group": "1_stateActions@1"
                 },
                 {
                     "command": "makefile.outline.buildCleanTarget",
-                    "when": "makefile:fullFeatureSet",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
                     "group": "1_stateActions@2"
                 },
                 {
