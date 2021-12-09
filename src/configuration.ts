@@ -551,7 +551,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     let makefileUsed: string | undefined = makefileConfiguration?.makefilePath || makefilePath;
     if (makefileUsed) {
         configurationMakeArgs.push("-f");
-        configurationMakeArgs.push(`"${makefileUsed}"`);
+        configurationMakeArgs.push(`${makefileUsed}`);
         // Need to rethink this (GitHub 59).
         // Some repos don't work when we automatically add -C, others don't work when we don't.
         // configurationMakeArgs.push("-C");
@@ -563,7 +563,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     let makeDirectoryUsed: string | undefined = makefileConfiguration?.makeDirectory || makeDirectory;
     if (makeDirectoryUsed) {
         configurationMakeArgs.push("-C");
-        configurationMakeArgs.push(`"${makeDirectoryUsed}"`);
+        configurationMakeArgs.push(`${makeDirectoryUsed}`);
     }
 
     if (configurationMakeCommand) {
