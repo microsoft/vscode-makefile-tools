@@ -2,22 +2,21 @@ Setting configuration - test-make-f
 Found build log path setting "./doesnt_exist.log" defined for configuration "test-make-f"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\doesnt_exist.log"
 Build log not found. Remove the build log setting or provide a build log file on disk at the given location.
-Deduced command 'make.exe -f ./SubDir/makefile with space' for configuration "test-make-f"
+Deduced command 'doesnt\exist\make.exe -f ./SubDir/makefile with space' for configuration "test-make-f"
 Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.
 Saving opened files before build.
 Loading configurations from cache is not necessary.
-Generating configuration cache with command: 'make.exe -f ./SubDir/makefile with space --dry-run --always-make --keep-going --print-directory'
+Generating configuration cache with command: 'doesnt\exist\make.exe -f ./SubDir/makefile with space --dry-run --always-make --keep-going --print-directory'
 Writing the dry-run output: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\dryrun.log
 Spawning child process with:
- process name: make.exe
+ process name: doesnt\exist\make.exe
  process args: -f,"./SubDir/makefile with space",--dry-run,--always-make,--keep-going,--print-directory
  working directory: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
  shell type: default
 Generating dry-run elapsed time: 0
 The make dry-run command failed.
 IntelliSense may work only partially or not at all.
-'make.exe' is not recognized as an internal or external command,
-operable program or batch file.
+The system cannot find the path specified.
  
 
 You can see the detailed dry-run output at {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\dryrun.log
@@ -42,10 +41,10 @@ No launch configurations have been detected.
 Complete list of launch targets: 
 Parsing for launch targets elapsed time: 0
 Generating parse content for build targets.
-Generating targets information with command: 'make.exe all -f ./SubDir/makefile with space --print-data-base --no-builtin-variables --no-builtin-rules --question'
+Generating targets information with command: 'doesnt\exist\make.exe all -f ./SubDir/makefile with space --print-data-base --no-builtin-variables --no-builtin-rules --question'
 Writing the dry-run output: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\targets.log
 Spawning child process with:
- process name: make.exe
+ process name: doesnt\exist\make.exe
  process args: all,-f,"./SubDir/makefile with space",--print-data-base,--no-builtin-variables,--no-builtin-rules,--question
  working directory: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
  shell type: default
@@ -67,16 +66,16 @@ Setting configuration - test-make-C
 Found build log path setting "./doesnt_exist.log" defined for configuration "test-make-C"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\doesnt_exist.log"
 Build log not found. Remove the build log setting or provide a build log file on disk at the given location.
-Deduced command 'make.exe -C ./SubDir with space/' for configuration "test-make-C"
+Deduced command 'doesnt\exist\make.exe -C ./SubDir with space/' for configuration "test-make-C"
 Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.
 Saving opened files before build.
-Building target "clean" with command: 'make.exe clean -C ./SubDir with space/'
+Building target "clean" with command: 'doesnt\exist\make.exe clean -C ./SubDir with space/'
 Executing task: "Makefile Tools Build Task" with quoting style "Strong"
- command name: make.exe
+ command name: doesnt\exist\make.exe
  command args clean,-C,./SubDir with space/
 Target "clean" failed to build.
-Building target "all" with command: 'make.exe all -C ./SubDir with space/'
+Building target "all" with command: 'doesnt\exist\make.exe all -C ./SubDir with space/'
 Executing task: "Makefile Tools Build Task" with quoting style "Strong"
- command name: make.exe
+ command name: doesnt\exist\make.exe
  command args all,-C,./SubDir with space/
 Target "all" failed to build.
