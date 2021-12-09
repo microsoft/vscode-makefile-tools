@@ -1,0 +1,81 @@
+Setting configuration - test-make-f
+Found build log path setting "./doesnt_exist.log" defined for configuration "test-make-f"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/doesnt_exist.log"
+Build log not found. Remove the build log setting or provide a build log file on disk at the given location.
+Deduced command 'doesnt/exist/make -f ./SubDir/makefile with space' for configuration "test-make-f"
+Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.
+Saving opened files before build.
+Loading configurations from cache is not necessary.
+Generating configuration cache with command: 'doesnt/exist/make -f ./SubDir/makefile with space --dry-run --always-make --keep-going --print-directory'
+Writing the dry-run output: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/dryrun.log
+Spawning child process with:
+ process name: doesnt/exist/make
+ process args: -f,"./SubDir/makefile with space",--dry-run,--always-make,--keep-going,--print-directory
+ working directory: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
+ shell type: default
+Generating dry-run elapsed time: 0
+The make dry-run command failed.
+IntelliSense may work only partially or not at all.
+/bin/sh: 1: doesnt/exist/make: not found
+ 
+
+You can see the detailed dry-run output at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/dryrun.log
+Make sure that the extension is invoking the same make command as in your development prompt environment.
+You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]
+Also make sure your code base does not have any known issues with the dry-run switches used by this extension (makefile.dryrunSwitches).
+If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: https://github.com/microsoft/vscode-makefile-tools/issues
+Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/dryrun.log"
+Preprocess elapsed time: 0
+Parsing for IntelliSense.
+Updating the CppTools IntelliSense Configuration Provider.
+Parsing dry-run output for CppTools Custom Configuration Provider.
+Sending Workspace Browse Configuration: -----------------------------------
+    Browse Path: 
+    Standard: undefined
+    Compiler Path: undefined
+    Compiler Arguments: 
+----------------------------------------------------------------------------
+Parsing for IntelliSense elapsed time: 0
+Parsing for launch targets.
+No launch configurations have been detected.
+Complete list of launch targets: 
+Parsing for launch targets elapsed time: 0
+Generating parse content for build targets.
+Generating targets information with command: 'doesnt/exist/make all -f ./SubDir/makefile with space --print-data-base --no-builtin-variables --no-builtin-rules --question'
+Writing the dry-run output: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/targets.log
+Spawning child process with:
+ process name: doesnt/exist/make
+ process args: all,-f,"./SubDir/makefile with space",--print-data-base,--no-builtin-variables,--no-builtin-rules,--question
+ working directory: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
+ shell type: default
+Generating dry-run elapsed time: 0
+Parsing for build targets from: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/targets.log"
+No build targets have been detected.
+Complete list of build targets: 
+Parsing build targets elapsed time: 0
+Configure finished. The status for all the subphases that ran:
+generateParseContent: return code = 127, elapsed time = 0
+preprocessParseContent: return code = 0, elapsed time = 0
+parseIntelliSense: return code = 0, elapsed time = 0
+parseLaunch: return code = 0, elapsed time = 0
+dryrunTargets: return code = 127, elapsed time = 0
+parseTargets: return code = 0, elapsed time = 0
+Configure succeeded.
+Configure elapsed time: 0
+Setting configuration - test-make-C
+Found build log path setting "./doesnt_exist.log" defined for configuration "test-make-C"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/doesnt_exist.log"
+Build log not found. Remove the build log setting or provide a build log file on disk at the given location.
+Deduced command 'doesnt/exist/make -C ./SubDir with space/' for configuration "test-make-C"
+Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.
+Saving opened files before build.
+Building target "clean" with command: 'doesnt/exist/make clean -C ./SubDir with space/'
+Executing task: "Makefile Tools Build Task" with quoting style "Strong"
+ command name: doesnt/exist/make
+ command args clean,-C,./SubDir with space/
+Target "clean" failed to build.
+Building target "all" with command: 'doesnt/exist/make all -C ./SubDir with space/'
+Executing task: "Makefile Tools Build Task" with quoting style "Strong"
+ command name: doesnt/exist/make
+ command args all,-C,./SubDir with space/
+Target "all" failed to build.
