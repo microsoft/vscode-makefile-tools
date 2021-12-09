@@ -8,13 +8,13 @@
     "makefile.configurations": [
         {
             "name": "test-make-f",
-            "makePath": "./make",
+            "makePath": "./doesnt/exist/make",
             "buildLog": "./doesnt_exist.log",
             "makeArgs": ["-f", "./SubDir/makefile with space"]
         },
         {
             "name": "test-make-C",
-            "makePath": "./make",
+            "makePath": "./doesnt/exist/make",
             "buildLog": "./doesnt_exist.log",
             "makeArgs": ["-C", "./SubDir with space/"]
         },
