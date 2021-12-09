@@ -67,9 +67,9 @@
         "onCommand:makefile.outline.cleanConfigure",
         "onCommand:makefile.outline.preConfigure",
         "onCommand:makefile.resetState",
-        "workspaceContains:makefile",
-        "workspaceContains:Makefile",
-        "workspaceContains:GNUmakefile"
+        "workspaceContains:**/makefile",
+        "workspaceContains:**/Makefile",
+        "workspaceContains:**/GNUmakefile"
     ],
     "main": "./out/src/extension.js",
     "contributes": {

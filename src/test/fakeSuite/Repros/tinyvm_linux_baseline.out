@@ -2,9 +2,9 @@ Pre-configuring...
 Script: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh"
 The pre-configure succeeded.
 Setting configuration - tinyvm_linux_pedantic
-Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
-Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration tinyvm_linux_pedantic
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
 Saving opened files before build.
 Loading configurations from cache is not necessary.
 Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
@@ -169,4 +169,4 @@ Created the following debug config:
    symbolSearchPath = undefined
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/tvmi" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros'
 Setting target tvmi
-Building target "tvmi" with command: "c:/some/other/fake/make tvmi PEDANTIC=yes"
+Building target "tvmi" with command: 'c:/some/other/fake/make tvmi PEDANTIC=yes'

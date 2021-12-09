@@ -4,9 +4,9 @@ Script: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfi
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>call "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat" 
 The pre-configure succeeded.
 Setting configuration - InterestingSmallMakefile_windows_configDebug
-Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
-Deduced command 'c:\some\other\fake\path.exe ' for configuration InterestingSmallMakefile_windows_configDebug
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
 Saving opened files before build.
 Loading configurations from cache is not necessary.
 Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
@@ -239,10 +239,10 @@ Created the following debug config:
    symbolSearchPath = undefined
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch2\Debug\main.exe" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'
 Setting configuration - InterestingSmallMakefile_windows_configRelSize
-Found build log path setting "./InterestingSmallMakefile_windows_dryrunRelSize.log" defined for configuration "InterestingSmallMakefile_windows_configRelSize
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunRelSize.log" defined for configuration "InterestingSmallMakefile_windows_configRelSize"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunRelSize.log"
-Deduced command 'c:\some\other\fake\make.exe OPT=RelSize' for configuration InterestingSmallMakefile_windows_configRelSize
+Deduced command 'c:\some\other\fake\make.exe OPT=RelSize' for configuration "InterestingSmallMakefile_windows_configRelSize"
 Setting configuration - InterestingSmallMakefile_windows_configRelSpeed
-Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration InterestingSmallMakefile_windows_configRelSpeed
+Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration "InterestingSmallMakefile_windows_configRelSpeed"
 Setting target Execute_Arch3
-Building target "Execute_Arch3" with command: "c:\fake\path\make.exe Execute_Arch3 OPT=RelSpeed"
+Building target "Execute_Arch3" with command: 'c:\fake\path\make.exe Execute_Arch3 OPT=RelSpeed'

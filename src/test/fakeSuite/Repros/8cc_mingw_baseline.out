@@ -13,7 +13,7 @@ Sending Workspace Browse Configuration: -----------------------------------
 ----------------------------------------------------------------------------
 Found the following configurations defined in makefile.configurations setting: InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
 Setting configuration - 8cc_mingw
-Found build log path setting "./8cc_mingw_dryrun.log" defined for configuration "8cc_mingw
+Found build log path setting "./8cc_mingw_dryrun.log" defined for configuration "8cc_mingw"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log"
 Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log" for IntelliSense integration with CppTools...
 Updating the CppTools IntelliSense Configuration Provider.

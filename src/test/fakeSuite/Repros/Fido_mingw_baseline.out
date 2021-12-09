@@ -1,5 +1,5 @@
 Setting configuration - Fido_mingw
-Found build log path setting "./Fido_mingw_dryrun.log" defined for configuration "Fido_mingw
+Found build log path setting "./Fido_mingw_dryrun.log" defined for configuration "Fido_mingw"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\Fido_mingw_dryrun.log"
 Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\Fido_mingw_dryrun.log" for IntelliSense integration with CppTools...
 Updating the CppTools IntelliSense Configuration Provider.

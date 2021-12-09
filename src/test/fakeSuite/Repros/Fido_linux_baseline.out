@@ -2,9 +2,9 @@ Pre-configuring...
 Script: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh"
 The pre-configure succeeded.
 Setting configuration - Fido_linux
-Found build log path setting "./Fido_linux_dryrun.log" defined for configuration "Fido_linux
+Found build log path setting "./Fido_linux_dryrun.log" defined for configuration "Fido_linux"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/Fido_linux_dryrun.log"
-Deduced command 'c:/some/other/fake/path ' for configuration Fido_linux
+Deduced command 'c:/some/other/fake/path ' for configuration "Fido_linux"
 Saving opened files before build.
 Loading configurations from cache is not necessary.
 Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/Fido_linux_dryrun.log"
@@ -225,4 +225,4 @@ Created the following debug config:
    symbolSearchPath = undefined
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/foo.o" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros'
 Setting target bin/foo.o
-Building target "bin/foo.o" with command: "c:/some/other/fake/path bin/foo.o"
+Building target "bin/foo.o" with command: 'c:/some/other/fake/path bin/foo.o'

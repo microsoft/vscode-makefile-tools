@@ -274,6 +274,11 @@ export function spawnChildProcess(
         let qArgs: string[] = ensureQuoted ? args.map(arg => {
             return quoteStringIfNeeded(arg);
         }) : args;
+
+        if (ensureQuoted) {
+           logger.message(`Spawning child process with:\n process name: ${qProcessName}\n process args: ${qArgs}\n working directory: ${workingDirectory}\n shell type: ${shellType || "default"}`, "Debug");
+        }
+
         const child: child_process.ChildProcess = child_process.spawn(qProcessName, qArgs,
                                                                       { cwd: workingDirectory, shell: shellType || true, env: finalEnvironment });
         make.setCurPID(child.pid);

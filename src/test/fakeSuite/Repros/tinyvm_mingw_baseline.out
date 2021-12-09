@@ -1,6 +1,6 @@
 Setting configuration - tinyvm_mingw_pedantic
-Found command 'c:\some\other\fake\make PEDANTIC=yes' for configuration tinyvm_mingw_pedantic
-Found build log path setting "./tinyvm_mingw_dryrunPedantic.log" defined for configuration "tinyvm_mingw_pedantic
+Found command 'c:\some\other\fake\make PEDANTIC=yes' for configuration "tinyvm_mingw_pedantic"
+Found build log path setting "./tinyvm_mingw_dryrunPedantic.log" defined for configuration "tinyvm_mingw_pedantic"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\tinyvm_mingw_dryrunPedantic.log"
 Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\tinyvm_mingw_dryrunPedantic.log" for IntelliSense integration with CppTools...
 Updating the CppTools IntelliSense Configuration Provider.

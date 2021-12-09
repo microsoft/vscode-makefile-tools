@@ -2,9 +2,9 @@ Pre-configuring...
 Script: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh"
 The pre-configure succeeded.
 Setting configuration - 8cc_linux
-Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux
+Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
-Deduced command 'c:/some/other/fake/path ' for configuration 8cc_linux
+Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
 Saving opened files before build.
 Loading configurations from cache is not necessary.
 Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
@@ -205,4 +205,4 @@ Created the following debug config:
    symbolSearchPath = undefined
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros'
 Setting target all
-Building target "all" with command: "c:/some/other/fake/path all"
+Building target "all" with command: 'c:/some/other/fake/path all'
