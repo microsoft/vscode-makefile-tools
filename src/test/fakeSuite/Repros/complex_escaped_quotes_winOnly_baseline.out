@@ -4,9 +4,9 @@ Script: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfi
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>call "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat" 
 The pre-configure succeeded.
 Setting configuration - complex_escaped_quotes_winOnly
-Found build log path setting "./complex_escaped_quotes_winOnly_dryrun.log" defined for configuration "complex_escaped_quotes_winOnly
+Found build log path setting "./complex_escaped_quotes_winOnly_dryrun.log" defined for configuration "complex_escaped_quotes_winOnly"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\complex_escaped_quotes_winOnly_dryrun.log"
-Deduced command 'c:\some\other\fake\path.exe ' for configuration complex_escaped_quotes_winOnly
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "complex_escaped_quotes_winOnly"
 Saving opened files before build.
 Loading configurations from cache is not necessary.
 Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\complex_escaped_quotes_winOnly_dryrun.log"

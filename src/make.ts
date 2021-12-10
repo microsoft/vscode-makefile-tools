@@ -170,7 +170,7 @@ export function prepareBuildTarget(target: string): string[] {
 
     makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
 
-    logger.message(`Building target "${target}" with command: "` + configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + '"');
+    logger.message(`Building target "${target}" with command: '${configuration.getConfigurationMakeCommand()} ${makeArgs.join(" ")}'`);
     return makeArgs;
 }
 
@@ -233,7 +233,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
     }
 
     configAndTarget = `"${configAndTarget}"`;
-    let popupStr: string = 'Building ' + (clean ? "clean " : "") + 'the current makefile configuration ' + configAndTarget;
+    let popupStr: string = `Building ${clean ? "clean " : ""}the current makefile configuration ${configAndTarget}`;
 
     let cancelBuild: boolean = false; // when the build was cancelled by the user
 
@@ -257,7 +257,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
                         }
                     });
 
-                    logger.message(`Killing task ${makefileBuildTaskName}.`);
+                    logger.message(`Killing task "${makefileBuildTaskName}".`);
                     myTask?.terminate();
                 });
 
@@ -318,9 +318,11 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
 export async function doBuildTarget(progress: vscode.Progress<{}>, target: string, clearTerminalOutput: boolean): Promise<number> {
     let makeArgs: string[] = prepareBuildTarget(target);
     try {
-        let myTaskCommand: vscode.ShellQuotedString = {value: configuration.getConfigurationMakeCommand(), quoting: vscode.ShellQuoting.Strong};
+        const quotingStlye: vscode.ShellQuoting = vscode.ShellQuoting.Strong;
+        const quotingStyleName: string = "Strong";
+        let myTaskCommand: vscode.ShellQuotedString = {value: configuration.getConfigurationMakeCommand(), quoting: quotingStlye};
         let myTaskArgs: vscode.ShellQuotedString[] = makeArgs.map(arg => {
-            return {value: arg, quoting: vscode.ShellQuoting.Strong};
+            return {value: arg, quoting: quotingStlye};
         });
         let myTaskOptions: vscode.ShellExecutionOptions = {env: util.mergeEnvironment(process.env as util.EnvironmentVariables)};
         let shellExec: vscode.ShellExecution = new vscode.ShellExecution(myTaskCommand, myTaskArgs, myTaskOptions);
@@ -331,6 +333,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         myTask.presentationOptions.clear = clearTerminalOutput;
         myTask.presentationOptions.showReuseMessage = true;
 
+        logger.message(`Executing task: "${myTask.name}" with quoting style "${quotingStyleName}"\n command name: ${myTaskCommand.value}\n command args ${makeArgs.join()}`, "Debug");
         await vscode.tasks.executeTask(myTask);
 
         const result: number = await(new Promise<number>(resolve => {
@@ -343,9 +346,9 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         }));
 
         if (result !== ConfigureBuildReturnCodeTypes.success) {
-            logger.message(`Target ${target} failed to build.`);
+            logger.message(`Target "${target}" failed to build.`);
         } else {
-            logger.message(`Target ${target} built successfully.`);
+            logger.message(`Target "${target}" built successfully.`);
         }
 
         return result;
@@ -461,10 +464,10 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
             }
         });
 
-        logger.messageNoCR("Generating " + (getConfigureIsInBackground() ? "in the background a new " : "") + "configuration cache with command: ");
+        logger.messageNoCR(`Generating ${getConfigureIsInBackground() ? "in the background a new " : ""}configuration cache with command: `);
     }
 
-    logger.message(configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" "));
+    logger.message(`'${configuration.getConfigurationMakeCommand()} ${makeArgs.join(" ")}'`);
 
     try {
         let dryrunFile : string = forTargets ? "./targets.log" : "./dryrun.log";
@@ -475,7 +478,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         dryrunFile = util.resolvePathToRoot(dryrunFile);
         logger.message(`Writing the dry-run output: ${dryrunFile}`);
         const lineEnding: string = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
-        util.writeFile(dryrunFile, configuration.getConfigurationMakeCommand() + " " + makeArgs.join(" ") + lineEnding);
+        util.writeFile(dryrunFile, `${configuration.getConfigurationMakeCommand()} ${makeArgs.join(" ")}${lineEnding}`);
 
         let completeOutput: string = "";
         let stderrStr: string = "";
@@ -519,7 +522,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }, 5 * 1000);
 
         // The dry-run analysis should operate on english.
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, util.getWorkspaceRoot(), true, stdout, stderr);
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, util.getWorkspaceRoot(), true, true, stdout, stderr);
         clearInterval(timeout);
         let elapsedTime: number = util.elapsedTimeSince(startTime);
         logger.message(`Generating dry-run elapsed time: ${elapsedTime}`);
@@ -699,7 +702,7 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
         };
 
         // The preconfigure invocation should use the system locale.
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, stdout, stderr);
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, false, stdout, stderr);
         if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
             if (someErr) {
                 // Depending how the preconfigure scripts (and any inner called sub-scripts) are written,
@@ -1062,7 +1065,7 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
     let launchConfigurations: configuration.LaunchConfiguration[] = [];
 
     let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
+        progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""}...` });
     };
 
     let onFoundLaunchConfiguration: any = (launchConfiguration: configuration.LaunchConfiguration): void => {
@@ -1077,7 +1080,7 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
         });
 
         if (launchConfigurationsStr.length === 0) {
-            logger.message("No" + (getConfigureIsClean() ? "" : " new") + " launch configurations have been detected.");
+            logger.message(`No${getConfigureIsClean() ? "" : " new"}${getConfigureIsClean() ? "" : " new"} launch configurations have been detected.`);
         } else {
             // Sort and remove duplicates that can be created in the following scenarios:
             //    - the same target binary invoked several times with the same arguments and from the same path
@@ -1088,7 +1091,7 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
             //      corresponding to the final binary, not the intermediate ones.
             launchConfigurationsStr = util.sortAndRemoveDuplicates(launchConfigurationsStr);
 
-            logger.message(`Found the following ${launchConfigurationsStr.length}` + (getConfigureIsClean() ? "" : " new") + " launch targets defined in the makefile: " + launchConfigurationsStr.join(";"));
+            logger.message(`Found the following ${launchConfigurationsStr.length}${getConfigureIsClean() ? "" : " new"} launch targets defined in the makefile: ${launchConfigurationsStr.join(";")}`);
         }
 
         if (getConfigureIsClean()) {
@@ -1125,7 +1128,7 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
     let targets: string[] = [];
 
     let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "") });
+        progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""}` });
     };
 
     let onFoundTarget: any = (target: string): void => {
@@ -1135,10 +1138,10 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
     let retc: number = await parser.parseTargets(cancel, dryRunOutput, onStatus, onFoundTarget);
     if (retc === ConfigureBuildReturnCodeTypes.success) {
         if (targets.length === 0) {
-            logger.message("No" + (getConfigureIsClean() ? "" : " new") + " build targets have been detected.");
+            logger.message(`No${getConfigureIsClean() ? "" : " new"} build targets have been detected.`);
         } else {
             targets = targets.sort();
-            logger.message(`Found the following ${targets.length}` + (getConfigureIsClean() ? "" : " new") + " build targets defined in the makefile: " + targets.join(";"));
+            logger.message(`Found the following ${targets.length}${getConfigureIsClean() ? "" : " new"} build targets defined in the makefile: ${targets.join(";")}`);
         }
 
         if (getConfigureIsClean()) {
@@ -1171,10 +1174,10 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
     }
 
     let startTime: number = Date.now();
-    logger.message("Updating the CppTools IntelliSense Configuration Provider." + ((recursive) ? "(recursive)" : ""));
+    logger.message(`Updating the CppTools IntelliSense Configuration Provider.${(recursive) ? "(recursive)" : ""}`);
 
     let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
+        progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""} ...` });
     };
 
     let onFoundCustomConfigProviderItem: any = (customConfigProviderItem: parser.CustomConfigProviderItem): void => {
@@ -1223,7 +1226,7 @@ export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vs
     }
 
     let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: status + ((recursive) ? "(recursive)" : "" + "...") });
+        progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""} ...` });
     };
 
     return parser.preprocessDryRunOutput(cancel, dryrunOutput, onStatus);

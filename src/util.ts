@@ -184,7 +184,7 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
 
     try {
         // pgrep should run on english, regardless of the system setting.
-        const result: SpawnProcessResult = await spawnChildProcess('pgrep', ['-P', pid.toString()], getWorkspaceRoot(), true, stdout);
+        const result: SpawnProcessResult = await spawnChildProcess('pgrep', ['-P', pid.toString()], getWorkspaceRoot(), true, false, stdout);
         if (!!stdoutStr.length) {
             children = stdoutStr.split('\n').map((line: string) => Number.parseInt(line));
 
@@ -246,6 +246,7 @@ export function spawnChildProcess(
     args: string[],
     workingDirectory: string,
     forceEnglish: boolean,
+    ensureQuoted: boolean,
     stdoutCallback?: (stdout: string) => void,
     stderrCallback?: (stderr: string) => void): Promise<SpawnProcessResult> {
 
@@ -259,8 +260,27 @@ export function spawnChildProcess(
     const finalEnvironment: EnvironmentVariables = mergeEnvironment(process.env as EnvironmentVariables, environment);
 
     return new Promise<SpawnProcessResult>((resolve, reject) => {
-        const child: child_process.ChildProcess = child_process.spawn(`"${processName}"`, args,
-                                                                      { cwd: workingDirectory, shell: true, env: finalEnvironment });
+        // Honor the "terminal.integrated.automationShell.<platform>" setting.
+        // According to documentation (and settings.json schema), the three allowed values for <platform> are "windows", "linux" and "osx".
+        // child_process.SpawnOptions accepts a string (which can be read from the above setting) or the boolean true to let VSCode pick a default
+        // based on where it is running.
+        let shellType: string | undefined;
+        let shellPlatform: string = (process.platform === "win32") ? "windows" : (process.platform === "linux") ? "linux" : "osx";
+        let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("terminal");
+        shellType = workspaceConfiguration.get<string>(`integrated.automationShell.${shellPlatform}`);
+
+        // Final quoting decisions for process name and args before being executed.
+        let qProcessName: string = ensureQuoted ? quoteStringIfNeeded(processName) : processName;
+        let qArgs: string[] = ensureQuoted ? args.map(arg => {
+            return quoteStringIfNeeded(arg);
+        }) : args;
+
+        if (ensureQuoted) {
+           logger.message(`Spawning child process with:\n process name: ${qProcessName}\n process args: ${qArgs}\n working directory: ${workingDirectory}\n shell type: ${shellType || "default"}`, "Debug");
+        }
+
+        const child: child_process.ChildProcess = child_process.spawn(qProcessName, qArgs,
+                                                                      { cwd: workingDirectory, shell: shellType || true, env: finalEnvironment });
         make.setCurPID(child.pid);
 
         if (stdoutCallback) {
@@ -307,7 +327,7 @@ export async function cygpath(pathStr: string): Promise<string> {
   };
 
   // Running cygpath can use the system locale.
-  await spawnChildProcess("cygpath", [pathStr, "-w"], "", false, stdout);
+  await spawnChildProcess("cygpath", [pathStr, "-w"], "", false, false, stdout);
   return windowsPath;
 }
 
@@ -404,8 +424,8 @@ export function makeRelPaths(fullPaths: string[], curPath: string | undefined): 
 // Helper to remove any quotes(", ' or `) from a given string
 // because many file operations don't work properly with paths
 // having quotes in the middle.
+const quotesStr: string[] = ["'", '"', "`"];
 export function removeQuotes(str: string): string {
-   const quotesStr: string[] = ["'", '"', "`"];
    for (const p in quotesStr) {
       if (str.includes(quotesStr[p])) {
          let regExpStr: string = `${quotesStr[p]}`;
@@ -420,7 +440,6 @@ export function removeQuotes(str: string): string {
 // Remove only the quotes (", ' or `) that are surrounding the given string.
 export function removeSurroundingQuotes(str: string): string {
     let result: string = str.trim();
-    const quotesStr: string[] = ["'", '"', "`"];
     for (const p in quotesStr) {
       if (result.startsWith(quotesStr[p]) && result.endsWith(quotesStr[p])) {
          result = result.substring(1, str.length - 1);
@@ -429,6 +448,24 @@ export function removeSurroundingQuotes(str: string): string {
    }
 
     return str;
+}
+
+// Quote given string if it contains space and is not quoted already
+export function quoteStringIfNeeded(str: string) : string {
+   // No need to quote if there is no space present.
+   if (!str.includes(" ")) {
+      return str;
+   }
+
+   // Return if already quoted.
+   for (const q in quotesStr) {
+      if (str.startsWith(quotesStr[q]) && str.endsWith(quotesStr[q])) {
+         return str;
+      }
+   }
+
+   // Quote and return.
+   return `"${str}"`;
 }
 
 // Used when constructing a regular expression from file names which can contain

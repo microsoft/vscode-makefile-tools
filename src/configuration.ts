@@ -67,7 +67,7 @@ export function getCurrentMakefileConfiguration(): string { return currentMakefi
 export function setCurrentMakefileConfiguration(configuration: string): void {
     currentMakefileConfiguration = configuration;
     statusBar.setConfiguration(currentMakefileConfiguration);
-    logger.message("Setting configuration - " + currentMakefileConfiguration);
+    logger.message(`Setting configuration - ${currentMakefileConfiguration}`);
     analyzeConfigureParams();
 }
 
@@ -163,7 +163,7 @@ function readBuildLog(): void {
     buildLog = workspaceConfiguration.get<string>("buildLog");
     if (buildLog) {
         buildLog = util.resolvePathToRoot(buildLog);
-        logger.message('Build log defined at "' + buildLog + '"');
+        logger.message(`Build log defined at "${buildLog}"`);
         if (!util.checkFileExistsSync(buildLog)) {
             logger.message("Build log not found on disk.");
         }
@@ -551,7 +551,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     let makefileUsed: string | undefined = makefileConfiguration?.makefilePath || makefilePath;
     if (makefileUsed) {
         configurationMakeArgs.push("-f");
-        configurationMakeArgs.push(`"${makefileUsed}"`);
+        configurationMakeArgs.push(`${makefileUsed}`);
         // Need to rethink this (GitHub 59).
         // Some repos don't work when we automatically add -C, others don't work when we don't.
         // configurationMakeArgs.push("-C");
@@ -563,11 +563,11 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     let makeDirectoryUsed: string | undefined = makefileConfiguration?.makeDirectory || makeDirectory;
     if (makeDirectoryUsed) {
         configurationMakeArgs.push("-C");
-        configurationMakeArgs.push(`"${makeDirectoryUsed}"`);
+        configurationMakeArgs.push(`${makeDirectoryUsed}`);
     }
 
     if (configurationMakeCommand) {
-        logger.message("Deduced command '" + configurationMakeCommand + " " + configurationMakeArgs.join(" ") + "' for configuration " + configuration);
+        logger.message(`Deduced command '${configurationMakeCommand} ${configurationMakeArgs.join(" ")}' for configuration "${configuration}"`);
     }
 
     // Validation and warnings about properly defining the makefile and make tool.
@@ -637,6 +637,9 @@ export function getCommandForConfiguration(configuration: string | undefined): v
             };
 
             telemetry.logEvent("makefileNotFound", telemetryProperties);
+            vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", false);
+        } else {
+            vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
         }
     }
 }
@@ -663,11 +666,11 @@ export function getBuildLogForConfiguration(configuration: string | undefined): 
     configurationBuildLog = makefileConfiguration?.buildLog;
 
     if (configurationBuildLog) {
-        logger.message('Found build log path setting "' + configurationBuildLog + '" defined for configuration "' + configuration);
+        logger.message(`Found build log path setting "${configurationBuildLog}" defined for configuration "${configuration}"`);
 
         if (!path.isAbsolute(configurationBuildLog)) {
             configurationBuildLog = path.join(util.getWorkspaceRoot(), configurationBuildLog);
-            logger.message('Resolving build log path to "' + configurationBuildLog + '"');
+            logger.message(`Resolving build log path to "${configurationBuildLog}"`);
         }
 
         if (!util.checkFileExistsSync(configurationBuildLog)) {
@@ -1333,7 +1336,7 @@ export function setTargetByName(targetName: string) : void {
     currentTarget = targetName;
     let displayTarget: string = targetName ? currentTarget : "Default";
     statusBar.setTarget(displayTarget);
-    logger.message("Setting target " + displayTarget);
+    logger.message(`Setting target ${displayTarget}`);
     extension.getState().buildTarget = currentTarget;
     extension._projectOutlineProvider.updateBuildTarget(targetName);
 }
@@ -1425,7 +1428,7 @@ export async function setLaunchConfigurationByName(launchConfigurationName: stri
     }
 
     if (currentLaunchConfiguration) {
-        logger.message('Setting current launch target "' + launchConfigurationName + '"');
+        logger.message(`Setting current launch target "${launchConfigurationName}"`);
         extension.getState().launchConfiguration = launchConfigurationName;
         statusBar.setLaunchConfiguration(launchConfigurationName);
     } else {

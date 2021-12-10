@@ -7,6 +7,18 @@
     "makefile.configureOnOpen": false,
     "makefile.configurations": [
         {
+            "name": "test-make-f",
+            "makePath": "./doesnt/exist/make",
+            "buildLog": "./doesnt_exist.log",
+            "makeArgs": ["-f", "./SubDir/makefile with space"]
+        },
+        {
+            "name": "test-make-C",
+            "makePath": "./doesnt/exist/make",
+            "buildLog": "./doesnt_exist.log",
+            "makeArgs": ["-C", "./SubDir with space/"]
+        },
+        {
             "name": "complex_escaped_quotes",
             "buildLog": "./complex_escaped_quotes_dryrun.log"
         },

@@ -428,4 +428,50 @@ suite('Fake dryrun parsing', /*async*/() => {
          expect(extensionLogContent).to.be.equal(baselineLogContent);
       });
    }
+
+   test(`Test real make - ${systemPlatform}`, async () => {
+      // Settings reset from the previous test run.
+      extension.getState().reset(false);
+      await configuration.initFromStateAndSettings();
+
+      // We define extension log here as opposed to in the fake repro .vscode/settings.json
+      // because the logging produced at the first project load has too few important data to verify and much variations
+      // that are not worth to be processed when comparing with a baseline.
+      // Example: when running a test after incomplete debugging or after loading the fake repro project independently of the testing framework,
+      // which leaves the workspace state not clean, resulting in a different extension output log
+      // than without debugging/loading the project before.
+      // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
+      // because at project load time, there is no makefile log identified and no file is deleted on activation.
+      let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+      if (util.checkFileExistsSync(extensionLogPath)) {
+         util.deleteFileSync(extensionLogPath);
+      }
+
+      configuration.setExtensionLog(extensionLogPath);
+      configuration.prepareConfigurationsQuickPick();
+
+      configuration.setConfigurationByName("test-make-f");
+      await make.cleanConfigure(make.TriggeredBy.tests);
+
+      configuration.setConfigurationByName("test-make-C");
+      await make.buildTarget(make.TriggeredBy.tests, "all", true);
+
+      // Compare the output log with the baseline
+      // TODO: incorporate relevant diff snippets into the test log.
+      // Until then, print into base and diff files for easier viewing
+      // when the test fails.
+      let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
+      let baselineLogPath: string = path.join(parsedPath.dir, process.platform === "win32" ? "../test_real_make_windows_baseline.out" : "../test_real_make_nonWin_baseline.out");
+      let extensionLogContent: string = util.readFile(extensionLogPath) || "";
+      extensionLogContent = extensionLogContent.replace(/\r\n/mg, "\n");
+      let baselineLogContent: string = util.readFile(baselineLogPath) || "";
+      let extensionRootPath: string = path.resolve(__dirname, "../../../../");
+      baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+      baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
+      // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+
+      expect(extensionLogContent).to.be.equal(baselineLogContent);
+   });
+
 });
