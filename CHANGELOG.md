@@ -1,6 +1,6 @@
 # What's New?
 
-## 0.3.1
+## 0.3.1 
 Bug fixes:
 - Honor the "terminal.integrated.automationShell" setting when spawning make for configure. [#233](https://github.com/microsoft/vscode-makefile-tools/issues/233)
 - Remove the "build" button icon from other UIs than the main Makefile Tools panel. [#245](https://github.com/microsoft/vscode-makefile-tools/issues/245)
