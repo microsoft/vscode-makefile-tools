@@ -1,5 +1,12 @@
 # What's New?
 
+## 0.3.1
+Bug fixes:
+- Honor the "terminal.integrated.automationShell" setting when spawning make for configure. [#233](https://github.com/microsoft/vscode-makefile-tools/issues/233)
+- Remove the "build" button icon from other UIs than the main Makefile Tools panel. [#245](https://github.com/microsoft/vscode-makefile-tools/issues/245)
+- The build task fails for projects using -f or -C (makefile not in root) because of quoting. [#249](https://github.com/microsoft/vscode-makefile-tools/issues/249)
+- Fix activation for makefiles below the root. [#248](https://github.com/microsoft/vscode-makefile-tools/issues/248)
+
 ## 0.3.0
 Improvements:
 - Generate compile commands. [#104](https://github.com/microsoft/vscode-makefile-tools/issues/104) [@rapgenic](https://github.com/rapgenic)
