@@ -641,6 +641,9 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         } else {
             vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
         }
+    } else {
+        // If we have a build log, then we want Makefile Tools to be fully active and the UI visible.
+        vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
     }
 }
 
