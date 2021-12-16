@@ -76,7 +76,7 @@
         "commands": [
             {
                 "command": "makefile.buildTarget",
-                "title": "%makefile-tools.command.makefile.buildTarget.title"
+                "title": "%makefile-tools.command.makefile.buildTarget.title%"
             },
             {
                 "command": "makefile.buildCleanTarget",
