@@ -16,7 +16,8 @@ Spawning child process with:
 Generating dry-run elapsed time: 0
 The make dry-run command failed.
 IntelliSense may work only partially or not at all.
-/bin/sh: 1: doesnt/exist/make: not found
+/bin/sh: 1: 
+doesnt/exist/make: not found
  
 
 You can see the detailed dry-run output at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/dryrun.log
