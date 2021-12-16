@@ -76,7 +76,7 @@
         "commands": [
             {
                 "command": "makefile.buildTarget",
-                "title": "Makefile: Build the current target"
+                "title": "%makefile-tools.command.makefile.buildTarget.title"
             },
             {
                 "command": "makefile.buildCleanTarget",
@@ -358,7 +358,7 @@
                 "makefile.makePath": {
                     "type": "string",
                     "default": "make",
-                    "description": "The path to the make tool",
+                    "description": "%makefile-tools.configuration.makefile.makePath.description%",
                     "scope": "resource"
                 },
                 "makefile.makeDirectory": {
@@ -677,6 +677,10 @@
     "scripts": {
         "vscode:prepublish": "yarn compile",
         "compile": "yarn install && tsc -p ./",
+        "compile-production": "yarn install && yarn run translations-generate && yarn run compile",
+        "translations-export": "gulp translations-export",
+        "translations-generate": "gulp translations-generate",
+        "translations-import": "gulp translations-import",
         "watch": "tsc -watch -p ./",
         "package": "vsce package --yarn -o makefile-tools.vsix",
         "pretest": "yarn compile",
@@ -698,6 +702,14 @@
         "vsce": "^1.95.0",
         "vrsource-tslint-rules": "^6.0.0",
         "vscode": "^1.1.36",
+        "vscode-nls-dev": "^3.3.2",
+        "gulp": "^4.0.2",
+        "gulp-eslint": "^6.0.0",
+        "gulp-filter": "^6.0.0",
+        "gulp-mocha": "^8.0.0",
+        "gulp-sourcemaps": "^3.0.0",
+        "gulp-typescript": "^5.0.1",
+        "jsonc-parser": "^3.0.0",
         "vscode-test": "^0.4.1"
     },
     "dependencies": {
@@ -705,6 +717,7 @@
         "glob": "^7.1.6",
         "module-alias": "^2.2.2",
         "vscode-cpptools": "^5.0.0",
+        "vscode-nls": "^5.0.0",
         "vscode-extension-telemetry": "^0.1.2",
         "vscode-jsonrpc": "^3.6.2"
     },

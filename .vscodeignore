@@ -17,3 +17,14 @@ tsconfig.json
 tslint.json
 *.log
 *.vsix
+translations_auto_pr.js
+gulpfile.js
+vscode-extensions-localization-export/
+vscode-translations-import/
+i18n/
+jobs/
+build/
+docs/
+node_modules/
+out/
+scripts/

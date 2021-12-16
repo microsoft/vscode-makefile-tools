@@ -19,6 +19,10 @@ import * as util from './util';
 import * as vscode from 'vscode';
 import * as cpp from 'vscode-cpptools';
 
+import * as nls from 'vscode-nls';
+nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+
 let statusBar: ui.UI = ui.getUI();
 let launcher: launch.Launcher = launch.getLauncher();
 
@@ -368,7 +372,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 export async function deactivate(): Promise<void> {
-    vscode.window.showInformationMessage('The extension "vscode-makefile-tools" is de-activated');
+    vscode.window.showInformationMessage(localize("extension.deactivated", "The extension 'vscode-makefile-tools' is de-activated."));
 
     await telemetry.deactivate();
 
