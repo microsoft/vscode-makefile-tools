@@ -1,0 +1,4 @@
+{
+   "makefile-tools.command.makefile.buildTarget.title": "Makefile: Build the current target",
+   "makefile-tools.configuration.makefile.makePath.description": "The path to the make tool"
+}
