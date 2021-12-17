@@ -586,10 +586,10 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
         // If configuration command has a path (absolute or relative), check if it exists on disk and error if not.
         // If no path is given to the make tool, search all paths in the environment and error if make is not on the path.
-        const notFoundStr: string = localize("not.found", "not found.");
+        const makeNotFoundStr: string = localize("make.not.found", "{0} not found.", "Make");
         if (configurationCommandPath  !== "") {
             if (!util.checkFileExistsSync(configurationMakeCommand)) {
-                vscode.window.showErrorMessage(`Make ${notFoundStr}.`);
+                vscode.window.showErrorMessage(makeNotFoundStr);
                 logger.message("Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.");
 
                 // How often location settings don't work (maybe because not yet expanding variables)?
@@ -600,8 +600,8 @@ export function getCommandForConfiguration(configuration: string | undefined): v
             }
         } else {
             if (!util.toolPathInEnv(path.parse(configurationMakeCommand).base)) {
-                vscode.window.showErrorMessage(`Make ${notFoundStr}.`);
-                logger.message("Make was not given any path in settings and is also not found on the environment path.");
+               vscode.window.showErrorMessage(makeNotFoundStr);
+               logger.message("Make was not given any path in settings and is also not found on the environment path.");
 
                 // Do the users need an environment automatically set by the extension?
                 // With a kits feature or expanding on the pre-configure script.
@@ -629,7 +629,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         }
 
         if (!util.checkFileExistsSync(makefileUsed)) {
-            vscode.window.showErrorMessage(`Makefile ${localize("entry.point.not.found", "entry point not found")}.`);
+            vscode.window.showErrorMessage(localize("makefile.entry.point.not.found", "{0} entry point not found", "Makefile"));
             logger.message("The makefile entry point was not found. " +
                 "Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, " +
                 "makefile.makeDirectory, makefile.configurations[].makeDirectory" +

@@ -23,7 +23,7 @@ let locSubPath = process.argv[9];
 if (!repoOwner || !repoName || !authUser || !authToken || !userFullName || !userEmail || !locRootPath || !locSubPath) {
     console.error(`ERROR: Usage: ${path.parse(process.argv[0]).base} ${path.parse(process.argv[1]).base} repo_owner repo_name auth_token user_full_name user_email loc_root_path loc_sub_path`);
     console.error(`   repo_owner - The owner of the repo on GitHub.  i.e. microsoft`);
-    console.error(`   repo_name - The name of the repo on GitHub.  i.e. vscode-cpptools`);
+    console.error(`   repo_name - The name of the repo on GitHub.  i.e. vscode-makefile-tools`);
     console.error(`   auth_user - User account wiith permission to post a pull request against the GitHub repo.`);
     console.error(`   auth_token - A PAT associated with auth_user.`);
     console.error(`   user_full_name - A full name to associate with a git commit. (This is replaced by the PR account if commit is squashed.)`);

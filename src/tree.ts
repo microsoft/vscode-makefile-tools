@@ -30,7 +30,7 @@ export class BuildTargetNode extends BaseNode {
     _name: string;
 
     update(targetName: string): void {
-        this._name = `${localize("Build.target", "Build target")}: [${targetName}]`;
+        this._name = localize("tree.build.target", "Build target: [{0}]", targetName);
     }
 
     getChildren(): BaseNode[] {
@@ -47,7 +47,7 @@ export class BuildTargetNode extends BaseNode {
             ].join(',');
             return item;
         } catch (e) {
-            return new vscode.TreeItem(`${this._name} (${localize("issue.rendering.item", "There was an issue rendering this item")}.)`);
+            return new vscode.TreeItem(localize("issue.rendering.item", "{0} (there was an issue rendering this item)", this._name));
         }
     }
 
@@ -76,7 +76,7 @@ export class LaunchTargetNode extends BaseNode {
             }
         }
 
-        return `${localize("Launch.target", "Launch target")}: [${shortName}]`;
+        return localize("tree.launch.target", "Launch target: [{0}]", shortName);
     }
 
     constructor(targetName: string) {
@@ -101,13 +101,14 @@ export class LaunchTargetNode extends BaseNode {
         try {
             const item: vscode.TreeItem = new vscode.TreeItem(this._name);
             item.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            item.tooltip = `${localize("launch.target.currently.selected.for.debug.run.in.terminal", "The launch target currently selected for debug and run in terminal")}.\n${this._toolTip}`;
+            item.tooltip = localize("launch.target.currently.selected.for.debug.run.in.terminal",
+                                    "The launch target currently selected for debug and run in terminal.\n{0}", this._toolTip);
             item.contextValue = [
                 `nodeType=launchTarget`,
             ].join(',');
             return item;
         } catch (e) {
-            return new vscode.TreeItem(`${this._name} (${localize("issue.rendering.item", "There was an issue rendering this item")}.)`);
+            return new vscode.TreeItem(localize("issue.rendering.item", "{0} (there was an issue rendering this item)", this._name));
         }
     }
 
@@ -122,7 +123,7 @@ export class ConfigurationNode extends BaseNode {
     _name: string;
 
     update(configurationName: string): void {
-        this._name = `Configuration: [${configurationName}]`;
+        this._name = localize("tree.configuration", "Configuration: [{0}]", configurationName);
     }
 
     getChildren(): BaseNode[] {
@@ -139,7 +140,7 @@ export class ConfigurationNode extends BaseNode {
             ].join(',');
             return item;
         } catch (e) {
-            return new vscode.TreeItem(`${this._name} (${localize("issue.rendering.item", "There was an issue rendering this item")}.)`);
+            return new vscode.TreeItem(localize("issue.rendering.item", "{0} (there was an issue rendering this item)", this._name));
         }
     }
 

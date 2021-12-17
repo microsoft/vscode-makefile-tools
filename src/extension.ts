@@ -372,7 +372,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 }
 
 export async function deactivate(): Promise<void> {
-    vscode.window.showInformationMessage(localize("extension.deactivated", "The extension 'vscode-makefile-tools' is de-activated."));
+    vscode.window.showInformationMessage(localize("extension.deactivated", "The extension {0} is de-activated.", "'vscode-makefile-tools'"));
 
     await telemetry.deactivate();
 

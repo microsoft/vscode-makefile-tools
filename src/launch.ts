@@ -238,23 +238,19 @@ export class Launcher implements vscode.Disposable {
         if (!currentLaunchConfiguration) {
             // If no launch configuration is set, give the user a chance to select one now from the quick pick
             // (unless we know it's going to be empty).
-            const cannotStr: string = localize("Cannot", "Cannot");
-            const noLaunchConfigSetStr: string = localize("because.no.launch.configuration.set", "because there is no launch configuration set");
             if (configuration.getLaunchTargets().length === 0) {
-                vscode.window.showErrorMessage(`${cannotStr} ${op} ${noLaunchConfigSetStr} ` +
-                    localize("and.launch.target.list.empty", "and the list of launch targets is empty.") +
-                    localize("double.check.makefile.configuration.build.target", "Double check the makefile configuration and the build target."));
+                vscode.window.showErrorMessage(localize("cannot.op.no.launch.config.list.launch.targets.empty", "Cannot '{0}' because there is no launch configuration set and the list of launch targets is empty. " +
+                                                        "Double check the makefile configuration and the build target.", op));
                 return LaunchStatuses.launchTargetsListEmpty;
             } else {
-                vscode.window.showErrorMessage(`${cannotStr} ${op} ${noLaunchConfigSetStr}.` +
-                                                localize("chose.one.from.quick.pick", "Choose one from the quick pick."));
+                vscode.window.showErrorMessage(localize("cannot.op.no.launch.config.choose.quick.pick", "Cannot '{0}' because there is no launch configuration set. Choose one from the quick pick.", op));
                 await configuration.selectLaunchConfiguration();
 
                 // Read again the current launch configuration. If a current launch configuration is stil not set
                 // (the user cancelled the quick pick or the parser found zero launch targets) message and fail.
                 currentLaunchConfiguration = configuration.getCurrentLaunchConfiguration();
                 if (!currentLaunchConfiguration) {
-                    vscode.window.showErrorMessage(`${cannotStr} ${op} ${localize("until.select.active.launch.configuration", "until you select an active launch configuration")}.`);
+                    vscode.window.showErrorMessage(localize("cannot.op.until.select.active.launch.config", "Cannot '{0}' until you select an active launch configuration.", op));
                     return LaunchStatuses.noLaunchConfigurationSet;
                 }
             }
