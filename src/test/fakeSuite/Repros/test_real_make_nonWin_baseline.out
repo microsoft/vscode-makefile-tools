@@ -18,7 +18,6 @@ The make dry-run command failed.
 IntelliSense may work only partially or not at all.
 /bin/sh: 1: doesnt/exist/make: not found
  
-
 You can see the detailed dry-run output at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/dryrun.log
 Make sure that the extension is invoking the same make command as in your development prompt environment.
 You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]

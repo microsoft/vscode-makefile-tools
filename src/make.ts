@@ -482,7 +482,15 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }
         dryrunFile = util.resolvePathToRoot(dryrunFile);
         logger.message(`Writing the dry-run output: ${dryrunFile}`);
-        const lineEnding: string = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
+
+        // We need this lineEnding to see more clearly the output coming from all these compilers and tools.
+        // But there is some unpredictability regarding how much these tools fragment their output, on various
+        // OSes and systems. To compare easily against a fix baseline, don't use lineEnding while running tests.
+        let lineEnding: string = "";
+        if (process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
+            lineEnding = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
+        }
+
         util.writeFile(dryrunFile, `${configuration.getConfigurationMakeCommand()} ${makeArgs.join(" ")}${lineEnding}`);
 
         let completeOutput: string = "";
