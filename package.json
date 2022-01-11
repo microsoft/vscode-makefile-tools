@@ -53,6 +53,7 @@
         "onCommand:makefile.getLaunchTargetDirectory",
         "onCommand:makefile.getLaunchTargetArgs",
         "onCommand:makefile.getLaunchTargetArgsConcat",
+        "onCommand:makefile.makeBaseDirectory",
         "onCommand:makefile.configure",
         "onCommand:makefile.cleanConfigure",
         "onCommand:makefile.preConfigure",
@@ -202,8 +203,8 @@
               "owner": "makefile-tools",
               "fileLocation": [
                 "autoDetect",
-                "${workspaceFolder}"
-              ],
+                "${command:makefile.makeBaseDirectory}"
+               ],
               "pattern": {
                 "regexp": "^(.*?):(\\d+):(\\d*):?\\s+(?:fatal\\s+)?(warning|error):\\s+(.*)$",
                 "file": 1,
@@ -220,7 +221,7 @@
                "base": "$msCompile",
                "fileLocation": [
                  "autoDetect",
-                 "${command:makefile.getLaunchTargetDirectory}"
+                 "${command:makefile.makeBaseDirectory}"
                ]
              }
           ],
