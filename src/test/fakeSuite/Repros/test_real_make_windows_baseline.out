@@ -66,16 +66,16 @@ Setting configuration - test-make-C
 Found build log path setting "./doesnt_exist.log" defined for configuration "test-make-C"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\doesnt_exist.log"
 Build log not found. Remove the build log setting or provide a build log file on disk at the given location.
-Deduced command 'doesnt\exist\make.exe -C ./SubDir with space/' for configuration "test-make-C"
+Deduced command 'doesnt\exist\make.exe -C {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubDir with space\' for configuration "test-make-C"
 Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.
 Saving opened files before build.
-Building target "clean" with command: 'doesnt\exist\make.exe clean -C ./SubDir with space/'
+Building target "clean" with command: 'doesnt\exist\make.exe clean -C {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubDir with space\'
 Executing task: "Makefile Tools Build Task" with quoting style "Strong"
  command name: doesnt\exist\make.exe
- command args clean,-C,./SubDir with space/
+ command args clean,-C,{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubDir with space\
 Target "clean" failed to build.
-Building target "all" with command: 'doesnt\exist\make.exe all -C ./SubDir with space/'
+Building target "all" with command: 'doesnt\exist\make.exe all -C {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubDir with space\'
 Executing task: "Makefile Tools Build Task" with quoting style "Strong"
  command name: doesnt\exist\make.exe
- command args all,-C,./SubDir with space/
+ command args all,-C,{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\SubDir with space\
 Target "all" failed to build.

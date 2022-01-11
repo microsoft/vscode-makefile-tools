@@ -287,7 +287,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
 
                 let buildElapsedTime: number = util.elapsedTimeSince(buildStartTime);
                 const telemetryProperties: telemetry.Properties = {
-                    exitCode: retc.toString(),
+                    exitCode: retc?.toString() || "undefined",
                     target: processTargetForTelemetry(target),
                     triggeredBy: triggeredBy
                 };
@@ -324,7 +324,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         let myTaskArgs: vscode.ShellQuotedString[] = makeArgs.map(arg => {
             return {value: arg, quoting: quotingStlye};
         });
-        let myTaskOptions: vscode.ShellExecutionOptions = {env: util.mergeEnvironment(process.env as util.EnvironmentVariables)};
+        let myTaskOptions: vscode.ShellExecutionOptions = {env: util.mergeEnvironment(process.env as util.EnvironmentVariables), cwd: configuration.makeBaseDirectory()};
         let shellExec: vscode.ShellExecution = new vscode.ShellExecution(myTaskCommand, myTaskArgs, myTaskOptions);
         let myTask: vscode.Task = new vscode.Task({type: "shell", group: "build", label: makefileBuildTaskName},
         vscode.TaskScope.Workspace, makefileBuildTaskName, "makefile", shellExec);

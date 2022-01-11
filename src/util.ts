@@ -267,7 +267,8 @@ export function spawnChildProcess(
         let shellType: string | undefined;
         let shellPlatform: string = (process.platform === "win32") ? "windows" : (process.platform === "linux") ? "linux" : "osx";
         let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("terminal");
-        shellType = workspaceConfiguration.get<string>(`integrated.automationShell.${shellPlatform}`);
+        shellType = workspaceConfiguration.get<string>(`integrated.automationProfile.${shellPlatform}`) || // automationShell is deprecated
+                    workspaceConfiguration.get<string>(`integrated.automationShell.${shellPlatform}`); // and replaced with automationProfile
 
         // Final quoting decisions for process name and args before being executed.
         let qProcessName: string = ensureQuoted ? quoteStringIfNeeded(processName) : processName;
