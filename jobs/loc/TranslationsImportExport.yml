@@ -41,8 +41,7 @@ steps:
     prSourceBranchPrefix: 'locfiles'
     packageSourceAuth: 'patAuth'
     patVariable: '$(OneLocBuildPat)'
-    LclSource: lclFilesfromPackage
-    LclPackageId: 'LCL-JUNO-PROD-VMAKEFILE'
+    LclSource: lclFilesInRepo
     lsBuildXLocPackageVersion: '7.0.30510'
 
 - task: CmdLine@2
