@@ -145,8 +145,8 @@ async function saveAll(): Promise<boolean>  {
             return true;
         } else {
             logger.message("Saving opened files failed.");
-            let yesButton: string = localize("Yes", "Yes");
-            let noButton: string = localize("No", "No");
+            let yesButton: string = localize("yes", "Yes");
+            let noButton: string = localize("no", "No");
             const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>("Saving opened files failed. Do you want to continue anyway?",
             {
                 title: yesButton,
