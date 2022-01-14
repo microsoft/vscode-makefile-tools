@@ -24,7 +24,7 @@ import * as vscode from 'vscode';
 // that would make parseLineAsTool to not match the regular expression,
 // therefore wrongly skipping over compilation lines?
 const compilers: string[] = ["ccache", "clang\\+\\+", "clang-cl", "clang-cpp", "clang", "gcc", "gpp", "cpp", "icc", "cc", "icl", "cl", "g\\+\\+", "c\\+\\+"];
-const linkers: string[] = ["ccache", "ilink", "link", "ld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
+const linkers: string[] = ["ccache", "ilink", "link", "ld", "ccld", "gcc", "clang\\+\\+", "clang", "cc", "g\\+\\+", "c\\+\\+"];
 const sourceFileExtensions: string[] = ["cpp", "cc", "cxx", "c"];
 
 const chunkSize: number = 100;
@@ -280,11 +280,15 @@ async function parseLineAsTool(
     });
 
     // Add any additional tools specified by the user
-    configuration.getAdditionalCompilerNames()?.forEach(compiler => {
-        if (!toolNames.includes(compiler)) {
-            versionedToolNames.push(`${prefixRegex}${compiler}${suffixRegex}`);
-        }
-    });
+    // when we are looking at compilers or linkers,
+    // not when we parse for binary targets.
+    if (isCompilerOrLinker) {
+        configuration.getAdditionalCompilerNames()?.forEach(compiler => {
+            if (!toolNames.includes(compiler)) {
+                versionedToolNames.push(`${prefixRegex}${compiler}${suffixRegex}`);
+            }
+        });
+    }
 
     // - any spaces/tabs before the tool invocation
     // - with or without path (relative -to the makefile location- or full)

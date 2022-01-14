@@ -53,6 +53,7 @@
         "onCommand:makefile.getLaunchTargetDirectory",
         "onCommand:makefile.getLaunchTargetArgs",
         "onCommand:makefile.getLaunchTargetArgsConcat",
+        "onCommand:makefile.makeBaseDirectory",
         "onCommand:makefile.configure",
         "onCommand:makefile.cleanConfigure",
         "onCommand:makefile.preConfigure",
@@ -202,8 +203,8 @@
               "owner": "makefile-tools",
               "fileLocation": [
                 "autoDetect",
-                "${workspaceFolder}"
-              ],
+                "${command:makefile.makeBaseDirectory}"
+               ],
               "pattern": {
                 "regexp": "^(.*?):(\\d+):(\\d*):?\\s+(?:fatal\\s+)?(warning|error):\\s+(.*)$",
                 "file": 1,
@@ -212,11 +213,21 @@
                 "severity": 4,
                 "message": 5
               }
-            }
+            },
+            {
+               "name": "msvc",
+               "source": "msvc",
+               "owner": "makefile-tools",
+               "base": "$msCompile",
+               "fileLocation": [
+                 "autoDetect",
+                 "${command:makefile.makeBaseDirectory}"
+               ]
+             }
           ],
         "configuration": {
             "type": "object",
-            "title": "makefile",
+            "title": "Makefile Tools",
             "properties": {
                 "makefile.configurations": {
                     "type": "array",
@@ -255,7 +266,7 @@
                                 "items": {
                                     "type": "string"
                                 },
-                                "default": [],
+                                "default": ["$gcc", "$msvc"],
                                 "description": "%makefile-tools.configuration.makefile.configurations.problemMatchers.description%"
                             },
                             "buildLog": {

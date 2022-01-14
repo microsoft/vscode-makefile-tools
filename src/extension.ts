@@ -267,6 +267,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return launcher.getLaunchTargetArgsConcat();
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.makeBaseDirectory', () => {
+        telemetry.logEvent("makeBaseDirectory");
+        return configuration.makeBaseDirectory();
+    }));
+
     context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', async () => {
         await make.configure(make.TriggeredBy.configure);
     }));

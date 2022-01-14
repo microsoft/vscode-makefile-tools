@@ -139,6 +139,33 @@ function readMakeDirectory(): void {
     }
 }
 
+// Command property accessible from launch.json:
+// the folder in which the current "make" invocation operates:
+// passed with -C (otherwise it is the workspace folder).
+// Note: -f does not change the current working directory. It only points to a makefile somewhere else.
+export function makeBaseDirectory(): string {
+    // In case more than one -C arguments are given to "make", it will chose the last one.
+    // getConfigurationMakeArgs will contain the final command we calculate for the "make" executable.
+    // We don't need to know here which -C gets pushed last (global makeDirectory,
+    // configuration local makeDirectory or one in makeArgs). Just reverse to easily get the last one.
+    const makeArgs: string[] = getConfigurationMakeArgs().concat().reverse();
+    let prevArg: string = "";
+    for (const arg of makeArgs) {
+       if (arg === "-C") {
+         return prevArg;
+       } else if (arg.startsWith("--directory")) {
+         const eqIdx: number = arg.indexOf("=");
+         return arg.substring(eqIdx + 1, arg.length);
+       }
+
+       // Since we reversed the "make" command line arguments, the path of a -C will be seen before the switch.
+       // Remember every previous argument to have it available in case we find the first -C.
+       prevArg = arg;
+    }
+
+    return util.getWorkspaceRoot();
+}
+
 let buildLog: string | undefined;
 export function getBuildLog(): string | undefined { return buildLog; }
 export function setBuildLog(path: string): void { buildLog = path; }
@@ -517,25 +544,24 @@ function analyzeConfigureParams(): void {
     getProblemMatchersForConfiguration(currentMakefileConfiguration);
 }
 
+function getMakefileConfiguration(configuration: string | undefined): MakefileConfiguration | undefined {
+   return makefileConfigurations.find(k => {
+      if (k.name === configuration) {
+          return k;
+      }
+  });
+}
+
 // Helper to find in the array of MakefileConfiguration which command/args correspond to a configuration name.
 // Higher level settings (like makefile.makePath, makefile.makefilePath or makefile.makeDirectory)
 // also have an additional effect on the final command.
 export function getCommandForConfiguration(configuration: string | undefined): void {
-    let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
-        if (k.name === configuration) {
-            return k;
-        }
-    });
+    let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
 
     let makeParsedPathSettings: path.ParsedPath | undefined = makePath ? path.parse(makePath) : undefined;
     let makeParsedPathConfigurations: path.ParsedPath | undefined = makefileConfiguration?.makePath ? path.parse(makefileConfiguration?.makePath) : undefined;
 
-    // Arguments for the make tool can be defined as makeArgs in makefile.configurations setting.
-    // When not defined, default to empty array.
-    // Make sure to copy from makefile.configurations.makeArgs because we are going to append more switches,
-    // which shouldn't be identified as read from settings.
-    // Make sure we start from a fresh empty configurationMakeArgs because there may be old arguments that don't apply anymore.
-    configurationMakeArgs = makefileConfiguration?.makeArgs?.concat() || [];
+    configurationMakeArgs = [];
 
     // Name of the make tool can be defined as makePath in makefile.configurations or as makefile.makePath.
     // When none defined, default to "make".
@@ -552,7 +578,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
     // Add the makefile path via the -f make switch.
     // makefile.configurations.makefilePath overwrites makefile.makefilePath.
-    let makefileUsed: string | undefined = makefileConfiguration?.makefilePath || makefilePath;
+    let makefileUsed: string | undefined = makefileConfiguration?.makefilePath ? util.resolvePathToRoot(makefileConfiguration?.makefilePath) : makefilePath;
     if (makefileUsed) {
         configurationMakeArgs.push("-f");
         configurationMakeArgs.push(`${makefileUsed}`);
@@ -564,10 +590,29 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
     // Add the working directory path via the -C switch.
     // makefile.configurations.makeDirectory overwrites makefile.makeDirectory.
-    let makeDirectoryUsed: string | undefined = makefileConfiguration?.makeDirectory || makeDirectory;
+    let makeDirectoryUsed: string | undefined = makefileConfiguration?.makeDirectory ? util.resolvePathToRoot(makefileConfiguration?.makeDirectory) : makeDirectory;
     if (makeDirectoryUsed) {
         configurationMakeArgs.push("-C");
         configurationMakeArgs.push(`${makeDirectoryUsed}`);
+    }
+
+    // Make sure we append "makefile.configurations[].makeArgs" last, in case the developer wants to overwrite any arguments that the extension
+    // deduces from the settings. Additionally, for -f/-C, resolve path to root.
+    if (makefileConfiguration?.makeArgs) {
+       let prevArg: string = "";
+       makefileConfiguration.makeArgs.forEach(arg => {
+         if (prevArg === "-C") {
+            configurationMakeArgs.push(util.resolvePathToRoot(arg));
+         } else if (arg.startsWith("--directory")) {
+            const eqIdx: number = arg.indexOf("=");
+            const folderStr: string = arg.substring(eqIdx + 1, arg.length);
+            configurationMakeArgs.push(`--directory=${util.resolvePathToRoot(folderStr)}`);
+         } else {
+            configurationMakeArgs.push(arg);
+         }
+
+         prevArg = arg;
+      });
     }
 
     if (configurationMakeCommand) {
@@ -646,27 +691,22 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         } else {
             vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
         }
+    } else {
+        // If we have a build log, then we want Makefile Tools to be fully active and the UI visible.
+        vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
     }
 }
 
 // Helper to find in the array of MakefileConfiguration which problemMatchers correspond to a configuration name
 export function getProblemMatchersForConfiguration(configuration: string | undefined): void {
-    let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
-        if (k.name === configuration) {
-            return { ...k, keep: true };
-        }
-    });
+    let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
 
     configurationProblemMatchers = makefileConfiguration?.problemMatchers || [];
 }
 
 // Helper to find in the array of MakefileConfiguration which buildLog correspond to a configuration name
 export function getBuildLogForConfiguration(configuration: string | undefined): void {
-    let makefileConfiguration: MakefileConfiguration | undefined = makefileConfigurations.find(k => {
-        if (k.name === configuration) {
-            return { ...k, keep: true };
-        }
-    });
+    let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
 
     configurationBuildLog = makefileConfiguration?.buildLog;
 
