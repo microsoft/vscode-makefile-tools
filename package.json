@@ -710,6 +710,8 @@
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^5.0.1",
         "fs-extra": "^9.1.0",
+        "@octokit/rest": "^18.1.1",
+        "parse-git-config": "^3.0.0",
         "jsonc-parser": "^3.0.0",
         "vscode-test": "^0.4.1"
     },
