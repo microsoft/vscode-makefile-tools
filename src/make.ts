@@ -483,13 +483,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         dryrunFile = util.resolvePathToRoot(dryrunFile);
         logger.message(`Writing the dry-run output: ${dryrunFile}`);
 
-        // We need this lineEnding to see more clearly the output coming from all these compilers and tools.
-        // But there is some unpredictability regarding how much these tools fragment their output, on various
-        // OSes and systems. To compare easily against a fix baseline, don't use lineEnding while running tests.
-        let lineEnding: string = "";
-        if (process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
-            lineEnding = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
-        }
+        const lineEnding: string = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
 
         util.writeFile(dryrunFile, `${configuration.getConfigurationMakeCommand()} ${makeArgs.join(" ")}${lineEnding}`);
 
@@ -510,7 +504,14 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         };
 
         let stderr: any = (result: string): void => {
-            const appendStr: string = `${result} ${lineEnding}`;
+            // We need this lineEnding to see more clearly the output coming from all these compilers and tools.
+            // But there is some unpredictability regarding how much these tools fragment their output, on various
+            // OSes and systems. To compare easily against a fix baseline, don't use lineEnding while running tests.
+            // So far this has been seen for stderr and not for stdout.
+            let appendStr: string = result;
+            if (process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
+               appendStr += lineEnding;
+            }
             fs.appendFileSync(dryrunFile, appendStr);
             stderrStr += appendStr;
 
