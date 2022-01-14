@@ -1,4 +1,19 @@
 {
    "makefile-tools.command.makefile.buildTarget.title": "Makefile: Build the current target",
-   "makefile-tools.configuration.makefile.makePath.description": "The path to the make tool"
+   "makefile-tools.command.makefile.buildCleanTarget.title": "Makefile: Build clean the current target",
+   "makefile-tools.command.makefile.buildAll.title": "Makefile: Build the target ALL",
+   "makefile-tools.command.makefile.buildCleanAll.title": "Makefile: Build clean the target ALL",
+   "makefile-tools.command.makefile.launchDebug.title": "Makefile: Debug the selected binary target",
+   "makefile-tools.command.makefile.launchRun.title": "Makefile: Run the selected binary target in the terminal",
+   "makefile-tools.command.makefile.setBuildConfiguration.title": "Makefile: Set the current build configuration",
+   "makefile-tools.command.makefile.setBuildTarget.title": "Makefile: Set the target to be built by make",
+   "makefile-tools.command.makefile.setLaunchConfiguration.title": "Makefile: Set the make launch configuration",
+   "makefile-tools.command.makefile.configure.title": "Makefile: Configure",
+   "makefile-tools.command.makefile.cleanConfigure.title": "Makefile: Clean Configure",
+   "makefile-tools.command.makefile.preConfigure.title": "Makefile: Pre-Configure",
+   "makefile-tools.command.makefile.resetState.title": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)",
+   "makefile-tools.configuration.views.makefile.outline.description": "Project Outline",
+   "makefile-tools.configuration.makefile.makePath.description": "The path to the make tool",
+   "makefile-tools.configuration.makefile.configurations.description": "The user defined makefile configurations",
+   "description": "%makefile-tools.configuration.makefile.m"
 }

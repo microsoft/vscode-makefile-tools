@@ -80,51 +80,51 @@
             },
             {
                 "command": "makefile.buildCleanTarget",
-                "title": "Makefile: Build clean the current target"
+                "title": "%makefile-tools.command.makefile.buildCleanTarget.title%"
             },
             {
                 "command": "makefile.buildAll",
-                "title": "Makefile: Build the target ALL"
+                "title": "%makefile-tools.command.makefile.buildAll.title%"
             },
             {
                 "command": "makefile.buildCleanAll",
-                "title": "Makefile: Build clean the target ALL"
+                "title": "%makefile-tools.command.makefile.buildCleanAll.title%"
             },
             {
                 "command": "makefile.launchDebug",
-                "title": "Makefile: Debug the selected binary target"
+                "title": "%makefile-tools.command.makefile.launchDebug.title%"
             },
             {
                 "command": "makefile.launchRun",
-                "title": "Makefile: Run the selected binary target in the terminal"
+                "title": "%makefile-tools.command.makefile.launchRun.title%"
             },
             {
                 "command": "makefile.setBuildConfiguration",
-                "title": "Makefile: Set the current build configuration"
+                "title": "%makefile-tools.command.makefile.setBuildConfiguration.title%"
             },
             {
                 "command": "makefile.setBuildTarget",
-                "title": "Makefile: Set the target to be built by make"
+                "title": "%makefile-tools.command.makefile.setBuildTarget.title%"
             },
             {
                 "command": "makefile.setLaunchConfiguration",
-                "title": "Makefile: Set the make launch configuration"
+                "title": "%makefile-tools.command.makefile.setLaunchConfiguration.title%"
             },
             {
                 "command": "makefile.configure",
-                "title": "Makefile: Configure"
+                "title": "%makefile-tools.command.makefile.configure.title%"
             },
             {
                 "command": "makefile.cleanConfigure",
-                "title": "Makefile: Clean configure"
+                "title": "%makefile-tools.command.makefile.cleanConfigure.title%"
             },
             {
                 "command": "makefile.preConfigure",
-                "title": "Makefile: Pre-Configure"
+                "title": "%makefile-tools.command.makefile.preConfigure.title%"
             },
             {
                 "command": "makefile.outline.buildTarget",
-                "title": "Build",
+                "title": "%makefile-tools.command.makefile.buildTarget.title%",
                 "icon": {
                     "light": "res/light/build.svg",
                     "dark": "res/dark/build.svg"
@@ -132,11 +132,11 @@
             },
             {
                 "command": "makefile.outline.buildCleanTarget",
-                "title": "Build clean"
+                "title": "%makefile-tools.command.makefile.buildCleanTarget.title%"
             },
             {
                 "command": "makefile.outline.launchDebug",
-                "title": "Debug",
+                "title": "%makefile-tools.command.makefile.launchDebug.title%",
                 "icon": {
                     "light": "res/light/debug.svg",
                     "dark": "res/dark/debug.svg"
@@ -144,7 +144,7 @@
             },
             {
                 "command": "makefile.outline.launchRun",
-                "title": "Run in terminal",
+                "title": "%makefile-tools.command.makefile.launchRun.title%",
                 "icon": {
                     "light": "res/light/run.svg",
                     "dark": "res/dark/run.svg"
@@ -152,7 +152,7 @@
             },
             {
                 "command": "makefile.outline.setBuildConfiguration",
-                "title": "Change build configuration",
+                "title": "%makefile-tools.command.makefile.setBuildConfiguration.title%",
                 "icon": {
                     "light": "res/light/edit.svg",
                     "dark": "res/dark/edit.svg"
@@ -160,7 +160,7 @@
             },
             {
                 "command": "makefile.outline.setBuildTarget",
-                "title": "Change build target",
+                "title": "%makefile-tools.command.makefile.setBuildTarget.title%",
                 "icon": {
                     "light": "res/light/edit.svg",
                     "dark": "res/dark/edit.svg"
@@ -168,7 +168,7 @@
             },
             {
                 "command": "makefile.outline.setLaunchConfiguration",
-                "title": "Change launch configuration",
+                "title": "%makefile-tools.command.makefile.setLaunchConfiguration.title%",
                 "icon": {
                     "light": "res/light/edit.svg",
                     "dark": "res/dark/edit.svg"
@@ -176,7 +176,7 @@
             },
             {
                 "command": "makefile.outline.configure",
-                "title": "Configure",
+                "title": "%makefile-tools.command.makefile.configure.title%",
                 "icon": {
                     "light": "res/light/configure.svg",
                     "dark": "res/dark/configure.svg"
@@ -184,15 +184,15 @@
             },
             {
                 "command": "makefile.outline.cleanConfigure",
-                "title": "Clean configure"
+                "title": "%makefile-tools.command.makefile.cleanConfigure.title%"
             },
             {
                 "command": "makefile.outline.preConfigure",
-                "title": "Pre-Configure"
+                "title": "%makefile-tools.command.makefile.preConfigure.title%"
             },
             {
                 "command": "makefile.resetState",
-                "title": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)"
+                "title": "%makefile-tools.command.makefile.resetState.title%"
             }
         ],
         "problemMatchers": [
@@ -221,7 +221,7 @@
                 "makefile.configurations": {
                     "type": "array",
                     "default": [],
-                    "description": "The user defined makefile configurations",
+                    "description": "%makefile-tools.configuration.makefile.configurations.description%",
                     "items": {
                         "type": "object",
                         "default": null,
@@ -509,7 +509,7 @@
                 {
                     "id": "makefile.outline",
                     "when": "makefile:fullFeatureSet",
-                    "name": ""
+                    "name": "%makefile-tools.configuration.views.makefile.outline.description%"
                 }
             ]
         },
@@ -709,6 +709,7 @@
         "gulp-mocha": "^8.0.0",
         "gulp-sourcemaps": "^3.0.0",
         "gulp-typescript": "^5.0.1",
+        "fs-extra": "^9.1.0",
         "jsonc-parser": "^3.0.0",
         "vscode-test": "^0.4.1"
     },
