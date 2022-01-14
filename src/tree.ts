@@ -30,7 +30,7 @@ export class BuildTargetNode extends BaseNode {
     _name: string;
 
     update(targetName: string): void {
-        this._name = localize("tree.build.target", "Build target: [{0}]", targetName);
+        this._name = localize("tree.build.target", "Build target: {0}", `[${targetName}]`);
     }
 
     getChildren(): BaseNode[] {
@@ -76,7 +76,7 @@ export class LaunchTargetNode extends BaseNode {
             }
         }
 
-        return localize("tree.launch.target", "Launch target: [{0}]", shortName);
+        return localize("tree.launch.target", "Launch target: {0}", `[${shortName}]`);
     }
 
     constructor(targetName: string) {
@@ -123,7 +123,7 @@ export class ConfigurationNode extends BaseNode {
     _name: string;
 
     update(configurationName: string): void {
-        this._name = localize("tree.configuration", "Configuration: [{0}]", configurationName);
+        this._name = localize("tree.configuration", "Configuration: {0}", `[${configurationName}]`);
     }
 
     getChildren(): BaseNode[] {

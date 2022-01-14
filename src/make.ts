@@ -131,7 +131,7 @@ export function blockedByOp(op: Operations, showPopup: boolean = true): Operatio
     }
 
     if (blocker && showPopup) {
-        vscode.window.showErrorMessage(localize("cannot.op.because.project.already.doing", "Cannot '{0}' because the project is already doing a '{1}'.", op, blocker));
+        vscode.window.showErrorMessage(localize("cannot.op.because.project.already.doing", "Cannot {0} because the project is already doing a '{1}'.", `'${op}'`, blocker));
     }
 
     return blocker;
