@@ -16,7 +16,6 @@ schedules:
   branches:
     include:
     - main
-    - localization
   always: true
 
 pool:
