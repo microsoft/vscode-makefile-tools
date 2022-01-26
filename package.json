@@ -77,55 +77,55 @@
         "commands": [
             {
                 "command": "makefile.buildTarget",
-                "title": "Makefile: Build the current target"
+                "title": "%makefile-tools.command.makefile.buildTarget.title%"
             },
             {
                 "command": "makefile.buildCleanTarget",
-                "title": "Makefile: Build clean the current target"
+                "title": "%makefile-tools.command.makefile.buildCleanTarget.title%"
             },
             {
                 "command": "makefile.buildAll",
-                "title": "Makefile: Build the target ALL"
+                "title": "%makefile-tools.command.makefile.buildAll.title%"
             },
             {
                 "command": "makefile.buildCleanAll",
-                "title": "Makefile: Build clean the target ALL"
+                "title": "%makefile-tools.command.makefile.buildCleanAll.title%"
             },
             {
                 "command": "makefile.launchDebug",
-                "title": "Makefile: Debug the selected binary target"
+                "title": "%makefile-tools.command.makefile.launchDebug.title%"
             },
             {
                 "command": "makefile.launchRun",
-                "title": "Makefile: Run the selected binary target in the terminal"
+                "title": "%makefile-tools.command.makefile.launchRun.title%"
             },
             {
                 "command": "makefile.setBuildConfiguration",
-                "title": "Makefile: Set the current build configuration"
+                "title": "%makefile-tools.command.makefile.setBuildConfiguration.title%"
             },
             {
                 "command": "makefile.setBuildTarget",
-                "title": "Makefile: Set the target to be built by make"
+                "title": "%makefile-tools.command.makefile.setBuildTarget.title%"
             },
             {
                 "command": "makefile.setLaunchConfiguration",
-                "title": "Makefile: Set the make launch configuration"
+                "title": "%makefile-tools.command.makefile.setLaunchConfiguration.title%"
             },
             {
                 "command": "makefile.configure",
-                "title": "Makefile: Configure"
+                "title": "%makefile-tools.command.makefile.configure.title%"
             },
             {
                 "command": "makefile.cleanConfigure",
-                "title": "Makefile: Clean configure"
+                "title": "%makefile-tools.command.makefile.cleanConfigure.title%"
             },
             {
                 "command": "makefile.preConfigure",
-                "title": "Makefile: Pre-Configure"
+                "title": "%makefile-tools.command.makefile.preConfigure.title%"
             },
             {
                 "command": "makefile.outline.buildTarget",
-                "title": "Build",
+                "title": "%makefile-tools.command.makefile.buildTarget.title%",
                 "icon": {
                     "light": "res/light/build.svg",
                     "dark": "res/dark/build.svg"
@@ -133,11 +133,11 @@
             },
             {
                 "command": "makefile.outline.buildCleanTarget",
-                "title": "Build clean"
+                "title": "%makefile-tools.command.makefile.buildCleanTarget.title%"
             },
             {
                 "command": "makefile.outline.launchDebug",
-                "title": "Debug",
+                "title": "%makefile-tools.command.makefile.launchDebug.title%",
                 "icon": {
                     "light": "res/light/debug.svg",
                     "dark": "res/dark/debug.svg"
@@ -145,7 +145,7 @@
             },
             {
                 "command": "makefile.outline.launchRun",
-                "title": "Run in terminal",
+                "title": "%makefile-tools.command.makefile.launchRun.title%",
                 "icon": {
                     "light": "res/light/run.svg",
                     "dark": "res/dark/run.svg"
@@ -153,7 +153,7 @@
             },
             {
                 "command": "makefile.outline.setBuildConfiguration",
-                "title": "Change build configuration",
+                "title": "%makefile-tools.command.makefile.setBuildConfiguration.title%",
                 "icon": {
                     "light": "res/light/edit.svg",
                     "dark": "res/dark/edit.svg"
@@ -161,7 +161,7 @@
             },
             {
                 "command": "makefile.outline.setBuildTarget",
-                "title": "Change build target",
+                "title": "%makefile-tools.command.makefile.setBuildTarget.title%",
                 "icon": {
                     "light": "res/light/edit.svg",
                     "dark": "res/dark/edit.svg"
@@ -169,7 +169,7 @@
             },
             {
                 "command": "makefile.outline.setLaunchConfiguration",
-                "title": "Change launch configuration",
+                "title": "%makefile-tools.command.makefile.setLaunchConfiguration.title%",
                 "icon": {
                     "light": "res/light/edit.svg",
                     "dark": "res/dark/edit.svg"
@@ -177,7 +177,7 @@
             },
             {
                 "command": "makefile.outline.configure",
-                "title": "Configure",
+                "title": "%makefile-tools.command.makefile.configure.title%",
                 "icon": {
                     "light": "res/light/configure.svg",
                     "dark": "res/dark/configure.svg"
@@ -185,15 +185,15 @@
             },
             {
                 "command": "makefile.outline.cleanConfigure",
-                "title": "Clean configure"
+                "title": "%makefile-tools.command.makefile.cleanConfigure.title%"
             },
             {
                 "command": "makefile.outline.preConfigure",
-                "title": "Pre-Configure"
+                "title": "%makefile-tools.command.makefile.preConfigure.title%"
             },
             {
                 "command": "makefile.resetState",
-                "title": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)"
+                "title": "%makefile-tools.command.makefile.resetState.title%"
             }
         ],
         "problemMatchers": [
@@ -232,30 +232,30 @@
                 "makefile.configurations": {
                     "type": "array",
                     "default": [],
-                    "description": "The user defined makefile configurations",
+                    "description": "%makefile-tools.configuration.makefile.configurations.description%",
                     "items": {
                         "type": "object",
                         "default": null,
                         "properties": {
                             "name": {
                                 "type": "string",
-                                "description": "The name of the makefile configuration"
+                                "description": "%makefile-tools.configuration.makefile.configurations.name.description%"
                             },
                             "makefilePath": {
                                 "type": "string",
-                                "description": "File path to the makefile"
+                                "description": "%makefile-tools.configuration.makefile.configurations.makefilePath.description%"
                             },
                             "makePath": {
                                 "type": "string",
-                                "description": "File path to the make command"
+                                "description": "%makefile-tools.configuration.makefile.configurations.makePath.description%"
                             },
                             "makeDirectory": {
                               "type": "string",
-                              "description": "Folder path passed to make via the -C switch"
+                              "description": "%makefile-tools.configuration.makefile.configurations.makeDirectory.description%"
                             },
                             "makeArgs": {
                                 "type": "array",
-                                "description": "Arguments to pass to the make command",
+                                "description": "%makefile-tools.configuration.makefile.configurations.makeArgs.description%",
                                 "items": {
                                     "type": "string"
                                 },
@@ -267,11 +267,11 @@
                                     "type": "string"
                                 },
                                 "default": ["$gcc", "$msvc"],
-                                "description": "Problem matcher names to use when building the current target"
+                                "description": "%makefile-tools.configuration.makefile.configurations.problemMatchers.description%"
                             },
                             "buildLog": {
                                 "type": "string",
-                                "description": "File path to the build log used instead of dry-run output"
+                                "description": "%makefile-tools.configuration.makefile.configurations.buildLog.description%"
                             }
                         }
                     },
@@ -280,11 +280,11 @@
                 "makefile.defaultLaunchConfiguration": {
                     "type": "object",
                     "default": null,
-                    "description": "Various global debugger settings",
+                    "description": "%makefile-tools.configuration.makefile.defaultLaunchConfiguration.description%",
                     "properties": {
                         "MIMode": {
                             "type": "string",
-                            "description": "The non VS debugger type: gdb or lldb",
+                            "description": "%makefile-tools.configuration.makefile.defaultLaunchConfiguration.MIMode.description%",
                             "enum": [
                               "gdb",
                               "lldb"
@@ -292,16 +292,16 @@
                         },
                         "miDebuggerPath": {
                             "type": "string",
-                            "description": "Path to the non VS debugger (gdb or lldb)"
+                            "description": "%makefile-tools.configuration.makefile.defaultLaunchConfiguration.miDebuggerPath.description%"
                         },
                         "stopAtEntry": {
                             "type": "boolean",
-                            "description": "Stop at the entry point of the target",
+                            "description": "%makefile-tools.configuration.makefile.defaultLaunchConfiguration.stopAtEntry.description%",
                             "default": false
                         },
                         "symbolSearchPath": {
                             "type": "string",
-                            "description": "The path to the symbols"
+                            "description": "%makefile-tools.configuration.makefile.defaultLaunchConfiguration.symbolSearchPath.description%"
                         }
                     },
                     "scope": "resource"
@@ -309,18 +309,18 @@
                 "makefile.launchConfigurations": {
                     "type": "array",
                     "default": [],
-                    "description": "The user defined launch (debug/run) configurations",
+                    "description": "%makefile-tools.configuration.makefile.launchConfigurations.description%",
                     "items": {
                         "type": "object",
                         "default": null,
                         "properties": {
                             "binaryPath": {
                                 "type": "string",
-                                "description": "The full path to the binary to run or debug"
+                                "description": "%makefile-tools.configuration.makefile.launchConfigurations.binaryPath.description%"
                             },
                             "binaryArgs": {
                                 "type": "array",
-                                "description": "Arguments to pass to program command line",
+                                "description": "%makefile-tools.configuration.makefile.launchConfigurations.binaryArgs.description%",
                                 "items": {
                                     "type": "string"
                                 },
@@ -328,11 +328,11 @@
                             },
                             "cwd": {
                                 "type": "string",
-                                "description": "Set the working directory for the program"
+                                "description": "%makefile-tools.configuration.makefile.launchConfigurations.cwd.description%"
                             },
                             "MIMode": {
                                 "type": "string",
-                                "description": "The non VS debugger type: gdb or lldb",
+                                "description": "%makefile-tools.configuration.makefile.launchConfigurations.MIMode.description%",
                                 "enum": [
                                   "gdb",
                                   "lldb"
@@ -340,16 +340,16 @@
                             },
                             "miDebuggerPath": {
                                 "type": "string",
-                                "description": "Path to the non VS debugger (gdb or lldb)"
+                                "description": "%makefile-tools.configuration.makefile.launchConfigurations.miDebuggerPath.description%"
                             },
                             "stopAtEntry": {
                                 "type": "boolean",
-                                "description": "Stop at the entry point of the target",
+                                "description": "%makefile-tools.configuration.makefile.launchConfigurations.stopAtEntry.description%",
                                 "default": false
                             },
                             "symbolSearchPath": {
                                 "type": "string",
-                                "description": "The path to the symbols"
+                                "description": "%makefile-tools.configuration.makefile.launchConfigurations.symbolSearchPath.description%"
                             }
                         }
                     },
@@ -363,46 +363,46 @@
                         "Debug"
                     ],
                     "default": "Normal",
-                    "description": "The logging level for the makefile tools extension",
+                    "description": "%makefile-tools.configuration.makefile.loggingLevel.description%",
                     "scope": "resource"
                 },
                 "makefile.makePath": {
                     "type": "string",
                     "default": "make",
-                    "description": "The path to the make tool",
+                    "description": "%makefile-tools.configuration.makefile.makePath.description%",
                     "scope": "resource"
                 },
                 "makefile.makeDirectory": {
                     "type": "string",
-                    "description": "The folder path to be passed to make via the switch -C",
+                    "description": "%makefile-tools.configuration.makefile.makeDirectory.description%",
                     "scope": "resource"
                 },
                 "makefile.makefilePath": {
                     "type": "string",
-                    "description": "The path to the makefile of the project",
+                    "description": "%makefile-tools.configuration.makefile.makefilePath.description%",
                     "scope": "resource"
                 },
                 "makefile.buildLog": {
                     "type": "string",
-                    "description": "The path to the build log that is read to bypass a dry-run",
+                    "description": "%makefile-tools.configuration.makefile.buildLog.description%",
                     "default": null,
                     "scope": "resource"
                 },
                 "makefile.extensionOutputFolder": {
                     "type": "string",
-                    "description": "The path to various output files produced by the extension",
+                    "description": "%makefile-tools.configuration.makefile.extensionOutputFolder.description%",
                     "default": "./.vscode",
                     "scope": "resource"
                 },
                 "makefile.extensionLog": {
                     "type": "string",
-                    "description": "The path to an output file storing all content from the Makefile output channel",
+                    "description": "%makefile-tools.configuration.makefile.extensionLog.description%",
                     "default": null,
                     "scope": "resource"
                 },
                 "makefile.configurationCachePath": {
                     "type": "string",
-                    "description": "The path to a cache file storing the output of the last dry-run make command",
+                    "description": "%makefile-tools.configuration.makefile.configurationCachePath.description%",
                     "default": ".vscode/configurationCache.log",
                     "scope": "resource"
                 },
@@ -413,7 +413,7 @@
                         "--keep-going",
                         "--print-directory"
                     ],
-                    "description": "Arguments to pass to the dry-run make invocation",
+                    "description": "%makefile-tools.configuration.makefile.dryrunSwitches.description%",
                     "items": {
                         "type": "string"
                     },
@@ -422,7 +422,7 @@
                 "makefile.additionalCompilerNames": {
                     "type": "array",
                     "default": [],
-                    "description": "Names of compiler tools to be added to the extension known list",
+                    "description": "%makefile-tools.configuration.makefile.additionalCompilerNames.description%",
                     "items": {
                         "type": "string"
                     },
@@ -431,7 +431,7 @@
                 "makefile.excludeCompilerNames": {
                     "type": "array",
                     "default": [],
-                    "description": "Names of compiler tools to be excluded from the extension known list",
+                    "description": "%makefile-tools.configuration.makefile.excludeCompilerNames.description%",
                     "items": {
                         "type": "string"
                     },
@@ -440,67 +440,67 @@
                 "makefile.configureOnOpen": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Automatically configure Makefile project directories when they are opened",
+                    "description": "%makefile-tools.configuration.makefile.configureOnOpen.description%",
                     "scope": "resource"
                 },
                 "makefile.configureOnEdit": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Automatically configure Makefile project directories when any relevant makefiles and/or settings are changed",
+                    "description": "%makefile-tools.configuration.makefile.configureOnEdit.description%",
                     "scope": "resource"
                 },
                 "makefile.configureAfterCommand": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Automatically configure Makefile project directories after relevant operations, like change build configuration or makefile target",
+                    "description": "%makefile-tools.configuration.makefile.configureAfterCommand.description%",
                     "scope": "resource"
                 },
                 "makefile.preConfigureScript": {
                     "type": "string",
-                    "description": "The path to the script that needs to be run at least once before configure",
+                    "description": "%makefile-tools.configuration.makefile.preConfigureScript.description%",
                     "default": null,
                     "scope": "resource"
                 },
                 "makefile.alwaysPreConfigure": {
                     "type": "boolean",
-                    "description": "Always run the pre-configure script before configure",
+                    "description": "%makefile-tools.configuration.makefile.alwaysPreConfigure.description%",
                     "default": false,
                     "scope": "resource"
                 },
                 "makefile.ignoreDirectoryCommands": {
                     "type": "boolean",
-                    "description": "Don't analyze directory changing commands like cd, push, pop.",
+                    "description": "%makefile-tools.configuration.makefile.ignoreDirectoryCommands.description%",
                     "default": true,
                     "scope": "resource"
                 },
                 "makefile.phonyOnlyTargets": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Display only the phony targets",
+                    "description": "%makefile-tools.configuration.makefile.phonyOnlyTargets.description%",
                     "scope": "resource"
                 },
                 "makefile.saveBeforeBuildOrConfigure": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Save opened files before building or configuring",
+                    "description": "%makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description%",
                     "scope": "resource"
                 },
                 "makefile.buildBeforeLaunch": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Build the current target before launch (debug/run)",
+                    "description": "%makefile-tools.configuration.makefile.buildBeforeLaunch.description%",
                     "scope": "resource"
                 },
                 "makefile.clearOutputBeforeBuild": {
                     "type": "boolean",
                     "default": true,
-                    "description": "Clear the output channel at the beginning of a build",
+                    "description": "%makefile-tools.configuration.makefile.clearOutputBeforeBuild.description%",
                     "scope": "resource"
                 },
                 "makefile.compileCommandsPath": {
                     "type": "string",
                     "default": null,
-                    "description": "The path to the compilation database file",
+                    "description": "%makefile-tools.configuration.makefile.compileCommandsPath.description%",
                     "scope": "resource"
                 }
             }
@@ -520,7 +520,7 @@
                 {
                     "id": "makefile.outline",
                     "when": "makefile:fullFeatureSet",
-                    "name": ""
+                    "name": "%makefile-tools.configuration.views.makefile.outline.description.description%"
                 }
             ]
         },
@@ -688,6 +688,10 @@
     "scripts": {
         "vscode:prepublish": "yarn compile",
         "compile": "yarn install && tsc -p ./",
+        "compile-production": "yarn install && yarn run translations-generate && yarn run compile",
+        "translations-export": "gulp translations-export",
+        "translations-generate": "gulp translations-generate",
+        "translations-import": "gulp translations-import",
         "watch": "tsc -watch -p ./",
         "package": "vsce package --yarn -o makefile-tools.vsix",
         "pretest": "yarn compile",
@@ -709,6 +713,17 @@
         "vsce": "^1.95.0",
         "vrsource-tslint-rules": "^6.0.0",
         "vscode": "^1.1.36",
+        "vscode-nls-dev": "^3.3.2",
+        "gulp": "^4.0.2",
+        "gulp-eslint": "^6.0.0",
+        "gulp-filter": "^6.0.0",
+        "gulp-mocha": "^8.0.0",
+        "gulp-sourcemaps": "^3.0.0",
+        "gulp-typescript": "^5.0.1",
+        "fs-extra": "^9.1.0",
+        "@octokit/rest": "^18.1.1",
+        "parse-git-config": "^3.0.0",
+        "jsonc-parser": "^3.0.0",
         "vscode-test": "^0.4.1"
     },
     "dependencies": {
@@ -716,6 +731,7 @@
         "glob": "^7.1.6",
         "module-alias": "^2.2.2",
         "vscode-cpptools": "^5.0.0",
+        "vscode-nls": "^5.0.0",
         "vscode-extension-telemetry": "^0.1.2",
         "vscode-jsonrpc": "^3.6.2"
     },

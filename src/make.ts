@@ -15,6 +15,10 @@ import * as util from './util';
 import * as telemetry from './telemetry';
 import * as vscode from 'vscode';
 
+import * as nls from 'vscode-nls';
+nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+
 let isBuilding: boolean = false;
 export function getIsBuilding(): boolean { return isBuilding; }
 export function setIsBuilding(building: boolean): void {
@@ -115,7 +119,8 @@ export function blockedByOp(op: Operations, showPopup: boolean = true): Operatio
     if (getIsConfiguring()) {
         // A configure in the background shouldn't block anything except another configure
         if (getConfigureIsInBackground() && op !== Operations.configure) {
-            vscode.window.showInformationMessage(`The project is configuring in the background and ${op} may run on out-of-date input.`);
+            vscode.window.showInformationMessage(localize("project.configuring.background.op.may.run.on.out.of.date.input",
+                                                          "The project is configuring in the background and {0} may run on out-of-date input.", op));
         } else {
             blocker = Operations.configure;
         }
@@ -126,7 +131,7 @@ export function blockedByOp(op: Operations, showPopup: boolean = true): Operatio
     }
 
     if (blocker && showPopup) {
-        vscode.window.showErrorMessage(`Cannot "${op}" because the project is already doing a ${blocker}.`);
+        vscode.window.showErrorMessage(localize("cannot.op.because.project.already.doing", "Cannot {0} because the project is already doing a '{1}'.", `'${op}'`, blocker));
     }
 
     return blocker;
@@ -140,8 +145,8 @@ async function saveAll(): Promise<boolean>  {
             return true;
         } else {
             logger.message("Saving opened files failed.");
-            let yesButton: string = "Yes";
-            let noButton: string = "No";
+            let yesButton: string = localize("yes", "Yes");
+            let noButton: string = localize("no", "No");
             const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>("Saving opened files failed. Do you want to continue anyway?",
             {
                 title: yesButton,
@@ -477,7 +482,9 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }
         dryrunFile = util.resolvePathToRoot(dryrunFile);
         logger.message(`Writing the dry-run output: ${dryrunFile}`);
+
         const lineEnding: string = (process.platform === "win32" && process.env.MSYSTEM === undefined) ? "\r\n" : "\n";
+
         util.writeFile(dryrunFile, `${configuration.getConfigurationMakeCommand()} ${makeArgs.join(" ")}${lineEnding}`);
 
         let completeOutput: string = "";
@@ -497,7 +504,14 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         };
 
         let stderr: any = (result: string): void => {
-            const appendStr: string = `${result} ${lineEnding}`;
+            // We need this lineEnding to see more clearly the output coming from all these compilers and tools.
+            // But there is some unpredictability regarding how much these tools fragment their output, on various
+            // OSes and systems. To compare easily against a fix baseline, don't use lineEnding while running tests.
+            // So far this has been seen for stderr and not for stdout.
+            let appendStr: string = result;
+            if (process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
+               appendStr += lineEnding;
+            }
             fs.appendFileSync(dryrunFile, appendStr);
             stderrStr += appendStr;
 

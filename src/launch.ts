@@ -11,6 +11,7 @@ import * as path from 'path';
 import * as telemetry from './telemetry';
 import * as util from './util';
 import * as vscode from 'vscode';
+import { localize } from 'vscode-nls';
 
 export enum LaunchStatuses {
     success = "success",
@@ -214,9 +215,10 @@ export class Launcher implements vscode.Disposable {
             let buildSuccess: boolean = (await make.buildTarget(make.TriggeredBy.buildTarget, currentBuildTarget, false)) === make.ConfigureBuildReturnCodeTypes.success;
             if (!buildSuccess) {
                 logger.message(`Building target "${currentBuildTarget}" failed.`);
-                let noButton: string = "No";
-                let yesButton: string = "Yes";
-                const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>("Build failed. Do you want to continue anyway?",
+                let noButton: string = localize("no", "No");
+                let yesButton: string = localize("yes", "Yes");
+                const message: string = localize("build.failed.continue.anyway", "Build failed. Do you want to continue anyway?");
+                const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>(message,
                 {
                     title: yesButton,
                     isCloseAffordance: false,
@@ -237,18 +239,18 @@ export class Launcher implements vscode.Disposable {
             // If no launch configuration is set, give the user a chance to select one now from the quick pick
             // (unless we know it's going to be empty).
             if (configuration.getLaunchTargets().length === 0) {
-                vscode.window.showErrorMessage(`Cannot ${op} because there is no launch configuration set` +
-                    " and the list of launch targets is empty. Double check the makefile configuration and the build target.");
+                vscode.window.showErrorMessage(localize("cannot.op.no.launch.config.targets",
+                    "Cannot {0} because there is no launch configuration set and the list of launch targets is empty. Double check the makefile configuration and the build target.", `'${op}'`));
                 return LaunchStatuses.launchTargetsListEmpty;
             } else {
-                vscode.window.showErrorMessage(`Cannot ${op} because there is no launch configuration set. Choose one from the quick pick.`);
+                vscode.window.showErrorMessage(localize("cannot.op.choose.launch.config", "Cannot {0} because there is no launch configuration set. Choose one from the quick pick.", `'${op}'`));
                 await configuration.selectLaunchConfiguration();
 
                 // Read again the current launch configuration. If a current launch configuration is stil not set
                 // (the user cancelled the quick pick or the parser found zero launch targets) message and fail.
                 currentLaunchConfiguration = configuration.getCurrentLaunchConfiguration();
                 if (!currentLaunchConfiguration) {
-                    vscode.window.showErrorMessage(`Cannot ${op} until you select an active launch configuration.`);
+                    vscode.window.showErrorMessage(localize("cannot.op.without.launch.config", "Cannot {0} until you select an active launch configuration.", `'${op}'`));
                     return LaunchStatuses.noLaunchConfigurationSet;
                 }
             }

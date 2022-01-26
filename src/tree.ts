@@ -7,6 +7,10 @@ import * as configuration from './configuration';
 import * as util from './util';
 import * as vscode from 'vscode';
 
+import * as nls from 'vscode-nls';
+nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+
 interface NamedItem {
     name: string;
 }
@@ -26,7 +30,7 @@ export class BuildTargetNode extends BaseNode {
     _name: string;
 
     update(targetName: string): void {
-        this._name = `Build target: [${targetName}]`;
+        this._name = localize("tree.build.target", "Build target: {0}", `[${targetName}]`);
     }
 
     getChildren(): BaseNode[] {
@@ -37,13 +41,13 @@ export class BuildTargetNode extends BaseNode {
         try {
             const item: vscode.TreeItem = new vscode.TreeItem(this._name);
             item.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            item.tooltip = "The makefile target currently selected for build.";
+            item.tooltip = localize("makefile.target.currently.selected.for.build", "The makefile target currently selected for build.");
             item.contextValue = [
                 `nodeType=buildTarget`,
             ].join(',');
             return item;
         } catch (e) {
-            return new vscode.TreeItem(`${this._name} (There was an issue rendering this item.)`);
+            return new vscode.TreeItem(localize("issue.rendering.item", "{0} (there was an issue rendering this item)", this._name));
         }
     }
 
@@ -72,7 +76,7 @@ export class LaunchTargetNode extends BaseNode {
             }
         }
 
-        return `Launch target: [${shortName}]`;
+        return localize("tree.launch.target", "Launch target: {0}", `[${shortName}]`);
     }
 
     constructor(targetName: string) {
@@ -97,13 +101,14 @@ export class LaunchTargetNode extends BaseNode {
         try {
             const item: vscode.TreeItem = new vscode.TreeItem(this._name);
             item.collapsibleState = vscode.TreeItemCollapsibleState.None;
-            item.tooltip = `The launch target currently selected for debug and run in terminal.\n${this._toolTip}`;
+            item.tooltip = localize("launch.target.currently.selected.for.debug.run.in.terminal",
+                                    "The launch target currently selected for debug and run in terminal.\n{0}", this._toolTip);
             item.contextValue = [
                 `nodeType=launchTarget`,
             ].join(',');
             return item;
         } catch (e) {
-            return new vscode.TreeItem(`${this._name} (There was an issue rendering this item.)`);
+            return new vscode.TreeItem(localize("issue.rendering.item", "{0} (there was an issue rendering this item)", this._name));
         }
     }
 
@@ -118,7 +123,7 @@ export class ConfigurationNode extends BaseNode {
     _name: string;
 
     update(configurationName: string): void {
-        this._name = `Configuration: [${configurationName}]`;
+        this._name = localize("tree.configuration", "Configuration: {0}", `[${configurationName}]`);
     }
 
     getChildren(): BaseNode[] {
@@ -135,7 +140,7 @@ export class ConfigurationNode extends BaseNode {
             ].join(',');
             return item;
         } catch (e) {
-            return new vscode.TreeItem(`${this._name} (There was an issue rendering this item.)`);
+            return new vscode.TreeItem(localize("issue.rendering.item", "{0} (there was an issue rendering this item)", this._name));
         }
     }
 
@@ -145,9 +150,10 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
     private readonly _changeEvent = new vscode.EventEmitter<BaseNode | null>();
 
     constructor() {
-        this._currentConfigurationItem = new ConfigurationNode("Unset");
-        this._currentBuildTargetItem = new BuildTargetNode("Unset");
-        this._currentLaunchTargetItem = new LaunchTargetNode("Unset");
+        const unsetString: string = localize("Unset", "Unset");
+        this._currentConfigurationItem = new ConfigurationNode(unsetString);
+        this._currentBuildTargetItem = new BuildTargetNode(unsetString);
+        this._currentLaunchTargetItem = new LaunchTargetNode(unsetString);
     }
 
     private _currentConfigurationItem: ConfigurationNode;
