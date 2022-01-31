@@ -26,5 +26,4 @@ jobs/
 build/
 docs/
 node_modules/
-out/
 scripts/
