@@ -1,5 +1,9 @@
 # What's New?
 
+## 
+Bug fixes:
+- makePath: add "make" when only a directory path was specified. [#237](https://github.com/microsoft/vscode-makefile-tools/issues/237)
+
 ## 0.3.1
 Bug fixes:
 - Honor the "terminal.integrated.automationShell" setting when spawning make for configure. [#233](https://github.com/microsoft/vscode-makefile-tools/issues/233)
