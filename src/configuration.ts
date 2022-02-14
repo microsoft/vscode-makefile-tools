@@ -571,6 +571,12 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     // Prepend the directory path, if defined in either makefile.configurations or makefile.makePath (first has priority).
     let configurationCommandPath: string = makeParsedPathConfigurations?.dir || makeParsedPathSettings?.dir || "";
     configurationMakeCommand = path.join(configurationCommandPath, configurationMakeCommand);
+
+    // Add "make" when only a directory path was specified.
+    if (util.checkDirectoryExistsSync(configurationMakeCommand)) {
+        configurationMakeCommand = path.join(configurationMakeCommand, "make");
+    }
+
     // Add the ".exe" extension on windows if no extension was specified, otherwise the file search APIs don't find it.
     if (process.platform === "win32" && configurationMakeCommandExtension === "") {
         configurationMakeCommand += ".exe";
