@@ -8,10 +8,7 @@ It also provides convenient commands to build, debug, and run your targets.
 ### Activating the extension
 The extension will activate when it finds a Makefile in your `${workspaceFolder}`. If your Makefile does not
 reside in the root of your folder, use the `makefile.makefilePath` (which generates the make switch -f)
-or `makefile.makeDirectory` (which generates thet make swich -C) settings to instruct the extension where to find it.
-> Note: the extension will not activate automatically if your Makefile is not in the root of your workspace
-folder. If this is the case, you will need to manually activate it by running one of the `Makefile:` commands
-from VS Code's command palette.
+or `makefile.makeDirectory` (which generates the make switch -C) settings to instruct the extension where to find it.
 
 ### Pre-configuring your project
 If you need any environment variables to be set or any terminal operations to be run before configure/build
