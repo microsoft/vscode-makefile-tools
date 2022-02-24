@@ -520,7 +520,7 @@
                 {
                     "id": "makefile.outline",
                     "when": "makefile:fullFeatureSet",
-                    "name": "%makefile-tools.configuration.views.makefile.outline.description.description%"
+                    "name": "%makefile-tools.configuration.views.makefile.outline.description%"
                 }
             ]
         },
@@ -686,7 +686,7 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "yarn compile",
+        "vscode:prepublish": "yarn compile-production",
         "compile": "yarn install && tsc -p ./",
         "compile-production": "yarn install && yarn run translations-generate && yarn run compile",
         "translations-export": "gulp translations-export",
