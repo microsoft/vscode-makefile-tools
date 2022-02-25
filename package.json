@@ -688,7 +688,7 @@
     "scripts": {
         "vscode:prepublish": "yarn compile-production",
         "compile": "yarn install && tsc -p ./",
-        "compile-production": "yarn install && yarn run translations-generate && yarn run compile",
+        "compile-production": "yarn install && yarn run translations-generate",
         "translations-export": "gulp translations-export",
         "translations-generate": "gulp translations-generate",
         "translations-import": "gulp translations-import",
