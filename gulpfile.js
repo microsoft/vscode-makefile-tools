@@ -206,12 +206,11 @@ const generatedSrcLocBundle = () => {
     return tsProject.src()
         .pipe(sourcemaps.init())
         .pipe(tsProject()).js
-        .pipe(nls.createMetaDataFiles())
+        .pipe(nls.rewriteLocalizeCalls())
         .pipe(nls.createAdditionalLanguageFiles(languages, "i18n"))
-        .pipe(nls.bundleMetaDataFiles('ms-vscode.makefile-tools', 'dist'))
+        .pipe(nls.bundleMetaDataFiles('ms-vscode.makefile-tools', 'out'))
         .pipe(nls.bundleLanguageFiles())
-        .pipe(filter(['**/nls.bundle.*.json', '**/nls.metadata.header.json', '**/nls.metadata.json']))
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('out'));
 };
 
 const generateLocalizedJsonSchemaFiles = () => {
