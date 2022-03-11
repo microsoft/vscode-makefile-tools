@@ -173,7 +173,8 @@
                 "icon": {
                     "light": "res/light/edit.svg",
                     "dark": "res/dark/edit.svg"
-                }
+                },
+                "enablement": "makefile:localFeatureSet"
             },
             {
                 "command": "makefile.outline.configure",
