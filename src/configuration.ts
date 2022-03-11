@@ -343,6 +343,19 @@ export function readCompileCommandsPath(): void {
     logger.message(`compile_commands.json path: ${compileCommandsPath}`);
 }
 
+let enableLocalDebugRun: boolean | undefined;
+export function getEnableLocalDebugRun(): boolean | undefined { return enableLocalDebugRun; }
+export function setEnableLocalDebugRun(path: boolean): void { enableLocalDebugRun = path; }
+
+// Read from settings whether the pre-configure step is supposed to be executed
+// always before the configure operation.
+export function readEnableLocalDebugRun(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    enableLocalDebugRun = workspaceConfiguration.get<boolean>("enableLocalDebugRun");
+    logger.message(`Enable debug run  feature: ${enableLocalDebugRun}`);
+}
+
+
 let additionalCompilerNames: string[] | undefined;
 export function getAdditionalCompilerNames(): string[] | undefined { return additionalCompilerNames; }
 export function setAdditionalCompilerNames(compilerNames: string[]): void { additionalCompilerNames = compilerNames; }
@@ -694,12 +707,15 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
             telemetry.logEvent("makefileNotFound", telemetryProperties);
             vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", false);
+            vscode.commands.executeCommand('setContext', "makefile:localFeatureSet", false);
         } else {
             vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
+            vscode.commands.executeCommand('setContext', "makefile:localFeatureSet", getEnableLocalDebugRun());
         }
     } else {
         // If we have a build log, then we want Makefile Tools to be fully active and the UI visible.
         vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
+        vscode.commands.executeCommand('setContext', "makefile:localFeatureSet", getEnableLocalDebugRun());
     }
 }
 
@@ -929,6 +945,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     readClearOutputBeforeBuild();
     readIgnoreDirectoryCommands();
     readCompileCommandsPath();
+    readEnableLocalDebugRun();
 
     analyzeConfigureParams();
 
@@ -1275,6 +1292,15 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
             if (updatedCompileCommandsPath !== compileCommandsPath) {
                 readCompileCommandsPath();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "enableLocalDebugRun";
+            let updatedEnableLocalDebugRun : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            if (updatedEnableLocalDebugRun !== enableLocalDebugRun) {
+                readEnableLocalDebugRun();
+                readCurrentLaunchConfiguration();
+                extension.getState().configureDirty = true;
                 updatedSettingsSubkeys.push(subKey);
             }
 

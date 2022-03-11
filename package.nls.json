@@ -55,5 +55,6 @@
    "makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Save opened files before building or configuring",
    "makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Build the current target before launch (debug/run)",
    "makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Clear the output channel at the beginning of a build",
-   "makefile-tools.configuration.makefile.compileCommandsPath.description": "The path to the compilation database file"
+   "makefile-tools.configuration.makefile.compileCommandsPath.description": "The path to the compilation database file",
+   "makefile-tools.configuration.makefile.enableLocalDebugRun.description": "Enable debugging and running local targets"
 }

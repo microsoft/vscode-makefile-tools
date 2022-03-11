@@ -103,6 +103,12 @@ export class LaunchTargetNode extends BaseNode {
             item.collapsibleState = vscode.TreeItemCollapsibleState.None;
             item.tooltip = localize("launch.target.currently.selected.for.debug.run.in.terminal",
                                     "The launch target currently selected for debug and run in terminal.\n{0}", this._toolTip);
+            // enablement in makefile.outline.setLaunchConfiguration is not
+            // disabling this TreeItem
+            item.command = {
+                command: "makefile.outline.setLaunchConfiguration",
+                title: "%makefile-tools.command.makefile.setLaunchConfiguration.title%"
+            }
             item.contextValue = [
                 `nodeType=launchTarget`,
             ].join(',');
@@ -170,8 +176,12 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
         if (node) {
             return node.getChildren();
         }
-
-        return [this._currentConfigurationItem, this._currentBuildTargetItem, this._currentLaunchTargetItem];
+        if (configuration.getEnableLocalDebugRun()) {
+            return [this._currentConfigurationItem, this._currentBuildTargetItem, this._currentLaunchTargetItem];
+        }
+        else {
+            return [this._currentConfigurationItem, this._currentBuildTargetItem];
+        }
     }
 
     async update(configuration: string, buildTarget: string, launchTarget: string): Promise<void> {

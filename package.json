@@ -502,6 +502,12 @@
                     "default": null,
                     "description": "%makefile-tools.configuration.makefile.compileCommandsPath.description%",
                     "scope": "resource"
+                },
+                "makefile.enableLocalDebugRun": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "%makefile-tools.configuration.makefile.enableLocalDebugRun.description%",
+                    "scope": "resource"
                 }
             }
         },
@@ -548,11 +554,11 @@
                 },
                 {
                     "command": "makefile.launchDebug",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localFeatureSet"
                 },
                 {
                     "command": "makefile.launchRun",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localFeatureSet"
                 },
                 {
                     "command": "makefile.setBuildConfiguration",
@@ -564,7 +570,7 @@
                 },
                 {
                     "command": "makefile.setLaunchConfiguration",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localFeatureSet"
                 },
                 {
                     "command": "makefile.outline.preConfigure",
@@ -580,11 +586,11 @@
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localFeatureSet"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localFeatureSet"
                 },
                 {
                     "command": "makefile.outline.setBuildConfiguration",
@@ -596,7 +602,7 @@
                 },
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localFeatureSet"
                 }
             ],
             "view/title": [
@@ -627,12 +633,12 @@
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "view == makefile.outline",
+                    "when": "view == makefile.outline && makefile:localFeatureSet",
                     "group": "navigation@2"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "view == makefile.outline",
+                    "when": "view == makefile.outline && makefile:localFeatureSet",
                     "group": "navigation@3"
                 }
             ],
