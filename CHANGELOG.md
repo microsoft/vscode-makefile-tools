@@ -3,6 +3,7 @@
 ## 
 Bug fixes:
 - makePath: add "make" when only a directory path was specified. [#237](https://github.com/microsoft/vscode-makefile-tools/issues/237)
+- Keep the pre-configure environment when sending the launch target to the terminal or the debugger. [#295](https://github.com/microsoft/vscode-makefile-tools/issues/295)
 
 ## 0.3.1
 Bug fixes:

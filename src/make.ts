@@ -329,7 +329,15 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         let myTaskArgs: vscode.ShellQuotedString[] = makeArgs.map(arg => {
             return {value: arg, quoting: quotingStlye};
         });
-        let myTaskOptions: vscode.ShellExecutionOptions = {env: util.mergeEnvironment(process.env as util.EnvironmentVariables), cwd: configuration.makeBaseDirectory()};
+
+        const cwd: string = configuration.makeBaseDirectory();
+        if (!util.checkDirectoryExistsSync(cwd)) {
+            logger.message(`Target "${target}" failed to build because CWD passed in does not exist (${cwd}).`);
+            return ConfigureBuildReturnCodeTypes.notFound;
+        }
+
+        let myTaskOptions: vscode.ShellExecutionOptions = {env: util.mergeEnvironment(process.env as util.EnvironmentVariables), cwd};
+
         let shellExec: vscode.ShellExecution = new vscode.ShellExecution(myTaskCommand, myTaskArgs, myTaskOptions);
         let myTask: vscode.Task = new vscode.Task({type: "shell", group: "build", label: makefileBuildTaskName},
         vscode.TaskScope.Workspace, makefileBuildTaskName, "makefile", shellExec);
@@ -343,7 +351,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
 
         const result: number = await(new Promise<number>(resolve => {
             let disposable: vscode.Disposable = vscode.tasks.onDidEndTaskProcess(e => {
-                if (e.execution.task.name === makefileBuildTaskName) {
+                if (e. execution.task.name === makefileBuildTaskName) {
                     disposable.dispose();
                     resolve(e.exitCode);
                 }
