@@ -182,6 +182,7 @@ export class Launcher implements vscode.Disposable {
             request: 'launch',
             cwd: this.getLaunchTargetDirectory(),
             args,
+            env: util.mergeEnvironment(process.env as util.EnvironmentVariables),
             program: this.getLaunchTargetPath(),
             MIMode: miMode,
             miDebuggerPath: miDebuggerPath,
@@ -322,6 +323,7 @@ export class Launcher implements vscode.Disposable {
         }
 
         terminalOptions.cwd = this.getLaunchTargetDirectory();
+        terminalOptions.env = util.mergeEnvironment(process.env as util.EnvironmentVariables);
 
         if (!this.launchTerminal) {
             this.launchTerminal = vscode.window.createTerminal(terminalOptions);

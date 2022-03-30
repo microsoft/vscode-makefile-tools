@@ -69,12 +69,6 @@ Deduced command 'doesnt/exist/make -C {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fake
 Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath.
 Saving opened files before build.
 Building target "clean" with command: 'doesnt/exist/make clean -C {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/SubDir with space/'
-Executing task: "Makefile Tools Build Task" with quoting style "Strong"
- command name: doesnt/exist/make
- command args clean,-C,{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/SubDir with space/
-Target "clean" failed to build.
+Target "clean" failed to build because CWD passed in does not exist ({REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/SubDir with space/).
 Building target "all" with command: 'doesnt/exist/make all -C {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/SubDir with space/'
-Executing task: "Makefile Tools Build Task" with quoting style "Strong"
- command name: doesnt/exist/make
- command args all,-C,{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/SubDir with space/
-Target "all" failed to build.
+Target "all" failed to build because CWD passed in does not exist ({REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/SubDir with space/).
