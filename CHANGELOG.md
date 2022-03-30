@@ -1,8 +1,13 @@
 # What's New?
 
-## 
+## 0.4.0
+Improvements:
+- Localization support for all strings used in titles and descriptions of settings, commands and various UI elements (popups, trees, buttons...).
+  The messages in the output channel are not yet localized.
+
 Bug fixes:
-- makePath: add "make" when only a directory path was specified. [#237](https://github.com/microsoft/vscode-makefile-tools/issues/237)
+- Fix makePath: add "make" when only a directory path was specified. [#237](https://github.com/microsoft/vscode-makefile-tools/issues/237)
+- Activation problem when buildLog is used. Add missing linker. Fix bug when calculating binary targets. Use non deprecated VSCode terminal setting. [PR #256](https://github.com/microsoft/vscode-makefile-tools/pull/256)
 - Keep the pre-configure environment when sending the launch target to the terminal or the debugger. [#295](https://github.com/microsoft/vscode-makefile-tools/issues/295)
 
 ## 0.3.1
