@@ -176,7 +176,7 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
         if (node) {
             return node.getChildren();
         }
-        if (configuration.getEnableLocalDebugRun()) {
+        if (configuration.isOptionalFeatureEnabled("enableLocalDebugging") || configuration.isOptionalFeatureEnabled("enableLocalRunning")  ) {
             return [this._currentConfigurationItem, this._currentBuildTargetItem, this._currentLaunchTargetItem];
         }
         else {
@@ -204,6 +204,10 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
 
     async updateLaunchTarget(launchTarget: string): Promise<void> {
         await this._currentLaunchTargetItem.update(launchTarget);
+        this._changeEvent.fire(null);
+    }
+
+    async updateTree(): Promise<void> {
         this._changeEvent.fire(null);
     }
 }

@@ -141,7 +141,8 @@
                 "icon": {
                     "light": "res/light/debug.svg",
                     "dark": "res/dark/debug.svg"
-                }
+                },
+                "enablement": "makefile:localDebugFeature"
             },
             {
                 "command": "makefile.outline.launchRun",
@@ -149,7 +150,8 @@
                 "icon": {
                     "light": "res/light/run.svg",
                     "dark": "res/dark/run.svg"
-                }
+                },
+                "enablement": "makefile:localRunFeature"
             },
             {
                 "command": "makefile.outline.setBuildConfiguration",
@@ -173,8 +175,7 @@
                 "icon": {
                     "light": "res/light/edit.svg",
                     "dark": "res/dark/edit.svg"
-                },
-                "enablement": "makefile:localFeatureSet"
+                }
             },
             {
                 "command": "makefile.outline.configure",
@@ -504,11 +505,26 @@
                     "description": "%makefile-tools.configuration.makefile.compileCommandsPath.description%",
                     "scope": "resource"
                 },
-                "makefile.enableLocalDebugRun": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%makefile-tools.configuration.makefile.enableLocalDebugRun.description%",
-                    "scope": "resource"
+                "makefile.panel.visibility": {
+                    "type": "array",
+                    "default": [],
+                    "items": 
+                    {
+                        "type": "object",
+                        "default": null,
+                        "properties": {
+                            "enableLocalDebugging": {
+                                "type": "boolean",
+                                "description": "%makefile-tools.configuration.makefile.panel.visibility.enableLocalDebugging.description%",
+                                "default": true
+                            },
+                            "enableLocalRunning": {
+                                "type": "boolean",
+                                "description": "%makefile-tools.configuration.makefile.panel.visibility.enableLocalRunning.description%",
+                                "default": true
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -555,11 +571,11 @@
                 },
                 {
                     "command": "makefile.launchDebug",
-                    "when": "makefile:localFeatureSet"
+                    "when": "makefile:localDebugFeature"
                 },
                 {
                     "command": "makefile.launchRun",
-                    "when": "makefile:localFeatureSet"
+                    "when": "makefile:localRunFeature"
                 },
                 {
                     "command": "makefile.setBuildConfiguration",
@@ -571,7 +587,7 @@
                 },
                 {
                     "command": "makefile.setLaunchConfiguration",
-                    "when": "makefile:localFeatureSet"
+                    "when": "makefile:localDebugFeature"
                 },
                 {
                     "command": "makefile.outline.preConfigure",
@@ -587,11 +603,11 @@
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "makefile:localFeatureSet"
+                    "when": "makefile:localDebugFeature"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "makefile:localFeatureSet"
+                    "when": "makefile:localRunFeature"
                 },
                 {
                     "command": "makefile.outline.setBuildConfiguration",
@@ -603,7 +619,7 @@
                 },
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
-                    "when": "makefile:localFeatureSet"
+                    "when": "makefile:localDebugFeature"
                 }
             ],
             "view/title": [
@@ -634,12 +650,12 @@
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "view == makefile.outline && makefile:localFeatureSet",
+                    "when": "view == makefile.outline && makefile:localDebugFeature",
                     "group": "navigation@2"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "view == makefile.outline && makefile:localFeatureSet",
+                    "when": "view == makefile.outline && makefile:localRunFeature",
                     "group": "navigation@3"
                 }
             ],

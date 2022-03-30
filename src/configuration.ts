@@ -89,6 +89,84 @@ function readCurrentMakefileConfiguration(): void {
     statusBar.setConfiguration(currentMakefileConfiguration);
 }
 
+type OptionalFeatureDescription = {
+    prop_name: string;
+    default: boolean;
+    value: boolean;
+    enablement?: string;
+}
+
+interface IOptionalFeatures {
+    features: OptionalFeatureDescription[];
+
+}
+// To add an optional feature (one that can be enabled/disabled based
+// on a property stored in settings.json):
+// * define property under makefile.panel.visibility in package.json
+// * initialize here the default values
+// * if the feature controls the UI via enablement, 
+// *    make sure enablement is handled in package.json, you are done
+// * if not, then add code to check Feature state wherever is needed.
+class OptionalFeatures implements IOptionalFeatures {
+    features = [
+        { prop_name: "enableLocalDebugging", enablement: "makefile:localDebugFeature", default: true, value: false },
+        { prop_name: "enableLocalRunning",   enablement: "makefile:localRunFeature",   default: true, value: false }
+    ]
+}
+let optionalFeatures = new OptionalFeatures();
+function initOptionalFeatures() {
+    for (let feature of optionalFeatures.features) {
+        feature.value = feature.default;
+    }
+}
+export function isOptionalFeatureEnabled(prop_name: string): boolean {
+    for (let feature of optionalFeatures.features) {
+        if (feature.prop_name == prop_name) {
+            return feature.value;
+        }
+    }
+    return false;
+}
+
+
+function updateOptionalFeaturesWithWorkspace() {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    // optionalFeatures will be set with default values.
+    // override with values from the workspace
+    let features: OptionalFeatureDescription[] | undefined = workspaceConfiguration.get<OptionalFeatureDescription[]>("panel.visibility") || undefined;
+    if (features) {
+        for (let feature of features) {
+            for (let knownFeature of optionalFeatures.features) {
+                    if (feature.hasOwnProperty(knownFeature.prop_name)) {
+                        let props_pairs = Object.entries(feature);
+                        let index = props_pairs.findIndex(e => e[0] == knownFeature.prop_name);
+                        knownFeature.value = Object.entries(feature)[index][1] as boolean;
+                }
+            }
+        }
+    }
+}
+
+function readFeaturesVisibility(): void {
+    updateOptionalFeaturesWithWorkspace();
+}
+
+export function disableAllOptionallyVisibleCommands() {
+    for (let feature of optionalFeatures.features) {
+        if (feature.enablement) {
+            vscode.commands.executeCommand('setContext', feature.enablement, false);
+        }
+    }
+
+}
+function enableOptionallyVisibleCommands() {
+    for (let feature of optionalFeatures.features) {
+        if (feature.enablement) {
+            vscode.commands.executeCommand('setContext', feature.enablement, feature.value);
+        }
+    }
+}
+
 let makePath: string | undefined;
 export function getMakePath(): string | undefined { return makePath; }
 export function setMakePath(path: string): void { makePath = path; }
@@ -342,19 +420,6 @@ export function readCompileCommandsPath(): void {
 
     logger.message(`compile_commands.json path: ${compileCommandsPath}`);
 }
-
-let enableLocalDebugRun: boolean | undefined;
-export function getEnableLocalDebugRun(): boolean | undefined { return enableLocalDebugRun; }
-export function setEnableLocalDebugRun(path: boolean): void { enableLocalDebugRun = path; }
-
-// Read from settings whether the pre-configure step is supposed to be executed
-// always before the configure operation.
-export function readEnableLocalDebugRun(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    enableLocalDebugRun = workspaceConfiguration.get<boolean>("enableLocalDebugRun");
-    logger.message(`Enable debug run  feature: ${enableLocalDebugRun}`);
-}
-
 
 let additionalCompilerNames: string[] | undefined;
 export function getAdditionalCompilerNames(): string[] | undefined { return additionalCompilerNames; }
@@ -707,15 +772,15 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
             telemetry.logEvent("makefileNotFound", telemetryProperties);
             vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", false);
-            vscode.commands.executeCommand('setContext', "makefile:localFeatureSet", false);
+            disableAllOptionallyVisibleCommands();
         } else {
             vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
-            vscode.commands.executeCommand('setContext', "makefile:localFeatureSet", getEnableLocalDebugRun());
+            enableOptionallyVisibleCommands();
         }
     } else {
         // If we have a build log, then we want Makefile Tools to be fully active and the UI visible.
         vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
-        vscode.commands.executeCommand('setContext', "makefile:localFeatureSet", getEnableLocalDebugRun());
+        enableOptionallyVisibleCommands();
     }
 }
 
@@ -945,7 +1010,8 @@ export async function initFromStateAndSettings(): Promise<void> {
     readClearOutputBeforeBuild();
     readIgnoreDirectoryCommands();
     readCompileCommandsPath();
-    readEnableLocalDebugRun();
+    initOptionalFeatures();
+    readFeaturesVisibility();
 
     analyzeConfigureParams();
 
@@ -1295,14 +1361,17 @@ export async function initFromStateAndSettings(): Promise<void> {
                 updatedSettingsSubkeys.push(subKey);
             }
 
-            subKey = "enableLocalDebugRun";
-            let updatedEnableLocalDebugRun : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
-            if (updatedEnableLocalDebugRun !== enableLocalDebugRun) {
-                readEnableLocalDebugRun();
-                readCurrentLaunchConfiguration();
-                extension.getState().configureDirty = true;
-                updatedSettingsSubkeys.push(subKey);
+            let wasLocalDebugEnabled = isOptionalFeatureEnabled("enableLocalDebugging");
+            let wasLocalRunningEnabled   = isOptionalFeatureEnabled("enableLocalRunning");
+            readFeaturesVisibility();
+            enableOptionallyVisibleCommands(); 
+            let isLocalDebugEnabled = isOptionalFeatureEnabled("enableLocalDebugging");
+            let isLocalRunningEnabled   = isOptionalFeatureEnabled("enableLocalRunning");
+            if ( (wasLocalDebugEnabled && !isLocalDebugEnabled) || (!wasLocalDebugEnabled && isLocalDebugEnabled) ||
+                 (wasLocalRunningEnabled && !isLocalRunningEnabled) || (!wasLocalRunningEnabled && isLocalRunningEnabled) ) {
+                await extension._projectOutlineProvider.updateTree();
             }
+            
 
             // Final updates in some constructs that depend on more than one of the above settings.
             if (extension.getState().configureDirty) {
@@ -1634,3 +1703,5 @@ export function setBuildTargets(targets: string[]): void { buildTargets = target
 let launchTargets: string[] = [];
 export function getLaunchTargets(): string[] { return launchTargets; }
 export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
+
+    
