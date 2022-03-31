@@ -367,7 +367,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         return result;
     } catch (error) {
         // No need for notification popup, since the build result is visible already in the output channel
-        logger.message(error);
+        logger.message(`${(error as NodeJS.ErrnoException)}`);
         return ConfigureBuildReturnCodeTypes.notFound;
     }
 }
@@ -576,7 +576,7 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
             elapsed: elapsedTime
         };
     } catch (error) {
-        logger.message(error);
+        logger.message(`${(error as NodeJS.ErrnoException)}`);
         return {
             retc: ConfigureBuildReturnCodeTypes.notFound,
             elapsed: util.elapsedTimeSince(startTime)
@@ -749,7 +749,7 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
 
         return result.returnCode;
     } catch (error) {
-        logger.message(error);
+        logger.message(`${(error as NodeJS.ErrnoException)}`);
         return ConfigureBuildReturnCodeTypes.notFound;
     }
 }
@@ -988,14 +988,14 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
         return retc;
     } catch (e) {
-        logger.message(`Exception thrown during the configure process: ${e.message}`);
+        logger.message(`Exception thrown during the configure process: ${(e as NodeJS.ErrnoException)}`);
         retc = ConfigureBuildReturnCodeTypes.other;
-        return e.errno;
+        return (e as NodeJS.ErrnoException).errno as number;
     } finally {
         let provider: cpptools.CustomConfigurationProvider = extension.getCppConfigurationProvider().getCustomConfigurationProvider();
         let ConfigurationCache: ConfigurationCache = {
             buildTargets: configuration.getBuildTargets(),
-            launchTargets: configuration.getLaunchTargets(),
+            launchTargets: [...configuration.getLaunchTargets().values()],
             customConfigurationProvider: {
                 workspaceBrowse: provider.workspaceBrowse,
                 // trick to serialize a map in a JSON
@@ -1019,7 +1019,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
         let configureElapsedTime: number = util.elapsedTimeSince(configureStartTime);
         const telemetryMeasures: telemetry.Measures = {
             numberBuildTargets: configuration.getBuildTargets().length,
-            numberLaunchTargets: configuration.getLaunchTargets().length,
+            numberLaunchTargets: configuration.getLaunchTargets().size,
             numberIndexedSourceFiles: provider.fileIndex.size,
             numberMakefileConfigurations: configuration.getMakefileConfigurations().length,
             totalElapsedTime: configureElapsedTime,
@@ -1084,24 +1084,20 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
     }
 
     let startTime: number = Date.now();
-    let launchConfigurations: configuration.LaunchConfiguration[] = [];
+    let launchConfigurations: Map<configuration.LaunchConfiguration, string> = new Map();
 
     let onStatus: any = (status: string): void => {
         progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""}...` });
     };
 
     let onFoundLaunchConfiguration: any = (launchConfiguration: configuration.LaunchConfiguration): void => {
-        launchConfigurations.push(launchConfiguration);
+        launchConfiguration.name = "Makefile";
+        launchConfigurations.set(launchConfiguration, configuration.launchConfigurationToString(launchConfiguration));
     };
 
     let retc: number = await parser.parseLaunchConfigurations(cancel, dryRunOutput, onStatus, onFoundLaunchConfiguration);
     if (retc === ConfigureBuildReturnCodeTypes.success) {
-        let launchConfigurationsStr: string[] = [];
-        launchConfigurations.forEach(config => {
-            launchConfigurationsStr.push(configuration.launchConfigurationToString(config));
-        });
-
-        if (launchConfigurationsStr.length === 0) {
+        if (launchConfigurations.size === 0) {
             logger.message(`No${getConfigureIsClean() ? "" : " new"}${getConfigureIsClean() ? "" : " new"} launch configurations have been detected.`);
         } else {
             // Sort and remove duplicates that can be created in the following scenarios:
@@ -1111,23 +1107,15 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
             //    - sometimes the same binary is linked more than once in the same location
             //      (example: instrumentation) but the launch configurations list need only one entry,
             //      corresponding to the final binary, not the intermediate ones.
-            launchConfigurationsStr = util.sortAndRemoveDuplicates(launchConfigurationsStr);
-
-            logger.message(`Found the following ${launchConfigurationsStr.length}${getConfigureIsClean() ? "" : " new"} launch targets defined in the makefile: ${launchConfigurationsStr.join(";")}`);
+            logger.message(`Found the following ${launchConfigurations.size}${getConfigureIsClean() ? "" : " new"} launch targets defined in the makefile: ${[...launchConfigurations.values()].join(";")}`);
         }
 
         if (getConfigureIsClean()) {
             // If configure is clean, delete any old launch targets found previously.
-            configuration.setLaunchTargets(launchConfigurationsStr);
-        } else {
-            // If we're merging with a previous set of launch targets,
-            // remove duplicates because sometimes, depending how the makefiles are set up,
-            // a non --always-make dry-run may still log commands for up to date files.
-            // These would be found also in the previous list of launch targets.
-            configuration.setLaunchTargets(util.sortAndRemoveDuplicates(configuration.getLaunchTargets().concat(launchConfigurationsStr)));
+            configuration.setLaunchTargets(launchConfigurations);
         }
 
-        logger.message(`Complete list of launch targets: ${configuration.getLaunchTargets().join(";")}`);
+        logger.message(`Complete list of launch targets: ${[...configuration.getLaunchTargets().values()].join(";")}`);
     }
 
     return {
@@ -1298,7 +1286,18 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
 
                 await util.scheduleTask(() => {
                     configuration.setBuildTargets(configurationCache.buildTargets);
-                    configuration.setLaunchTargets(configurationCache.launchTargets);
+                    let buildMap = () => {
+                        let tempMap: Map<configuration.LaunchConfiguration, string> = new Map();
+                        configurationCache.launchTargets.forEach((value) => {
+                            configuration.stringToLaunchConfiguration(value).then((result) => {
+                                if(result != undefined) tempMap.set(result, value);
+                            });
+                        })
+                        return tempMap;
+                    }
+
+
+                    configuration.setLaunchTargets(buildMap());
                 });
 
                 await util.scheduleTask(() => {

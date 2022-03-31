@@ -239,7 +239,7 @@ export class Launcher implements vscode.Disposable {
         if (!currentLaunchConfiguration) {
             // If no launch configuration is set, give the user a chance to select one now from the quick pick
             // (unless we know it's going to be empty).
-            if (configuration.getLaunchTargets().length === 0) {
+            if (configuration.getLaunchTargets().size === 0) {
                 vscode.window.showErrorMessage(localize("cannot.op.no.launch.config.targets",
                     "Cannot {0} because there is no launch configuration set and the list of launch targets is empty. Double check the makefile configuration and the build target.", `'${op}'`));
                 return LaunchStatuses.launchTargetsListEmpty;

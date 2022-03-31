@@ -506,7 +506,7 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
             logger.message(`The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode} for regions (${compilerArgRegions})`, "Normal");
         }
     } catch (error) {
-        logger.message(error);
+        logger.message(`${error}`);
     }
 
     return switches;

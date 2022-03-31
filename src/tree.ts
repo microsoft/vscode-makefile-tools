@@ -66,7 +66,11 @@ export class LaunchTargetNode extends BaseNode {
         if (!launchConfiguration) {
             shortName = "Unset";
         } else {
-            if (vscode.workspace.workspaceFolders) {
+            if(launchConfiguration.name) {
+                // If the name parameter is defined, use that as the short name
+                shortName = launchConfiguration.name;
+            }
+            else if (vscode.workspace.workspaceFolders) {
                 // In a complete launch target string, the binary path is relative to cwd.
                 // In here, since we don't show cwd, make it relative to current workspace folder.
                 shortName = util.makeRelPath(launchConfiguration.binaryPath, vscode.workspace.workspaceFolders[0].uri.fsPath);

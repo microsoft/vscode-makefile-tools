@@ -391,6 +391,7 @@ export interface LaunchConfiguration {
     binaryPath: string; // full path to the binary that this launch configuration is tied to
     binaryArgs: string[]; // arguments that this binary is called with for this launch configuration
     cwd: string; // folder from where the binary is run
+    name?: string; // display name for configuration
 
     // The following represent optional properties that can be additionally defined by the user in settings.
     MIMode?: string;
@@ -418,17 +419,40 @@ function readLaunchConfigurations(): void {
 // in settings (after the extension creates a first minimal launch configuration object) and are not relevant
 // for the strings being used to populate the quick pick.
 // Syntax:
-//    [CWD path]>[binaryPath]([binaryArg1,binaryArg2,binaryArg3,...])
-export function launchConfigurationToString(configuration: LaunchConfiguration): string {
+//    [CWD path | name]>[binaryPath]([binaryArg1,binaryArg2,binaryArg3,...])
+export function launchConfigurationToString(configuration: LaunchConfiguration, full: Boolean = true): string {
     let binPath: string = util.makeRelPath(configuration.binaryPath, configuration.cwd);
     let binArgs: string = configuration.binaryArgs.join(",");
-    return `${configuration.cwd}>${binPath}(${binArgs})`;
+
+    if(configuration.name) {
+        if(full)
+            return `${configuration.name} | ${configuration.cwd}>${binPath}(${binArgs})`;
+        else
+            return `${configuration.name} |>${binPath}(${binArgs})`
+    } else {
+        return `${configuration.cwd}>${binPath}(${binArgs})`;
+    }    
 }
 
 // Helper used to construct a minimal launch configuration object
 // (only cwd, binary path and arguments) from a string that respects
 // the syntax of its quick pick.
 export async function stringToLaunchConfiguration(str: string): Promise<LaunchConfiguration | undefined> {
+    let nameRegExp: RegExp =/(.*) \| (.*)\>(.*)\((.*)\)/mg;
+    let nameMatch: RegExpExecArray | null = nameRegExp.exec(str);
+
+    if(nameMatch) {
+        let fullPath: string = await util.makeFullPath(nameMatch[3], nameMatch[2]);
+        let splitArgs: string[] = (nameMatch[4] === "") ? [] : nameMatch[4].split(",");
+
+        return {
+            name: nameMatch[1],
+            cwd: nameMatch[2],
+            binaryPath: fullPath,
+            binaryArgs: splitArgs
+        };
+    }
+
     let regexp: RegExp = /(.*)\>(.*)\((.*)\)/mg;
     let match: RegExpExecArray | null = regexp.exec(str);
 
@@ -1296,7 +1320,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                         util.thisExtensionPackage().contributes.configuration.properties[key],
                         false, telemetryProperties);
                 } catch (e) {
-                    logger.message(e.message);
+                    logger.message((e as Error).message);
                 }
             });
 
@@ -1373,7 +1397,7 @@ export async function setNewConfiguration(): Promise<void> {
                     util.thisExtensionPackage().contributes.configuration.properties[key],
                     true, telemetryProperties);
             } catch (e) {
-                logger.message(e.message);
+                logger.message((e as Error).message);
             }
 
             if (telemetryProperties && util.hasProperties(telemetryProperties)) {
@@ -1523,29 +1547,32 @@ export async function selectLaunchConfiguration(): Promise<void> {
 
     // In the quick pick, include also any makefile.launchConfigurations entries,
     // as long as they exist on disk and without allowing duplicates.
-    let launchTargetsNames: string[] = [...launchTargets];
-    launchConfigurations.forEach(launchConfiguration => {
-        if (util.checkFileExistsSync(launchConfiguration.binaryPath)) {
-            launchTargetsNames.push(launchConfigurationToString(launchConfiguration));
-        }
+    let launchTargetsNames: Map<string, LaunchConfiguration> = new Map();
+
+    launchTargets.forEach((_, launchConfiguration) => {
+        launchTargetsNames.set(launchConfigurationToString(launchConfiguration, false), launchConfiguration);
     });
-    launchTargetsNames = util.sortAndRemoveDuplicates(launchTargetsNames);
+    launchConfigurations.forEach(launchConfiguration => {
+        launchTargetsNames.set(launchConfigurationToString(launchConfiguration, false), launchConfiguration);
+    });
+
     let options: vscode.QuickPickOptions = {};
     options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
-    if (launchTargets.length === 0) {
+    if (launchTargets.size === 0) {
         options.placeHolder = "No launch targets identified";
     }
-    const chosen: string | undefined = await vscode.window.showQuickPick(launchTargetsNames, options);
+    const chosen: string | undefined = await vscode.window.showQuickPick([...launchTargetsNames.keys()], options);
 
     if (chosen) {
+        let fullName = launchConfigurationToString(launchTargetsNames.get(chosen) as LaunchConfiguration);
         let currentLaunchConfiguration: LaunchConfiguration | undefined = getCurrentLaunchConfiguration();
-        if (!currentLaunchConfiguration || chosen !== launchConfigurationToString(currentLaunchConfiguration)) {
+        if (!currentLaunchConfiguration || fullName !== launchConfigurationToString(currentLaunchConfiguration)) {
             let telemetryProperties: telemetry.Properties | null = {
                 state: "launchConfiguration"
             };
             telemetry.logEvent("stateChanged", telemetryProperties);
 
-            await setLaunchConfigurationByName(chosen);
+            await setLaunchConfigurationByName(fullName);
 
             // Refresh telemetry for this new launch configuration
             // (this will find the corresponding item in the makefile.launchConfigurations array
@@ -1568,7 +1595,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
                         util.thisExtensionPackage().contributes.configuration.properties[key],
                         true, telemetryProperties);
                 } catch (e) {
-                    logger.message(e.message);
+                    logger.message((e as Error).message);
                 }
 
                 if (telemetryProperties && util.hasProperties(telemetryProperties)) {
@@ -1605,6 +1632,6 @@ export function setBuildTargets(targets: string[]): void { buildTargets = target
 // The quick pick is not populated by the launch configurations list because its entries may be
 // out of date and most importantly a subset. We want the quick pick to reflect all the possibilities
 // that are found available with the current configuration of the project.
-let launchTargets: string[] = [];
-export function getLaunchTargets(): string[] { return launchTargets; }
-export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
+let launchTargets: Map<LaunchConfiguration, string> = new Map();
+export function getLaunchTargets(): Map<LaunchConfiguration, string> { return launchTargets; }
+export function setLaunchTargets(targets: Map<LaunchConfiguration, string>): void { launchTargets = targets; }

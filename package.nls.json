@@ -31,6 +31,7 @@
    "makefile-tools.configuration.makefile.launchConfigurations.binaryPath.description": "The full path to the binary to run or debug",
    "makefile-tools.configuration.makefile.launchConfigurations.binaryArgs.description": "Arguments to pass to program command line",
    "makefile-tools.configuration.makefile.launchConfigurations.cwd.description": "Set the working directory for the program",
+   "makefile-tools.configuration.makefile.launchConfigurations.name.description": "The display name used for the configuration",
    "makefile-tools.configuration.makefile.launchConfigurations.MIMode.description": "The non VS debugger type: gdb or lldb",
    "makefile-tools.configuration.makefile.launchConfigurations.miDebuggerPath.description": "Path to the non VS debugger (gdb or lldb)",
    "makefile-tools.configuration.makefile.launchConfigurations.stopAtEntry.description": "Stop at the entry point of the target",
