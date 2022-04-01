@@ -89,14 +89,14 @@ function readCurrentMakefileConfiguration(): void {
     statusBar.setConfiguration(currentMakefileConfiguration);
 }
 
-// as described in makefile.optionalFeatures
-type MakefileOptionalFeatures = {
+// as described in makefile.panel.visibility
+type MakefilePanelVisibility = {
     enableLocalDebugging: boolean,
     enableLocalRunning: boolean
 };
 
 // internal, runtime representation of an optional feature
-type MakefileOptionalFeatureDescription = {
+type MakefilePanelVisibilityDescription = {
     propertyName: string;
     default: boolean;
     value: boolean;
@@ -110,23 +110,23 @@ type MakefileOptionalFeatureDescription = {
 // * if the feature controls the UI via enablement, 
 // *    make sure enablement is handled in package.json, you are done
 // * if not, then add code to check Feature state wherever is needed.
-class MakefileOptionalFeatureDescriptions {
-    features: MakefileOptionalFeatureDescription[] = [
+class MakefilePanelVisibilityDescriptions {
+    features: MakefilePanelVisibilityDescription[] = [
         { propertyName: "enableLocalDebugging", enablement: "makefile:localDebugFeature", default: true, value: false },
         { propertyName: "enableLocalRunning", enablement: "makefile:localRunFeature", default: true, value: false }
     ];
 };
 
-let optionalFeatures = new MakefileOptionalFeatureDescriptions();
+let panelVisibility = new MakefilePanelVisibilityDescriptions();
 
 // Set all features to their defaults (enabled or disabled)
 function initOptionalFeatures() {
-    for (let feature of optionalFeatures.features) {
+    for (let feature of panelVisibility.features) {
         feature.value = feature.default;
     }
 }
 export function isOptionalFeatureEnabled(propertyName: string): boolean {
-    for (let feature of optionalFeatures.features) {
+    for (let feature of panelVisibility.features) {
         if (feature.propertyName === propertyName) {
             return feature.value;
         }
@@ -139,10 +139,10 @@ function updateOptionalFeaturesWithWorkspace() {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // optionalFeatures will be set with default values.
     // override with values from the workspace
-    let features: MakefileOptionalFeatures | undefined = workspaceConfiguration.get<MakefileOptionalFeatures>("optionalFeatures") || undefined;
+    let features: MakefilePanelVisibility | undefined = workspaceConfiguration.get<MakefilePanelVisibility>("panel.visibility") || undefined;
     if (features) {
         for (let propEntry of Object.entries(features)) {
-            for (let knownFeature of optionalFeatures.features) {
+            for (let knownFeature of panelVisibility.features) {
                 if (propEntry[0] === knownFeature.propertyName) {
                     knownFeature.value = propEntry[1];
                 }
@@ -154,7 +154,7 @@ function updateOptionalFeaturesWithWorkspace() {
 }
 
 export function disableAllOptionallyVisibleCommands() {
-    for (let feature of optionalFeatures.features) {
+    for (let feature of panelVisibility.features) {
         if (feature.enablement) {
             vscode.commands.executeCommand('setContext', feature.enablement, false);
         }
@@ -163,7 +163,7 @@ export function disableAllOptionallyVisibleCommands() {
 }
 
 function enableOptionallyVisibleCommands() {
-    for (let feature of optionalFeatures.features) {
+    for (let feature of panelVisibility.features) {
         if (feature.enablement) {
             vscode.commands.executeCommand('setContext', feature.enablement, feature.value);
         }

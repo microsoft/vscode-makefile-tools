@@ -505,7 +505,7 @@
                     "description": "%makefile-tools.configuration.makefile.compileCommandsPath.description%",
                     "scope": "resource"
                 },
-                "makefile.optionalFeatures": {
+                "makefile.panel.visibility": {
                     "type": "object",
                     "default": null,
                     "properties": {
