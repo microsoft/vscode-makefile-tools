@@ -505,24 +505,19 @@
                     "description": "%makefile-tools.configuration.makefile.compileCommandsPath.description%",
                     "scope": "resource"
                 },
-                "makefile.panel.visibility": {
-                    "type": "array",
-                    "default": [],
-                    "items": 
-                    {
-                        "type": "object",
-                        "default": null,
-                        "properties": {
-                            "enableLocalDebugging": {
-                                "type": "boolean",
-                                "description": "%makefile-tools.configuration.makefile.panel.visibility.enableLocalDebugging.description%",
-                                "default": true
-                            },
-                            "enableLocalRunning": {
-                                "type": "boolean",
-                                "description": "%makefile-tools.configuration.makefile.panel.visibility.enableLocalRunning.description%",
-                                "default": true
-                            }
+                "makefile.optionalFeatures": {
+                    "type": "object",
+                    "default": null,
+                    "properties": {
+                        "enableLocalDebugging": {
+                            "type": "boolean",
+                            "description": "%makefile-tools.configuration.makefile.panel.visibility.enableLocalDebugging.description%",
+                            "default": true
+                        },
+                        "enableLocalRunning": {
+                            "type": "boolean",
+                            "description": "%makefile-tools.configuration.makefile.panel.visibility.enableLocalRunning.description%",
+                            "default": true
                         }
                     }
                 }
