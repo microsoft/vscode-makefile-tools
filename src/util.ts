@@ -592,6 +592,11 @@ export function resolvePathToRoot(relPath: string): string {
     return relPath;
 }
 
+// Helper for substituting workspace paths.
+export function resolveSubstitutedPath(path: string): string {
+    return path.replace(/^\${workspace(Folder|Root)}/, getWorkspaceRoot());
+}
+
 // Schedule a task to be run at some future time. This allows other pending tasks to
 // execute ahead of the scheduled task and provides a form of async behavior for TypeScript.
 export function scheduleTask<T>(task: () => T): Promise<T> {

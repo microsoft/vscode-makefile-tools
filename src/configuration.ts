@@ -99,9 +99,13 @@ export function setMakePath(path: string): void { makePath = path; }
 function readMakePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makePath = workspaceConfiguration.get<string>("makePath");
-    // Don't resolve makePath to root, because make needs to be searched in the path too.
     if (!makePath) {
         logger.message("No path to the make tool is defined in the settings file.");
+    } else {
+        // Don't resolve makePath to root, because make needs to be searched in the path too.
+        // Instead, offer ability to substitute ${workspaceRoot}/${workspacePath} to the current
+        // workspace directory.
+        makePath = util.resolveSubstitutedPath(makePath);
     }
 }
 
