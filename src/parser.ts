@@ -38,7 +38,7 @@ export async function parseTargets(cancel: vscode.CancellationToken, verboseLog:
 
     // Extract the text between "# Files" and "# Finished Make data base" lines
     // There can be more than one matching section.
-    let regexpExtract: RegExp = /(# Files\n*)([\s\S]*?)(# Finished Make data base)/mg;
+    let regexpExtract: RegExp = /(# Files\n*)([\s\S]*?)(\n# Finished Make data base)/mg;
     let result: RegExpExecArray | null;
     let extractedLog: string = "";
 
