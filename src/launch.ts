@@ -11,7 +11,10 @@ import * as path from 'path';
 import * as telemetry from './telemetry';
 import * as util from './util';
 import * as vscode from 'vscode';
-import { localize } from 'vscode-nls';
+
+import * as nls from 'vscode-nls';
+nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 export enum LaunchStatuses {
     success = "success",
