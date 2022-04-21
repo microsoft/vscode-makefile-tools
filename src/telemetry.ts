@@ -255,10 +255,10 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
                 if (jsonType === "array") {
                     jsonProps = propSchema.items.properties || propSchema.items;
                 } else {
-                    // For a setting like "makefile.obj1.obj2.obj3",
+                    // For a setting like "makefile.name1.name2.name3",
                     // when we need to query for its schema we should use the whole name as index
                     // but when we query for the workspace value, we have to use each sub object name:
-                    // setting[obj1][obj2][obj3].
+                    // setting[name1][name2][name3].
                     // Otherwise we will not read anything useful about such a setting and we will also
                     // report a schema mismatch, even if it is written correctly.
                     let newProp: string = prop;
