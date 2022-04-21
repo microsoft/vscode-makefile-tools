@@ -91,8 +91,8 @@ function readCurrentMakefileConfiguration(): void {
 
 // as described in makefile.panel.visibility
 type MakefilePanelVisibility = {
-    enableLocalDebugging: boolean,
-    enableLocalRunning: boolean
+    debug: boolean;
+    run: boolean;
 };
 
 // internal, runtime representation of an optional feature
@@ -107,20 +107,20 @@ type MakefilePanelVisibilityDescription = {
 // on a property stored in settings.json):
 // * define property under makefile.panel.visibility in package.json
 // * initialize here the default values
-// * if the feature controls the UI via enablement, 
+// * if the feature controls the UI via enablement,
 // *    make sure enablement is handled in package.json, you are done
 // * if not, then add code to check Feature state wherever is needed.
 class MakefilePanelVisibilityDescriptions {
     features: MakefilePanelVisibilityDescription[] = [
-        { propertyName: "enableLocalDebugging", enablement: "makefile:localDebugFeature", default: true, value: false },
-        { propertyName: "enableLocalRunning", enablement: "makefile:localRunFeature", default: true, value: false }
+        { propertyName: "debug", enablement: "makefile:localDebugFeature", default: true, value: false },
+        { propertyName: "run", enablement: "makefile:localRunFeature", default: true, value: false }
     ];
-};
+}
 
-let panelVisibility = new MakefilePanelVisibilityDescriptions();
+let panelVisibility: MakefilePanelVisibilityDescriptions = new MakefilePanelVisibilityDescriptions();
 
 // Set all features to their defaults (enabled or disabled)
-function initOptionalFeatures() {
+function initOptionalFeatures(): void {
     for (let feature of panelVisibility.features) {
         feature.value = feature.default;
     }
@@ -135,12 +135,21 @@ export function isOptionalFeatureEnabled(propertyName: string): boolean {
 }
 
 // Override default settings for each feature based on workspace current information
-function updateOptionalFeaturesWithWorkspace() {
+function updateOptionalFeaturesWithWorkspace(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // optionalFeatures will be set with default values.
     // override with values from the workspace
     let features: MakefilePanelVisibility | undefined = workspaceConfiguration.get<MakefilePanelVisibility>("panel.visibility") || undefined;
     if (features) {
+        if (Object.entries(features).length < panelVisibility.features.length) {
+            // At least one feature is missing from the settings, which means we need to use defaults.
+            // If we don't refresh defaults here, we won't cover the following scenario:
+            //    - default TRUE feature
+            //    - which was set to false in the settings, causing knownFeature.value to be false
+            //    - just got removed from settings now, meaning it won't be included in the features varibale and the FOR won't loop through it
+            //    giving it no opportunity to switch .value back to the default of TRUE.
+            initOptionalFeatures();
+        }
         for (let propEntry of Object.entries(features)) {
             for (let knownFeature of panelVisibility.features) {
                 if (propEntry[0] === knownFeature.propertyName) {
@@ -153,7 +162,7 @@ function updateOptionalFeaturesWithWorkspace() {
     }
 }
 
-export function disableAllOptionallyVisibleCommands() {
+export function disableAllOptionallyVisibleCommands(): void {
     for (let feature of panelVisibility.features) {
         if (feature.enablement) {
             vscode.commands.executeCommand('setContext', feature.enablement, false);
@@ -162,14 +171,14 @@ export function disableAllOptionallyVisibleCommands() {
 
 }
 
-function enableOptionallyVisibleCommands() {
+function enableOptionallyVisibleCommands(): void {
     for (let feature of panelVisibility.features) {
         if (feature.enablement) {
             vscode.commands.executeCommand('setContext', feature.enablement, feature.value);
         }
     }
 }
-function readFeaturesVisibility() {
+function readFeaturesVisibility(): void {
     updateOptionalFeaturesWithWorkspace();
 }
 
@@ -1367,17 +1376,18 @@ export async function initFromStateAndSettings(): Promise<void> {
                 updatedSettingsSubkeys.push(subKey);
             }
 
-            let wasLocalDebugEnabled = isOptionalFeatureEnabled("enableLocalDebugging");
-            let wasLocalRunningEnabled   = isOptionalFeatureEnabled("enableLocalRunning");
+            subKey = "panel.visibility";
+            let wasLocalDebugEnabled: boolean = isOptionalFeatureEnabled("debug");
+            let wasLocalRunningEnabled: boolean   = isOptionalFeatureEnabled("run");
             readFeaturesVisibility();
-            enableOptionallyVisibleCommands(); 
-            let isLocalDebugEnabled = isOptionalFeatureEnabled("enableLocalDebugging");
-            let isLocalRunningEnabled   = isOptionalFeatureEnabled("enableLocalRunning");
-            if ( (wasLocalDebugEnabled && !isLocalDebugEnabled) || (!wasLocalDebugEnabled && isLocalDebugEnabled) ||
-                 (wasLocalRunningEnabled && !isLocalRunningEnabled) || (!wasLocalRunningEnabled && isLocalRunningEnabled) ) {
-                await extension._projectOutlineProvider.updateTree();
+            enableOptionallyVisibleCommands();
+            let isLocalDebugEnabled: boolean = isOptionalFeatureEnabled("debug");
+            let isLocalRunningEnabled: boolean   = isOptionalFeatureEnabled("run");
+            if ((wasLocalDebugEnabled && !isLocalDebugEnabled) || (!wasLocalDebugEnabled && isLocalDebugEnabled) ||
+                 (wasLocalRunningEnabled && !isLocalRunningEnabled) || (!wasLocalRunningEnabled && isLocalRunningEnabled)) {
+                extension._projectOutlineProvider.updateTree();
+                updatedSettingsSubkeys.push(subKey);
             }
-            
 
             // Final updates in some constructs that depend on more than one of the above settings.
             if (extension.getState().configureDirty) {
@@ -1709,5 +1719,3 @@ export function setBuildTargets(targets: string[]): void { buildTargets = target
 let launchTargets: string[] = [];
 export function getLaunchTargets(): string[] { return launchTargets; }
 export function setLaunchTargets(targets: string[]): void { launchTargets = targets; }
-
-    

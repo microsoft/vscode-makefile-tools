@@ -56,6 +56,6 @@
    "makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Build the current target before launch (debug/run)",
    "makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Clear the output channel at the beginning of a build",
    "makefile-tools.configuration.makefile.compileCommandsPath.description": "The path to the compilation database file",
-   "makefile-tools.configuration.makefile.panel.visibility.enableLocalDebugging.description": "Enable debugging locally (in this host) images built by this extension",
-   "makefile-tools.configuration.makefile.panel.visibility.enableLocalRunning.description": "Enable running locally (in this host) images built by this extension"
+   "makefile-tools.configuration.makefile.panel.visibility.debug.description": "Enable debugging locally (in this host) images built by this extension",
+   "makefile-tools.configuration.makefile.panel.visibility.run.description": "Enable running locally (in this host) images built by this extension"
 }

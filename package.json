@@ -509,14 +509,14 @@
                     "type": "object",
                     "default": null,
                     "properties": {
-                        "enableLocalDebugging": {
+                        "debug": {
                             "type": "boolean",
-                            "description": "%makefile-tools.configuration.makefile.panel.visibility.enableLocalDebugging.description%",
+                            "description": "%makefile-tools.configuration.makefile.panel.visibility.debug.description%",
                             "default": true
                         },
-                        "enableLocalRunning": {
+                        "run": {
                             "type": "boolean",
-                            "description": "%makefile-tools.configuration.makefile.panel.visibility.enableLocalRunning.description%",
+                            "description": "%makefile-tools.configuration.makefile.panel.visibility.run.description%",
                             "default": true
                         }
                     }

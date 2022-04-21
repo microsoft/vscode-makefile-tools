@@ -108,7 +108,7 @@ export class LaunchTargetNode extends BaseNode {
             item.command = {
                 command: "makefile.outline.setLaunchConfiguration",
                 title: "%makefile-tools.command.makefile.setLaunchConfiguration.title%"
-            }
+            };
             item.contextValue = [
                 `nodeType=launchTarget`,
             ].join(',');
@@ -176,10 +176,9 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
         if (node) {
             return node.getChildren();
         }
-        if (configuration.isOptionalFeatureEnabled("enableLocalDebugging") || configuration.isOptionalFeatureEnabled("enableLocalRunning")  ) {
+        if (configuration.isOptionalFeatureEnabled("debug") || configuration.isOptionalFeatureEnabled("run")) {
             return [this._currentConfigurationItem, this._currentBuildTargetItem, this._currentLaunchTargetItem];
-        }
-        else {
+        } else {
             return [this._currentConfigurationItem, this._currentBuildTargetItem];
         }
     }
@@ -189,25 +188,25 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
         this._currentBuildTargetItem.update(buildTarget);
         await this._currentLaunchTargetItem.update(launchTarget);
 
-        this._changeEvent.fire(null);
+        this.updateTree();
     }
 
     updateConfiguration(configuration: string): void {
         this._currentConfigurationItem.update(configuration);
-        this._changeEvent.fire(null);
+        this.updateTree();
     }
 
     updateBuildTarget(buildTarget: string): void {
         this._currentBuildTargetItem.update(buildTarget);
-        this._changeEvent.fire(null);
+        this.updateTree();
     }
 
     async updateLaunchTarget(launchTarget: string): Promise<void> {
         await this._currentLaunchTargetItem.update(launchTarget);
-        this._changeEvent.fire(null);
+        this.updateTree();
     }
 
-    async updateTree(): Promise<void> {
+    updateTree(): void {
         this._changeEvent.fire(null);
     }
 }
