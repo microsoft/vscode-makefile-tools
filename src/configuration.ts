@@ -1292,7 +1292,21 @@ export async function initFromStateAndSettings(): Promise<void> {
                 let key: string = keyRoot + "." + subKey;
                 logger.message(`${key} setting changed.`, "Verbose");
                 try {
-                    telemetryProperties = telemetry.analyzeSettings(workspaceConfiguration[subKey], key,
+                    // For settings that use "." in their name, make sure we send the right object
+                    // to the telemetry function. Currently, the schema for such a setting
+                    // is represented differently than the workspace setting value.
+                    let settingObj: any;
+                    if (subKey.includes(".")) {
+                       const subKeys: string[] = subKey.split(".");
+                       settingObj = workspaceConfiguration;
+                       subKeys.forEach(key => {
+                          settingObj = settingObj[key];
+                       });
+                    } else {
+                       settingObj = workspaceConfiguration[subKey];
+                    }
+
+                    telemetryProperties = telemetry.analyzeSettings(settingObj, key,
                         util.thisExtensionPackage().contributes.configuration.properties[key],
                         false, telemetryProperties);
                 } catch (e) {

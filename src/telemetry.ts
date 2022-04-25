@@ -251,17 +251,36 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
             settingsProps.forEach(prop => {
                 index++;
                 let jsonProps: any;
+                let newPropObj: any = setting[prop];
                 if (jsonType === "array") {
                     jsonProps = propSchema.items.properties || propSchema.items;
                 } else {
-                    let newProp: string = (key === "makefile") ? `${key}.` + prop : prop;
-                    if (propSchema.properties) {
-                        jsonProps = Object.getOwnPropertyNames(propSchema.properties).includes(newProp) ?
-                                    propSchema.properties[newProp] : undefined;
-                    } else {
-                        jsonProps = Object.getOwnPropertyNames(propSchema).includes(newProp) ?
-                                    propSchema[newProp] : undefined;
-                    }
+                    // For a setting like "makefile.name1.name2.name3",
+                    // when we need to query for its schema we should use the whole name as index
+                    // but when we query for the workspace value, we have to use each sub object name:
+                    // setting[name1][name2][name3].
+                    // Otherwise we will not read anything useful about such a setting and we will also
+                    // report a schema mismatch, even if it is written correctly.
+                    let newProp: string = prop;
+                    let newFullProp: string = (key === "makefile") ? key + "." : "";
+                    while (jsonProps === undefined && newProp !== "") {
+                        newFullProp = newFullProp + newProp;
+                        if (propSchema.properties) {
+                            jsonProps = Object.getOwnPropertyNames(propSchema.properties).includes(newFullProp) ?
+                                        propSchema.properties[newFullProp] : undefined;
+                        } else {
+                            jsonProps = Object.getOwnPropertyNames(propSchema).includes(newFullProp) ?
+                                        propSchema[newFullProp] : undefined;
+                        }
+
+                       if (jsonProps === undefined && typeof(newPropObj) === "object") {
+                           newProp = Object.getOwnPropertyNames(newPropObj)[0];
+                           newPropObj = newPropObj[newProp];
+                           newProp = "." + newProp;
+                       } else {
+                           newProp = "";
+                       }
+                   }
                 }
 
                 // The user defined a setting property wrong (example miMode instead of MIMode).
@@ -276,7 +295,7 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
                     if (type !== "function" /*&& jsonType !== undefined*/ &&
                         (jsonType !== "array" || prop !== "length")) {
                         let newTelemetryProperties: Properties | null = {};
-                        newTelemetryProperties = analyzeSettings(setting[prop], key + "." + prop, jsonProps, ignoreDefault,
+                        newTelemetryProperties = analyzeSettings(newPropObj, key + "." + prop, jsonProps, ignoreDefault,
                             ((jsonType !== "array" || index === active)) ? newTelemetryProperties : null);
 
                         // If telemetryProperties is null, it means we're not interested in reporting any telemetry for this subtree
