@@ -89,6 +89,99 @@ function readCurrentMakefileConfiguration(): void {
     statusBar.setConfiguration(currentMakefileConfiguration);
 }
 
+// as described in makefile.panel.visibility
+type MakefilePanelVisibility = {
+    debug: boolean;
+    run: boolean;
+};
+
+// internal, runtime representation of an optional feature
+type MakefilePanelVisibilityDescription = {
+    propertyName: string;
+    default: boolean;
+    value: boolean;
+    enablement?: string;
+};
+
+// To add an optional feature (one that can be enabled/disabled based
+// on a property stored in settings.json):
+// * define property under makefile.panel.visibility in package.json
+// * initialize here the default values
+// * if the feature controls the UI via enablement,
+// *    make sure enablement is handled in package.json, you are done
+// * if not, then add code to check Feature state wherever is needed.
+class MakefilePanelVisibilityDescriptions {
+    features: MakefilePanelVisibilityDescription[] = [
+        { propertyName: "debug", enablement: "makefile:localDebugFeature", default: true, value: false },
+        { propertyName: "run", enablement: "makefile:localRunFeature", default: true, value: false }
+    ];
+}
+
+let panelVisibility: MakefilePanelVisibilityDescriptions = new MakefilePanelVisibilityDescriptions();
+
+// Set all features to their defaults (enabled or disabled)
+function initOptionalFeatures(): void {
+    for (let feature of panelVisibility.features) {
+        feature.value = feature.default;
+    }
+}
+export function isOptionalFeatureEnabled(propertyName: string): boolean {
+    for (let feature of panelVisibility.features) {
+        if (feature.propertyName === propertyName) {
+            return feature.value;
+        }
+    }
+    return false;
+}
+
+// Override default settings for each feature based on workspace current information
+function updateOptionalFeaturesWithWorkspace(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    // optionalFeatures will be set with default values.
+    // override with values from the workspace
+    let features: MakefilePanelVisibility | undefined = workspaceConfiguration.get<MakefilePanelVisibility>("panel.visibility") || undefined;
+    if (features) {
+        if (Object.entries(features).length < panelVisibility.features.length) {
+            // At least one feature is missing from the settings, which means we need to use defaults.
+            // If we don't refresh defaults here, we won't cover the following scenario:
+            //    - default TRUE feature
+            //    - which was set to false in the settings, causing knownFeature.value to be false
+            //    - just got removed from settings now, meaning it won't be included in the features varibale and the FOR won't loop through it
+            //    giving it no opportunity to switch .value back to the default of TRUE.
+            initOptionalFeatures();
+        }
+        for (let propEntry of Object.entries(features)) {
+            for (let knownFeature of panelVisibility.features) {
+                if (propEntry[0] === knownFeature.propertyName) {
+                    knownFeature.value = propEntry[1];
+                }
+            }
+        }
+    } else {
+        initOptionalFeatures(); // no info in workspace, use defaults
+    }
+}
+
+export function disableAllOptionallyVisibleCommands(): void {
+    for (let feature of panelVisibility.features) {
+        if (feature.enablement) {
+            vscode.commands.executeCommand('setContext', feature.enablement, false);
+        }
+    }
+
+}
+
+function enableOptionallyVisibleCommands(): void {
+    for (let feature of panelVisibility.features) {
+        if (feature.enablement) {
+            vscode.commands.executeCommand('setContext', feature.enablement, feature.value);
+        }
+    }
+}
+function readFeaturesVisibility(): void {
+    updateOptionalFeaturesWithWorkspace();
+}
+
 let makePath: string | undefined;
 export function getMakePath(): string | undefined { return makePath; }
 export function setMakePath(path: string): void { makePath = path; }
@@ -694,12 +787,15 @@ export function getCommandForConfiguration(configuration: string | undefined): v
 
             telemetry.logEvent("makefileNotFound", telemetryProperties);
             vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", false);
+            disableAllOptionallyVisibleCommands();
         } else {
             vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
+            enableOptionallyVisibleCommands();
         }
     } else {
         // If we have a build log, then we want Makefile Tools to be fully active and the UI visible.
         vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
+        enableOptionallyVisibleCommands();
     }
 }
 
@@ -929,6 +1025,8 @@ export async function initFromStateAndSettings(): Promise<void> {
     readClearOutputBeforeBuild();
     readIgnoreDirectoryCommands();
     readCompileCommandsPath();
+    initOptionalFeatures();
+    readFeaturesVisibility();
 
     analyzeConfigureParams();
 
@@ -1275,6 +1373,19 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
             if (updatedCompileCommandsPath !== compileCommandsPath) {
                 readCompileCommandsPath();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "panel.visibility";
+            let wasLocalDebugEnabled: boolean = isOptionalFeatureEnabled("debug");
+            let wasLocalRunningEnabled: boolean   = isOptionalFeatureEnabled("run");
+            readFeaturesVisibility();
+            enableOptionallyVisibleCommands();
+            let isLocalDebugEnabled: boolean = isOptionalFeatureEnabled("debug");
+            let isLocalRunningEnabled: boolean   = isOptionalFeatureEnabled("run");
+            if ((wasLocalDebugEnabled && !isLocalDebugEnabled) || (!wasLocalDebugEnabled && isLocalDebugEnabled) ||
+                 (wasLocalRunningEnabled && !isLocalRunningEnabled) || (!wasLocalRunningEnabled && isLocalRunningEnabled)) {
+                extension._projectOutlineProvider.updateTree();
                 updatedSettingsSubkeys.push(subKey);
             }
 

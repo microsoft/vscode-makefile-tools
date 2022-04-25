@@ -141,7 +141,8 @@
                 "icon": {
                     "light": "res/light/debug.svg",
                     "dark": "res/dark/debug.svg"
-                }
+                },
+                "enablement": "makefile:localDebugFeature"
             },
             {
                 "command": "makefile.outline.launchRun",
@@ -149,7 +150,8 @@
                 "icon": {
                     "light": "res/light/run.svg",
                     "dark": "res/dark/run.svg"
-                }
+                },
+                "enablement": "makefile:localRunFeature"
             },
             {
                 "command": "makefile.outline.setBuildConfiguration",
@@ -502,6 +504,22 @@
                     "default": null,
                     "description": "%makefile-tools.configuration.makefile.compileCommandsPath.description%",
                     "scope": "resource"
+                },
+                "makefile.panel.visibility": {
+                    "type": "object",
+                    "default": null,
+                    "properties": {
+                        "debug": {
+                            "type": "boolean",
+                            "description": "%makefile-tools.configuration.makefile.panel.visibility.debug.description%",
+                            "default": true
+                        },
+                        "run": {
+                            "type": "boolean",
+                            "description": "%makefile-tools.configuration.makefile.panel.visibility.run.description%",
+                            "default": true
+                        }
+                    }
                 }
             }
         },
@@ -548,11 +566,11 @@
                 },
                 {
                     "command": "makefile.launchDebug",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localDebugFeature"
                 },
                 {
                     "command": "makefile.launchRun",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localRunFeature"
                 },
                 {
                     "command": "makefile.setBuildConfiguration",
@@ -564,7 +582,7 @@
                 },
                 {
                     "command": "makefile.setLaunchConfiguration",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localDebugFeature"
                 },
                 {
                     "command": "makefile.outline.preConfigure",
@@ -580,11 +598,11 @@
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localDebugFeature"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localRunFeature"
                 },
                 {
                     "command": "makefile.outline.setBuildConfiguration",
@@ -596,7 +614,7 @@
                 },
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "makefile:localDebugFeature"
                 }
             ],
             "view/title": [
@@ -627,12 +645,12 @@
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "view == makefile.outline",
+                    "when": "view == makefile.outline && makefile:localDebugFeature",
                     "group": "navigation@2"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "view == makefile.outline",
+                    "when": "view == makefile.outline && makefile:localRunFeature",
                     "group": "navigation@3"
                 }
             ],
