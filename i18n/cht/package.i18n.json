@@ -60,5 +60,7 @@
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "組建或設定之前先儲存開啟的檔案",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "在啟動 (偵錯/執行) 之前先組建目前的目標",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "清除組建開頭的輸出通道",
-	"makefile-tools.configuration.makefile.compileCommandsPath.description": "編譯資料庫檔案的路徑"
+	"makefile-tools.configuration.makefile.compileCommandsPath.description": "編譯資料庫檔案的路徑",
+	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Enable debugging locally (in this host) images built by this extension",
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Enable running locally (in this host) images built by this extension"
 }

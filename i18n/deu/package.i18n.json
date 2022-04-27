@@ -60,5 +60,7 @@
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Geöffnete Dateien vor dem Erstellen oder Konfigurieren speichern",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Aktuelles Ziel vor dem Start erstellen (debuggen/ausführen)",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Ausgabekanal am Anfang eines Builds löschen",
-	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Der Pfad zur Datenbankdatei der Kompilierung"
+	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Der Pfad zur Datenbankdatei der Kompilierung",
+	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Enable debugging locally (in this host) images built by this extension",
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Enable running locally (in this host) images built by this extension"
 }
