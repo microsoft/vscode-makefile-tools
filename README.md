@@ -21,7 +21,9 @@ The extension is going to invoke the script before every configure operation.
 ### Configuring your project
 By default, the extension will attempt to use a `make` program that resides within your $PATH to configure
 the project.  If you use a different flavor of the make tool or if it is not in your $PATH, use the
-`makefile.makePath` setting to instruct the extension where to find it.
+`makefile.makePath` setting to instruct the extension where to find it.  Provide a file/command that is in the
+system path, prefixed with `${workspaceRoot}`, or an absolute path as relative paths will not be resolved
+properly.
 
 The extension can also avoid running the `make` program when it configures your project, if you point the
 `makefile.buildLog` setting to the output of a build.
