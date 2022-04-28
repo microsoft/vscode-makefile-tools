@@ -1,5 +1,14 @@
 # What's New?
 
+## 0.5.0
+Improvements:
+- Implement the ability to make various extension features optional and hide them from the UI. Initial examples: debugging an executable target and/or running it in terminal. [#290](https://github.com/microsoft/vscode-makefile-tools/issues/290) [@jdmchp](https://github.com/jdmchp)
+
+Bug fixes:
+- Fix telemetry bug related to object settings. [PR #309](https://github.com/microsoft/vscode-makefile-tools/pull/309)
+- Fix localize initialization logistics in launch source code. [#305](https://github.com/microsoft/vscode-makefile-tools/issues/305)
+- Fix regular expression used in processing the build targets ouf of the dryrun log. [PR #307](https://github.com/microsoft/vscode-makefile-tools/pull/307) [@DepthDeluxe](https://github.com/DepthDeluxe)
+
 ## 0.4.0
 Improvements:
 - Localization support for all strings used in titles and descriptions of settings, commands and various UI elements (popups, trees, buttons...).
