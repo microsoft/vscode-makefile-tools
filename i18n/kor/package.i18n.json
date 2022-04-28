@@ -61,6 +61,6 @@
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "시작하기 전에 현재 대상 빌드(디버그/실행)",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "빌드 시작 시 출력 채널 지우기",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "컴파일 데이터베이스 파일의 경로",
-	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Enable debugging locally (in this host) images built by this extension",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Enable running locally (in this host) images built by this extension"
+	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "이 확장으로 빌드된 이미지를 (이 호스트에서) 로컬로 디버깅 활성화",
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "이 확장으로 빌드된 이미지를 (이 호스트에서) 로컬로 실행 활성화"
 }
