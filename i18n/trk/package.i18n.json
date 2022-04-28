@@ -61,6 +61,6 @@
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Başlatmadan önce mevcut hedefi oluşturun (hata ayıkla/çalıştır)",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Derlemenin başındaki çıkış kanalını temizleyin",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Derleme veritabanı dosyasına giden yol",
-	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Enable debugging locally (in this host) images built by this extension",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Enable running locally (in this host) images built by this extension"
+	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Bu uzantı tarafından oluşturulan görüntülerde yerel olarak (bu konakta) hata ayıklamayı etkinleştir",
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Bu uzantı tarafından oluşturulan görüntüleri yerel olarak (bu konakta) çalıştırmayı etkinleştir"
 }
