@@ -61,6 +61,6 @@
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "起動前に現在のターゲットをビルドする (デバッグ/実行)",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "ビルドの開始時に出力チャネルをクリアする",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "コンパイル データベース ファイルへのパス",
-	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Enable debugging locally (in this host) images built by this extension",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Enable running locally (in this host) images built by this extension"
+	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "この拡張機能によってビルドされたイメージの、ローカル (このホスト内) でのデバッグを有効にする",
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "この拡張機能によってビルドされたイメージの、ローカル (このホスト内) での実行を有効にする"
 }
