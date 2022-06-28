@@ -6,7 +6,7 @@
 import * as configuration from './configuration';
 import * as logger from './logger';
 import * as util from './util';
-import TelemetryReporter from 'vscode-extension-telemetry';
+import TelemetryReporter from '@vscode/extension-telemetry';
 
 export type Properties = { [key: string]: string };
 export type Measures = { [key: string]: number };
