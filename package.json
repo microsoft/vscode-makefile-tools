@@ -750,10 +750,14 @@
         "module-alias": "^2.2.2",
         "vscode-cpptools": "^5.0.0",
         "vscode-nls": "^5.0.0",
-        "vscode-extension-telemetry": "^0.1.2",
+        "@vscode/extension-telemetry": "^0.6.2",
         "vscode-jsonrpc": "^3.6.2"
     },
     "resolutions": {
-        "**/mkdirp/minimist": "^0.2.1"
+        "ansi-regex": "^5.0.1",
+        "glob-parent": "^5.1.2",
+        "markdown-it": "^12.3.2",
+        "minimist": "^1.2.6",
+        "nanoid": "^3.1.20"
     }
 }
