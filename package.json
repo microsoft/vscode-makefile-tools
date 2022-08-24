@@ -393,19 +393,19 @@
                 "makefile.extensionOutputFolder": {
                     "type": "string",
                     "description": "%makefile-tools.configuration.makefile.extensionOutputFolder.description%",
-                    "default": "./.vscode",
+                    "default": "",
                     "scope": "resource"
                 },
                 "makefile.extensionLog": {
                     "type": "string",
                     "description": "%makefile-tools.configuration.makefile.extensionLog.description%",
-                    "default": null,
+                    "default": "",
                     "scope": "resource"
                 },
                 "makefile.configurationCachePath": {
                     "type": "string",
                     "description": "%makefile-tools.configuration.makefile.configurationCachePath.description%",
-                    "default": ".vscode/configurationCache.log",
+                    "default": "",
                     "scope": "resource"
                 },
                 "makefile.dryrunSwitches": {
