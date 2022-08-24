@@ -1,6 +1,7 @@
 {
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
     "makefile.buildLog": "./dummy_dryrun.log",
+    "makefile.extensionOutputFolder": "./.vscode",
     "makefile.makePath": "c:/some/other/fake/path",
     "makefile.loggingLevel": "Debug",
     "makefile.additionalCompilerNames": ["MyOwnFakeCompiler"],
