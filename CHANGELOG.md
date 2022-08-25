@@ -1,5 +1,10 @@
 # What's New?
 
+## 0.6.0
+Bug fixes:
+- Do not write to the user's workspace folders by default. [#329](https://github.com/microsoft/vscode-makefile-tools/issues/329)
+- Do not change the value of makefile.extensionOutputFolder in the user's workspace/folder settings. [#331](https://github.com/microsoft/vscode-makefile-tools/issues/331)
+
 ## 0.5.0
 Improvements:
 - Implement the ability to make various extension features optional and hide them from the UI. Initial examples: debugging an executable target and/or running it in terminal. [#290](https://github.com/microsoft/vscode-makefile-tools/issues/290) [@jdmchp](https://github.com/jdmchp)
