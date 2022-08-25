@@ -327,17 +327,19 @@ export function readExtensionOutputFolder(): void {
     extensionOutputFolder = workspaceConfiguration.get<string>(propKey);
     if (extensionOutputFolder) {
         extensionOutputFolder = util.resolvePathToRoot(extensionOutputFolder);
+    } else {
+        extensionOutputFolder = extension.extensionContext.storagePath;
+    }
 
+    // Check one more time because the value can still be undefined if no folder was opened.
+    if (extensionOutputFolder) {
         if (!util.checkDirectoryExistsSync(extensionOutputFolder)) {
-            logger.message(`Provided extension output folder does not exist: ${extensionOutputFolder}.`);
-            let defaultExtensionOutputFolder: string | undefined = workspaceConfiguration.inspect<string>(propKey)?.defaultValue;
-            if (defaultExtensionOutputFolder) {
-                logger.message(`Switching to default: ${defaultExtensionOutputFolder}.`);
-                workspaceConfiguration.update(propKey, defaultExtensionOutputFolder);
-                extensionOutputFolder = util.resolvePathToRoot(defaultExtensionOutputFolder);
+            if (!util.createDirectorySync(extensionOutputFolder)) {
+                logger.message(`Extension output folder does not exist and could not be created: ${extensionOutputFolder}.`);
+                extensionOutputFolder = undefined;
+                return;
             }
         }
-
         logger.message(`Dropping various extension output files at ${extensionOutputFolder}`);
     }
 }
@@ -412,6 +414,9 @@ export function readConfigurationCachePath(): void {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     // how to get default from package.json to avoid problem with 'undefined' type?
     configurationCachePath = workspaceConfiguration.get<string>("configurationCachePath");
+    if (!configurationCachePath && extensionOutputFolder) {
+        configurationCachePath = path.join(extensionOutputFolder, 'configurationCache.log');
+    }
     if (configurationCachePath) {
         // If there is a directory defined within the configuration cache path,
         // honor it and don't append to extensionOutputFolder.

@@ -41,6 +41,15 @@ export function checkDirectoryExistsSync(directoryPath: string): boolean {
     return false;
 }
 
+export function createDirectorySync(directoryPath: string): boolean {
+    try {
+        fs.mkdirSync(directoryPath, { recursive: true });
+        return true;
+    } catch {
+    }
+    return false;
+}
+
 export function deleteFileSync(filePath: string): void {
     try {
         fs.unlinkSync(filePath);
