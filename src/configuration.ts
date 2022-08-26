@@ -1162,25 +1162,16 @@ export async function initFromStateAndSettings(): Promise<void> {
 
             subKey = "extensionOutputFolder";
             let updatedExtensionOutputFolder : string | undefined = workspaceConfiguration.get<string>(subKey);
-            let switchedToDefault: boolean = false;
             if (updatedExtensionOutputFolder) {
                 updatedExtensionOutputFolder = util.resolvePathToRoot(updatedExtensionOutputFolder);
-                if (!util.checkDirectoryExistsSync(updatedExtensionOutputFolder)) {
-                    logger.message(`Provided extension output folder does not exist: ${updatedExtensionOutputFolder}.`);
-                    let defaultExtensionOutputFolder: string | undefined = workspaceConfiguration.inspect<string>(subKey)?.defaultValue;
-                    if (defaultExtensionOutputFolder) {
-                        logger.message(`Switching to default: ${defaultExtensionOutputFolder}.`);
-                        updatedExtensionOutputFolder = util.resolvePathToRoot(defaultExtensionOutputFolder);
-                        // This will trigger another settings changed event
-                        workspaceConfiguration.update(subKey, defaultExtensionOutputFolder);
-                        updatedSettingsSubkeys.push(subKey);
-                        // to prevent the below readExtensionOutputFolder to be executed now,
-                        // it will during the next immediate changed event
-                        switchedToDefault = true;
-                    }
-                }
+                if (!util.checkDirectoryExistsSync(updatedExtensionOutputFolder) &&
+                    !util.createDirectorySync(updatedExtensionOutputFolder)) {
+                     // No logging necessary about not being able to create the directory,
+                     // readExtensionOutputFolder called below will complain if it's the case.
+                     updatedExtensionOutputFolder = undefined;
+                  }
             }
-            if (updatedExtensionOutputFolder !== extensionOutputFolder && !switchedToDefault) {
+            if (updatedExtensionOutputFolder !== extensionOutputFolder) {
                 // No IntelliSense update needed.
                 readExtensionOutputFolder();
                 updatedSettingsSubkeys.push(subKey);
