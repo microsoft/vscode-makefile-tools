@@ -354,7 +354,7 @@ async function parseLineAsTool(
         // don't use join and neither paths/filenames processed above if we want to keep the exact text in the makefile
         pathInMakefile: match[1] + match[2],
         fullPath: toolFullPath,
-        arguments: match[match.length - 1],
+        arguments: await util.replaceCommands(match[match.length - 1], configuration.getSafeCommands(), {cwd: util.getWorkspaceRoot(), shell: true}),
         found: toolFound
     };
 }
@@ -371,72 +371,13 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
     // Identify the non value part of the switch: prefix, switch name
     // and what may separate this from an eventual switch value
     let switches: string[] = [];
-    let regExpStr: string = "(^|\\s+)(--|-" +
-        // On Win32 allow '/' as switch prefix as well,
-        // otherwise it conflicts with path character
-        (process.platform === "win32" ? "|\\/" : "") +
-        ")([a-zA-Z0-9_]+)";
-    let regexp: RegExp = RegExp(regExpStr, "mg");
-    let match1: RegExpExecArray | null;
-    let match2: RegExpExecArray | null;
-    let index1: number = -1;
-    let index2: number = -1;
 
     // This contains all the compilation command fragments in between two different consecutive switches
     // (except the ones we plan to ignore, specified by excludeArgs).
     // Once this function is done concatenating into compilerArgRegions,
     // we call the compiler args parsing script once for the whole list of regions
     // (as opposed to invoking it for each fragment separately).
-    let compilerArgRegions: string = "";
-
-    // With every loop iteration we need 2 switch matches so that we analyze the text
-    // that is between them. If the current match is the last one, then we will analyze
-    // everything until the end of line.
-    match1 = regexp.exec(args);
-
-    // Even if we don't find any arguments that have a switch syntax,
-    // consider the whole command line to parse into arguments
-    // (this case is encountered when we call this helper while we parse launch targets).
-    if (!match1) {
-       compilerArgRegions = args;
-    }
-
-    while (match1) {
-        // Marks the beginning of the current switch (prefix + name).
-        // The exact switch prefix is needed when we call other parser helpers later
-        // and also CppTools expects the compiler arguments to be prefixed
-        // when received from the custom providers.
-        index1 = regexp.lastIndex - match1[0].length;
-
-        // Marks the beginning of the next switch
-        match2 = regexp.exec(args);
-        if (match2) {
-            index2 = regexp.lastIndex - match2[0].length;
-        } else {
-            index2 = args.length;
-        }
-
-        // The substring to analyze for the current switch.
-        // It doesn't help to look beyond the next switch match.
-        let partialArgs: string = args.substring(index1, index2);
-        let swi: string = match1[3];
-        swi = swi.trim();
-
-        // Skip over any switches that we know we don't need
-        let exclude: boolean = false;
-        for (const arg of excludeArgs) {
-            if (swi.startsWith(arg)) {
-                exclude = true;
-                break;
-            }
-        }
-
-        if (!exclude) {
-            compilerArgRegions += partialArgs;
-        }
-
-        match1 = match2;
-    }
+    let compilerArgRegions: string = args;
 
     let parseCompilerArgsScriptFile: string = util.parseCompilerArgsScriptFile();
     let parseCompilerArgsScriptContent: string;
@@ -479,6 +420,13 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
     }
 
     try {
+        let regExpStr: string = "(^|\\s+)(--|-" +
+            // On Win32 allow '/' as switch prefix as well,
+            // otherwise it conflicts with path character
+            (process.platform === "win32" ? "|\\/" : "") +
+            ")(.+)";
+        let regexp: RegExp = RegExp(regExpStr, "mg");
+
         let stdout: any = (result: string): void => {
             if (process.platform === 'win32') {
                 // Restore the commas and equals that were hidden from the script invocation.
@@ -486,12 +434,26 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
                 result = result.replace(/DONT_USE_EQUAL_AS_SEPARATOR/mg, "=");
             }
             let results: string[] = result.replace(/\r\n/mg, "\n").split("\n");
+            let skipNext = false;
             // In case of concatenated separators, the shell sees different empty arguments
             // which we can remove (most common is more spaces not being seen as a single space).
             results.forEach(res => {
-                if (res !== "") {
+                if (res !== "" && !skipNext) {
+                    regexp.lastIndex = 0;
+                    const match = regexp.exec(res);
+
+                    // Skip over any switches that will be parsed later.
+                    if (match && match.length > 3) {
+                        let arg = "";
+                        if (excludeArgs.some(a => { arg = a; return match[3].startsWith(a); })) {
+                            skipNext = match[3].length === arg.length;
+                            return;
+                        }
+                    }
+
                     switches.push(res.trim());
                 }
+                skipNext = false;
             });
         };
 
@@ -501,12 +463,17 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
         };
 
         // Running the compiler arguments parsing script can use the system locale.
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, false, stdout, stderr);
+        const opts: util.ProcOptions = {
+            workingDirectory: util.getWorkspaceRoot(),
+            stdoutCallback: stdout,
+            stderrCallback: stderr
+        };
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, opts);
         if (result.returnCode !== 0) {
             logger.message(`The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode} for regions (${compilerArgRegions})`, "Normal");
         }
     } catch (error) {
-        logger.message(error);
+        logger.message((<any>error).toString());
     }
 
     return switches;
