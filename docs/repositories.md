@@ -47,7 +47,7 @@
 | openh264 | [https://github.com/cisco/openh264.git](https://github.com/cisco/openh264.git)| | | for build log, V=1 is more cryptic than without | Yes |
 | PCapPlusPlus | [https://github.com/seladb/PcapPlusPlus.git](https://github.com/seladb/PcapPlusPlus.git) | Various OS specific configure scripts in the root | | The build output is very cryptic even with v=1 | Yes |
 | PHP | [https://github.com/php/php-src.git](https://github.com/php/php-src.git) | ./buildconf && ./configure | | | Yes |
-| PostgresSQL | [https://github.com/postgres/postgres.git](https://github.com/postgres/postgres.git) | ./configure | | Headers squiggles without a real build before configure.<br>One file compiled many times differently (src/common/ip.c) during the all or default makefile target. | Yes |
+| PostgreSQL | [https://github.com/postgres/postgres.git](https://github.com/postgres/postgres.git) | ./configure | | Headers squiggles without a real build before configure.<br>One file compiled many times differently (src/common/ip.c) during the all or default makefile target. | Yes |
 | qemu | [https://github.com/qemu/qemu.git](https://github.com/qemu/qemu.git) | ./configure | | | Yes |
 | Recommender | [https://github.com/GHamrouni/Recommender.git](https://github.com/GHamrouni/Recommender.git) | | | | Yes |
 | Redis | [https://github.com/redis/redis.git](https://github.com/redis/redis.git)| | | | Yes |
