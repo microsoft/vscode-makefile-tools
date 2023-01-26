@@ -216,7 +216,6 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     preprocessTasks.push(function (): void {
       regexp = /------/mg;
       preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "- - - - - - ");
-      regexp = /abc/mg;
   });
 
   // Loop through all the configure preprocess tasks, checking for cancel.
