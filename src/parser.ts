@@ -208,7 +208,18 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
         preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/;/g, "\n");
     });
 
-    // Loop through all the configure preprocess tasks, checking for cancel.
+    // Replace multiple "-" sequence because it hangs the regular expression engine.
+    // Strings with this pattern do not contain useful information to parse, they are safe to replace
+    // in our internal representation of the dryrun or build log.
+    // Replace with "- " instead of remove since this pattern does not cause hang or slow processing
+    // and so that we have a similar view of the preprocessed text.
+    preprocessTasks.push(function (): void {
+      regexp = /------/mg;
+      preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(regexp, "- - - - - - ");
+      regexp = /abc/mg;
+  });
+
+  // Loop through all the configure preprocess tasks, checking for cancel.
     for (const func of preprocessTasks) {
         await util.scheduleTask(func);
 
