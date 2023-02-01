@@ -1,0 +1,13 @@
+Type: Debugger
+ERROR: Unable to start debugging. Unexpected GDB output from command "-enironment-cd". 
+Cannot access memory at address 0x800ff20
+
+Describe the bug: I decided to learn C++. Installed everything that is needed, and it gives me an error
+
+
+OS and Version: Windows 10
+VS Code Version: 1.72.2
+C/C++ Extension Version: 1.13.3
+Other extensions you installed (and if the issue persists after disabling them): ----
+
+Any suggestion with regards to this would be truly appreciated.
