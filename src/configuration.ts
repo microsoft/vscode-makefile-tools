@@ -782,7 +782,6 @@ export function getCommandForConfiguration(configuration: string | undefined): v
         }
 
         if (!util.checkFileExistsSync(makefileUsed)) {
-            vscode.window.showErrorMessage(localize("makefile.entry.point.not.found", "{0} entry point not found", "Makefile"));
             logger.message("The makefile entry point was not found. " +
                 "Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, " +
                 "makefile.makeDirectory, makefile.configurations[].makeDirectory" +
