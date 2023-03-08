@@ -150,7 +150,8 @@ export class Launcher implements vscode.Disposable {
 
         // If the first chosen debugger is not installed, try the other one.
         if (guessMiDebuggerPath && guessMiMode) {
-            let debuggerPath: string = path.join(guessMiDebuggerPath, guessMiMode);
+            // if the guessMiDebuggerPath is already a file, then go with that. Otherwise, append the guessMiMode.
+            let debuggerPath: string = util.checkFileExistsSync(guessMiDebuggerPath) ? guessMiDebuggerPath : path.join(guessMiDebuggerPath, guessMiMode);
             if (process.platform === "win32") {
                 // On mingw a file is not found if the extension is not part of the path
                 debuggerPath = debuggerPath + ".exe";
@@ -173,7 +174,9 @@ export class Launcher implements vscode.Disposable {
             const cpptoolsExtension: vscode.Extension<any> | undefined = vscode.extensions.getExtension('ms-vscode.cpptools');
             miDebuggerPath = cpptoolsExtension ? path.join(cpptoolsExtension.extensionPath, "debugAdapters", "lldb-mi", "bin", "lldb-mi") : undefined;
         } else if (miDebuggerPath && miMode) {
-            miDebuggerPath = path.join(miDebuggerPath, miMode);
+            // if the miDebuggerPath is already a file, rather than a directory, go with it.
+            // Otherwise, append the MiMode. 
+            miDebuggerPath = util.checkFileExistsSync(miDebuggerPath) ? miDebuggerPath :  path.join(miDebuggerPath, miMode);
             if (process.platform === "win32") {
                 miDebuggerPath = miDebuggerPath + ".exe";
             }

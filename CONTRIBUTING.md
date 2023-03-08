@@ -7,7 +7,7 @@
 * Run the following commands, in a terminal, from the Makefile Tools extension code base root folder:
       * `yarn install` will install the dependencies needed to build the extension.
       * **(optional)** `yarn global add vsce` will install `vsce` globally to create a VSIX package that you can install.
-* To compile source changes, run from terminal: 'yarn compile'.
+* To compile source changes, run from terminal: `yarn compile`.
       * This is also done automatically by VSCode when requesting to debug the extension via F5.
 * To build a vsix with your changes, run from terminal: 'vsce package'.
 * File an [issue](https://github.com/microsoft/vscode-makefile-tools/issues) and a [pull request](https://github.com/microsoft/vscode-makefile-tools/pulls) with the change and we will review it.
