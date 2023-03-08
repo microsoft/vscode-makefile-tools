@@ -100,38 +100,6 @@
                 "title": "%makefile-tools.command.makefile.launchRun.title%"
             },
             {
-                "command": "makefile.launchTargetPath",
-                "title": "%makefile-tools.command.makefile.launchTargetPath.title%"
-            },
-            {
-                "command": "makefile.getLaunchTargetPath",
-                "title": "%makefile-tools.command.makefile.getLaunchTargetPath.title%"
-            },
-            {
-                "command": "makefile.getLaunchTargetDirectory",
-                "title": "%makefile-tools.command.makefile.getLaunchTargetDirectory.title%"
-            },
-            {
-                "command": "makefile.getLaunchTargetFileName",
-                "title": "%makefile-tools.command.makefile.getLaunchTargetFileName.title%"
-            },
-            {
-                "command": "makefile.launchTargetFileName",
-                "title": "%makefile-tools.command.makefile.launchTargetFileName.title%"
-            },
-            {
-                "command": "makefile.getLaunchTargetArgs",
-                "title": "%makefile-tools.command.makefile.getLaunchTargetArgs.title%"
-            },
-            {
-                "command": "makefile.getLaunchTargetArgsConcat",
-                "title": "%makefile-tools.command.makefile.getLaunchTargetArgsConcat.title%"
-            },
-            {
-                "command": "makefile.makeBaseDirectory",
-                "title": "%makefile-tools.command.makefile.makeBaseDirectory.title%"
-            },
-            {
                 "command": "makefile.setBuildConfiguration",
                 "title": "%makefile-tools.command.makefile.setBuildConfiguration.title%"
             },
