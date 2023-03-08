@@ -234,7 +234,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
 
-    /** Start of commands that shouldn't be exposed in package.json */
+    /** Start of commands that shouldn't be exposed in package.json, they are used for command substitution in launch.json and tasks.json.  */
     context.subscriptions.push(vscode.commands.registerCommand('makefile.getLaunchTargetPath', () => {
         telemetry.logEvent("getLaunchTargetPath");
         return launcher.getLaunchTargetPath();
@@ -274,7 +274,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         telemetry.logEvent("makeBaseDirectory");
         return configuration.makeBaseDirectory();
     }));
-    /** End of commands that shouldn't be exposed in package.json */
+    /** End of commands that shouldn't be exposed in package.json, they are used for command substitution in launch.json and tasks.json. */
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.configure', async () => {
         await make.configure(make.TriggeredBy.configure);
