@@ -688,6 +688,19 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     // makefile.configurations.makefilePath overwrites makefile.makefilePath.
     let makefileUsed: string | undefined = makefileConfiguration?.makefilePath ? util.resolvePathToRoot(makefileConfiguration?.makefilePath) : makefilePath;
     if (makefileUsed) {
+        // check if the makefile path is a directory. If so, try adding `Makefile` or `makefile` 
+        if (util.checkDirectoryExistsSync(makefileUsed)) {
+            let makeFileTest = path.join(makefileUsed, "Makefile");
+            if (!util.checkFileExistsSync(makeFileTest)) {
+                makeFileTest = path.join(makefileUsed, "makefile");
+            }
+
+            // if we found the makefile in the directory, set the `makefileUsed` to the found file path.
+            if (util.checkFileExistsSync(makeFileTest)) {
+                makefileUsed = makeFileTest;
+            }   
+        }
+
         configurationMakeArgs.push("-f");
         configurationMakeArgs.push(`${makefileUsed}`);
         // Need to rethink this (GitHub 59).
