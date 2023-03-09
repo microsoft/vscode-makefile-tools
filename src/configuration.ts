@@ -690,10 +690,15 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     if (makefileUsed) {
         // check if the makefile path is a directory. If so, try adding `Makefile` or `makefile` 
         if (util.checkDirectoryExistsSync(makefileUsed)) {
-            makefileUsed = path.join(makefileUsed, "Makefile");
-            if (!util.checkFileExistsSync(makefileUsed)) {
-                makefileUsed = path.join(makefileUsed, "makefile");
+            let makeFileTest = path.join(makefileUsed, "Makefile");
+            if (!util.checkFileExistsSync(makeFileTest)) {
+                makeFileTest = path.join(makefileUsed, "makefile");
             }
+
+            // if we found the makefile in the directory, set the `makefileUsed` to the found file path.
+            if (util.checkFileExistsSync(makeFileTest)) {
+                makefileUsed = makeFileTest;
+            }   
         }
 
         configurationMakeArgs.push("-f");
