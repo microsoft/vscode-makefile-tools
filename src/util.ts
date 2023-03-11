@@ -27,7 +27,13 @@ export type Language = "c" | "cpp" | undefined;
 
 export function checkFileExistsSync(filePath: string): boolean {
     try {
-        return fs.statSync(filePath).isFile();
+        // Often a path is added by the user to the PATH environment variable with surrounding quotes,
+        // especially on Windows where they get automatically added after TAB.
+        // These quotes become inner (not surrounding) quotes after we append various file names or do oher processing,
+        // making file sysem stats fail. Safe to remove here.
+        let filePathUnq: string = filePath;
+        filePathUnq = removeQuotes(filePathUnq);
+        return fs.statSync(filePathUnq).isFile();
     } catch (e) {
     }
     return false;
@@ -150,12 +156,7 @@ export function toolPathInEnv(name: string): string | undefined {
     // (the concept of kit for cmake extension)
 
     return envPathSplit.find(p => {
-        let fullPath: string = path.join(p, path.basename(name));
-        // Often a path is added by the user to the PATH environment variable with surrounding quotes,
-        // especially on Windows where they get automatically added after TAB.
-        // These quotes become inner (not surrounding) quotes after we append various file names or do oher processing,
-        // making file sysem stats fail. Safe to remove here.
-        fullPath = removeQuotes(fullPath);
+        const fullPath: string = path.join(p, path.basename(name));
         if (checkFileExistsSync(fullPath)) {
             return fullPath;
         }

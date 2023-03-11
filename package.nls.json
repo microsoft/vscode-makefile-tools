@@ -8,6 +8,7 @@
    "makefile-tools.command.makefile.setBuildConfiguration.title": "Makefile: Set the current build configuration",
    "makefile-tools.command.makefile.setBuildTarget.title": "Makefile: Set the target to be built by make",
    "makefile-tools.command.makefile.setLaunchConfiguration.title": "Makefile: Set the make launch configuration",
+   "workbench.action.openWorkspaceSettings.title": "Preferences: Open Workspace Settings",
    "makefile-tools.command.makefile.configure.title": "Makefile: Configure",
    "makefile-tools.command.makefile.cleanConfigure.title": "Makefile: Clean Configure",
    "makefile-tools.command.makefile.preConfigure.title": "Makefile: Pre-Configure",
