@@ -462,8 +462,8 @@ export function removeSurroundingQuotes(str: string): string {
 
 // Quote given string if it contains space and is not quoted already
 export function quoteStringIfNeeded(str: string) : string {
-   // No need to quote if there is no space present.
-   if (!str.includes(" ")) {
+   // No need to quote if there is no space or ampersand present.
+   if (!str.includes(" ") && !str.includes("&")) {
       return str;
    }
 
