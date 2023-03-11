@@ -785,11 +785,11 @@ export function getCommandForConfiguration(configuration: string | undefined): v
               };
               telemetry.logEvent("makeNotFound", telemetryProperties);
             }
-         } else {
+        } else {
             const makeBaseName: string = path.parse(configurationMakeCommand).base;
             const makePathInEnv: string | undefined = util.toolPathInEnv(makeBaseName);
             if (!makePathInEnv) {
-               logger.message("Make was not given any path in settings and is also not found on the environment path.");
+                logger.message("Make was not given any path in settings and is also not found on the environment path.");
 
                 // Do the users need an environment automatically set by the extension?
                 // With a kits feature or expanding on the pre-configure script.
@@ -1181,7 +1181,6 @@ export async function initFromStateAndSettings(): Promise<void> {
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !currentMakefileConfiguration || !currentMakefileConfiguration.buildLog;
                 readBuildLog();
-                await extension._projectOutlineProvider.updateBuildLogPathInfo(getConfigurationBuildLog());
                 updatedSettingsSubkeys.push(subKey);
             }
 
@@ -1269,7 +1268,6 @@ export async function initFromStateAndSettings(): Promise<void> {
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakePath();
-                await extension._projectOutlineProvider.updateMakePathInfo(getConfigurationMakeCommand());
                 updatedSettingsSubkeys.push(subKey);
             }
 
@@ -1284,7 +1282,6 @@ export async function initFromStateAndSettings(): Promise<void> {
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
                 readMakefilePath();
-                await extension._projectOutlineProvider.updateMakefilePathInfo(getConfigurationMakefile());
                 updatedSettingsSubkeys.push(subKey);
             }
 
@@ -1417,12 +1414,10 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
 
             // Final updates in some constructs that depend on more than one of the above settings.
-            if (extension.getState().configureDirty) {
-                analyzeConfigureParams();
-                await extension._projectOutlineProvider.updateMakePathInfo(getConfigurationMakeCommand());
-                await extension._projectOutlineProvider.updateMakefilePathInfo(getConfigurationMakefile());
-                await extension._projectOutlineProvider.updateBuildLogPathInfo(getConfigurationBuildLog());
-            }
+            analyzeConfigureParams();
+            await extension._projectOutlineProvider.updateMakePathInfo(getConfigurationMakeCommand());
+            await extension._projectOutlineProvider.updateMakefilePathInfo(getConfigurationMakefile());
+            await extension._projectOutlineProvider.updateBuildLogPathInfo(getConfigurationBuildLog());
 
             // Report all the settings changes detected by now.
             // TODO: to avoid unnecessary telemetry processing, evaluate whether the changes done
