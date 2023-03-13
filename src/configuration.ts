@@ -463,6 +463,15 @@ export function readExcludeCompilerNames(): void {
     logger.message(`Exclude compiler names: ${excludeCompilerNames}`);
 }
 
+let safeCommands: string[] | undefined;
+export function getSafeCommands(): string[] | undefined { return safeCommands; }
+export function setSafeCommands(compilerNames: string[]): void { safeCommands = compilerNames; }
+export function readSafeCommands(): void {
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    safeCommands = workspaceConfiguration.get<string[]>("safeCommands");
+    logger.message(`Exclude compiler names: ${safeCommands}`);
+}
+
 let dryrunSwitches: string[] | undefined;
 export function getDryrunSwitches(): string[] | undefined { return dryrunSwitches; }
 export function setDryrunSwitches(switches: string[]): void { dryrunSwitches = switches; }
@@ -1032,6 +1041,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     readDryrunSwitches();
     readAdditionalCompilerNames();
     readExcludeCompilerNames();
+    readSafeCommands();
     readCurrentMakefileConfiguration();
     readMakefileConfigurations();
     readCurrentTarget();
@@ -1319,6 +1329,13 @@ export async function initFromStateAndSettings(): Promise<void> {
             let updatedExcludeCompilerNames : string[] | undefined = workspaceConfiguration.get<string[]>(subKey);
             if (!util.areEqual(updatedExcludeCompilerNames, excludeCompilerNames)) {
                 readExcludeCompilerNames();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "safeCommands";
+            let updatedSafeCommands : string[] | undefined = workspaceConfiguration.get<string[]>(subKey);
+            if (!util.areEqual(updatedSafeCommands, safeCommands)) {
+                readSafeCommands();
                 updatedSettingsSubkeys.push(subKey);
             }
 

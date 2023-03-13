@@ -544,7 +544,14 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }, 5 * 1000);
 
         // The dry-run analysis should operate on english.
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, util.getWorkspaceRoot(), true, true, stdout, stderr);
+        const opts: util.ProcOptions = {
+            workingDirectory: util.getWorkspaceRoot(),
+            forceEnglish: true,
+            ensureQuoted: true,
+            stdoutCallback: stdout,
+            stderrCallback: stderr
+        };
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(configuration.getConfigurationMakeCommand(), makeArgs, opts);
         clearInterval(timeout);
         let elapsedTime: number = util.elapsedTimeSince(startTime);
         logger.message(`Generating dry-run elapsed time: ${elapsedTime}`);
@@ -724,7 +731,12 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
         };
 
         // The preconfigure invocation should use the system locale.
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, false, stdout, stderr);
+        const opts: util.ProcOptions = {
+            workingDirectory: util.getWorkspaceRoot(),
+            stdoutCallback: stdout,
+            stderrCallback: stderr
+        };
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, opts);
         if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
             if (someErr) {
                 // Depending how the preconfigure scripts (and any inner called sub-scripts) are written,

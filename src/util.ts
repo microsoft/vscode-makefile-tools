@@ -10,6 +10,10 @@ import * as make from './make';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
+import * as nls from 'vscode-nls';
+nls.config({messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone})();
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+
 // C/CPP standard versions
 export type StandardVersion = 'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' |
                               'gnu89' | 'gnu99' | 'gnu11' | 'gnu17' | 'gnu++98' | 'gnu++03' | 'gnu++11' | 'gnu++14' | 'gnu++17' | 'gnu++20' | undefined;
@@ -24,6 +28,14 @@ export type IntelliSenseMode = "msvc-x64" | "msvc-x86" | "msvc-arm" | "msvc-arm6
 
 // Language types
 export type Language = "c" | "cpp" | undefined;
+
+export interface ProcOptions {
+    workingDirectory?: string;
+    forceEnglish?: boolean;
+    ensureQuoted?: boolean;
+    stdoutCallback?: (stdout: string) => void;
+    stderrCallback?: (stderr: string) => void;
+}
 
 export function checkFileExistsSync(filePath: string): boolean {
     try {
@@ -43,7 +55,7 @@ export function checkDirectoryExistsSync(directoryPath: string): boolean {
 
 export function createDirectorySync(directoryPath: string): boolean {
     try {
-        fs.mkdirSync(directoryPath, { recursive: true });
+        fs.mkdirSync(directoryPath, {recursive: true});
         return true;
     } catch {
     }
@@ -104,7 +116,7 @@ export function getWorkspaceRoot(): string {
     return vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : "";
 }
 
- // Evaluate whether a string looks like a path or not,
+// Evaluate whether a string looks like a path or not,
 // without using fs.stat, since dry-run may output tools
 // that are not found yet at certain locations,
 // without running the prep targets that would copy them there
@@ -193,7 +205,12 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
 
     try {
         // pgrep should run on english, regardless of the system setting.
-        const result: SpawnProcessResult = await spawnChildProcess('pgrep', ['-P', pid.toString()], getWorkspaceRoot(), true, false, stdout);
+        const opts = {
+            workingDirectory: getWorkspaceRoot(),
+            forceEnglish: true,
+            stdoutCallback: stdout
+        };
+        const result: SpawnProcessResult = await spawnChildProcess('pgrep', ['-P', pid.toString()], opts);
         if (!!stdoutStr.length) {
             children = stdoutStr.split('\n').map((line: string) => Number.parseInt(line));
 
@@ -205,23 +222,23 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
             }
         }
     } catch (e) {
-        logger.message(e.message);
+        logger.message((<Error>e).message);
         throw e;
     }
 
     try {
         logger.message(`Killing process PID = ${pid}`);
-        progress.report({ increment: 1, message: `Terminating process PID=${pid} ...` });
+        progress.report({increment: 1, message: `Terminating process PID=${pid} ...`});
         process.kill(pid, 'SIGINT');
     } catch (e) {
-        if (e.code !== 'ESRCH') {
+        if ((<any>e).code !== 'ESRCH') {
             throw e;
         }
     }
 }
 
 // Environment variables helpers (inspired from CMake Tools utils).
-export interface EnvironmentVariables { [key: string]: string; }
+export interface EnvironmentVariables {[key: string]: string;}
 
 export function normalizeEnvironmentVarname(varname: string): string {
     return process.platform === 'win32' ? varname.toUpperCase() : varname;
@@ -250,58 +267,51 @@ export interface SpawnProcessResult {
 
 // Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
 // forceEnglish is true when the caller relies on parsing english words from the output.
-export function spawnChildProcess(
-    processName: string,
-    args: string[],
-    workingDirectory: string,
-    forceEnglish: boolean,
-    ensureQuoted: boolean,
-    stdoutCallback?: (stdout: string) => void,
-    stderrCallback?: (stderr: string) => void): Promise<SpawnProcessResult> {
-
+export async function spawnChildProcess(processName: string, args: string[], options: ProcOptions): Promise<SpawnProcessResult> {
     const localeOverride: EnvironmentVariables = {
         LANG: "C",
         LC_ALL: "C"
     };
 
     // Use english language for this process regardless of the system setting.
-    const environment: EnvironmentVariables = (forceEnglish) ? localeOverride : {};
+    const environment: EnvironmentVariables = (options.forceEnglish) ? localeOverride : {};
     const finalEnvironment: EnvironmentVariables = mergeEnvironment(process.env as EnvironmentVariables, environment);
 
+    // Honor the "terminal.integrated.automationShell.<platform>" setting.
+    // According to documentation (and settings.json schema), the three allowed values for <platform> are "windows", "linux" and "osx".
+    // child_process.SpawnOptions accepts a string (which can be read from the above setting) or the boolean true to let VSCode pick a default
+    // based on where it is running.
+    let shellType: string | undefined;
+    let shellPlatform: string = (process.platform === "win32") ? "windows" : (process.platform === "linux") ? "linux" : "osx";
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("terminal");
+    shellType = workspaceConfiguration.get<string>(`integrated.automationProfile.${shellPlatform}`) || // automationShell is deprecated
+                workspaceConfiguration.get<string>(`integrated.automationShell.${shellPlatform}`); // and replaced with automationProfile
+
+    // Final quoting decisions for process name and args before being executed.
+    let qProcessName: string = options.ensureQuoted ? quoteStringIfNeeded(processName) : processName;
+    let qArgs: string[] = options.ensureQuoted ? args.map(arg => {
+        return quoteStringIfNeeded(arg);
+    }) : args;
+
+    if (options.ensureQuoted) {
+        logger.message(`Spawning child process with:\n process name: ${qProcessName}\n process args: ${qArgs}\n working directory: ${options.workingDirectory}\n shell type: ${shellType || "default"}`, "Debug");
+    }
+
+    const opt = {cwd: options.workingDirectory, shell: shellType || true, env: finalEnvironment};
+
     return new Promise<SpawnProcessResult>((resolve, reject) => {
-        // Honor the "terminal.integrated.automationShell.<platform>" setting.
-        // According to documentation (and settings.json schema), the three allowed values for <platform> are "windows", "linux" and "osx".
-        // child_process.SpawnOptions accepts a string (which can be read from the above setting) or the boolean true to let VSCode pick a default
-        // based on where it is running.
-        let shellType: string | undefined;
-        let shellPlatform: string = (process.platform === "win32") ? "windows" : (process.platform === "linux") ? "linux" : "osx";
-        let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("terminal");
-        shellType = workspaceConfiguration.get<string>(`integrated.automationProfile.${shellPlatform}`) || // automationShell is deprecated
-                    workspaceConfiguration.get<string>(`integrated.automationShell.${shellPlatform}`); // and replaced with automationProfile
-
-        // Final quoting decisions for process name and args before being executed.
-        let qProcessName: string = ensureQuoted ? quoteStringIfNeeded(processName) : processName;
-        let qArgs: string[] = ensureQuoted ? args.map(arg => {
-            return quoteStringIfNeeded(arg);
-        }) : args;
-
-        if (ensureQuoted) {
-           logger.message(`Spawning child process with:\n process name: ${qProcessName}\n process args: ${qArgs}\n working directory: ${workingDirectory}\n shell type: ${shellType || "default"}`, "Debug");
-        }
-
-        const child: child_process.ChildProcess = child_process.spawn(qProcessName, qArgs,
-                                                                      { cwd: workingDirectory, shell: shellType || true, env: finalEnvironment });
+        const child: child_process.ChildProcess = child_process.spawn(qProcessName, qArgs, opt);
         make.setCurPID(child.pid);
 
-        if (stdoutCallback) {
+        if (options.stdoutCallback) {
             child.stdout.on('data', (data) => {
-                stdoutCallback(`${data}`);
+                options.stdoutCallback!(`${data}`);
             });
         }
 
-        if (stderrCallback) {
+        if (options.stderrCallback) {
             child.stderr.on('data', (data) => {
-                stderrCallback(`${data}`);
+                options.stderrCallback!(`${data}`);
             });
         }
 
@@ -319,6 +329,40 @@ export function spawnChildProcess(
     });
 }
 
+// Excutes commands within backticks if they are marked as safe.
+export async function replaceCommands(x: string, safeCommands: string[] | undefined, opt: child_process.SpawnOptions): Promise<string> {
+    const regex = /`([^\s]+)\s(.*?)`/g;
+    let match = regex.exec(x);
+    while (match !== null) {
+        if (safeCommands?.some(c => c === match![1])) {
+            const output = await runCommand(`${match[1]} ${match[2]}`, opt);
+            x = x.replace(match[0], output);
+        } else {
+            logger.message(localize('unsafe.command', 'Commands must be marked as safe before they will be executed in the shell. Add {0} to the {1} setting if this command is safe to execute', match[1], `'makefile.safeCommands'`), 'Normal');
+            x = x.replace(match[0], `\`${match[1]} ${match[2]}\``);
+        }
+        match = regex.exec(x);
+    }
+    return x;
+}
+
+// Run a shell command and return the output.
+async function runCommand(x: string, opt: child_process.SpawnOptions): Promise<string> {
+    const child = child_process.spawn('/bin/bash', ['-c', `"${x}"`], opt);
+    return new Promise(resolve => {
+        let out: string = "";
+        child.stdout!.on('data', (data) => {
+            out += `${data}`;
+        });
+        child.on('close', (_r, _s) => {
+            resolve(out.trim());
+        });
+        child.on('exit', (_r) => {
+            resolve(out.trim());
+        });
+    });
+}
+
 // Helper to eliminate empty items in an array
 export function dropNulls<T>(items: (T | null | undefined)[]): T[] {
     return items.filter(item => (item !== null && item !== undefined)) as T[];
@@ -330,57 +374,57 @@ export function dropNulls<T>(items: (T | null | undefined)[]): T[] {
 // result: c:\msys64\home\dir1\dir2\file.ext
 // Called usually for Windows subsystems: MinGW, CygWin.
 export async function cygpath(pathStr: string): Promise<string> {
-   let windowsPath: string = pathStr;
+    let windowsPath: string = pathStr;
 
-   let stdout: any = (result: string): void => {
-      windowsPath = result.replace(/\n/mg, ""); // remove the end of line
-  };
+    let stdout: any = (result: string): void => {
+        windowsPath = result.replace(/\n/mg, ""); // remove the end of line
+    };
 
-  // Running cygpath can use the system locale.
-  await spawnChildProcess("cygpath", [pathStr, "-w"], "", false, false, stdout);
-  return windowsPath;
+    // Running cygpath can use the system locale.
+    await spawnChildProcess("cygpath", [pathStr, "-w"], {stdoutCallback: stdout});
+    return windowsPath;
 }
 
 // Helper that transforms a posix path (used in various non windows environments on a windows system)
 // into a windows style path.
 export async function ensureWindowsPath(path: string): Promise<string> {
-   if (process.platform !== "win32" || !path.startsWith("/")) {
-      return path;
-   }
+    if (process.platform !== "win32" || !path.startsWith("/")) {
+        return path;
+    }
 
-   let winPath: string = path;
+    let winPath: string = path;
 
-   if (process.env.MSYSTEM !== undefined) {
-      // When in MSYS/MinGW/CygWin environments, cygpath can help transform into a windows path
-      // that we know CppTools will use when querying us.
-      winPath = await cygpath(winPath);
-   } else {
-      // Even in a pure windows environment, there are tools that may report posix paths.
-      // Instead of searching a cygpath tool somewhere, do the most basic transformations:
+    if (process.env.MSYSTEM !== undefined) {
+        // When in MSYS/MinGW/CygWin environments, cygpath can help transform into a windows path
+        // that we know CppTools will use when querying us.
+        winPath = await cygpath(winPath);
+    } else {
+        // Even in a pure windows environment, there are tools that may report posix paths.
+        // Instead of searching a cygpath tool somewhere, do the most basic transformations:
 
-      // Mount drives names like "cygdrive" or "mnt" can be ignored.
-      const mountDrives: string[] = ["cygdrive", "mnt"];
-      for (const drv of mountDrives) {
-         if (winPath.startsWith(`/${drv}`)) {
-            winPath = winPath.substr(drv.length + 1);
+        // Mount drives names like "cygdrive" or "mnt" can be ignored.
+        const mountDrives: string[] = ["cygdrive", "mnt"];
+        for (const drv of mountDrives) {
+            if (winPath.startsWith(`/${drv}`)) {
+                winPath = winPath.substr(drv.length + 1);
 
-            // Exit the loop, because we don't want to remove anything else
-            // in case the path happens to follow with a subfolder with the same name
-            // as other mountable drives for various systems/environments.
-            break;
-         }
-      }
+                // Exit the loop, because we don't want to remove anything else
+                // in case the path happens to follow with a subfolder with the same name
+                // as other mountable drives for various systems/environments.
+                break;
+            }
+        }
 
-      // Remove the slash and add the : for the drive.
-      winPath = winPath.substr(1);
-      const driveEndIndex: number = winPath.search("/");
-      winPath = winPath.substring(0, driveEndIndex) + ":" + winPath.substr(driveEndIndex);
+        // Remove the slash and add the : for the drive.
+        winPath = winPath.substr(1);
+        const driveEndIndex: number = winPath.search("/");
+        winPath = winPath.substring(0, driveEndIndex) + ":" + winPath.substr(driveEndIndex);
 
-      // Replace / with \.
-      winPath = winPath.replace(/\//mg, "\\");
-   }
+        // Replace / with \.
+        winPath = winPath.replace(/\//mg, "\\");
+    }
 
-   return winPath;
+    return winPath;
 }
 
 // Helper to reinterpret one relative path (to the given current path) printed by make as full path
@@ -399,14 +443,14 @@ export async function makeFullPath(relPath: string, curPath: string | undefined)
 
 // Helper to reinterpret the relative paths (to the given current path) printed by make as full paths
 export async function makeFullPaths(relPaths: string[], curPath: string | undefined): Promise<string[]> {
-   let fullPaths: string[] = [];
+    let fullPaths: string[] = [];
 
-   for (const p of relPaths) {
-      let fullPath: string = await makeFullPath(p, curPath);
-      fullPaths.push(fullPath);
-   }
+    for (const p of relPaths) {
+        let fullPath: string = await makeFullPath(p, curPath);
+        fullPaths.push(fullPath);
+    }
 
-   return fullPaths;
+    return fullPaths;
 }
 
 // Helper to reinterpret one full path as relative to the given current path
@@ -436,13 +480,13 @@ export function makeRelPaths(fullPaths: string[], curPath: string | undefined): 
 // having quotes in the middle.
 const quotesStr: string[] = ["'", '"', "`"];
 export function removeQuotes(str: string): string {
-   for (const p in quotesStr) {
-      if (str.includes(quotesStr[p])) {
-         let regExpStr: string = `${quotesStr[p]}`;
-         let regExp: RegExp = RegExp(regExpStr, 'g');
-         str = str.replace(regExp, "");
+    for (const p in quotesStr) {
+        if (str.includes(quotesStr[p])) {
+            let regExpStr: string = `${quotesStr[p]}`;
+            let regExp: RegExp = RegExp(regExpStr, 'g');
+            str = str.replace(regExp, "");
+        }
     }
-   }
 
     return str;
 }
@@ -451,31 +495,31 @@ export function removeQuotes(str: string): string {
 export function removeSurroundingQuotes(str: string): string {
     let result: string = str.trim();
     for (const p in quotesStr) {
-      if (result.startsWith(quotesStr[p]) && result.endsWith(quotesStr[p])) {
-         result = result.substring(1, str.length - 1);
-         return result;
-     }
-   }
+        if (result.startsWith(quotesStr[p]) && result.endsWith(quotesStr[p])) {
+            result = result.substring(1, str.length - 1);
+            return result;
+        }
+    }
 
     return str;
 }
 
 // Quote given string if it contains space and is not quoted already
-export function quoteStringIfNeeded(str: string) : string {
-   // No need to quote if there is no space present.
-   if (!str.includes(" ")) {
-      return str;
-   }
+export function quoteStringIfNeeded(str: string): string {
+    // No need to quote if there is no space present.
+    if (!str.includes(" ")) {
+        return str;
+    }
 
-   // Return if already quoted.
-   for (const q in quotesStr) {
-      if (str.startsWith(quotesStr[q]) && str.endsWith(quotesStr[q])) {
-         return str;
-      }
-   }
+    // Return if already quoted.
+    for (const q in quotesStr) {
+        if (str.startsWith(quotesStr[q]) && str.endsWith(quotesStr[q])) {
+            return str;
+        }
+    }
 
-   // Quote and return.
-   return `"${str}"`;
+    // Quote and return.
+    return `"${str}"`;
 }
 
 // Used when constructing a regular expression from file names which can contain
@@ -524,7 +568,7 @@ export function areEqual(setting1: any, setting2: any): boolean {
     for (let p: number = 0; p < properties1.length; p++) {
         let property: string = properties1[p];
         let isEqual: boolean;
-        if (typeof(setting1[property]) === 'object' && typeof(setting2[property]) === 'object') {
+        if (typeof (setting1[property]) === 'object' && typeof (setting2[property]) === 'object') {
             isEqual = areEqual(setting1[property], setting2[property]);
         } else {
             isEqual = (setting1[property] === setting2[property]);
@@ -566,7 +610,7 @@ export function mergeProperties(dst: any, src: any): any {
 
     return dst;
 }
-export function removeDuplicates(src: string[]) : string[] {
+export function removeDuplicates(src: string[]): string[] {
     let seen: {[key: string]: boolean} = {};
     let result: string[] = [];
     src.forEach(item => {
@@ -579,7 +623,7 @@ export function removeDuplicates(src: string[]) : string[] {
     return result;
 }
 
-export function sortAndRemoveDuplicates(src: string[]) : string[] {
+export function sortAndRemoveDuplicates(src: string[]): string[] {
     return removeDuplicates(src.sort());
 }
 
@@ -623,22 +667,22 @@ export function scheduleTask<T>(task: () => T): Promise<T> {
 
 // Async version of scheduleTask
 export async function scheduleAsyncTask<T>(task: () => Promise<T>): Promise<T> {
-   return new Promise<T>((resolve, reject) => {
-       setImmediate(async () => {
-           try {
-               const result: T = await task();
-               resolve(result);
-           } catch (e) {
-               reject(e);
-           }
-       });
-   });
+    return new Promise<T>((resolve, reject) => {
+        setImmediate(async () => {
+            try {
+                const result: T = await task();
+                resolve(result);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    });
 }
 
 export function thisExtension(): vscode.Extension<any> {
     const ext: vscode.Extension<any> | undefined = vscode.extensions.getExtension('ms-vscode.makefile-tools');
     if (!ext) {
-      throw new Error("Our own extension is null.");
+        throw new Error("Our own extension is null.");
     }
 
     return ext;
@@ -655,11 +699,13 @@ export function thisExtensionPackage(): PackageJSON {
     const pkg: PackageJSON = thisExtension().packageJSON as PackageJSON;
 
     return {
-      name: pkg.name,
-      publisher: pkg.publisher,
-      version: pkg.version,
-      contributes: pkg.contributes
+        name: pkg.name,
+        publisher: pkg.publisher,
+        version: pkg.version,
+        contributes: pkg.contributes
     };
 }
 
-export function thisExtensionPath(): string { return thisExtension().extensionPath; }
+export function thisExtensionPath(): string {
+    return thisExtension().extensionPath;
+}

@@ -439,6 +439,15 @@
                     },
                     "scope": "resource"
                 },
+                "makefile.safeCommands": {
+                    "type": "array",
+                    "default": [],
+                    "description": "%makefile-tools.configuration.makefile.safeCommands.description%",
+                    "items": {
+                        "type": "string"
+                    },
+                    "scope": "resource"
+                },
                 "makefile.configureOnOpen": {
                     "type": "boolean",
                     "default": true,
