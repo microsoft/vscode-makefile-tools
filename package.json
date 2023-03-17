@@ -178,6 +178,14 @@
                 }
             },
             {
+               "command": "workbench.action.openWorkspaceSettings",
+               "title": "%workbench.action.openWorkspaceSettings.title%",
+               "icon": {
+                   "light": "res/light/edit.svg",
+                   "dark": "res/dark/edit.svg"
+               }
+            },
+            {
                 "command": "makefile.outline.configure",
                 "title": "%makefile-tools.command.makefile.configure.title%",
                 "icon": {
@@ -537,7 +545,6 @@
             "makefile__viewContainer": [
                 {
                     "id": "makefile.outline",
-                    "when": "makefile:fullFeatureSet",
                     "name": "%makefile-tools.configuration.views.makefile.outline.description%"
                 }
             ]
@@ -615,6 +622,10 @@
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
                     "when": "makefile:localDebugFeature"
+                },
+                {
+                  "command": "workbench.action.openWorkspaceSettings",
+                  "when": "always"
                 }
             ],
             "view/title": [
@@ -635,22 +646,22 @@
                 },
                 {
                     "command": "makefile.outline.buildTarget",
-                    "when": "view == makefile.outline",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline",
                     "group": "navigation@1"
                 },
                 {
                     "command": "makefile.outline.buildCleanTarget",
-                    "when": "view == makefile.outline",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline",
                     "group": "1_makefileOutline@4"
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "view == makefile.outline && makefile:localDebugFeature",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && makefile:localDebugFeature",
                     "group": "navigation@2"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "view == makefile.outline && makefile:localRunFeature",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && makefile:localRunFeature",
                     "group": "navigation@3"
                 }
             ],
@@ -667,38 +678,53 @@
                 },
                 {
                     "command": "makefile.outline.setBuildConfiguration",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=configuration/",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=configuration/",
                     "group": "inline@1"
                 },
                 {
                     "command": "makefile.outline.buildTarget",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
                     "group": "1_stateActions@1"
                 },
                 {
                     "command": "makefile.outline.buildCleanTarget",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
                     "group": "1_stateActions@2"
                 },
                 {
                     "command": "makefile.outline.setBuildTarget",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=buildTarget/",
                     "group": "inline@1"
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
                     "group": "1_stateActions@1"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
                     "group": "1_stateActions@2"
                 },
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
+                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=launchTarget/",
                     "group": "inline@1"
+                },
+                {
+                  "command": "workbench.action.openWorkspaceSettings",
+                  "when": "view == makefile.outline && viewItem =~ /nodeType=makefilePathInfo/",
+                  "group": "inline@1"
+                },
+                {
+                  "command": "workbench.action.openWorkspaceSettings",
+                  "when": "view == makefile.outline && viewItem =~ /nodeType=makePathInfo/",
+                  "group": "inline@1"
+                },
+                {
+                  "command": "workbench.action.openWorkspaceSettings",
+                  "when": "view == makefile.outline && viewItem =~ /nodeType=buildLogPathInfo/",
+                  "group": "inline@1"
                 }
             ]
         }
