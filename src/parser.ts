@@ -1541,7 +1541,7 @@ function parseCppStandard(std: string, canUseGnu: boolean, canUseCxx23: boolean)
         } else {
             return isGnu ? 'gnu++20' : 'c++20';
         }
-    } else if (std.endsWith('++2a') || std.endsWith('++20') || std.endsWith('++latest')) {
+    } else if (std.endsWith('++2a') || std.endsWith('++20')) {
       return isGnu ? 'gnu++20' : 'c++20';
     } else if (std.endsWith('++17') || std.endsWith('++1z')) {
       return isGnu ? 'gnu++17' : 'c++17';
