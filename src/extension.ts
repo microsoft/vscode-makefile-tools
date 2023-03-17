@@ -153,7 +153,8 @@ export class MakefileToolsExtension {
 
             // These are the configurations processed during the current configure.
             // Store them in the 'delta' file index instead of the final one.
-            provider.fileIndex.set(path.normalize(uri.fsPath), sourceFileConfigurationItem);
+            provider.fileIndex.set(path.normalize((process.platform === "win32") ? uri.fsPath.toUpperCase() : uri.fsPath),
+                                                  sourceFileConfigurationItem);
             extension.getCppConfigurationProvider().logConfigurationProviderItem(sourceFileConfigurationItem);
 
             let folder: string = path.dirname(filePath);

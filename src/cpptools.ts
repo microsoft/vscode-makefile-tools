@@ -28,7 +28,10 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     private workspaceBrowseConfiguration: cpp.WorkspaceBrowseConfiguration = { browsePath: [] };
 
     private getConfiguration(uri: vscode.Uri): SourceFileConfigurationItem | undefined {
-        const norm_path: string = path.normalize(uri.fsPath);
+        let norm_path: string = path.normalize(uri.fsPath);
+        if (process.platform === "win32") {
+           norm_path = norm_path.toUpperCase();
+        }
 
         // First look in the file index computed during the last configure.
         // If nothing is found and there is a configure running right now,
