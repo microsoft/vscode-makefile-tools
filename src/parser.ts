@@ -998,7 +998,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                 // If the command is compiling the same extension or uses -TC/-TP, send all the source files in one batch.
                 if (language) {
                         // More standard validation and defaults, in the context of the whole command.
-                    let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
+                    let standard: util.StandardVersion | undefined = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
 
                     if (ext.extension) {
                         onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files, windowsSDKVersion, currentPath, line });
@@ -1014,7 +1014,7 @@ export async function parseCustomConfigProvider(cancel: vscode.CancellationToken
                         }
 
                         // More standard validation and defaults, in the context of each source file.
-                        let standard: util.StandardVersion = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
+                        let standard: util.StandardVersion | undefined = parseStandard(ext.extension.getCppToolsVersion(), standardStr, language);
 
                         if (ext.extension) {
                             onFoundCustomConfigProviderItem({ defines, includes, forcedIncludes, standard, intelliSenseMode, compilerFullPath, compilerArgs, files: [file], windowsSDKVersion, currentPath, line });
@@ -1492,9 +1492,10 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
     return targetArch;
 }
 
-function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefined, language: util.Language): util.StandardVersion {
+export function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefined, language: util.Language): util.StandardVersion | undefined {
     let canUseGnu: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v4);
-    let standard: util.StandardVersion;
+    let canUseCxx23: boolean = (cppVersion !== undefined && cppVersion >= cpp.Version.v6);
+    let standard: util.StandardVersion | undefined;
     if (cppVersion && cppVersion >= cpp.Version.v5 && std === undefined) {
         // C/C++ standard is optional for CppTools v5+ and is determined by CppTools.
         return undefined;
@@ -1508,7 +1509,7 @@ function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefi
             return "c++17";
         }
     } else if (language === "cpp") {
-        standard = parseCppStandard(std, canUseGnu);
+        standard = parseCppStandard(std, canUseGnu, canUseCxx23);
         if (!standard) {
             logger.message(`Unknown C++ standard control flag: ${std}`, "Normal");
         }
@@ -1518,7 +1519,7 @@ function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefi
             logger.message(`Unknown C standard control flag: ${std}`, "Normal");
         }
     } else if (language === undefined) {
-        standard = parseCppStandard(std, canUseGnu);
+        standard = parseCppStandard(std, canUseGnu, canUseCxx23);
         if (!standard) {
             standard = parseCStandard(std, canUseGnu);
         }
@@ -1532,9 +1533,15 @@ function parseStandard(cppVersion: cpp.Version | undefined, std: string | undefi
     return standard;
 }
 
-function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion {
+function parseCppStandard(std: string, canUseGnu: boolean, canUseCxx23: boolean): util.StandardVersion | undefined {
     const isGnu: boolean = canUseGnu && std.startsWith('gnu');
-    if (std.endsWith('++2a') || std.endsWith('++20') || std.endsWith('++latest')) {
+    if (std.endsWith('++23') || std.endsWith('++2b') || std.endsWith('++latest')) {
+        if (canUseCxx23) {
+            return isGnu ? 'gnu++23' : 'c++23';
+        } else {
+            return isGnu ? 'gnu++20' : 'c++20';
+        }
+    } else if (std.endsWith('++2a') || std.endsWith('++20')) {
       return isGnu ? 'gnu++20' : 'c++20';
     } else if (std.endsWith('++17') || std.endsWith('++1z')) {
       return isGnu ? 'gnu++17' : 'c++17';
@@ -1551,7 +1558,7 @@ function parseCppStandard(std: string, canUseGnu: boolean): util.StandardVersion
     }
   }
 
-  function parseCStandard(std: string, canUseGnu: boolean): util.StandardVersion {
+  function parseCStandard(std: string, canUseGnu: boolean): util.StandardVersion | undefined {
     // GNU options from: https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#C-Dialect-Options
     const isGnu: boolean = canUseGnu && std.startsWith('gnu');
     if (/(c|gnu)(90|89|iso9899:(1990|199409))/.test(std)) {
