@@ -350,10 +350,10 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
         await vscode.tasks.executeTask(myTask);
 
         const result: number = await(new Promise<number>(resolve => {
-            let disposable: vscode.Disposable = vscode.tasks.onDidEndTaskProcess(e => {
+            let disposable: vscode.Disposable = vscode.tasks.onDidEndTaskProcess((e: vscode.TaskProcessEndEvent) => {
                 if (e.execution.task.name === makefileBuildTaskName) {
                     disposable.dispose();
-                    resolve(e.exitCode);
+                    resolve(e.exitCode ?? ConfigureBuildReturnCodeTypes.cancelled);
                 }
             });
         }));
