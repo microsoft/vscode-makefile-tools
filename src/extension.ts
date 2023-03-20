@@ -109,7 +109,7 @@ export class MakefileToolsExtension {
 
     public async registerCppTools(): Promise<void> {
         if (!this.cppToolsAPI) {
-            this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v5);
+            this.cppToolsAPI = await cpp.getCppToolsApi(cpp.Version.v6);
         }
 
         if (this.cppToolsAPI) {
