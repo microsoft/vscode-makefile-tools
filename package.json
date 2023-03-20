@@ -742,7 +742,7 @@
         "test": "yarn run pretest && node ./out/src/test/runTest.js"
     },
     "devDependencies": {
-        "@types/mocha": "^2.2.42",
+        "@types/mocha": "^9.0.0",
         "@types/node": "^10.17.17",
         "@types/vscode": "^1.76.0",
         "tslint": "^5.20.1",
