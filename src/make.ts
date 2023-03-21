@@ -353,7 +353,7 @@ export async function doBuildTarget(progress: vscode.Progress<{}>, target: strin
             let disposable: vscode.Disposable = vscode.tasks.onDidEndTaskProcess((e: vscode.TaskProcessEndEvent) => {
                 if (e.execution.task.name === makefileBuildTaskName) {
                     disposable.dispose();
-                    resolve(e.exitCode ?? ConfigureBuildReturnCodeTypes.cancelled);
+                    resolve(e.exitCode ?? ConfigureBuildReturnCodeTypes.other);
                 }
             });
         }));
