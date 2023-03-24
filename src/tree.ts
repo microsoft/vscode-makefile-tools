@@ -306,7 +306,7 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
          return `${kind}: [Unset]`;
        }
        
-       const pathInSettingsToTest = !pathInSettings.endsWith(".exe") && kind === "Make" && process.platform === "win32" ? pathInSettings.concat(".exe") : pathInSettings;
+       const pathInSettingsToTest = process.platform === "win32" && !pathInSettings.endsWith(".exe") && kind === "Make" ? pathInSettings.concat(".exe") : pathInSettings;
        const pathBase: string | undefined = (searchInPath && path.parse(pathInSettingsToTest).dir === "") ? path.parse(pathInSettingsToTest).base : undefined;
        const pathInEnv: string | undefined = pathBase ? (path.join(util.toolPathInEnv(pathBase) || "", pathBase)) : undefined;
        const finalPath: string = pathInEnv || pathInSettingsToTest;
