@@ -102,7 +102,7 @@ export class CppConfigurationProvider implements cpp.CustomConfigurationProvider
     }
 
     public async canProvideBrowseConfiguration(): Promise<boolean> {
-        return true;
+        return this.workspaceBrowseConfiguration.browsePath.length > 0;
     }
 
     public async canProvideBrowseConfigurationsPerFolder(): Promise<boolean> {
