@@ -7,6 +7,7 @@ import * as configuration from './configuration';
 import * as logger from './logger';
 import * as util from './util';
 import TelemetryReporter from '@vscode/extension-telemetry';
+import * as vscode from "vscode";
 
 export type Properties = { [key: string]: string };
 export type Measures = { [key: string]: number };
@@ -37,22 +38,28 @@ export async function deactivate(): Promise<void> {
     }
 }
 
+export function telemetryLogger(str: string, loggingLevel?: string) {
+    if (vscode.env.isTelemetryEnabled) {
+        logger.message(str, loggingLevel);
+    }
+}
+
 export function logEvent(eventName: string, properties?: Properties, measures?: Measures): void {
     if (telemetryReporter) {
         try {
             telemetryReporter.sendTelemetryEvent(eventName, properties, measures);
         } catch (e) {
-            logger.message(e.message);
+            telemetryLogger(e.message);
         }
 
-        logger.message(`Sending telemetry: eventName = ${eventName}`, "Debug");
+        telemetryLogger(`Sending telemetry: eventName = ${eventName}`, "Debug");
 
         if (properties) {
-            logger.message(`properties: ${Object.getOwnPropertyNames(properties).map(k => `${k} = "${properties[k]}"`).concat()}`, "Debug");
+            telemetryLogger(`properties: ${Object.getOwnPropertyNames(properties).map(k => `${k} = "${properties[k]}"`).concat()}`, "Debug");
         }
 
         if (measures) {
-            logger.message(`measures: ${Object.getOwnPropertyNames(measures).map(k => `${k} = "${measures[k]}"`).concat()}`, "Debug");
+            telemetryLogger(`measures: ${Object.getOwnPropertyNames(measures).map(k => `${k} = "${measures[k]}"`).concat()}`, "Debug");
         }
     }
 }
@@ -196,14 +203,14 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
     if (jsonType !== type &&
         jsonType !== undefined && type !== undefined &&
         (type !== "object" || jsonType !== "array")) {
-            logger.message(`Settings versus package.json type mismatch for "${key}".`);
+            telemetryLogger(`Settings versus package.json type mismatch for "${key}".`);
     }
 
     // Enum values always safe to report.
     let enumValues: any[] = propSchema.enum;
     if (enumValues && enumValues.length > 0) {
         if (!enumValues.includes(setting)) {
-            logger.message(`Invalid value "${setting}" for enum "${key}". Only "${enumValues.join(";")}" values are allowed."`);
+            telemetryLogger(`Invalid value "${setting}" for enum "${key}". Only "${enumValues.join(";")}" values are allowed."`);
             if (telemetryProperties) {
                 telemetryProperties[filterKey(key)] = "invalid";
             }
@@ -288,7 +295,7 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
                 // They are functions and we can use this type to make the exclusion..
                 if (jsonProps === undefined) {
                     if (typeof (setting[prop]) !== "function") {
-                        logger.message(`Schema mismatch between settings and package.json for property "${key}.${prop}"`);
+                        telemetryLogger(`Schema mismatch between settings and package.json for property "${key}.${prop}"`);
                     }
                 } else {
                     // Skip if the analyzed prop is a function or if it's the length of an array.

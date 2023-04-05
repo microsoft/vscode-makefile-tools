@@ -373,7 +373,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             util.thisExtensionPackage().contributes.configuration.properties,
             true, telemetryProperties);
     } catch (e) {
-        logger.message(e.message);
+        telemetry.telemetryLogger(e.message);
     }
 
     if (telemetryProperties && util.hasProperties(telemetryProperties)) {
