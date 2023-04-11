@@ -55,6 +55,13 @@ export class MakefileToolsExtension {
         }
     }
 
+    private fullFeatureSet: boolean = false;
+    public getFullFeatureSet(): boolean { return this.fullFeatureSet; }
+    public async setFullFeatureSet(newValue: boolean): Promise<void> {
+        await vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", newValue);
+        this.fullFeatureSet = newValue;
+    }
+
     // Used for calling cppToolsAPI.notifyReady only once in a VSCode session.
     private ranNotifyReadyInSession: boolean = false;
     public getRanNotifyReadyInSession() : boolean { return this.ranNotifyReadyInSession; }
@@ -192,9 +199,9 @@ export class MakefileToolsExtension {
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
     statusBar = ui.getUI();
-    await vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", false);
-    configuration.disableAllOptionallyVisibleCommands();
     extension = new MakefileToolsExtension(context);
+    configuration.disableAllOptionallyVisibleCommands();
+    await extension.setFullFeatureSet(false);
 
     telemetry.activate();
 
@@ -360,7 +367,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // Read configuration info from settings
     await configuration.initFromStateAndSettings();
 
-    if (configuration.getConfigureOnOpen()) {
+    if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
         // Always clean configure on open
         await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
     }

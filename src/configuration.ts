@@ -68,11 +68,11 @@ export interface MakefileConfiguration {
 // If no particular current configuration is defined in settings, set to 'Default'.
 let currentMakefileConfiguration: string;
 export function getCurrentMakefileConfiguration(): string { return currentMakefileConfiguration; }
-export function setCurrentMakefileConfiguration(configuration: string): void {
+export async function setCurrentMakefileConfiguration(configuration: string): Promise<void> {
     currentMakefileConfiguration = configuration;
     statusBar.setConfiguration(currentMakefileConfiguration);
     logger.message(`Setting configuration - ${currentMakefileConfiguration}`);
-    analyzeConfigureParams();
+    await analyzeConfigureParams();
 }
 
 // Read the current configuration from workspace state, update status bar item
@@ -647,9 +647,9 @@ export function setConfigurationBuildLog(name: string): void { configurationBuil
 // Analyze the settings of the current makefile configuration and the global workspace settings,
 // according to various merging rules and decide what make command and build log
 // apply to the current makefile configuration.
-function analyzeConfigureParams(): void {
+async function analyzeConfigureParams(): Promise<void> {
     getBuildLogForConfiguration(currentMakefileConfiguration);
-    getCommandForConfiguration(currentMakefileConfiguration);
+    await getCommandForConfiguration(currentMakefileConfiguration);
     getProblemMatchersForConfiguration(currentMakefileConfiguration);
 }
 
@@ -664,7 +664,7 @@ function getMakefileConfiguration(configuration: string | undefined): MakefileCo
 // Helper to find in the array of MakefileConfiguration which command/args correspond to a configuration name.
 // Higher level settings (like makefile.makePath, makefile.makefilePath or makefile.makeDirectory)
 // also have an additional effect on the final command.
-export function getCommandForConfiguration(configuration: string | undefined): void {
+export async function getCommandForConfiguration(configuration: string | undefined): Promise<void> {
     let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
 
     let makeParsedPathSettings: path.ParsedPath | undefined = makePath ? path.parse(makePath) : undefined;
@@ -816,15 +816,15 @@ export function getCommandForConfiguration(configuration: string | undefined): v
             };
 
             telemetry.logEvent("makefileNotFound", telemetryProperties);
-            vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", false);
+            await extension.setFullFeatureSet(false);
             disableAllOptionallyVisibleCommands();
         } else {
-            vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
+            await extension.setFullFeatureSet(true);
             enableOptionallyVisibleCommands();
         }
     } else {
         // If we have a build log, then we want Makefile Tools to be fully active and the UI visible.
-        vscode.commands.executeCommand('setContext', "makefile:fullFeatureSet", true);
+        await extension.setFullFeatureSet(true);
         enableOptionallyVisibleCommands();
     }
 }
@@ -865,7 +865,7 @@ export function getMakefileConfigurations(): MakefileConfiguration[] { return ma
 export function setMakefileConfigurations(configurations: MakefileConfiguration[]): void { makefileConfigurations = configurations; }
 
 // Read make configurations optionally defined by the user in settings: makefile.configurations.
-function readMakefileConfigurations(): void {
+async function readMakefileConfigurations(): Promise<void> {
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makefileConfigurations = workspaceConfiguration.get<MakefileConfiguration[]>("configurations") || [];
     let detectedUnnamedConfigurations: boolean = false;
@@ -919,7 +919,7 @@ function readMakefileConfigurations(): void {
     if (currentMakefileConfiguration !== "Default" && !makefileConfigurationNames.includes(currentMakefileConfiguration)) {
         logger.message(`Current makefile configuration ${currentMakefileConfiguration} is no longer present in the available list.` +
             ` Re-setting the current makefile configuration to default.`);
-        setConfigurationByName("Default");
+        await setConfigurationByName("Default");
     }
 }
 
@@ -1042,7 +1042,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     readAdditionalCompilerNames();
     readExcludeCompilerNames();
     readCurrentMakefileConfiguration();
-    readMakefileConfigurations();
+    await readMakefileConfigurations();
     readCurrentTarget();
     await readCurrentLaunchConfiguration();
     readDefaultLaunchConfiguration();
@@ -1058,7 +1058,7 @@ export async function initFromStateAndSettings(): Promise<void> {
     initOptionalFeatures();
     readFeaturesVisibility();
 
-    analyzeConfigureParams();
+    await analyzeConfigureParams();
 
     await extension._projectOutlineProvider.update(extension.getState().buildConfiguration,
                                              extension.getState().buildTarget,
@@ -1304,7 +1304,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // todo: skip over updating the IntelliSense configuration provider if the current makefile configuration
                 // is not among the subobjects that suffered modifications.
                 extension.getState().configureDirty = true;
-                readMakefileConfigurations();
+                await readMakefileConfigurations();
                 updatedSettingsSubkeys.push(subKey);
             }
 
@@ -1413,7 +1413,7 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
 
             // Final updates in some constructs that depend on more than one of the above settings.
-            analyzeConfigureParams();
+            await analyzeConfigureParams();
             await extension._projectOutlineProvider.updateMakePathInfo(getConfigurationMakeCommand());
             await extension._projectOutlineProvider.updateMakefilePathInfo(getConfigurationMakefile());
             await extension._projectOutlineProvider.updateBuildLogPathInfo(getConfigurationBuildLog());
@@ -1456,9 +1456,9 @@ export async function initFromStateAndSettings(): Promise<void> {
       });
 }
 
-export function setConfigurationByName(configurationName: string): void {
+export async function setConfigurationByName(configurationName: string): Promise<void> {
     extension.getState().buildConfiguration = configurationName;
-    setCurrentMakefileConfiguration(configurationName);
+    await setCurrentMakefileConfiguration(configurationName);
     extension._projectOutlineProvider.updateConfiguration(configurationName);
 }
 
@@ -1494,7 +1494,7 @@ export async function setNewConfiguration(): Promise<void> {
         };
         telemetry.logEvent("stateChanged", telemetryProperties);
 
-        setConfigurationByName(chosen);
+        await setConfigurationByName(chosen);
 
         if (configureAfterCommand) {
             logger.message("Automatically reconfiguring the project after a makefile configuration change.");
