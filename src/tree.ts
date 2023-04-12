@@ -178,7 +178,7 @@ export class MakefilePathInfoNode extends BaseNode {
            item.collapsibleState = vscode.TreeItemCollapsibleState.None;
            item.tooltip = this._tooltip;
            item.contextValue = [
-               `nodeType=makefilepathInSettings`,
+               `nodeType=makefilePathInfo`,
            ].join(',');
            return item;
        } catch (e) {
