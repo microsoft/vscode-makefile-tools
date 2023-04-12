@@ -2,11 +2,20 @@
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
     "makefile.buildLog": "./dummy_dryrun.log",
     "makefile.extensionOutputFolder": "./.vscode",
+    "makefile.extensionLog": "./.vscode/Makefile.out",
     "makefile.makePath": "c:/some/other/fake/path",
+    "makefile.buildBeforeLaunch": false,
     "makefile.loggingLevel": "Debug",
     "makefile.additionalCompilerNames": ["MyOwnFakeCompiler"],
+    "makefile.compileCommandsPath": "./.vscode/compile_commands.json",
+    "makefile.panel.visibility": {
+      "debug": true
+    },
     "makefile.configureOnOpen": false,
     "makefile.configurations": [
+        {
+            "name": "varexp",
+        },
         {
             "name": "test-make-f",
             "makePath": "./doesnt/exist/make",

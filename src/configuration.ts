@@ -71,12 +71,11 @@ export function getCurrentMakefileConfiguration(): string { return currentMakefi
 export function setCurrentMakefileConfiguration(configuration: string): void {
     currentMakefileConfiguration = configuration;
     statusBar.setConfiguration(currentMakefileConfiguration);
-    logger.message(`Setting configuration - ${currentMakefileConfiguration}`);
     analyzeConfigureParams();
 }
 
 // Read the current configuration from workspace state, update status bar item
-function readCurrentMakefileConfiguration(): void {
+export function readCurrentMakefileConfiguration(): void {
     let buildConfiguration : string | undefined = extension.getState().buildConfiguration;
     if (!buildConfiguration) {
         logger.message("No current configuration is defined in the workspace state. Assuming 'Default'.");
@@ -135,11 +134,10 @@ export function isOptionalFeatureEnabled(propertyName: string): boolean {
 }
 
 // Override default settings for each feature based on workspace current information
-function updateOptionalFeaturesWithWorkspace(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+async function updateOptionalFeaturesWithWorkspace(): Promise<void> {
     // optionalFeatures will be set with default values.
     // override with values from the workspace
-    let features: MakefilePanelVisibility | undefined = workspaceConfiguration.get<MakefilePanelVisibility>("panel.visibility") || undefined;
+    let features: MakefilePanelVisibility | undefined = await util.getExpandedSetting<MakefilePanelVisibility>("panel.visibility") || undefined;
     if (features) {
         if (Object.entries(features).length < panelVisibility.features.length) {
             // At least one feature is missing from the settings, which means we need to use defaults.
@@ -178,8 +176,8 @@ function enableOptionallyVisibleCommands(): void {
         }
     }
 }
-function readFeaturesVisibility(): void {
-    updateOptionalFeaturesWithWorkspace();
+async function readFeaturesVisibility(): Promise<void> {
+    await updateOptionalFeaturesWithWorkspace();
 }
 
 let makePath: string | undefined;
@@ -189,16 +187,10 @@ export function setMakePath(path: string): void { makePath = path; }
 // Read the path (full or directory only) of the make tool if defined in settings.
 // It represents a default to look for if no other path is already included
 // in "makefile.configurations.makePath".
-function readMakePath(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    makePath = workspaceConfiguration.get<string>("makePath");
+async function readMakePath(): Promise<void> {
+    makePath = await util.getExpandedSetting<string>("makePath");
     if (!makePath) {
         logger.message("No path to the make tool is defined in the settings file.");
-    } else {
-        // Don't resolve makePath to root, because make needs to be searched in the path too.
-        // Instead, offer ability to substitute ${workspaceRoot}/${workspacePath} to the current
-        // workspace directory.
-        makePath = util.resolveSubstitutedPath(makePath);
     }
 }
 
@@ -209,9 +201,8 @@ export function setMakefilePath(path: string): void { makefilePath = path; }
 // It represents a default to look for if no other makefile is already provided
 // in makefile.configurations.makefilePath.
 // TODO: validate and integrate with "-f [Makefile]" passed in makefile.configurations.makeArgs.
-function readMakefilePath(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    makefilePath = workspaceConfiguration.get<string>("makefilePath");
+async function readMakefilePath(): Promise<void> {
+    makefilePath = await util.getExpandedSetting<string>("makefilePath");
     if (!makefilePath) {
         logger.message("No path to the makefile is defined in the settings file.");
     } else {
@@ -226,9 +217,8 @@ export function setMakeDirectory(dir: string): void { makeDirectory = dir; }
 // It represents a default to look for if no other makeDirectory is already provided
 // in makefile.configurations.makeDirectory.
 // TODO: validate and integrate with "-C [DIR_PATH]" passed in makefile.configurations.makeArgs.
-function readMakeDirectory(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    makeDirectory = workspaceConfiguration.get<string>("makeDirectory");
+async function readMakeDirectory(): Promise<void> {
+    makeDirectory = await util.getExpandedSetting<string>("makeDirectory");
     if (!makeDirectory) {
         logger.message("No folder path to the makefile is defined in the settings file.");
     } else {
@@ -286,9 +276,8 @@ export function setBuildLog(path: string): void { buildLog = path; }
 // If any of the above switches is missing, the extension may have less log to parse from,
 // therefore offering less intellisense information for source files,
 // identifying less possible binaries to debug or not providing any makefile targets (other than the 'all' default).
-function readBuildLog(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    buildLog = workspaceConfiguration.get<string>("buildLog");
+export async function readBuildLog(): Promise<void> {
+    buildLog = await util.getExpandedSetting<string>("buildLog");
     if (buildLog) {
         buildLog = util.resolvePathToRoot(buildLog);
         logger.message(`Build log defined at "${buildLog}"`);
@@ -303,14 +292,8 @@ export function getLoggingLevel(): string | undefined { return loggingLevel; }
 export function setLoggingLevel(logLevel: string): void { loggingLevel = logLevel; }
 
 // Read from settings the desired logging level for the Makefile Tools extension.
-export function readLoggingLevel(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    loggingLevel = workspaceConfiguration.get<string>("loggingLevel");
-
-    if (!loggingLevel) {
-        loggingLevel = "Normal";
-    }
-
+export async function readLoggingLevel(): Promise<void> {
+    loggingLevel = await util.getExpandedSetting<string>("loggingLevel") || "Normal";
     logger.message(`Logging level: ${loggingLevel}`);
 }
 
@@ -321,10 +304,8 @@ export function setExtensionOutputFolder(folder: string): void { extensionOutput
 // Read from settings the path to a folder where the extension is dropping various output files
 // (like extension.log, dry-run.log, targets.log).
 // Useful to control where such potentially large files should reside.
-export function readExtensionOutputFolder(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    const propKey: string = "extensionOutputFolder";
-    extensionOutputFolder = workspaceConfiguration.get<string>(propKey);
+export async function readExtensionOutputFolder(): Promise<void> {
+    extensionOutputFolder = await util.getExpandedSetting<string>("extensionOutputFolder");
     if (extensionOutputFolder) {
         extensionOutputFolder = util.resolvePathToRoot(extensionOutputFolder);
     } else {
@@ -335,8 +316,9 @@ export function readExtensionOutputFolder(): void {
     if (extensionOutputFolder) {
         if (!util.checkDirectoryExistsSync(extensionOutputFolder)) {
             if (!util.createDirectorySync(extensionOutputFolder)) {
+                extensionOutputFolder = extension.extensionContext.storagePath;
                 logger.message(`Extension output folder does not exist and could not be created: ${extensionOutputFolder}.`);
-                extensionOutputFolder = undefined;
+                logger.message(`Reverting to '${extensionOutputFolder}' default for extension output folder.`);
                 return;
             }
         }
@@ -356,9 +338,8 @@ export function setExtensionLog(path: string): void { extensionLog = path; }
 // If an extension log is specified, its content is cleared during activation.
 // Any messages that are being logged throughout the lifetime of the extension
 // are going to be appended to this file.
-export function readExtensionLog(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    extensionLog = workspaceConfiguration.get<string>("extensionLog");
+export async function readExtensionLog(): Promise<void> {
+    extensionLog = await util.getExpandedSetting<string>("extensionLog");
     if (extensionLog) {
         // If there is a directory defined within the extension log path,
         // honor it and don't append to extensionOutputFolder.
@@ -379,9 +360,8 @@ export function setPreConfigureScript(path: string): void { preConfigureScript =
 
 // Read from settings the path to a script file that needs to have been run at least once
 // before a sucessful configure of this project.
-export function readPreConfigureScript(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    preConfigureScript = workspaceConfiguration.get<string>("preConfigureScript");
+export async function readPreConfigureScript(): Promise<void> {
+    preConfigureScript = await util.getExpandedSetting<string>("preConfigureScript");
     if (preConfigureScript) {
         preConfigureScript = util.resolvePathToRoot(preConfigureScript);
         logger.message(`Found pre-configure script defined as ${preConfigureScript}`);
@@ -397,9 +377,8 @@ export function setAlwaysPreConfigure(path: boolean): void { alwaysPreConfigure 
 
 // Read from settings whether the pre-configure step is supposed to be executed
 // always before the configure operation.
-export function readAlwaysPreConfigure(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    alwaysPreConfigure = workspaceConfiguration.get<boolean>("alwaysPreConfigure");
+export async function readAlwaysPreConfigure(): Promise<void> {
+    alwaysPreConfigure = await util.getExpandedSetting<boolean>("alwaysPreConfigure");
     logger.message(`Always pre-configure: ${alwaysPreConfigure}`);
 }
 
@@ -410,13 +389,13 @@ export function setConfigurationCachePath(path: string): void { configurationCac
 // Read from settings the path to a cache file containing the output of the last dry-run make command.
 // This file is recreated when opening a project, when changing the build configuration or the build target
 // and when the settings watcher detects a change of any properties that may impact the dryrun output.
-export function readConfigurationCachePath(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+export async function readConfigurationCachePath(): Promise<void> {
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configurationCachePath = workspaceConfiguration.get<string>("configurationCachePath");
+    configurationCachePath = await util.getExpandedSetting<string>("configurationCachePath");
     if (!configurationCachePath && extensionOutputFolder) {
         configurationCachePath = path.join(extensionOutputFolder, 'configurationCache.log');
     }
+
     if (configurationCachePath) {
         // If there is a directory defined within the configuration cache path,
         // honor it and don't append to extensionOutputFolder.
@@ -426,18 +405,16 @@ export function readConfigurationCachePath(): void {
         } else {
             configurationCachePath = util.resolvePathToRoot(configurationCachePath);
         }
-    }
 
-    logger.message(`Configurations cached at ${configurationCachePath}`);
+        logger.message(`Configurations cached at ${configurationCachePath}`);
+    }
 }
 
 let compileCommandsPath: string | undefined;
 export function getCompileCommandsPath(): string | undefined { return compileCommandsPath; }
 export function setCompileCommandsPath(path: string): void { compileCommandsPath = path; }
-export function readCompileCommandsPath(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-
-    compileCommandsPath = workspaceConfiguration.get<string>("compileCommandsPath");
+export async function readCompileCommandsPath(): Promise<void> {
+    compileCommandsPath = await util.getExpandedSetting<string>("compileCommandsPath");
     if (compileCommandsPath) {
         compileCommandsPath = util.resolvePathToRoot(compileCommandsPath);
     }
@@ -448,19 +425,21 @@ export function readCompileCommandsPath(): void {
 let additionalCompilerNames: string[] | undefined;
 export function getAdditionalCompilerNames(): string[] | undefined { return additionalCompilerNames; }
 export function setAdditionalCompilerNames(compilerNames: string[]): void { additionalCompilerNames = compilerNames; }
-export function readAdditionalCompilerNames(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    additionalCompilerNames = workspaceConfiguration.get<string[]>("additionalCompilerNames");
-    logger.message(`Additional compiler names: ${additionalCompilerNames}`);
+export async function readAdditionalCompilerNames(): Promise<void> {
+    additionalCompilerNames = await util.getExpandedSetting<string[]>("additionalCompilerNames");
+    if (additionalCompilerNames && additionalCompilerNames.length > 0) {
+        logger.message(`Additional compiler names: '${additionalCompilerNames?.join("', '")}'`);
+    }
 }
 
 let excludeCompilerNames: string[] | undefined;
 export function getExcludeCompilerNames(): string[] | undefined { return excludeCompilerNames; }
 export function setExcludeCompilerNames(compilerNames: string[]): void { excludeCompilerNames = compilerNames; }
-export function readExcludeCompilerNames(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    excludeCompilerNames = workspaceConfiguration.get<string[]>("excludeCompilerNames");
-    logger.message(`Exclude compiler names: ${excludeCompilerNames}`);
+export async function readExcludeCompilerNames(): Promise<void> {
+    excludeCompilerNames = await util.getExpandedSetting<string[]>("excludeCompilerNames");
+    if (excludeCompilerNames && excludeCompilerNames.length > 0) {
+        logger.message(`Exclude compiler names: '${excludeCompilerNames?.join("', '")}'`);
+    }
 }
 
 let dryrunSwitches: string[] | undefined;
@@ -475,10 +454,11 @@ export function setDryrunSwitches(switches: string[]): void { dryrunSwitches = s
 // infinite reconfiguration loops, resulting in the extension being unusable.
 // To work around this, the setting makefile.dryrunSwitches is providing a way to skip over the problematic make arguments,
 // even if this results in not ideal behavior: less information available to be parsed, which leads to incomplete IntelliSense or missing targets.
-export function readDryrunSwitches(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    dryrunSwitches = workspaceConfiguration.get<string[]>("dryrunSwitches");
-    logger.message(`Dry-run switches: ${dryrunSwitches}`);
+export async function readDryrunSwitches(): Promise<void> {
+    dryrunSwitches = await util.getExpandedSetting<string[]>("dryrunSwitches");
+    if (dryrunSwitches && dryrunSwitches.length > 0) {
+        logger.message(`Dry-run switches: '${dryrunSwitches?.join("', '")}'`);
+    }
 }
 
 // Currently, the makefile extension supports debugging only an executable.
@@ -505,10 +485,9 @@ let launchConfigurations: LaunchConfiguration[] = [];
 export function getLaunchConfigurations(): LaunchConfiguration[] { return launchConfigurations; }
 export function setLaunchConfigurations(configurations: LaunchConfiguration[]): void { launchConfigurations = configurations; }
 
-// Read make configurations optionally defined by the user in settings: makefile.configurations.
-function readLaunchConfigurations(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    launchConfigurations = workspaceConfiguration.get<LaunchConfiguration[]>("launchConfigurations") || [];
+// Read launch configurations defined by the user in settings: makefile.launchConfigurations[]
+async function readLaunchConfigurations(): Promise<void> {
+    launchConfigurations = await util.getExpandedSetting<LaunchConfiguration[]>("launchConfigurations") || [];
 }
 
 // Helper used to fill the launch configurations quick pick.
@@ -570,7 +549,7 @@ function getLaunchConfiguration(name: string): LaunchConfiguration | undefined {
 // in the launch configurations array from settings.
 // Also update the status bar item.
 async function readCurrentLaunchConfiguration(): Promise<void> {
-    readLaunchConfigurations();
+    await readLaunchConfigurations();
     let currentLaunchConfigurationName: string | undefined = extension.getState().launchConfiguration;
     if (currentLaunchConfigurationName) {
         currentLaunchConfiguration = getLaunchConfiguration(currentLaunchConfigurationName);
@@ -609,9 +588,8 @@ let defaultLaunchConfiguration: DefaultLaunchConfiguration | undefined;
 export function getDefaultLaunchConfiguration(): DefaultLaunchConfiguration | undefined { return defaultLaunchConfiguration; }
 // No setter needed. Currently only the user can define makefile.defaultLaunchConfiguration
 
-export function readDefaultLaunchConfiguration(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    defaultLaunchConfiguration = workspaceConfiguration.get<DefaultLaunchConfiguration>("defaultLaunchConfiguration");
+export async function readDefaultLaunchConfiguration(): Promise<void> {
+    defaultLaunchConfiguration = await util.getExpandedSetting<DefaultLaunchConfiguration>("defaultLaunchConfiguration");
     logger.message(`Default launch configuration: MIMode = ${defaultLaunchConfiguration?.MIMode},
                     miDebuggerPath = ${defaultLaunchConfiguration?.miDebuggerPath},
                     stopAtEntry = ${defaultLaunchConfiguration?.stopAtEntry},
@@ -695,9 +673,9 @@ export function getCommandForConfiguration(configuration: string | undefined): v
     // makefile.configurations.makefilePath overwrites makefile.makefilePath.
     configurationMakefile = makefileConfiguration?.makefilePath ? util.resolvePathToRoot(makefileConfiguration?.makefilePath) : makefilePath;
     if (configurationMakefile) {
-        // check if the makefile path is a directory. If so, try adding `Makefile` or `makefile` 
+        // check if the makefile path is a directory. If so, try adding `Makefile` or `makefile`
         if (util.checkDirectoryExistsSync(configurationMakefile)) {
-            let makeFileTest = path.join(configurationMakefile, "Makefile");
+            let makeFileTest: string = path.join(configurationMakefile, "Makefile");
             if (!util.checkFileExistsSync(makeFileTest)) {
                 makeFileTest = path.join(configurationMakefile, "makefile");
             }
@@ -705,7 +683,7 @@ export function getCommandForConfiguration(configuration: string | undefined): v
             // if we found the makefile in the directory, set the `configurationMakefile` to the found file path.
             if (util.checkFileExistsSync(makeFileTest)) {
                 configurationMakefile = makeFileTest;
-            }   
+            }
         }
 
         configurationMakeArgs.push("-f");
@@ -865,7 +843,9 @@ export function getMakefileConfigurations(): MakefileConfiguration[] { return ma
 export function setMakefileConfigurations(configurations: MakefileConfiguration[]): void { makefileConfigurations = configurations; }
 
 // Read make configurations optionally defined by the user in settings: makefile.configurations.
-function readMakefileConfigurations(): void {
+export async function readMakefileConfigurations(): Promise<void> {
+    // We need to read "makefile.configurations" unexpanded first, because we may write back into these settings
+    // in case we indentify "name" missing. We'll expand later, see end of function.
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     makefileConfigurations = workspaceConfiguration.get<MakefileConfiguration[]>("configurations") || [];
     let detectedUnnamedConfigurations: boolean = false;
@@ -899,7 +879,7 @@ function readMakefileConfigurations(): void {
 
     if (detectedUnnamedConfigurations) {
         logger.message("Updating makefile configurations in settings.");
-        workspaceConfiguration.update("configurations", makefileConfigurations);
+        await workspaceConfiguration.update("configurations", makefileConfigurations);
     }
 
     // Log the updated list of configuration names
@@ -907,19 +887,21 @@ function readMakefileConfigurations(): void {
         return k.name;
     }));
 
+    // Now read "makefile.configurations" again and expand as needed.
+    makefileConfigurations = await util.getExpandedSetting<MakefileConfiguration[]>("configurations") || [];
     if (makefileConfigurationNames.length > 0) {
-        logger.message("Found the following configurations defined in makefile.configurations setting: " +
-            makefileConfigurationNames.join(";"));
+        logger.message("Found the following configurations defined in makefile.configurations setting: " + makefileConfigurationNames.join(";"));
     }
 
-    // Verify if the current makefile configuration is still part of the list and unset otherwise.
+    // Verify if the current makefile configuration (check against the expanded values)
+    // is still part of the list and unset otherwise.
     // Exception: "Default" which means the user didn't set it and relies on whatever default
     // the current set of makefiles support. "Default" is not going to be part of the list
     // but we shouldn't log about it.
     if (currentMakefileConfiguration !== "Default" && !makefileConfigurationNames.includes(currentMakefileConfiguration)) {
         logger.message(`Current makefile configuration ${currentMakefileConfiguration} is no longer present in the available list.` +
-            ` Re-setting the current makefile configuration to default.`);
-        setConfigurationByName("Default");
+                       ` Re-setting the current makefile configuration to default.`);
+        await setConfigurationByName("Default");
     }
 }
 
@@ -949,67 +931,60 @@ function readCurrentTarget(): void {
 let configureOnOpen: boolean | undefined;
 export function getConfigureOnOpen(): boolean | undefined { return configureOnOpen; }
 export function setConfigureOnOpen(configure: boolean): void { configureOnOpen = configure; }
-export function readConfigureOnOpen(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+export async function readConfigureOnOpen(): Promise<void> {
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configureOnOpen = workspaceConfiguration.get<boolean>("configureOnOpen");
+    configureOnOpen = await util.getExpandedSetting<boolean>("configureOnOpen");
     logger.message(`Configure on open: ${configureOnOpen}`);
 }
 
 let configureOnEdit: boolean | undefined;
 export function getConfigureOnEdit(): boolean | undefined { return configureOnEdit; }
 export function setConfigureOnEdit(configure: boolean): void { configureOnEdit = configure; }
-export function readConfigureOnEdit(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+export async function readConfigureOnEdit(): Promise<void> {
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configureOnEdit = workspaceConfiguration.get<boolean>("configureOnEdit");
+    configureOnEdit = await util.getExpandedSetting<boolean>("configureOnEdit");
     logger.message(`Configure on edit: ${configureOnEdit}`);
 }
 
 let configureAfterCommand: boolean | undefined;
 export function getConfigureAfterCommand(): boolean | undefined { return configureAfterCommand; }
 export function setConfigureAfterCommand(configure: boolean): void { configureAfterCommand = configure; }
-export function readConfigureAfterCommand(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+export async function readConfigureAfterCommand(): Promise<void> {
     // how to get default from package.json to avoid problem with 'undefined' type?
-    configureAfterCommand = workspaceConfiguration.get<boolean>("configureAfterCommand");
+    configureAfterCommand = await util.getExpandedSetting<boolean>("configureAfterCommand");
     logger.message(`Configure after command: ${configureAfterCommand}`);
 }
 
 let phonyOnlyTargets: boolean | undefined;
 export function getPhonyOnlyTargets(): boolean | undefined { return phonyOnlyTargets; }
 export function setPhonyOnlyTargets(phony: boolean): void { phonyOnlyTargets = phony; }
-export function readPhonyOnlyTargets(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+export async function readPhonyOnlyTargets(): Promise<void> {
     // how to get default from package.json to avoid problem with 'undefined' type?
-    phonyOnlyTargets = workspaceConfiguration.get<boolean>("phonyOnlyTargets");
+    phonyOnlyTargets = await util.getExpandedSetting<boolean>("phonyOnlyTargets");
     logger.message(`Only .PHONY targets: ${phonyOnlyTargets}`);
 }
 
 let saveBeforeBuildOrConfigure: boolean | undefined;
 export function getSaveBeforeBuildOrConfigure(): boolean | undefined { return saveBeforeBuildOrConfigure; }
 export function setSaveBeforeBuildOrConfigure(save: boolean): void { saveBeforeBuildOrConfigure = save; }
-export function readSaveBeforeBuildOrConfigure(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    saveBeforeBuildOrConfigure = workspaceConfiguration.get<boolean>("saveBeforeBuildOrConfigure");
+export async function readSaveBeforeBuildOrConfigure(): Promise<void> {
+    saveBeforeBuildOrConfigure = await util.getExpandedSetting<boolean>("saveBeforeBuildOrConfigure");
     logger.message(`Save before build or configure: ${saveBeforeBuildOrConfigure}`);
 }
 
 let buildBeforeLaunch: boolean | undefined;
 export function getBuildBeforeLaunch(): boolean | undefined { return buildBeforeLaunch; }
 export function setBuildBeforeLaunch(build: boolean): void { buildBeforeLaunch = build; }
-export function readBuildBeforeLaunch(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    buildBeforeLaunch = workspaceConfiguration.get<boolean>("buildBeforeLaunch");
+export async function readBuildBeforeLaunch(): Promise<void> {
+    buildBeforeLaunch = await util.getExpandedSetting<boolean>("buildBeforeLaunch");
     logger.message(`Build before launch: ${buildBeforeLaunch}`);
 }
 
 let clearOutputBeforeBuild: boolean | undefined;
 export function getClearOutputBeforeBuild(): boolean | undefined { return clearOutputBeforeBuild; }
 export function setClearOutputBeforeBuild(clear: boolean): void { clearOutputBeforeBuild = clear; }
-export function readClearOutputBeforeBuild(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-    clearOutputBeforeBuild = workspaceConfiguration.get<boolean>("clearOutputBeforeBuild");
+export async function readClearOutputBeforeBuild(): Promise<void> {
+    clearOutputBeforeBuild = await util.getExpandedSetting<boolean>("clearOutputBeforeBuild");
     logger.message(`Clear output before build: ${clearOutputBeforeBuild}`);
 }
 
@@ -1022,41 +997,70 @@ export function readClearOutputBeforeBuild(): void {
 let ignoreDirectoryCommands: boolean | undefined;
 export function getIgnoreDirectoryCommands(): boolean | undefined { return ignoreDirectoryCommands; }
 export function setIgnoreDirectoryCommands(ignore: boolean): void { ignoreDirectoryCommands = ignore; }
-export function readIgnoreDirectoryCommands(): void {
-    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+export async function readIgnoreDirectoryCommands(): Promise<void> {
     // how to get default from package.json to avoid problem with 'undefined' type?
-    ignoreDirectoryCommands = workspaceConfiguration.get<boolean>("ignoreDirectoryCommands");
+    ignoreDirectoryCommands = await util.getExpandedSetting<boolean>("ignoreDirectoryCommands");
     logger.message(`Ignore directory commands: ${ignoreDirectoryCommands}`);
 }
 
-// Initialization from settings (or backup default rules), done at activation time
-export async function initFromStateAndSettings(): Promise<void> {
-    readConfigurationCachePath();
-    readMakePath();
-    readMakefilePath();
-    readMakeDirectory();
-    readBuildLog();
-    readPreConfigureScript();
-    readAlwaysPreConfigure();
-    readDryrunSwitches();
-    readAdditionalCompilerNames();
-    readExcludeCompilerNames();
-    readCurrentMakefileConfiguration();
-    readMakefileConfigurations();
-    readCurrentTarget();
+// Initialization from the state of the workspace.
+// The user does not have direct access to this data.
+// The extension sets state variables via user actions like:
+// set configuration, set build target, set launch target.
+// At activation time we read from state, update UI accordingly
+// and commands become available to be run in settings via expansion.
+// These can also be resetted via the makefile.resetState command.
+export function initFromState(): void {
+   readCurrentMakefileConfiguration();
+   readCurrentTarget();
+}
+
+// Initialization from settings (or backup default rules).
+// This is called at activation time (with activation boolean being passed as true explicitly)
+// or after any change in the configuration/build-target workspace state variables, in which case
+// we need a refresh of all settings expanding ${configuration} or ${buildTarget}.
+export async function initFromSettings(activation: boolean = false): Promise<void> {
+    // Read first anything related to the output folder and the extension log,
+    // to be able to document any upcoming reads.
+    await readExtensionOutputFolder();
+    await readExtensionLog();
+
+    // Delete the extension log file, if exists, even if we lose what we logged earlier
+    // about reading the output folder and extension log.
+    // The deletion should happen only at activation time (to not allow the log file to grow indefinitely),
+    // while reading the settings is done at activation time  and also anytime later,
+    // after changing a makefile configuration, a build or a launch target.
+    let extensionLog : string | undefined = getExtensionLog();
+    if (extensionLog && activation && util.checkFileExistsSync(extensionLog)) {
+        util.deleteFileSync(extensionLog);
+    }
+
+    await readLoggingLevel();
+    await readConfigurationCachePath();
+    await readMakePath();
+    await readMakefilePath();
+    await readMakeDirectory();
+    await readBuildLog();
+    await readPreConfigureScript();
+    await readAlwaysPreConfigure();
+    await readDryrunSwitches();
+    await readAdditionalCompilerNames();
+    await readExcludeCompilerNames();
+    await readMakefileConfigurations();
     await readCurrentLaunchConfiguration();
-    readDefaultLaunchConfiguration();
-    readConfigureOnOpen();
-    readConfigureOnEdit();
-    readConfigureAfterCommand();
-    readPhonyOnlyTargets();
-    readSaveBeforeBuildOrConfigure();
-    readBuildBeforeLaunch();
-    readClearOutputBeforeBuild();
-    readIgnoreDirectoryCommands();
-    readCompileCommandsPath();
+    await readDefaultLaunchConfiguration();
+    await readConfigureOnOpen();
+    await readConfigureOnEdit();
+    await readConfigureAfterCommand();
+    await readPhonyOnlyTargets();
+    await readSaveBeforeBuildOrConfigure();
+    await readBuildBeforeLaunch();
+    await readClearOutputBeforeBuild();
+    await readIgnoreDirectoryCommands();
+    await readCompileCommandsPath();
+
     initOptionalFeatures();
-    readFeaturesVisibility();
+    await readFeaturesVisibility();
 
     analyzeConfigureParams();
 
@@ -1133,11 +1137,10 @@ export async function initFromStateAndSettings(): Promise<void> {
             // Avoid unnecessary updates (for example, when settings are modified via the extension quickPick).
             let telemetryProperties: telemetry.Properties | null = {};
             let updatedSettingsSubkeys: string[] = [];
-            let keyRoot: string = "makefile";
-            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(keyRoot);
-
+            const keyRoot: string = "makefile";
             let subKey: string = "launchConfigurations";
-            let updatedLaunchConfigurations : LaunchConfiguration[] | undefined = workspaceConfiguration.get<LaunchConfiguration[]>(subKey);
+
+            let updatedLaunchConfigurations : LaunchConfiguration[] | undefined = await util.getExpandedSetting<LaunchConfiguration[]>(subKey);
             if (!util.areEqual(updatedLaunchConfigurations, launchConfigurations)) {
                 // Changing a launch configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
@@ -1147,23 +1150,23 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
 
             subKey = "defaultLaunchConfiguration";
-            let updatedDefaultLaunchConfiguration : DefaultLaunchConfiguration | undefined = workspaceConfiguration.get<DefaultLaunchConfiguration>(subKey);
+            let updatedDefaultLaunchConfiguration : DefaultLaunchConfiguration | undefined = await util.getExpandedSetting<DefaultLaunchConfiguration>(subKey);
             if (!util.areEqual(updatedDefaultLaunchConfiguration, defaultLaunchConfiguration)) {
                 // Changing a global debug configuration does not impact the make or compiler tools invocations,
                 // so no IntelliSense update is needed.
-                readDefaultLaunchConfiguration();
+                await readDefaultLaunchConfiguration();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "loggingLevel";
-            let updatedLoggingLevel : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedLoggingLevel : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedLoggingLevel !== loggingLevel) {
-                readLoggingLevel();
+                await readLoggingLevel();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "buildLog";
-            let updatedBuildLog : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedBuildLog : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedBuildLog) {
                 updatedBuildLog = util.resolvePathToRoot(updatedBuildLog);
             }
@@ -1179,12 +1182,12 @@ export async function initFromStateAndSettings(): Promise<void> {
 
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !currentMakefileConfiguration || !currentMakefileConfiguration.buildLog;
-                readBuildLog();
+                await readBuildLog();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "extensionOutputFolder";
-            let updatedExtensionOutputFolder : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedExtensionOutputFolder : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedExtensionOutputFolder) {
                 updatedExtensionOutputFolder = util.resolvePathToRoot(updatedExtensionOutputFolder);
                 if (!util.checkDirectoryExistsSync(updatedExtensionOutputFolder) &&
@@ -1196,12 +1199,12 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
             if (updatedExtensionOutputFolder !== extensionOutputFolder) {
                 // No IntelliSense update needed.
-                readExtensionOutputFolder();
+                await readExtensionOutputFolder();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "extensionLog";
-            let updatedExtensionLog : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedExtensionLog : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedExtensionLog) {
                 // If there is a directory defined within the extension log path,
                 // honor it and don't append to extensionOutputFolder.
@@ -1214,31 +1217,31 @@ export async function initFromStateAndSettings(): Promise<void> {
             }
             if (updatedExtensionLog !== extensionLog) {
                 // No IntelliSense update needed.
-                readExtensionLog();
+                await readExtensionLog();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "preConfigureScript";
-            let updatedPreConfigureScript : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedPreConfigureScript : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedPreConfigureScript) {
                 updatedPreConfigureScript = util.resolvePathToRoot(updatedPreConfigureScript);
             }
             if (updatedPreConfigureScript !== preConfigureScript) {
                 // No IntelliSense update needed.
-                readPreConfigureScript();
+                await readPreConfigureScript();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "alwaysPreConfigure";
-            let updatedAlwaysPreConfigure : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedAlwaysPreConfigure : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedAlwaysPreConfigure !== alwaysPreConfigure) {
                 // No IntelliSense update needed.
-                readAlwaysPreConfigure();
+                await readAlwaysPreConfigure();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "configurationCachePath";
-            let updatedConfigurationCachePath : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedConfigurationCachePath : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedConfigurationCachePath) {
                 // If there is a directory defined within the configuration cache path,
                 // honor it and don't append to extensionOutputFolder.
@@ -1254,24 +1257,24 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
-                readConfigurationCachePath();
+                await readConfigurationCachePath();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "makePath";
-            let updatedMakePath : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedMakePath : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedMakePath !== makePath) {
                 // Not very likely, but it is safe to consider that a different make tool
                 // may produce a different dry-run output with potential impact on IntelliSense,
                 // so trigger an update (unless we read from a build log).
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
-                readMakePath();
+                await readMakePath();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "makefilePath";
-            let updatedMakefilePath : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedMakefilePath : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedMakefilePath) {
                 updatedMakefilePath = util.resolvePathToRoot(updatedMakefilePath);
             }
@@ -1280,12 +1283,12 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
-                readMakefilePath();
+                await readMakefilePath();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "makeDirectory";
-            let updatedMakeDirectory : string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedMakeDirectory : string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedMakeDirectory) {
                 updatedMakeDirectory = util.resolvePathToRoot(updatedMakeDirectory);
             }
@@ -1294,120 +1297,119 @@ export async function initFromStateAndSettings(): Promise<void> {
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
-                readMakeDirectory();
+                await readMakeDirectory();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "configurations";
-            let updatedMakefileConfigurations : MakefileConfiguration[] | undefined = workspaceConfiguration.get<MakefileConfiguration[]>(subKey);
+            let updatedMakefileConfigurations : MakefileConfiguration[] | undefined = await util.getExpandedSetting<MakefileConfiguration[]>(subKey);
             if (!util.areEqual(updatedMakefileConfigurations, makefileConfigurations)) {
                 // todo: skip over updating the IntelliSense configuration provider if the current makefile configuration
                 // is not among the subobjects that suffered modifications.
                 extension.getState().configureDirty = true;
-                readMakefileConfigurations();
+                await readMakefileConfigurations();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "dryrunSwitches";
-            let updatedDryrunSwitches : string[] | undefined = workspaceConfiguration.get<string[]>(subKey);
+            let updatedDryrunSwitches : string[] | undefined = await util.getExpandedSetting<string[]>(subKey);
             if (!util.areEqual(updatedDryrunSwitches, dryrunSwitches)) {
                 // A change in makefile.dryrunSwitches should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
-                readDryrunSwitches();
+                await readDryrunSwitches();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "additionalCompilerNames";
-            let updatedAdditionalCompilerNames : string[] | undefined = workspaceConfiguration.get<string[]>(subKey);
+            let updatedAdditionalCompilerNames : string[] | undefined = await util.getExpandedSetting<string[]>(subKey);
             if (!util.areEqual(updatedAdditionalCompilerNames, additionalCompilerNames)) {
-                readAdditionalCompilerNames();
+                await readAdditionalCompilerNames();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "excludeCompilerNames";
-            let updatedExcludeCompilerNames : string[] | undefined = workspaceConfiguration.get<string[]>(subKey);
+            let updatedExcludeCompilerNames : string[] | undefined = await util.getExpandedSetting<string[]>(subKey);
             if (!util.areEqual(updatedExcludeCompilerNames, excludeCompilerNames)) {
-                readExcludeCompilerNames();
+                await readExcludeCompilerNames();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "configureOnOpen";
-            let updatedConfigureOnOpen : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedConfigureOnOpen : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedConfigureOnOpen !== configureOnOpen) {
-                readConfigureOnOpen();
+                await readConfigureOnOpen();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "configureOnEdit";
-            let updatedConfigureOnEdit : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedConfigureOnEdit : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedConfigureOnEdit !== configureOnEdit) {
-                readConfigureOnEdit();
+                await readConfigureOnEdit();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "configureAfterCommand";
-            let updatedConfigureAfterCommand : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedConfigureAfterCommand : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedConfigureAfterCommand !== configureAfterCommand) {
-                readConfigureAfterCommand();
+                await readConfigureAfterCommand();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "phonyOnlyTargets";
-            let updatedPhonyOnlyTargets : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedPhonyOnlyTargets : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedPhonyOnlyTargets !== phonyOnlyTargets) {
-                readPhonyOnlyTargets();
+                await readPhonyOnlyTargets();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "saveBeforeBuildOrConfigure";
-            let updatedSaveBeforeBuildOrConfigure : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedSaveBeforeBuildOrConfigure : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedSaveBeforeBuildOrConfigure !== saveBeforeBuildOrConfigure) {
-                readSaveBeforeBuildOrConfigure();
+                await readSaveBeforeBuildOrConfigure();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "buildBeforeLaunch";
-            let updatedBuildBeforeLaunch : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedBuildBeforeLaunch : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedBuildBeforeLaunch !== buildBeforeLaunch) {
-                readBuildBeforeLaunch();
+                await readBuildBeforeLaunch();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "clearOutputBeforeBuild";
-            let updatedClearOutputBeforeBuild : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedClearOutputBeforeBuild : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedClearOutputBeforeBuild !== clearOutputBeforeBuild) {
-                readClearOutputBeforeBuild();
+                await readClearOutputBeforeBuild();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "ignoreDirectoryCommands";
-            let updatedIgnoreDirectoryCommands : boolean | undefined = workspaceConfiguration.get<boolean>(subKey);
+            let updatedIgnoreDirectoryCommands : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedIgnoreDirectoryCommands !== ignoreDirectoryCommands) {
-                readIgnoreDirectoryCommands();
+                await readIgnoreDirectoryCommands();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "compileCommandsPath";
-            let updatedCompileCommandsPath: string | undefined = workspaceConfiguration.get<string>(subKey);
+            let updatedCompileCommandsPath: string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedCompileCommandsPath) {
                 updatedCompileCommandsPath = util.resolvePathToRoot(updatedCompileCommandsPath);
             }
             if (updatedCompileCommandsPath !== compileCommandsPath) {
-                readCompileCommandsPath();
+                await readCompileCommandsPath();
                 updatedSettingsSubkeys.push(subKey);
             }
 
             subKey = "panel.visibility";
             let wasLocalDebugEnabled: boolean = isOptionalFeatureEnabled("debug");
             let wasLocalRunningEnabled: boolean   = isOptionalFeatureEnabled("run");
-            readFeaturesVisibility();
+            await readFeaturesVisibility();
             enableOptionallyVisibleCommands();
             let isLocalDebugEnabled: boolean = isOptionalFeatureEnabled("debug");
             let isLocalRunningEnabled: boolean   = isOptionalFeatureEnabled("run");
-            if ((wasLocalDebugEnabled && !isLocalDebugEnabled) || (!wasLocalDebugEnabled && isLocalDebugEnabled) ||
-                 (wasLocalRunningEnabled && !isLocalRunningEnabled) || (!wasLocalRunningEnabled && isLocalRunningEnabled)) {
+            if ((wasLocalDebugEnabled !== isLocalDebugEnabled) || (wasLocalRunningEnabled !== isLocalRunningEnabled)) {
                 extension._projectOutlineProvider.updateTree();
                 updatedSettingsSubkeys.push(subKey);
             }
@@ -1423,7 +1425,7 @@ export async function initFromStateAndSettings(): Promise<void> {
             // in the object makefile.launchConfigurations and makefile.configurations
             // apply exactly to the current launch configuration, since we don't collect and aggregate
             // information from all the array yet.
-            updatedSettingsSubkeys.forEach(subKey => {
+            updatedSettingsSubkeys.forEach(async (subKey) => {
                 let key: string = keyRoot + "." + subKey;
                 logger.message(`${key} setting changed.`, "Verbose");
                 try {
@@ -1431,6 +1433,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                     // to the telemetry function. Currently, the schema for such a setting
                     // is represented differently than the workspace setting value.
                     let settingObj: any;
+                    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(keyRoot);
                     if (subKey.includes(".")) {
                        const subKeys: string[] = subKey.split(".");
                        settingObj = workspaceConfiguration;
@@ -1441,7 +1444,7 @@ export async function initFromStateAndSettings(): Promise<void> {
                        settingObj = workspaceConfiguration[subKey];
                     }
 
-                    telemetryProperties = telemetry.analyzeSettings(settingObj, key,
+                    telemetryProperties = await telemetry.analyzeSettings(settingObj, key,
                         util.thisExtensionPackage().contributes.configuration.properties[key],
                         false, telemetryProperties);
                 } catch (e) {
@@ -1453,12 +1456,16 @@ export async function initFromStateAndSettings(): Promise<void> {
                 telemetry.logEvent("settingsChanged", telemetryProperties);
             }
         }
-      });
+    });
 }
 
-export function setConfigurationByName(configurationName: string): void {
+export async function setConfigurationByName(configurationName: string): Promise<void> {
     extension.getState().buildConfiguration = configurationName;
+    logger.message(`Setting configuration - ${configurationName}`);
+    logger.message("Re-reading settings after configuration change.");
     setCurrentMakefileConfiguration(configurationName);
+    // Refresh settings, they may reference variables or commands reading state configuration var (${configuration}).
+    await initFromSettings();
     extension._projectOutlineProvider.updateConfiguration(configurationName);
 }
 
@@ -1494,7 +1501,7 @@ export async function setNewConfiguration(): Promise<void> {
         };
         telemetry.logEvent("stateChanged", telemetryProperties);
 
-        setConfigurationByName(chosen);
+        await setConfigurationByName(chosen);
 
         if (configureAfterCommand) {
             logger.message("Automatically reconfiguring the project after a makefile configuration change.");
@@ -1518,7 +1525,7 @@ export async function setNewConfiguration(): Promise<void> {
         let makefileonfigurationSetting: any = workspaceConfiguration[subKey];
         if (makefileonfigurationSetting) {
             try {
-                telemetryProperties = telemetry.analyzeSettings(makefileonfigurationSetting, key,
+                telemetryProperties = await telemetry.analyzeSettings(makefileonfigurationSetting, key,
                     util.thisExtensionPackage().contributes.configuration.properties[key],
                     true, telemetryProperties);
             } catch (e) {
@@ -1532,12 +1539,15 @@ export async function setNewConfiguration(): Promise<void> {
     }
 }
 
-export function setTargetByName(targetName: string) : void {
+export async function setTargetByName(targetName: string) : Promise<void> {
     currentTarget = targetName;
     let displayTarget: string = targetName ? currentTarget : "Default";
     statusBar.setTarget(displayTarget);
     logger.message(`Setting target ${displayTarget}`);
+    logger.message("Re-reading settings after target change.");
+    // Refresh settings, they may reference variables or commands reading state target var (${buildTarget}).
     extension.getState().buildTarget = currentTarget;
+    await initFromSettings();
     extension._projectOutlineProvider.updateBuildTarget(targetName);
 }
 
@@ -1591,7 +1601,7 @@ export async function selectTarget(): Promise<void> {
         };
         telemetry.logEvent("stateChanged", telemetryProperties);
 
-        setTargetByName(chosen);
+        await setTargetByName(chosen);
 
         if (configureAfterCommand) {
             // The set of build targets remains the same even if the current target has changed
@@ -1620,7 +1630,7 @@ export async function setLaunchConfigurationByName(launchConfigurationName: stri
             // Avoid updating the launchConfigurations array in settings.json for regression tests.
             if (process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
                 let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-                workspaceConfiguration.update("launchConfigurations", launchConfigurations);
+                await workspaceConfiguration.update("launchConfigurations", launchConfigurations);
             }
             logger.message(`Inserting a new entry for ${launchConfigurationName} in the array of makefile.launchConfigurations. ` +
                            "You may define any additional debug properties for it in settings.");
@@ -1641,6 +1651,9 @@ export async function setLaunchConfigurationByName(launchConfigurationName: stri
         statusBar.setLaunchConfiguration("No launch configuration set");
     }
 
+    // Refresh settings, they may reference variables or commands reading launch targets commands: ${command:makefile.getLaunchTargetPath} and others...
+    logger.message("Re-reading settings after launch target change.");
+    await initFromSettings();
     await extension._projectOutlineProvider.updateLaunchTarget(launchConfigurationName);
 }
 
@@ -1713,7 +1726,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
             let launchConfigurationSetting: any = workspaceConfiguration[subKey];
             if (launchConfigurationSetting) {
                 try {
-                    telemetryProperties = telemetry.analyzeSettings(launchConfigurationSetting, key,
+                    telemetryProperties = await telemetry.analyzeSettings(launchConfigurationSetting, key,
                         util.thisExtensionPackage().contributes.configuration.properties[key],
                         true, telemetryProperties);
                 } catch (e) {

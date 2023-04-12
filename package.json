@@ -38,7 +38,9 @@
     ],
     "activationEvents": [
         "onCommand:makefile.setBuildConfiguration",
+        "onCommand:makefile.getConfiguration",
         "onCommand:makefile.setBuildTarget",
+        "onCommand:makefile.getBuildTarget",
         "onCommand:makefile.buildTarget",
         "onCommand:makefile.buildCleanTarget",
         "onCommand:makefile.buildAll",

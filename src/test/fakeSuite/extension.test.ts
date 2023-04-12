@@ -61,7 +61,8 @@ suite('Fake dryrun parsing', /*async*/() => {
    test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       extension.getState().reset(false);
-      await configuration.initFromStateAndSettings();
+      configuration.initFromState();
+      await configuration.initFromSettings();
 
       // We define extension log here as opposed to in the fake repro .vscode/settings.json
       // because the logging produced at the first project load has too few important data to verify and much variations
@@ -71,11 +72,10 @@ suite('Fake dryrun parsing', /*async*/() => {
       // than without debugging/loading the project before.
       // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
       // because at project load time, there is no makefile log identified and no file is deleted on activation.
-      let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+      let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
       if (util.checkFileExistsSync(extensionLogPath)) {
          util.deleteFileSync(extensionLogPath);
       }
-      configuration.setExtensionLog(extensionLogPath);
 
       // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
       // from this extension repository instead of a real installation which may vary from system to system.
@@ -83,7 +83,7 @@ suite('Fake dryrun parsing', /*async*/() => {
       await make.preConfigure(make.TriggeredBy.tests);
 
       configuration.prepareConfigurationsQuickPick();
-      configuration.setConfigurationByName("complex_escaped_quotes");
+      await configuration.setConfigurationByName("complex_escaped_quotes");
 
       // No need to setting and building a target, running a launch target, ...etc... like the other tests
       // Compare log output only from a configure to see how we parse the quotes and escape characters in compiler command lines.
@@ -111,8 +111,9 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`Complex scenarios with quotes and escaped quotes - winOnly`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
-         await configuration.initFromStateAndSettings();
-
+         configuration.initFromState();
+         await configuration.initFromSettings();
+   
          // We define extension log here as opposed to in the fake repro .vscode/settings.json
          // because the logging produced at the first project load has too few important data to verify and much variations
          // that are not worth to be processed when comparing with a baseline.
@@ -121,11 +122,10 @@ suite('Fake dryrun parsing', /*async*/() => {
          // than without debugging/loading the project before.
          // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
          // because at project load time, there is no makefile log identified and no file is deleted on activation.
-         let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+         let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
          if (util.checkFileExistsSync(extensionLogPath)) {
             util.deleteFileSync(extensionLogPath);
          }
-         configuration.setExtensionLog(extensionLogPath);
 
          // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
          // from this extension repository instead of a real installation which may vary from system to system.
@@ -133,7 +133,7 @@ suite('Fake dryrun parsing', /*async*/() => {
          await make.preConfigure(make.TriggeredBy.tests);
 
          configuration.prepareConfigurationsQuickPick();
-         configuration.setConfigurationByName("complex_escaped_quotes_winOnly");
+         await configuration.setConfigurationByName("complex_escaped_quotes_winOnly");
 
          // No need to setting and building a target, running a launch target, ...etc... like the other tests
          // Compare log output only from a configure to see how we parse the quotes and escape characters in compiler command lines.
@@ -162,21 +162,15 @@ suite('Fake dryrun parsing', /*async*/() => {
       test('Interesting small makefile - windows', async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
-         await configuration.initFromStateAndSettings();
+         configuration.initFromState();
+         await configuration.initFromSettings();
 
-         // We define extension log here as opposed to in the fake repro .vscode/settings.json
-         // because the logging produced at the first project load has too few important data to verify and much variations
-         // that are not worth to be processed when comparing with a baseline.
-         // Example: when running a test after incomplete debugging or after loading the fake repro project independently of the testing framework,
-         // which leaves the workspace state not clean, resulting in a different extension output log
-         // than without debugging/loading the project before.
-         // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
-         // because at project load time, there is no makefile log identified and no file is deleted on activation.
-         let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
-         if (util.checkFileExistsSync(extensionLogPath)) {
+         // Extension log is defined in the test .vscode/settings.json but delete it now
+         // because we are interested to compare against a baseline from this point further.
+         let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+         if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
             util.deleteFileSync(extensionLogPath);
          }
-         configuration.setExtensionLog(extensionLogPath);
 
          // Run a preconfigure script to include our tests "Program Files" path so that we always find a cl.exe
          // from this extension repository instead of a real VS installation that happens to be in the path.
@@ -184,10 +178,9 @@ suite('Fake dryrun parsing', /*async*/() => {
          await make.preConfigure(make.TriggeredBy.tests);
 
          configuration.prepareConfigurationsQuickPick();
-         configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
+         await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
          const retc: number = await make.cleanConfigure(make.TriggeredBy.tests, true);
 
-         configuration.setBuildBeforeLaunch(false);
          const launchConfigurations: string[] = ["bin\\InterestingSmallMakefile\\ARC H3\\Debug\\main.exe(str3a,str3b,str3c)",
             "bin\\InterestingSmallMakefile\\arch1\\Debug\\main.exe(str3a,str3b,str3c)",
             "bin\\InterestingSmallMakefile\\arch2\\Debug\\main.exe()"];
@@ -209,11 +202,11 @@ suite('Fake dryrun parsing', /*async*/() => {
          // to exercise different combinations of pre-created build log and/or make tools.
          // No configure is necessary to be run here, it is enough to look at what happens
          // when changing a configuration.
-         configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
-         configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
+         await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
+         await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
 
          // InterestingSmallMakefile_windows_configRelSpeed constructs a more interesting build command.
-         configuration.setTargetByName("Execute_Arch3");
+         await configuration.setTargetByName("Execute_Arch3");
          make.prepareBuildTarget("Execute_Arch3");
 
          // Compare the output log with the baseline
@@ -239,21 +232,15 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`8cc - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
-         await configuration.initFromStateAndSettings();
-
-         // We define extension log here as opposed to in the fake repro .vscode/settings.json
-         // because the logging produced at the first project load has too few important data to verify and much variations
-         // that are not worth to be processed when comparing with a baseline.
-         // Example: when running a test after incomplete debugging or after loading the fake repro project independently of the testing framework,
-         // which leaves the workspace state not clean, resulting in a different extension output log
-         // than without debugging/loading the project before.
-         // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
-         // because at project load time, there is no makefile log identified and no file is deleted on activation.
-         let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
-         if (util.checkFileExistsSync(extensionLogPath)) {
+         configuration.initFromState();
+         await configuration.initFromSettings();
+   
+         // Extension log is defined in the test .vscode/settings.json but delete it now
+         // because we are interested to compare against a baseline from this point further.
+         let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+         if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
             util.deleteFileSync(extensionLogPath);
          }
-         configuration.setExtensionLog(extensionLogPath);
 
          // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
          // from this extension repository instead of a real installation which may vary from system to system.
@@ -261,10 +248,9 @@ suite('Fake dryrun parsing', /*async*/() => {
          await make.preConfigure(make.TriggeredBy.tests);
 
          configuration.prepareConfigurationsQuickPick();
-         configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
+         await configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
          const retc: number = await make.cleanConfigure(make.TriggeredBy.tests, true);
 
-         configuration.setBuildBeforeLaunch(false);
          const launchConfigurations: string[] = ["8cc()"];
          for (const config of launchConfigurations) {
             await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">" + config);
@@ -280,7 +266,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             }
          }
 
-         configuration.setTargetByName("all");
+         await configuration.setTargetByName("all");
          make.prepareBuildTarget("all");
 
          // Compare the output log with the baseline
@@ -304,21 +290,15 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`Fido - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
-         await configuration.initFromStateAndSettings();
-
-         // We define extension log here as opposed to in the fake repro .vscode/settings.json
-         // because the logging produced at the first project load has too few important data to verify and much variations
-         // that are not worth to be processed when comparing with a baseline.
-         // Example: when running a test after incomplete debugging or after loading the fake repro project independently of the testing framework,
-         // which leaves the workspace state not clean, resulting in a different extension output log
-         // than without debugging/loading the project before.
-         // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
-         // because at project load time, there is no makefile log identified and no file is deleted on activation.
-         let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
-         if (util.checkFileExistsSync(extensionLogPath)) {
+         configuration.initFromState();
+         await configuration.initFromSettings();
+   
+         // Extension log is defined in the test .vscode/settings.json but delete it now
+         // because we are interested to compare against a baseline from this point further.
+         let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+         if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
             util.deleteFileSync(extensionLogPath);
          }
-         configuration.setExtensionLog(extensionLogPath);
 
          // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
          // from this extension repository instead of a real installation which may vary from system to system.
@@ -326,10 +306,9 @@ suite('Fake dryrun parsing', /*async*/() => {
          await make.preConfigure(make.TriggeredBy.tests);
 
          configuration.prepareConfigurationsQuickPick();
-         configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
+         await configuration.setConfigurationByName(process.platform === "linux" ? "Fido_linux" : "Fido_mingw");
          const retc: number = await make.cleanConfigure(make.TriggeredBy.tests, true);
 
-         configuration.setBuildBeforeLaunch(false);
          const launchConfigurations: string[] = ["bin/foo.o()"];
          for (const config of launchConfigurations) {
             await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">" + config);
@@ -345,7 +324,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             }
          }
 
-         configuration.setTargetByName("bin/foo.o");
+         await configuration.setTargetByName("bin/foo.o");
          make.prepareBuildTarget("bin/foo.o");
 
          // Compare the output log with the baseline
@@ -369,21 +348,15 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`tinyvm - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
-         await configuration.initFromStateAndSettings();
-
-         // We define extension log here as opposed to in the fake repro .vscode/settings.json
-         // because the logging produced at the first project load has too few important data to verify and much variations
-         // that are not worth to be processed when comparing with a baseline.
-         // Example: when running a test after incomplete debugging or after loading the fake repro project independently of the testing framework,
-         // which leaves the workspace state not clean, resulting in a different extension output log
-         // than without debugging/loading the project before.
-         // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
-         // because at project load time, there is no makefile log identified and no file is deleted on activation.
-         let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
-         if (util.checkFileExistsSync(extensionLogPath)) {
+         configuration.initFromState();
+         await configuration.initFromSettings();
+   
+         // Extension log is defined in the test .vscode/settings.json but delete it now
+         // because we are interested to compare against a baseline from this point further.
+         let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+         if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
             util.deleteFileSync(extensionLogPath);
          }
-         configuration.setExtensionLog(extensionLogPath);
 
          // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
          // from this extension repository instead of a real installation which may vary from system to system.
@@ -391,10 +364,9 @@ suite('Fake dryrun parsing', /*async*/() => {
          await make.preConfigure(make.TriggeredBy.tests);
 
          configuration.prepareConfigurationsQuickPick();
-         configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
+         await configuration.setConfigurationByName(process.platform === "linux" ? "tinyvm_linux_pedantic" : "tinyvm_mingw_pedantic");
          const retc: number = await make.cleanConfigure(make.TriggeredBy.tests, true);
 
-         configuration.setBuildBeforeLaunch(false);
          const launchConfigurations: string[] = ["bin/tvmi()"];
          for (const config of launchConfigurations) {
             await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">" + config);
@@ -410,7 +382,7 @@ suite('Fake dryrun parsing', /*async*/() => {
             }
          }
 
-         configuration.setTargetByName("tvmi");
+         await configuration.setTargetByName("tvmi");
          make.prepareBuildTarget("tvmi");
 
          // Compare the output log with the baseline
@@ -432,28 +404,22 @@ suite('Fake dryrun parsing', /*async*/() => {
    test(`Test real make - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       extension.getState().reset(false);
-      await configuration.initFromStateAndSettings();
+      configuration.initFromState();
+      await configuration.initFromSettings();
 
-      // We define extension log here as opposed to in the fake repro .vscode/settings.json
-      // because the logging produced at the first project load has too few important data to verify and much variations
-      // that are not worth to be processed when comparing with a baseline.
-      // Example: when running a test after incomplete debugging or after loading the fake repro project independently of the testing framework,
-      // which leaves the workspace state not clean, resulting in a different extension output log
-      // than without debugging/loading the project before.
-      // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
-      // because at project load time, there is no makefile log identified and no file is deleted on activation.
-      let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
-      if (util.checkFileExistsSync(extensionLogPath)) {
+      // Extension log is defined in the test .vscode/settings.json but delete it now
+      // because we are interested to compare against a baseline from this point further.
+      let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+      if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
          util.deleteFileSync(extensionLogPath);
       }
 
-      configuration.setExtensionLog(extensionLogPath);
       configuration.prepareConfigurationsQuickPick();
 
-      configuration.setConfigurationByName("test-make-f");
+      await configuration.setConfigurationByName("test-make-f");
       await make.cleanConfigure(make.TriggeredBy.tests);
 
-      configuration.setConfigurationByName("test-make-C");
+      await configuration.setConfigurationByName("test-make-C");
       await make.buildTarget(make.TriggeredBy.tests, "all", true);
 
       // Compare the output log with the baseline
@@ -470,7 +436,59 @@ suite('Fake dryrun parsing', /*async*/() => {
       baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
       // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
       // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+      expect(extensionLogContent).to.be.equal(baselineLogContent);
+   });
 
+   test(`Variables expansion - ${systemPlatform}`, async () => {
+      // Settings reset from the previous test run.
+      extension.getState().reset(false);
+      configuration.initFromState();
+      await configuration.initFromSettings();
+
+      configuration.prepareConfigurationsQuickPick();
+      await configuration.setConfigurationByName("varexp");
+      await configuration.setTargetByName("all");
+
+      // Delete extension log a bit later than other tests. For this one, we only care to capture varexp.
+      // All else that happens before, it was covered during the other tests in this suite.
+      let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+      if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
+         util.deleteFileSync(extensionLogPath);
+      }
+
+      await util.getExpandedSettingVal("buildLog", "./${workspaceFolder}/${configuration}/${buildTarget}/something/${configuration}/${buildTarget}/build.log");
+
+      let stopAtEntry: string = await util.expandVariablesInSetting("defaultLaunchConfiguration.stopAtEntry", "${config:makefile.panel.visibility.debug}");
+      let tmpDefaultLaunchConfiguration: configuration.DefaultLaunchConfiguration = {
+         miDebuggerPath: "./${workspaceRoot}/${command:makefile.getConfiguration}/${command:makefile.getBuildTarget}",
+         stopAtEntry: util.booleanify(stopAtEntry)
+      };
+      await util.getExpandedSettingVal<configuration.DefaultLaunchConfiguration>("defaultLaunchConfiguration", tmpDefaultLaunchConfiguration);
+
+      let tmpConfigurations: configuration.MakefileConfiguration[] = [{
+         name: "MyTmpName",
+         makePath: "${env:ProgramFiles(x86)}/${workspaceFolderBasename}/make",
+         makeArgs: ["SomeParam=${userHome}",
+                    "${command:makefile.getLaunchTargetPath}",
+                    "${SomeUnsupportedVar}",
+                    "${command:makefile.inexistentCommand}",
+                    "${config:makefile.inexistentSetting}"]}];
+      await util.getExpandedSettingVal<configuration.MakefileConfiguration>("configurations", tmpConfigurations);
+
+      // Compare the output log with the baseline
+      // TODO: incorporate relevant diff snippets into the test log.
+      // Until then, print into base and diff files for easier viewing
+      // when the test fails.
+      let parsedPath: path.ParsedPath = path.parse(extensionLogPath);
+      let baselineLogPath: string = path.join(parsedPath.dir, process.platform === "win32" ? "../varexp_win32_baseline.out" : "../varexp_baseline.out");
+      let extensionLogContent: string = util.readFile(extensionLogPath) || "";
+      extensionLogContent = extensionLogContent.replace(/\r\n/mg, "\n");
+      let baselineLogContent: string = util.readFile(baselineLogPath) || "";
+      let extensionRootPath: string = path.resolve(__dirname, "../../../../");
+      baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
+      baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
+      // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
 
