@@ -4,7 +4,7 @@ Expanding from './${workspaceRoot}/${command:makefile.getConfiguration}/${comman
 Expanding from '${env:ProgramFiles(x86)}/${workspaceFolderBasename}/make' to 'C:\Program Files (x86)/Repros/make' for setting 'configurations.0.makePath'.
 Expanding from '${command:makefile.getLaunchTargetPath}' to '' for setting 'configurations.0.makeArgs.0'.
 Unrecognized variable format: ${SomeUnsupportedVar}
-Expanding from '${SomeUnsupportedVar}' to 'unknown' for setting 'configurations.0.makeArgs.2'.
+Expanding from '${SomeUnsupportedVar}' to 'unknown' for setting 'configurations.0.makeArgs.1'.
 Exception while executing command "makefile.inexistentCommand": 'command 'makefile.inexistentCommand' not found'
-Expanding from '${command:makefile.inexistentCommand}' to 'unknown' for setting 'configurations.0.makeArgs.3'.
-Expanding from '${config:makefile.inexistentSetting}' to 'unknown' for setting 'configurations.0.makeArgs.4'.
+Expanding from '${command:makefile.inexistentCommand}' to 'unknown' for setting 'configurations.0.makeArgs.2'.
+Expanding from '${config:makefile.inexistentSetting}' to 'unknown' for setting 'configurations.0.makeArgs.3'.

@@ -104,8 +104,8 @@ suite('Fake dryrun parsing', /*async*/() => {
       let extensionRootPath: string = path.resolve(__dirname, "../../../../");
       baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
       baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
-    //   fs.writeFileSync(path.join(parsedPath.dir, "base6.out"), baselineLogContent);
-    //   fs.writeFileSync(path.join(parsedPath.dir, "diff6.out"), extensionLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "base6.out"), baselineLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "diff6.out"), extensionLogContent);
 
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
@@ -291,8 +291,8 @@ suite('Fake dryrun parsing', /*async*/() => {
          let baselineLogContent: string = util.readFile(baselineLogPath) || "";
          let extensionRootPath: string = path.resolve(__dirname, "../../../../");
          baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-        //  fs.writeFileSync(path.join(parsedPath.dir, "base5.out"), baselineLogContent);
-        //  fs.writeFileSync(path.join(parsedPath.dir, "diff5.out"), extensionLogContent);
+         // fs.writeFileSync(path.join(parsedPath.dir, "base5.out"), baselineLogContent);
+         // fs.writeFileSync(path.join(parsedPath.dir, "diff5.out"), extensionLogContent);
          expect(extensionLogContent).to.be.equal(baselineLogContent);
       });
    }
@@ -352,8 +352,8 @@ suite('Fake dryrun parsing', /*async*/() => {
          let baselineLogContent: string = util.readFile(baselineLogPath) || "";
          let extensionRootPath: string = path.resolve(__dirname, "../../../../");
          baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-        //  fs.writeFileSync(path.join(parsedPath.dir, "base4.out"), baselineLogContent);
-        //  fs.writeFileSync(path.join(parsedPath.dir, "diff4.out"), extensionLogContent);
+         // fs.writeFileSync(path.join(parsedPath.dir, "base4.out"), baselineLogContent);
+         // fs.writeFileSync(path.join(parsedPath.dir, "diff4.out"), extensionLogContent);
          expect(extensionLogContent).to.be.equal(baselineLogContent);
       });
    }
@@ -413,8 +413,8 @@ suite('Fake dryrun parsing', /*async*/() => {
          let baselineLogContent: string = util.readFile(baselineLogPath) || "";
          let extensionRootPath: string = path.resolve(__dirname, "../../../../");
          baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-        //  fs.writeFileSync(path.join(parsedPath.dir, "base3.out"), baselineLogContent);
-        //  fs.writeFileSync(path.join(parsedPath.dir, "diff3.out"), extensionLogContent);
+         // fs.writeFileSync(path.join(parsedPath.dir, "base3.out"), baselineLogContent);
+         // fs.writeFileSync(path.join(parsedPath.dir, "diff3.out"), extensionLogContent);
          expect(extensionLogContent).to.be.equal(baselineLogContent);
       });
    }
@@ -455,8 +455,8 @@ suite('Fake dryrun parsing', /*async*/() => {
       let extensionRootPath: string = path.resolve(__dirname, "../../../../");
       baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
       baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
-    //   fs.writeFileSync(path.join(parsedPath.dir, "base2.out"), baselineLogContent);
-    //   fs.writeFileSync(path.join(parsedPath.dir, "diff2.out"), extensionLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "base2.out"), baselineLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "diff2.out"), extensionLogContent);
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
 
@@ -510,8 +510,8 @@ suite('Fake dryrun parsing', /*async*/() => {
       let extensionRootPath: string = path.resolve(__dirname, "../../../../");
       baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
       baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
-    //   fs.writeFileSync(path.join(parsedPath.dir, "base1.out"), baselineLogContent);
-    //   fs.writeFileSync(path.join(parsedPath.dir, "diff1.out"), extensionLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "base1.out"), baselineLogContent);
+      // fs.writeFileSync(path.join(parsedPath.dir, "diff1.out"), extensionLogContent);
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
 
