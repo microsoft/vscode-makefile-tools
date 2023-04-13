@@ -20,6 +20,7 @@ import * as vscode from 'vscode';
 import * as cpp from 'vscode-cpptools';
 
 import * as nls from 'vscode-nls';
+import { readBuildLog } from './configuration';
 nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -44,6 +45,10 @@ export class MakefileToolsExtension {
     private compilerFullPath ?: string;
 
     public constructor(public readonly extensionContext: vscode.ExtensionContext) {
+    }
+
+    public updateBuildLogPresent(newValue: boolean): void {
+        vscode.commands.executeCommand("setContext", "makefile.buildLogFilePresent", newValue);
     }
 
     public getState(): state.StateManager { return this.mementoState; }
@@ -356,6 +361,38 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // becase the latter may use state info in variable expansion.
     configuration.initFromState();
     await configuration.initFromSettings(true);
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefilePathSetting', () => {
+        return vscode.commands.executeCommand("workbench.action.openSettings", "makefile.makefilePath");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefileFile', () => {
+        // TODO: Probably don't toggle visibility but rather just check for existence here and pop a UI if not present. 
+        // There is probably MUCH refactoring to do if we want to improve UI to be consistent with whether a file is present and 
+        // whether we show "not found" in the UI.
+        const makefile = configuration.getConfigurationMakefile();
+        if (makefile) {
+            vscode.commands.executeCommand("vscode.open", vscode.Uri.file(makefile));
+        }
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakePathSetting', () => {
+        return vscode.commands.executeCommand("workbench.action.openSettings", "makefile.makePath");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogSetting', () => {
+        return vscode.commands.executeCommand("workbench.action.openSettings", "makefile.buildLog");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogFile', () => {
+        // TODO: Probably don't toggle visibility but rather just check for existence here and pop a UI if not present. 
+        // There is probably MUCH refactoring to do if we want to improve UI to be consistent with whether a file is present and 
+        // whether we show "not found" in the UI.
+        const buildLog = configuration.getBuildLog();
+        if (buildLog) {
+            vscode.commands.executeCommand("vscode.open", vscode.Uri.file(buildLog));
+        }
+    }));
 
     // Delete the script that is created by this extension in the temporary folder
     // with the purpose of spliting a compilation command fragment into switch arguments
