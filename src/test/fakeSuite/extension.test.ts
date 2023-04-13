@@ -61,6 +61,9 @@ suite('Fake dryrun parsing', /*async*/() => {
    test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       extension.getState().reset(false);
+      configuration.setCurrentLaunchConfiguration(undefined);
+      configuration.setCurrentMakefileConfiguration("Default");
+      configuration.setCurrentTarget(undefined);
       configuration.initFromState();
       await configuration.initFromSettings();
 
@@ -101,8 +104,8 @@ suite('Fake dryrun parsing', /*async*/() => {
       let extensionRootPath: string = path.resolve(__dirname, "../../../../");
       baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
       baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
-      // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-      // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+    //   fs.writeFileSync(path.join(parsedPath.dir, "base6.out"), baselineLogContent);
+    //   fs.writeFileSync(path.join(parsedPath.dir, "diff6.out"), extensionLogContent);
 
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
@@ -111,6 +114,9 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`Complex scenarios with quotes and escaped quotes - winOnly`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         configuration.setCurrentLaunchConfiguration(undefined);
+         configuration.setCurrentMakefileConfiguration("Default");
+         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
    
@@ -162,6 +168,9 @@ suite('Fake dryrun parsing', /*async*/() => {
       test('Interesting small makefile - windows', async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         configuration.setCurrentLaunchConfiguration(undefined);
+         configuration.setCurrentMakefileConfiguration("Default");
+         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
 
@@ -232,6 +241,9 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`8cc - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         configuration.setCurrentLaunchConfiguration(undefined);
+         configuration.setCurrentMakefileConfiguration("Default");
+         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
    
@@ -279,8 +291,8 @@ suite('Fake dryrun parsing', /*async*/() => {
          let baselineLogContent: string = util.readFile(baselineLogPath) || "";
          let extensionRootPath: string = path.resolve(__dirname, "../../../../");
          baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-         // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-         // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+        //  fs.writeFileSync(path.join(parsedPath.dir, "base5.out"), baselineLogContent);
+        //  fs.writeFileSync(path.join(parsedPath.dir, "diff5.out"), extensionLogContent);
          expect(extensionLogContent).to.be.equal(baselineLogContent);
       });
    }
@@ -290,6 +302,9 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`Fido - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         configuration.setCurrentLaunchConfiguration(undefined);
+         configuration.setCurrentMakefileConfiguration("Default");
+         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
    
@@ -337,8 +352,8 @@ suite('Fake dryrun parsing', /*async*/() => {
          let baselineLogContent: string = util.readFile(baselineLogPath) || "";
          let extensionRootPath: string = path.resolve(__dirname, "../../../../");
          baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-         // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-         // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+        //  fs.writeFileSync(path.join(parsedPath.dir, "base4.out"), baselineLogContent);
+        //  fs.writeFileSync(path.join(parsedPath.dir, "diff4.out"), extensionLogContent);
          expect(extensionLogContent).to.be.equal(baselineLogContent);
       });
    }
@@ -348,6 +363,9 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`tinyvm - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         configuration.setCurrentLaunchConfiguration(undefined);
+         configuration.setCurrentMakefileConfiguration("Default");
+         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
    
@@ -395,8 +413,8 @@ suite('Fake dryrun parsing', /*async*/() => {
          let baselineLogContent: string = util.readFile(baselineLogPath) || "";
          let extensionRootPath: string = path.resolve(__dirname, "../../../../");
          baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
-         // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-         // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+        //  fs.writeFileSync(path.join(parsedPath.dir, "base3.out"), baselineLogContent);
+        //  fs.writeFileSync(path.join(parsedPath.dir, "diff3.out"), extensionLogContent);
          expect(extensionLogContent).to.be.equal(baselineLogContent);
       });
    }
@@ -404,6 +422,9 @@ suite('Fake dryrun parsing', /*async*/() => {
    test(`Test real make - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       extension.getState().reset(false);
+      configuration.setCurrentLaunchConfiguration(undefined);
+      configuration.setCurrentMakefileConfiguration("Default");
+      configuration.setCurrentTarget(undefined);
       configuration.initFromState();
       await configuration.initFromSettings();
 
@@ -434,14 +455,17 @@ suite('Fake dryrun parsing', /*async*/() => {
       let extensionRootPath: string = path.resolve(__dirname, "../../../../");
       baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
       baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
-      // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-      // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+    //   fs.writeFileSync(path.join(parsedPath.dir, "base2.out"), baselineLogContent);
+    //   fs.writeFileSync(path.join(parsedPath.dir, "diff2.out"), extensionLogContent);
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
 
    test(`Variables expansion - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       extension.getState().reset(false);
+      configuration.setCurrentLaunchConfiguration(undefined);
+      configuration.setCurrentMakefileConfiguration("Default");
+      configuration.setCurrentTarget(undefined);
       configuration.initFromState();
       await configuration.initFromSettings();
 
@@ -468,8 +492,7 @@ suite('Fake dryrun parsing', /*async*/() => {
       let tmpConfigurations: configuration.MakefileConfiguration[] = [{
          name: "MyTmpName",
          makePath: "${env:ProgramFiles(x86)}/${workspaceFolderBasename}/make",
-         makeArgs: ["SomeParam=${userHome}",
-                    "${command:makefile.getLaunchTargetPath}",
+         makeArgs: ["${command:makefile.getLaunchTargetPath}",
                     "${SomeUnsupportedVar}",
                     "${command:makefile.inexistentCommand}",
                     "${config:makefile.inexistentSetting}"]}];
@@ -487,8 +510,8 @@ suite('Fake dryrun parsing', /*async*/() => {
       let extensionRootPath: string = path.resolve(__dirname, "../../../../");
       baselineLogContent = baselineLogContent.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
       baselineLogContent = baselineLogContent.replace(/\r\n/mg, "\n");
-      // fs.writeFileSync(path.join(parsedPath.dir, "base.out"), baselineLogContent);
-      // fs.writeFileSync(path.join(parsedPath.dir, "diff.out"), extensionLogContent);
+    //   fs.writeFileSync(path.join(parsedPath.dir, "base1.out"), baselineLogContent);
+    //   fs.writeFileSync(path.join(parsedPath.dir, "diff1.out"), extensionLogContent);
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
 

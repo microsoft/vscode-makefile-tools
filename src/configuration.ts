@@ -529,9 +529,9 @@ export async function stringToLaunchConfiguration(str: string): Promise<LaunchCo
 
 let currentLaunchConfiguration: LaunchConfiguration | undefined;
 export function getCurrentLaunchConfiguration(): LaunchConfiguration | undefined { return currentLaunchConfiguration; }
-export async function setCurrentLaunchConfiguration(configuration: LaunchConfiguration): Promise<void> {
+export async function setCurrentLaunchConfiguration(configuration: LaunchConfiguration | undefined): Promise<void> {
     currentLaunchConfiguration = configuration;
-    let launchConfigStr: string = launchConfigurationToString(currentLaunchConfiguration);
+    let launchConfigStr: string = currentLaunchConfiguration ? launchConfigurationToString(currentLaunchConfiguration) : "";
     statusBar.setLaunchConfiguration(launchConfigStr);
     await extension._projectOutlineProvider.updateLaunchTarget(launchConfigStr);
 }
