@@ -255,7 +255,7 @@ Always pre-configure: false
 Dry-run switches: '--always-make', '--keep-going', '--print-directory'
 Additional compiler names: 'MyOwnFakeCompiler'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
-Reading current launch configuration "/home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros>bin/foo.o()" from the workspace state.
+Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/foo.o()" from the workspace state.
 Default launch configuration: MIMode = undefined,
                     miDebuggerPath = undefined,
                     stopAtEntry = undefined,
@@ -274,14 +274,14 @@ Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Rep
 Deduced command 'c:/some/other/fake/path ' for configuration "Fido_linux"
 Created the following debug config:
    type = cppdbg
-   cwd = /home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros (= /home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros)
+   cwd = {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros)
    args = 
-   program = /home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros/bin/foo.o (= /home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros/bin/foo.o)
+   program = {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/foo.o (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/foo.o)
    MIMode = gdb
-   miDebuggerPath = /home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros/bin/GitHub/compilers/gdb
+   miDebuggerPath = {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/gdb
    stopAtEntry = undefined
    symbolSearchPath = undefined
-Running command '"/home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros/bin/foo.o" ' in the terminal from location '/home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros'
+Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/foo.o" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros'
 Setting target bin/foo.o
 Re-reading settings after target change.
 Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode
@@ -295,7 +295,7 @@ Always pre-configure: false
 Dry-run switches: '--always-make', '--keep-going', '--print-directory'
 Additional compiler names: 'MyOwnFakeCompiler'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
-Reading current launch configuration "/home/andris/git2/vscode-makefile-tools/src/test/fakeSuite/Repros>bin/foo.o()" from the workspace state.
+Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/foo.o()" from the workspace state.
 Default launch configuration: MIMode = undefined,
                     miDebuggerPath = undefined,
                     stopAtEntry = undefined,
