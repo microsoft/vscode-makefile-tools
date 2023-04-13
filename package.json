@@ -746,7 +746,7 @@
     "devDependencies": {
         "@types/mocha": "^9.0.0",
         "@types/node": "^10.17.17",
-        "@types/vscode": "^1.76.0",
+        "@types/vscode": "^1.74.0",
         "tslint": "^5.20.1",
         "tslint-microsoft-contrib": "^6.2.0",
         "tslint-no-unused-expression-chai": "^0.1.4",
@@ -787,7 +787,8 @@
         "markdown-it": "^12.3.2",
         "minimist": "^1.2.6",
         "nanoid": "^3.1.20",
-        "minimatch": "^3.0.5"
+        "minimatch": "^3.0.5",
+        "xml2js": "^0.5.0"
     }
 
 }

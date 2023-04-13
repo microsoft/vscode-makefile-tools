@@ -50,6 +50,7 @@ export enum ConfigureBuildReturnCodeTypes {
     outOfDate = -4,
     other = -5,
     saveFailed = -6,
+    fullFeatureFalse = -7,
 }
 
 export enum Operations {
@@ -767,6 +768,13 @@ interface ConfigurationCache {
     };
 }
 
+function isConfigurationEmpty(configurationCache: ConfigurationCache): boolean {
+    if (configurationCache.buildTargets.length === 0 && configurationCache.launchTargets.length === 0 && configurationCache.customConfigurationProvider.workspaceBrowse.browsePath.length === 0) {
+        return true;
+    }
+    return false;
+}
+
 interface ConfigureSubphasesStatus {
     loadFromCache?: ConfigureSubphaseStatus;
     generateParseContent?: ConfigureSubphaseStatus;
@@ -871,6 +879,11 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     // to accurately identify whether this project configured successfully out of the box or not.
     let ranConfigureInCodebaseLifetime: boolean = extension.getState().ranConfigureInCodebaseLifetime;
     extension.getState().ranConfigureInCodebaseLifetime = true;
+
+    // If `fullFeatureSet` is false and it wasn't a manual command invocation, return and `other` return value.
+    if (!extension.getFullFeatureSet() && !triggeredBy.includes("command pallette")) {
+        return ConfigureBuildReturnCodeTypes.fullFeatureFalse;
+    }
 
     if (blockedByOp(Operations.configure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
@@ -1003,16 +1016,18 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
             }
         };
 
-        // Rewrite the configuration cache according to the last updates of the internal arrays,
-        // but not if the configure was cancelled and not while running regression tests.
-        if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled && process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
-            util.writeFile(configurationCachePath, JSON.stringify(ConfigurationCache));
-        }
+        if (!isConfigurationEmpty(ConfigurationCache)) {
+            // Rewrite the configuration cache according to the last updates of the internal arrays,
+            // but not if the configure was cancelled and not while running regression tests.
+            if (configurationCachePath && retc !== ConfigureBuildReturnCodeTypes.cancelled && process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
+                util.writeFile(configurationCachePath, JSON.stringify(ConfigurationCache));
+            }
 
-        // Export the compile_commands.json file if the option is enabled.
-        if (compileCommandsPath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
-            let compileCommands: parser.CompileCommand[] = ConfigurationCache.customConfigurationProvider.fileIndex.map(([, {compileCommand}]) => compileCommand);
-            util.writeFile(compileCommandsPath, JSON.stringify(compileCommands, undefined, 4));
+            // Export the compile_commands.json file if the option is enabled.
+            if (compileCommandsPath && retc !== ConfigureBuildReturnCodeTypes.cancelled) {
+                let compileCommands: parser.CompileCommand[] = ConfigurationCache.customConfigurationProvider.fileIndex.map(([, {compileCommand}]) => compileCommand);
+                util.writeFile(compileCommandsPath, JSON.stringify(compileCommands, undefined, 4));
+            }
         }
 
         let newBuildTarget: string | undefined = configuration.getCurrentTarget();

@@ -178,7 +178,7 @@ export class MakefilePathInfoNode extends BaseNode {
            item.collapsibleState = vscode.TreeItemCollapsibleState.None;
            item.tooltip = this._tooltip;
            item.contextValue = [
-               `nodeType=makefilepathInSettings`,
+               `nodeType=makefilePathInfo`,
            ].join(',');
            return item;
        } catch (e) {
@@ -305,12 +305,13 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
        if (!pathInSettings) {
          return `${kind}: [Unset]`;
        }
-
-       const pathBase: string | undefined = (searchInPath && path.parse(pathInSettings).dir === "") ? path.parse(pathInSettings).base : undefined;
+       
+       const pathInSettingsToTest: string | undefined = process.platform === "win32" && !pathInSettings?.endsWith(".exe") && kind === "Make" ? pathInSettings?.concat(".exe") : pathInSettings;
+       const pathBase: string | undefined = (searchInPath && path.parse(pathInSettingsToTest).dir === "") ? path.parse(pathInSettingsToTest).base : undefined;
        const pathInEnv: string | undefined = pathBase ? (path.join(util.toolPathInEnv(pathBase) || "", pathBase)) : undefined;
-       const finalPath: string = pathInEnv || pathInSettings;
+       const finalPath: string = pathInEnv || pathInSettingsToTest;
        return (!util.checkFileExistsSync(finalPath) ? `${kind} (not found)` : `${kind}`) + `: [${makeRelative ? util.makeRelPath(finalPath, util.getWorkspaceRoot()) : finalPath}]`;
-    }   
+    }
 
     async update(configuration: string | undefined,
                  buildTarget: string | undefined,
