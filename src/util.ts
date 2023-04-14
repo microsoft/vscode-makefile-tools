@@ -626,19 +626,37 @@ export function userHome(): string {
 // is used on such types of settings) and for arrays or objects, expand recursively
 // until we reach the simple types for submembers. This handles any structure.
 export async function getExpandedSetting<T>(settingId: string, propSchema?: any): Promise<T | undefined> {
-   let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-   let settingVal: any | undefined = workspaceConfiguration.get<T>(settingId);
-   return getExpandedSettingVal<T>(settingId, settingVal, propSchema);
-}
+    let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+    let settingVal: any | undefined = workspaceConfiguration.get<T>(settingId);
 
-// Same as above but read from an object instead of the settings (as if we get<> before calling this).
-// Such approach was needed for tests.
-export async function getExpandedSettingVal<T>(settingId: string, settingVal: any, propSchema?: any): Promise<T | undefined> {
     if (!propSchema) {
         propSchema = thisExtensionPackage().contributes.configuration.properties;
         propSchema = propSchema.properties ? propSchema.properties[`makefile.${settingId}`] : propSchema[`makefile.${settingId}`];
     }
 
+    // Read what's at settingId in the workspace settings and for objects and arrays of complex types make sure
+    // to copy into a new counterpart that we will modify, because we don't want to persist expanded values in settings.
+    let copySettingVal: any | undefined;
+    if (propSchema && propSchema.type === "array") {
+      copySettingVal = [];
+      (settingVal as any[]).forEach(element => {
+         let copyElement: any = {};
+         copyElement = (typeof(element) === "object") ? Object.assign(copyElement, element) : element;
+         copySettingVal.push(copyElement);
+      });
+    } else if (propSchema && propSchema.type === "object") {
+      copySettingVal = {};
+      copySettingVal = Object.assign(copySettingVal, settingVal);
+    } else {
+      copySettingVal = settingVal;
+    }
+
+    return getExpandedSettingVal<T>(settingId, copySettingVal, propSchema);
+}
+
+// Same as above but read from an object instead of the settings (as if we get<> before calling this).
+// Such approach was needed for tests.
+export async function getExpandedSettingVal<T>(settingId: string, settingVal: any, propSchema?: any): Promise<T | undefined> {
     // Currently, we have no ${} variables in the default values of our settings.
     // Skip expanding defaults to keep things faster simpler and safer.
     // Change this when needed.
@@ -662,7 +680,6 @@ export async function getExpandedSettingVal<T>(settingId: string, settingVal: an
             // example: array[5] is seen as property object with index array.5
             // and at the next call we'll see the string.
             let properties: string[] = Object.getOwnPropertyNames(settingVal);
-            let modified: boolean = false;
             for (let p: number = 0; p < properties.length; p++) {
                 let prop: string = properties[p];
                 let childPropSchema: any;
@@ -678,15 +695,11 @@ export async function getExpandedSettingVal<T>(settingId: string, settingVal: an
                     let expandedProp: T = await getExpandedSettingVal<typeof childPropSchema>(settingId + "." + prop, settingVal[prop], childPropSchema);
                     if (!areEqual(settingVal[prop], expandedProp)) {
                         settingVal[prop] = expandedProp;
-                        modified = true;
                     }
                 } catch (e) {
                     logger.message(`Exception while expanding string "${settingId}.${prop}": '${e.message}'`);
                 }
             }
-
-            let copySettingVal: any = {};
-            return modified && typeJson !== "array" ? Object.assign(copySettingVal, settingVal) : settingVal;
         }
     }
 
@@ -777,15 +790,12 @@ export async function expandVariablesInSetting(settingId: string, settingVal: st
                     toStr = getSettingMultipleDots(workspaceCfg, res[2]);
                 }
 
-                // If still we could not resolve the ${config:} pattern, expand to empty string.
                 if (toStr === null || toStr === undefined) {
                     toStr = "unknown";
                 }
             }
         } else {
             logger.message(`Unrecognized variable format: ${result[0]}`);
-            // let's not expand to empty string when the user writes a variable expansion syntax
-            // we don't recognize, it may go unnoticed for longer.
             toStr = "unknown";
             telemetryProperties.pattern =  "unrecognized";
         }

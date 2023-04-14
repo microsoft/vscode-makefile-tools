@@ -487,7 +487,7 @@ export function setLaunchConfigurations(configurations: LaunchConfiguration[]): 
 
 // Read launch configurations defined by the user in settings: makefile.launchConfigurations[]
 async function readLaunchConfigurations(): Promise<void> {
-    launchConfigurations = await util.getExpandedSetting<LaunchConfiguration[]>("launchConfigurations") || [];
+   launchConfigurations = await util.getExpandedSetting<LaunchConfiguration[]>("launchConfigurations") || [];
 }
 
 // Helper used to fill the launch configurations quick pick.
@@ -1626,11 +1626,16 @@ export async function setLaunchConfigurationByName(launchConfigurationName: stri
     if (!currentLaunchConfiguration) {
         currentLaunchConfiguration = await stringToLaunchConfiguration(launchConfigurationName);
         if (currentLaunchConfiguration) {
+            // Read again all launch configurations from settings, so that we push this incoming into that array as well
+            // because we want to persist the original unexpanded content of launch configurations.
+            let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
+            let launchConfigAsInSettings: LaunchConfiguration[] = workspaceConfiguration.get<LaunchConfiguration[]>("launchConfigurations") || [];
+            launchConfigAsInSettings.push(currentLaunchConfiguration);
+            // Push into the processed 'in-memory' launch configurations array as well.
             launchConfigurations.push(currentLaunchConfiguration);
             // Avoid updating the launchConfigurations array in settings.json for regression tests.
             if (process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
-                let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
-                await workspaceConfiguration.update("launchConfigurations", launchConfigurations);
+                await workspaceConfiguration.update("launchConfigurations", launchConfigAsInSettings);
             }
             logger.message(`Inserting a new entry for ${launchConfigurationName} in the array of makefile.launchConfigurations. ` +
                            "You may define any additional debug properties for it in settings.");
