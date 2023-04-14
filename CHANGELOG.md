@@ -1,5 +1,24 @@
 # What's New?
 
+## 0.7.0
+
+Improvements
+
+- Variable expansion support in settings. [#25](https://github.com/microsoft/vscode-makefile-tools/issues/25)
+- Improve the UI user experience when key pieces (makeafile, make, build.log) are not found. [#394](https://github.com/microsoft/vscode-makefile-tools/issues/394)
+- Add support for C++23 [#433](https://github.com/microsoft/vscode-makefile-tools/issues/433)
+- Smart path handling and flexibility in required path structure/default for various path settings (makefilePath, miDebuggerPath). [#341](https://github.com/microsoft/vscode-makefile-tools/issues/341) [#365](https://github.com/microsoft/vscode-makefile-tools/issues/365)
+
+Bug fixes:
+
+- Fix case sensitivity on Windows. [#416](https://github.com/microsoft/vscode-makefile-tools/issues/416)
+- Ensure paths with `&` are quoted. [417](https://github.com/microsoft/vscode-makefile-tools/issues/417)
+- Avoid regexp hang when processing strings like "-------------". [#106](https://github.com/microsoft/vscode-makefile-tools/issues/106)
+- Ensure that we don't write into user settings when a value has been specified by the user. [#356](https://github.com/microsoft/vscode-makefile-tools/pull/356)
+- Fix regex parsing for targets [#441](https://github.com/microsoft/vscode-makefile-tools/issues/441) [@nick-hebi](https://github.com/nick-hebi)
+- Don't configure when there is no makefile entrypoint. Don't cache when provider data is empty. [#449](https://github.com/microsoft/vscode-makefile-tools/issues/449)
+- Log about telemetry only when it is enabled in VSCode. [#446](https://github.com/microsoft/vscode-makefile-tools/issues/446)
+
 ## 0.6.0
 Bug fixes:
 - Do not write to the user's workspace folders by default. [#329](https://github.com/microsoft/vscode-makefile-tools/issues/329)
