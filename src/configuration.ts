@@ -882,13 +882,13 @@ export async function readMakefileConfigurations(): Promise<void> {
         await workspaceConfiguration.update("configurations", makefileConfigurations);
     }
 
+    // Now read "makefile.configurations" again and expand as needed.
+    makefileConfigurations = await util.getExpandedSetting<MakefileConfiguration[]>("configurations") || [];
+
     // Log the updated list of configuration names
     const makefileConfigurationNames: string[] = makefileConfigurations.map((k => {
         return k.name;
     }));
-
-    // Now read "makefile.configurations" again and expand as needed.
-    makefileConfigurations = await util.getExpandedSetting<MakefileConfiguration[]>("configurations") || [];
     if (makefileConfigurationNames.length > 0) {
         logger.message("Found the following configurations defined in makefile.configurations setting: " + makefileConfigurationNames.join(";"));
     }

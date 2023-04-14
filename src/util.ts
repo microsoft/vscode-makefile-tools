@@ -638,6 +638,7 @@ export async function getExpandedSetting<T>(settingId: string, propSchema?: any)
     // to copy into a new counterpart that we will modify, because we don't want to persist expanded values in settings.
     let copySettingVal: any | undefined;
     if (propSchema && propSchema.type === "array") {
+      // A simple .concat() is not enough. We need to push(Object.assign) on all object entries in the array.
       copySettingVal = [];
       (settingVal as any[]).forEach(element => {
          let copyElement: any = {};
@@ -685,14 +686,22 @@ export async function getExpandedSettingVal<T>(settingId: string, settingVal: an
                 let childPropSchema: any;
                 if (propSchema) {
                     if (typeJson === "array") {
-                        childPropSchema = propSchema.items.properties ? propSchema.items.properties : propSchema.items;
+                        childPropSchema = propSchema.items;
                     } else {
                         childPropSchema = propSchema.properties ? propSchema.properties[`${prop}`] : propSchema[`${prop}`];
                     }
                 }
 
                 try {
-                    let expandedProp: T = await getExpandedSettingVal<typeof childPropSchema>(settingId + "." + prop, settingVal[prop], childPropSchema);
+                    // The settingVal that was given to this function was already a separate copy from its workspace settings counterpart
+                    // but if that contained an array anywhere in its structure, if we don't copy here, this expansion will modify
+                    // workspace settings which we want to leave untouched.
+                    let copySettingValProp: any = settingVal[prop];
+                    if (childPropSchema && childPropSchema.type === "array") {
+                        copySettingValProp = [].concat(settingVal[prop]);
+                    }
+
+                    let expandedProp: T = await getExpandedSettingVal<typeof childPropSchema>(settingId + "." + prop, copySettingValProp, childPropSchema);
                     if (!areEqual(settingVal[prop], expandedProp)) {
                         settingVal[prop] = expandedProp;
                     }
@@ -715,6 +724,14 @@ export async function getExpandedSettingVal<T>(settingId: string, settingVal: an
 // - environment variables: ${env:USERNAME}
 // - (any extensions) configuration variables: ${config:extension.setting}
 // - command variables: ${command:extension.command} (currently, without commands input variables support)
+// - allow for escaping a varexp sequence in case the user wants to pass that through as is.
+//   The escape character is backslash and in json one backslash is not allowed inside a string, so we'll always get double.
+//   When used in paths, we can't know if a \\ is wanted as a path separator or an escape character so we assume
+//   it is always an escape character. Whenever this is not the case, the user can switch to forward slashes in the paths.
+//   Example: "drive:\\folder1\\folder2_\\${variable}\\folder3" may be wanted as "drive:\\folder1\\folder2_\\value\\folder3"
+//   or as "drive:\\folder1\\folder2_${variable}\\folder3". $ does not make much sense to be left in a path
+//   but also the analysis of the meaning of a string (especially if not full path) is not simple.
+//   Forward slashes are recommended in paths.
 //       NOTES:
 //       - ${command:makefile.getConfiguration} is the same as ${configuration}
 //       - ${command:makefile.getBuildTarget} is the same as ${buildTarget}
@@ -727,6 +744,22 @@ export async function getExpandedSettingVal<T>(settingId: string, settingVal: an
 // we log an error but in future let's handle the recursivity and complications of expanding anything
 // coming via this entrypoint.
 export async function expandVariablesInSetting(settingId: string, settingVal: string): Promise<string> {
+    // Do some string preprocessing first, related to escaping.
+    // Since we don't want to change the value persisted in settings but we need to lose the separator
+    // (so that the final beneficiaries of these settings don't need to handle the separator character)
+    // we will keep the varexp pattern in the final value without the escape character.
+    // The escape character is only for our regexp here to know to not expand it.
+    // Safe to replace \\${ with ESCAPED_VARIABLE_EXPANSION. This will cause the pattern to be skipped
+    // by the regular expression below and also we will replace in reverse at the end (without \\).
+    const telemetryProperties: telemetry.Properties = {setting: settingId};
+    let preprocStr: string = settingVal.replace(/\\\$\{/mg, "ESCAPED_VARIABLE_EXPANSION");
+    if (preprocStr !== settingVal) {
+        logger.message(`Detected escaped variable expansion patterns in setting '${settingId}', within value '${settingVal}'.`);
+        telemetryProperties.pattern = "escaped";
+        telemetry.logEvent("varexp", telemetryProperties);
+        settingVal = preprocStr;
+    }
+
     // Try the predefined VSCode variable first. The regexp for ${variable} won't fit the others because of the ":".
     let expandedSetting: string = settingVal;
     let regexpVSCodeVar: RegExp = /(\$\{(\w+)\})|(\$\{(\w+):(.+?)\})/mg;
@@ -827,7 +860,9 @@ export async function expandVariablesInSetting(settingId: string, settingVal: st
         logger.message(`Expanding from '${settingVal}' to '${expandedSetting}' for setting '${settingId}'.`);
     }
 
-    return expandedSetting;
+    // Reverse the preprocessing done at the beginning, except that we don't keep the escape character.
+    preprocStr = expandedSetting.replace(/ESCAPED_VARIABLE_EXPANSION/mg, "${");
+    return preprocStr;
 }
 
 // Function specialized to get properties with multiple dots in their names.
