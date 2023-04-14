@@ -179,7 +179,7 @@ function filterKey(key: string): string {
 // If analyzeSettings gets called before a configure (or after an unsuccesful one), it is possible to have
 // inaccurate or incomplete telemetry information for makefile and launch configurations.
 // This is not very critical since any of their state changes will update telemetry for them.
-export function analyzeSettings(setting: any, key: string, propSchema: any, ignoreDefault: boolean, telemetryProperties: Properties | null): Properties | null {
+export async function analyzeSettings(setting: any, key: string, propSchema: any, ignoreDefault: boolean, telemetryProperties: Properties | null): Promise<Properties | null> {
     // type can be undefined if setting is null,
     // which happens when the user removes that setting.
     let type : string | undefined = setting ? typeof (setting) : undefined;
@@ -207,15 +207,19 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
     }
 
     // Enum values always safe to report.
+    // Validate the allowed values against the expanded variable.
     let enumValues: any[] = propSchema.enum;
     if (enumValues && enumValues.length > 0) {
-        if (!enumValues.includes(setting)) {
-            telemetryLogger(`Invalid value "${setting}" for enum "${key}". Only "${enumValues.join(";")}" values are allowed."`);
+        const regexp: RegExp = /(makefile\.)(.+)/mg;
+        const res: RegExpExecArray | null = regexp.exec(key);
+        let expandedSetting: string = res ? await util.getExpandedSetting<string>(res[2]) : setting;
+        if (!enumValues.includes(expandedSetting)) {
+            telemetryLogger(`Invalid value "${expandedSetting}" for enum "${key}". Only "${enumValues.join(";")}" values are allowed."`);
             if (telemetryProperties) {
                 telemetryProperties[filterKey(key)] = "invalid";
             }
         } else if (telemetryProperties) {
-            telemetryProperties[filterKey(key)] = setting;
+            telemetryProperties[filterKey(key)] = expandedSetting;
         }
 
         return telemetryProperties;
@@ -255,7 +259,7 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
                 active = activeArrayItem(setting, key);
             }
 
-            settingsProps.forEach(prop => {
+            settingsProps.forEach(async (prop) => {
                 index++;
                 let jsonProps: any;
                 let newPropObj: any = setting[prop];
@@ -302,7 +306,7 @@ export function analyzeSettings(setting: any, key: string, propSchema: any, igno
                     if (type !== "function" /*&& jsonType !== undefined*/ &&
                         (jsonType !== "array" || prop !== "length")) {
                         let newTelemetryProperties: Properties | null = {};
-                        newTelemetryProperties = analyzeSettings(newPropObj, key + "." + prop, jsonProps, ignoreDefault,
+                        newTelemetryProperties = await analyzeSettings(newPropObj, key + "." + prop, jsonProps, ignoreDefault,
                             ((jsonType !== "array" || index === active)) ? newTelemetryProperties : null);
 
                         // If telemetryProperties is null, it means we're not interested in reporting any telemetry for this subtree

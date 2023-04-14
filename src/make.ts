@@ -1488,7 +1488,7 @@ export async function doConfigure(progress: vscode.Progress<{}>, cancel: vscode.
             // as the caller and its result will be included into the telemetry information reported by that.
             // There can be only one level of recursivity because once the target is reset to empty,
             // it is impossible to get into the state of having a target that is not found in the available list.
-            configuration.setTargetByName("");
+            await configuration.setTargetByName("");
             logger.message("Automatically reconfiguring the project after a build target change.");
             recursiveDoConfigure = true;
 

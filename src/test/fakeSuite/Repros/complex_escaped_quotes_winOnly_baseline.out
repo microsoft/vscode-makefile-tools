@@ -4,6 +4,35 @@ Script: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfi
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>call "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat" 
 The pre-configure succeeded.
 Setting configuration - complex_escaped_quotes_winOnly
+Re-reading settings after configuration change.
+Found build log path setting "./complex_escaped_quotes_winOnly_dryrun.log" defined for configuration "complex_escaped_quotes_winOnly"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\complex_escaped_quotes_winOnly_dryrun.log"
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "complex_escaped_quotes_winOnly"
+Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode
+Writing extension log at {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\Makefile.out
+Logging level: Debug
+Configurations cached at {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\configurationCache.log
+No path to the makefile is defined in the settings file.
+No folder path to the makefile is defined in the settings file.
+Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log"
+Always pre-configure: false
+Dry-run switches: '--always-make', '--keep-going', '--print-directory'
+Additional compiler names: 'MyOwnFakeCompiler'
+Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
+No current launch configuration is set in the workspace state.
+Default launch configuration: MIMode = undefined,
+                    miDebuggerPath = undefined,
+                    stopAtEntry = undefined,
+                    symbolSearchPath = undefined
+Configure on open: false
+Configure on edit: true
+Configure after command: true
+Only .PHONY targets: false
+Save before build or configure: true
+Build before launch: false
+Clear output before build: true
+Ignore directory commands: true
+compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
 Found build log path setting "./complex_escaped_quotes_winOnly_dryrun.log" defined for configuration "complex_escaped_quotes_winOnly"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\complex_escaped_quotes_winOnly_dryrun.log"
 Deduced command 'c:\some\other\fake\path.exe ' for configuration "complex_escaped_quotes_winOnly"

@@ -209,8 +209,18 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         await configuration.setNewConfiguration();
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.getConfiguration', async () => {
+        telemetry.logEvent("getConfiguration");
+        return configuration.getCurrentMakefileConfiguration();
+    }));
+
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildTarget', async () => {
        await configuration.selectTarget();
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.getBuildTarget', async () => {
+        telemetry.logEvent("getBuildTarget");
+        return configuration.getCurrentTarget() || "";
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.buildTarget', async () => {
@@ -342,15 +352,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         return vscode.commands.executeCommand("makefile.setBuildConfiguration");
     }));
 
-    configuration.readLoggingLevel();
-    configuration.readExtensionOutputFolder();
-    configuration.readExtensionLog();
-
-    // Delete the extension log file, if exists
-    let extensionLog : string | undefined = configuration.getExtensionLog();
-    if (extensionLog && util.checkFileExistsSync(extensionLog)) {
-        util.deleteFileSync(extensionLog);
-    }
+    // Read from the workspace state before reading from settings,
+    // becase the latter may use state info in variable expansion.
+    configuration.initFromState();
+    await configuration.initFromSettings(true);
 
     // Delete the script that is created by this extension in the temporary folder
     // with the purpose of spliting a compilation command fragment into switch arguments
@@ -364,9 +369,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         util.deleteFileSync(parseCompilerArgsScript);
     }
 
-    // Read configuration info from settings
-    await configuration.initFromStateAndSettings();
-
     if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
         // Always clean configure on open
         await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
@@ -376,7 +378,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
     let telemetryProperties: telemetry.Properties | null = {};
     try {
-        telemetryProperties = telemetry.analyzeSettings(workspaceConfiguration, "makefile",
+        telemetryProperties = await telemetry.analyzeSettings(workspaceConfiguration, "makefile",
             util.thisExtensionPackage().contributes.configuration.properties,
             true, telemetryProperties);
     } catch (e) {

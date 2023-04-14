@@ -1,0 +1,11 @@
+Expanding from './${workspaceFolder}/${configuration}/${buildTarget}/something/${configuration}/${buildTarget}/build.log' to './{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/varexp/all/something/varexp/all/build.log' for setting 'buildLog'.
+Expanding from '${config:makefile.panel.visibility.debug}' to 'true' for setting 'defaultLaunchConfiguration.stopAtEntry'.
+Expanding from './${workspaceRoot}/${command:makefile.getConfiguration}/${command:makefile.getBuildTarget}' to './{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/varexp/all' for setting 'defaultLaunchConfiguration.miDebuggerPath'.
+Expanding from '${env:ProgramFiles(x86)}/${workspaceFolderBasename}/make' to '/Repros/make' for setting 'configurations.0.makePath'.
+Expanding from '${command:makefile.getLaunchTargetPath}' to '' for setting 'configurations.0.makeArgs.0'.
+Unrecognized variable format: ${SomeUnsupportedVar}
+Expanding from '${SomeUnsupportedVar}' to 'unknown' for setting 'configurations.0.makeArgs.1'.
+Detected escaped variable expansion patterns in setting 'configurations.0.makeArgs.2', within value 'try_\${escape_varexp1}_various_\${escape_varexp2}_escapes'.
+Exception while executing command "makefile.inexistentCommand": 'command 'makefile.inexistentCommand' not found'
+Expanding from '${command:makefile.inexistentCommand}' to 'unknown' for setting 'configurations.0.makeArgs.3'.
+Expanding from '${config:makefile.inexistentSetting}' to 'unknown' for setting 'configurations.0.makeArgs.4'.

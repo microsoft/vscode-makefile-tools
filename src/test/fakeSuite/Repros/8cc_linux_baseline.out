@@ -2,6 +2,35 @@ Pre-configuring...
 Script: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh"
 The pre-configure succeeded.
 Setting configuration - 8cc_linux
+Re-reading settings after configuration change.
+Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
+Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
+Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode
+Writing extension log at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/Makefile.out
+Logging level: Debug
+Configurations cached at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/configurationCache.log
+No path to the makefile is defined in the settings file.
+No folder path to the makefile is defined in the settings file.
+Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/dummy_dryrun.log"
+Always pre-configure: false
+Dry-run switches: '--always-make', '--keep-going', '--print-directory'
+Additional compiler names: 'MyOwnFakeCompiler'
+Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
+No current launch configuration is set in the workspace state.
+Default launch configuration: MIMode = undefined,
+                    miDebuggerPath = undefined,
+                    stopAtEntry = undefined,
+                    symbolSearchPath = undefined
+Configure on open: false
+Configure on edit: true
+Configure after command: true
+Only .PHONY targets: false
+Save before build or configure: true
+Build before launch: false
+Clear output before build: true
+Ignore directory commands: true
+compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/compile_commands.json
 Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
 Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
@@ -194,6 +223,35 @@ Configure succeeded.
 Configure elapsed time: 0
 Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>8cc() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
 Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>8cc()"
+Re-reading settings after launch target change.
+Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode
+Writing extension log at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/Makefile.out
+Logging level: Debug
+Configurations cached at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/configurationCache.log
+No path to the makefile is defined in the settings file.
+No folder path to the makefile is defined in the settings file.
+Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/dummy_dryrun.log"
+Always pre-configure: false
+Dry-run switches: '--always-make', '--keep-going', '--print-directory'
+Additional compiler names: 'MyOwnFakeCompiler'
+Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
+Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>8cc()" from the workspace state.
+Default launch configuration: MIMode = undefined,
+                    miDebuggerPath = undefined,
+                    stopAtEntry = undefined,
+                    symbolSearchPath = undefined
+Configure on open: false
+Configure on edit: true
+Configure after command: true
+Only .PHONY targets: false
+Save before build or configure: true
+Build before launch: false
+Clear output before build: true
+Ignore directory commands: true
+compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/compile_commands.json
+Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
+Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
 Created the following debug config:
    type = cppdbg
    cwd = {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros (= {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros)
@@ -205,4 +263,33 @@ Created the following debug config:
    symbolSearchPath = undefined
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc" ' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros'
 Setting target all
+Re-reading settings after target change.
+Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode
+Writing extension log at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/Makefile.out
+Logging level: Debug
+Configurations cached at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/configurationCache.log
+No path to the makefile is defined in the settings file.
+No folder path to the makefile is defined in the settings file.
+Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/dummy_dryrun.log"
+Always pre-configure: false
+Dry-run switches: '--always-make', '--keep-going', '--print-directory'
+Additional compiler names: 'MyOwnFakeCompiler'
+Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
+Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>8cc()" from the workspace state.
+Default launch configuration: MIMode = undefined,
+                    miDebuggerPath = undefined,
+                    stopAtEntry = undefined,
+                    symbolSearchPath = undefined
+Configure on open: false
+Configure on edit: true
+Configure after command: true
+Only .PHONY targets: false
+Save before build or configure: true
+Build before launch: false
+Clear output before build: true
+Ignore directory commands: true
+compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/compile_commands.json
+Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
+Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
 Building target "all" with command: 'c:/some/other/fake/path all'
