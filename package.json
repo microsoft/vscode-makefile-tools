@@ -748,7 +748,7 @@
                 },
                 {
                     "command": "makefile.outline.openMakefileFile",
-                    "when": "view == makefile.outline && viewItem =~ /nodeType=makefilePathInfo/",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=makefilePathInfo/ && makefile.makefileFilePresent",
                     "group": "inline@1"
                 },
                 {

@@ -51,6 +51,10 @@ export class MakefileToolsExtension {
         vscode.commands.executeCommand("setContext", "makefile.buildLogFilePresent", newValue);
     }
 
+    public updateMakefileFilePresent(newValue: boolean): void {
+        vscode.commands.executeCommand("setContext", "makefile.makefileFilePresent", newValue);
+    }
+
     public getState(): state.StateManager { return this.mementoState; }
 
     public dispose(): void {
@@ -367,12 +371,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefileFile', () => {
-        // TODO: Probably don't toggle visibility but rather just check for existence here and pop a UI if not present. 
-        // There is probably MUCH refactoring to do if we want to improve UI to be consistent with whether a file is present and 
-        // whether we show "not found" in the UI.
         const makefile = configuration.getConfigurationMakefile();
         if (makefile) {
-            vscode.commands.executeCommand("vscode.open", vscode.Uri.file(makefile));
+            if (util.checkFileExistsSync(makefile)) {
+                vscode.commands.executeCommand("vscode.open", vscode.Uri.file(makefile));
+            }
+            else {
+                vscode.window.showErrorMessage(localize("makefile.outline.makefileFileNotFound", "The makefile file could not be opened."));
+            }
         }
     }));
 
@@ -385,12 +391,13 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogFile', () => {
-        // TODO: Probably don't toggle visibility but rather just check for existence here and pop a UI if not present. 
-        // There is probably MUCH refactoring to do if we want to improve UI to be consistent with whether a file is present and 
-        // whether we show "not found" in the UI.
         const buildLog = configuration.getBuildLog();
         if (buildLog) {
-            vscode.commands.executeCommand("vscode.open", vscode.Uri.file(buildLog));
+            if (util.checkFileExistsSync(buildLog)) {
+                vscode.commands.executeCommand("vscode.open", vscode.Uri.file(buildLog));
+            } else {
+                vscode.window.showErrorMessage(localize("makefile.outline.buildLogFileNotFound", "The build log file could not be opened."));
+            }
         }
     }));
 
