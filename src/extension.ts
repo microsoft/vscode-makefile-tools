@@ -377,6 +377,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
                 vscode.commands.executeCommand("vscode.open", vscode.Uri.file(makefile));
             }
             else {
+                extension.updateMakefileFilePresent(false);
                 vscode.window.showErrorMessage(localize("makefile.outline.makefileFileNotFound", "The makefile file could not be opened."));
             }
         }
@@ -396,6 +397,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             if (util.checkFileExistsSync(buildLog)) {
                 vscode.commands.executeCommand("vscode.open", vscode.Uri.file(buildLog));
             } else {
+                extension.updateBuildLogPresent(false);
                 vscode.window.showErrorMessage(localize("makefile.outline.buildLogFileNotFound", "The build log file could not be opened."));
             }
         }
