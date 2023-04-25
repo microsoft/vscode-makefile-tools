@@ -366,15 +366,25 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     configuration.initFromState();
     await configuration.initFromSettings(true);
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefilePathSetting', () => {
-        return vscode.commands.executeCommand("workbench.action.openSettings", "makefile.makefilePath");
+    const openSettings = async (setting: string) => {
+        await vscode.commands.executeCommand("workbench.action.openSettings", setting);
+        await vscode.commands.executeCommand("workbench.action.openWorkspaceSettings");
+    }
+
+    const openFile = async (fileUri: vscode.Uri) => {
+        await vscode.commands.executeCommand("vscode.open", fileUri);
+        await vscode.commands.executeCommand("workbench.files.action.showActiveFileInExplorer");
+    }
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefilePathSetting', async () => {
+        await openSettings("makefile.makefilePath");
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefileFile', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefileFile', async () => {
         const makefile = configuration.getConfigurationMakefile();
         if (makefile) {
             if (util.checkFileExistsSync(makefile)) {
-                vscode.commands.executeCommand("vscode.open", vscode.Uri.file(makefile));
+                await openFile(vscode.Uri.file(makefile));
             }
             else {
                 extension.updateMakefileFilePresent(false);
@@ -383,19 +393,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         }
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakePathSetting', () => {
-        return vscode.commands.executeCommand("workbench.action.openSettings", "makefile.makePath");
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakePathSetting', async () => {
+        await openSettings("makefile.makePath");
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogSetting', () => {
-        return vscode.commands.executeCommand("workbench.action.openSettings", "makefile.buildLog");
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogSetting', async () => {
+        await openSettings("makefile.buildLog");
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogFile', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogFile', async () => {
         const buildLog = configuration.getBuildLog();
         if (buildLog) {
             if (util.checkFileExistsSync(buildLog)) {
-                vscode.commands.executeCommand("vscode.open", vscode.Uri.file(buildLog));
+                await openFile(vscode.Uri.file(buildLog));
             } else {
                 extension.updateBuildLogPresent(false);
                 vscode.window.showErrorMessage(localize("makefile.outline.buildLogFileNotFound", "The build log file could not be opened."));
