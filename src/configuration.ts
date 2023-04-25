@@ -276,15 +276,17 @@ export function setBuildLog(path: string): void { buildLog = path; }
 // If any of the above switches is missing, the extension may have less log to parse from,
 // therefore offering less intellisense information for source files,
 // identifying less possible binaries to debug or not providing any makefile targets (other than the 'all' default).
-export async function readBuildLog(): Promise<void> {
+export async function readBuildLog(): Promise<boolean> {
     buildLog = await util.getExpandedSetting<string>("buildLog");
     if (buildLog) {
         buildLog = util.resolvePathToRoot(buildLog);
         logger.message(`Build log defined at "${buildLog}"`);
         if (!util.checkFileExistsSync(buildLog)) {
             logger.message("Build log not found on disk.");
+            return false;
         }
     }
+    return true;
 }
 
 let loggingLevel: string | undefined;
@@ -1040,7 +1042,7 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
     await readMakePath();
     await readMakefilePath();
     await readMakeDirectory();
-    await readBuildLog();
+    extension.updateBuildLogPresent(await readBuildLog());
     await readPreConfigureScript();
     await readAlwaysPreConfigure();
     await readDryrunSwitches();
@@ -1182,7 +1184,7 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
 
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !currentMakefileConfiguration || !currentMakefileConfiguration.buildLog;
-                await readBuildLog();
+                extension.updateBuildLogPresent(await readBuildLog());
                 updatedSettingsSubkeys.push(subKey);
             }
 

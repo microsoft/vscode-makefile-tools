@@ -140,60 +140,59 @@
             {
                 "command": "makefile.outline.launchDebug",
                 "title": "%makefile-tools.command.makefile.launchDebug.title%",
-                "icon": {
-                    "light": "res/light/debug.svg",
-                    "dark": "res/dark/debug.svg"
-                },
+                "icon": "$(debug)",
                 "enablement": "makefile:localDebugFeature"
             },
             {
                 "command": "makefile.outline.launchRun",
                 "title": "%makefile-tools.command.makefile.launchRun.title%",
-                "icon": {
-                    "light": "res/light/run.svg",
-                    "dark": "res/dark/run.svg"
-                },
+                "icon": "$(run)",
                 "enablement": "makefile:localRunFeature"
             },
             {
                 "command": "makefile.outline.setBuildConfiguration",
                 "title": "%makefile-tools.command.makefile.setBuildConfiguration.title%",
-                "icon": {
-                    "light": "res/light/edit.svg",
-                    "dark": "res/dark/edit.svg"
-                }
+                "icon": "$(notebook-edit)"
             },
             {
                 "command": "makefile.outline.setBuildTarget",
                 "title": "%makefile-tools.command.makefile.setBuildTarget.title%",
-                "icon": {
-                    "light": "res/light/edit.svg",
-                    "dark": "res/dark/edit.svg"
-                }
+                "icon": "$(notebook-edit)"
             },
             {
                 "command": "makefile.outline.setLaunchConfiguration",
                 "title": "%makefile-tools.command.makefile.setLaunchConfiguration.title%",
-                "icon": {
-                    "light": "res/light/edit.svg",
-                    "dark": "res/dark/edit.svg"
-                }
+                "icon": "$(notebook-edit)"
             },
             {
-               "command": "workbench.action.openWorkspaceSettings",
-               "title": "%workbench.action.openWorkspaceSettings.title%",
-               "icon": {
-                   "light": "res/light/edit.svg",
-                   "dark": "res/dark/edit.svg"
-               }
+               "command": "makefile.outline.openMakefilePathSetting",
+               "title": "Open Makefile Path Setting",
+               "icon": "$(notebook-edit)"
+            },
+            {
+                "command": "makefile.outline.openMakefileFile",
+                "title": "Open Makefile File",
+                "icon": "$(open-preview)"
+            },
+            {
+                "command": "makefile.outline.openMakePathSetting",
+                "title": "Open Makefile Path Setting",
+                "icon": "$(notebook-edit)"
+            },
+            {
+                "command": "makefile.outline.openBuildLogSetting",
+                "title": "Open Makefile Path Setting",
+                "icon": "$(notebook-edit)"
+            },
+            {
+                "command": "makefile.outline.openBuildLogFile",
+                "title": "Open Build Log File",
+                "icon": "$(open-preview)"
             },
             {
                 "command": "makefile.outline.configure",
                 "title": "%makefile-tools.command.makefile.configure.title%",
-                "icon": {
-                    "light": "res/light/configure.svg",
-                    "dark": "res/dark/configure.svg"
-                }
+                "icon": "$(settings)"
             },
             {
                 "command": "makefile.outline.cleanConfigure",
@@ -624,10 +623,6 @@
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
                     "when": "makefile:localDebugFeature"
-                },
-                {
-                  "command": "workbench.action.openWorkspaceSettings",
-                  "when": "always"
                 }
             ],
             "view/title": [
@@ -714,19 +709,29 @@
                     "group": "inline@1"
                 },
                 {
-                  "command": "workbench.action.openWorkspaceSettings",
-                  "when": "view == makefile.outline && viewItem =~ /nodeType=makefilePathInfo/",
-                  "group": "inline@1"
+                    "command": "makefile.outline.openMakefilePathSetting",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=makefilePathInfo/",
+                    "group": "inline@2"
                 },
                 {
-                  "command": "workbench.action.openWorkspaceSettings",
-                  "when": "view == makefile.outline && viewItem =~ /nodeType=makePathInfo/",
-                  "group": "inline@1"
+                    "command": "makefile.outline.openMakefileFile",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=makefilePathInfo/ && makefile.makefileFilePresent",
+                    "group": "inline@1"
                 },
                 {
-                  "command": "workbench.action.openWorkspaceSettings",
-                  "when": "view == makefile.outline && viewItem =~ /nodeType=buildLogPathInfo/",
-                  "group": "inline@1"
+                    "command": "makefile.outline.openMakePathSetting",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=makePathInfo/",
+                    "group": "inline@1"
+                },
+                {
+                    "command": "makefile.outline.openBuildLogSetting",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildLogPathInfo/",
+                    "group": "inline@1"
+                },
+                {
+                    "command": "makefile.outline.openBuildLogFile",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=buildLogPathInfo/ && makefile.buildLogFilePresent",
+                    "group": "inline@1"
                 }
             ]
         }

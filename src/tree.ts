@@ -9,6 +9,7 @@ import * as util from './util';
 import * as vscode from 'vscode';
 
 import * as nls from 'vscode-nls';
+import { extension } from './extension';
 nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -303,6 +304,11 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
 
     pathDisplayed(pathInSettings: string | undefined, kind: string, searchInPath: boolean, makeRelative: boolean): string {
        if (!pathInSettings) {
+         if (kind === "Build Log") {
+            extension.updateBuildLogPresent(false);
+         } else if (kind === "Makefile") {
+            extension.updateMakefileFilePresent(false);
+         }
          return `${kind}: [Unset]`;
        }
        
@@ -310,7 +316,15 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
        const pathBase: string | undefined = (searchInPath && path.parse(pathInSettingsToTest).dir === "") ? path.parse(pathInSettingsToTest).base : undefined;
        const pathInEnv: string | undefined = pathBase ? (path.join(util.toolPathInEnv(pathBase) || "", pathBase)) : undefined;
        const finalPath: string = pathInEnv || pathInSettingsToTest;
-       return (!util.checkFileExistsSync(finalPath) ? `${kind} (not found)` : `${kind}`) + `: [${makeRelative ? util.makeRelPath(finalPath, util.getWorkspaceRoot()) : finalPath}]`;
+       const checkFileExists = util.checkFileExistsSync(finalPath);
+
+       if (kind === "Build Log") {
+        extension.updateBuildLogPresent(checkFileExists);
+       } else if (kind === "Makefile") {
+        extension.updateMakefileFilePresent(checkFileExists);
+       }
+
+       return (!checkFileExists ? `${kind} (not found)` : `${kind}`) + `: [${makeRelative ? util.makeRelPath(finalPath, util.getWorkspaceRoot()) : finalPath}]`;
     }
 
     async update(configuration: string | undefined,

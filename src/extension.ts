@@ -20,6 +20,7 @@ import * as vscode from 'vscode';
 import * as cpp from 'vscode-cpptools';
 
 import * as nls from 'vscode-nls';
+import { readBuildLog } from './configuration';
 nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -44,6 +45,14 @@ export class MakefileToolsExtension {
     private compilerFullPath ?: string;
 
     public constructor(public readonly extensionContext: vscode.ExtensionContext) {
+    }
+
+    public updateBuildLogPresent(newValue: boolean): void {
+        vscode.commands.executeCommand("setContext", "makefile.buildLogFilePresent", newValue);
+    }
+
+    public updateMakefileFilePresent(newValue: boolean): void {
+        vscode.commands.executeCommand("setContext", "makefile.makefileFilePresent", newValue);
     }
 
     public getState(): state.StateManager { return this.mementoState; }
@@ -356,6 +365,53 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     // becase the latter may use state info in variable expansion.
     configuration.initFromState();
     await configuration.initFromSettings(true);
+
+    const openSettings = async (setting: string) => {
+        await vscode.commands.executeCommand("workbench.action.openSettings", setting);
+        await vscode.commands.executeCommand("workbench.action.openWorkspaceSettings");
+    }
+
+    const openFile = async (fileUri: vscode.Uri) => {
+        await vscode.commands.executeCommand("vscode.open", fileUri);
+        await vscode.commands.executeCommand("workbench.files.action.showActiveFileInExplorer");
+    }
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefilePathSetting', async () => {
+        await openSettings("makefile.makefilePath");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakefileFile', async () => {
+        const makefile = configuration.getConfigurationMakefile();
+        if (makefile) {
+            if (util.checkFileExistsSync(makefile)) {
+                await openFile(vscode.Uri.file(makefile));
+            }
+            else {
+                extension.updateMakefileFilePresent(false);
+                vscode.window.showErrorMessage(localize("makefile.outline.makefileFileNotFound", "The makefile file could not be opened."));
+            }
+        }
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openMakePathSetting', async () => {
+        await openSettings("makefile.makePath");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogSetting', async () => {
+        await openSettings("makefile.buildLog");
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.openBuildLogFile', async () => {
+        const buildLog = configuration.getBuildLog();
+        if (buildLog) {
+            if (util.checkFileExistsSync(buildLog)) {
+                await openFile(vscode.Uri.file(buildLog));
+            } else {
+                extension.updateBuildLogPresent(false);
+                vscode.window.showErrorMessage(localize("makefile.outline.buildLogFileNotFound", "The build log file could not be opened."));
+            }
+        }
+    }));
 
     // Delete the script that is created by this extension in the temporary folder
     // with the purpose of spliting a compilation command fragment into switch arguments
