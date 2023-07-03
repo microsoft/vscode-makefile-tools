@@ -44,6 +44,13 @@ There are other options you can configure in this object as well. If you configu
 different ways, you can create multiple configuration objects with different arguments. Just make sure to
 give your configurations a unique `name` so that you can tell them apart.
 
+### Post-configuring your project
+If you need any environment variables to be set, modified, or deleted, or any terminal operations to be run after configure/build,
+you need to launch VSCode from a terminal that is already set up according to your project requirements OR
+you can point the `makefile.postConfigureScript` setting to a batch script file and invoke it at any time via the
+command `makefile.postConfigure` in the pallette. By setting `makefile.alwaysPostConfigure` to true,
+you don't need to run the post-configure command separately. The extension is going to invoke the script after every configure operation.
+
 ### Building targets
 
 To build a target, run the `Makefile: Set the target to be built by make` command (default target is "all")

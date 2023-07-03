@@ -41,6 +41,10 @@ let isPreConfiguring: boolean = false;
 export function getIsPreConfiguring(): boolean { return isPreConfiguring; }
 export function setIsPreConfiguring(preConfiguring: boolean): void { isPreConfiguring = preConfiguring; }
 
+let isPostConfiguring: boolean = false;
+export function getIsPostConfiguring(): boolean { return isPostConfiguring; };
+export function setIsPostConfiguring(postConfiguring: boolean): void { isPostConfiguring = postConfiguring; }
+
 // Leave positive error codes for make exit values
 export enum ConfigureBuildReturnCodeTypes {
     success = 0,
@@ -55,6 +59,7 @@ export enum ConfigureBuildReturnCodeTypes {
 
 export enum Operations {
     preConfigure = "pre-configure",
+    postConfigure = "post-configure",
     configure = "configure",
     build = "build",
     changeConfiguration = "change makefile configuration",
@@ -71,6 +76,8 @@ export enum TriggeredBy {
     buildCleanAll = "command pallette (buildCleanAll)",
     preconfigure = "command pallette (preConfigure)",
     alwaysPreconfigure = "settings (alwaysPreConfigure)",
+    postConfigure = "command pallette (postConfigure)",
+    alwaysPostConfigure = "settings (alwaysPostConfigure)",
     configure = "command pallette (configure)",
     configureOnOpen = "settings (configureOnOpen)",
     cleanConfigureOnOpen = "configure dirty (on open), settings (configureOnOpen)",
@@ -115,6 +122,10 @@ export function blockedByOp(op: Operations, showPopup: boolean = true): Operatio
 
     if (getIsPreConfiguring()) {
         blocker = Operations.preConfigure;
+    }
+
+    if (getIsPostConfiguring()) {
+        blocker = Operations.postConfigure;
     }
 
     if (getIsConfiguring()) {
@@ -590,6 +601,10 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
+    if (blockedByOp(Operations.postConfigure)) {
+        return ConfigureBuildReturnCodeTypes.blocked;
+    }
+
     let preConfigureStartTime: number = Date.now();
 
     let scriptFile: string | undefined = configuration.getPreConfigureScript();
@@ -662,6 +677,11 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
     } finally {
         setIsPreConfiguring(false);
     }
+}
+
+export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
+    // TODO: Implement
+    return -1; 
 }
 
 // Applies to the current process all the environment variables that resulted from the pre-configure step.
