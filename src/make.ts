@@ -16,6 +16,7 @@ import * as telemetry from './telemetry';
 import * as vscode from 'vscode';
 
 import * as nls from 'vscode-nls';
+import { exitCode } from 'process';
 nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
@@ -596,7 +597,8 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     }
 }
 
-export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
+export async function prePostConfigureHelper(titles: {configuringScript: string, cancelling: string}, configureScriptMethod: (progress: vscode.Progress<{}>) => Promise<number>, setConfigureScriptState: (value: boolean) => void, logConfigureScriptTelemetry: (elapsedTime: number, exitCode: number) => void): Promise<number> {
+    // check for being blocked by operations.
     if (blockedByOp(Operations.preConfigure)) {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
@@ -605,8 +607,61 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
         return ConfigureBuildReturnCodeTypes.blocked;
     }
 
-    let preConfigureStartTime: number = Date.now();
+    let configureScriptStartTime: number = Date.now();
 
+    let cancelConfigureScript: boolean = false;
+
+    try {
+        return await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: titles.configuringScript,
+            cancellable: true
+        },
+        async (progress, cancel) => {
+            cancel.onCancellationRequested(async () => {
+                    progress.report({increment: 1, message: "Cancelling..."});
+                    cancelConfigureScript = true;
+
+                    logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
+
+                    await vscode.window.withProgress({
+                        location: vscode.ProgressLocation.Notification,
+                        title: titles.cancelling,
+                        cancellable: false,
+                    },
+                    async (progress) => {
+                        await util.killTree(progress, curPID);
+                    });
+                });
+
+                setConfigureScriptState(true);
+
+                let retc: number = await configureScriptMethod(progress);
+
+                if (cancelConfigureScript) {
+                  retc = ConfigureBuildReturnCodeTypes.cancelled;
+                }
+
+                let configureScriptElapsedTime: number = util.elapsedTimeSince(
+                  configureScriptStartTime
+                );
+
+                logConfigureScriptTelemetry(configureScriptElapsedTime, retc);
+
+                cancelConfigureScript = false;
+
+                if (retc !== ConfigureBuildReturnCodeTypes.success) {
+                    logger.showOutputChannel();
+                }
+
+                return retc;
+        })
+    } finally {
+        setConfigureScriptState(false);
+    }
+}
+
+export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
     let scriptFile: string | undefined = configuration.getPreConfigureScript();
     if (!scriptFile) {
         vscode.window.showErrorMessage("Pre-configure failed: no script provided.");
@@ -621,75 +676,28 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
         return ConfigureBuildReturnCodeTypes.notFound;
     }
 
-    let cancelPreConfigure: boolean = false; // when the pre-configure was cancelled by the user
-
-    try {
-        return await vscode.window.withProgress({
-                location: vscode.ProgressLocation.Notification,
-                title: `Pre-configuring: ${scriptFile}`,
-                cancellable: true,
-            },
-            async (progress, cancel) => {
-                cancel.onCancellationRequested(async () => {
-                    progress.report({increment: 1, message: "Cancelling..."});
-                    cancelPreConfigure = true;
-
-                    logger.message("The user is cancelling the pre-configure...");
-                    logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
-                    await vscode.window.withProgress({
-                            location: vscode.ProgressLocation.Notification,
-                            title: "Cancelling pre-configure",
-                            cancellable: false,
-                        },
-                        async (progress) => {
-                            await util.killTree(progress, curPID);
-                        });
-                });
-
-                setIsPreConfiguring(true);
-                let retc: number = await runPreConfigureScript(progress, scriptFile || ""); // get rid of || ""
-
-                // We need to know whether this pre-configure was cancelled by the user
-                // more than the real exit code of the pr-econfigure script in this circumstance.
-                if (cancelPreConfigure) {
-                    retc = ConfigureBuildReturnCodeTypes.cancelled;
-                }
-
-                let preConfigureElapsedTime: number = util.elapsedTimeSince(preConfigureStartTime);
-                const telemetryMeasures: telemetry.Measures = {
-                    preConfigureElapsedTime: preConfigureElapsedTime
-                };
-                const telemetryProperties: telemetry.Properties = {
-                    exitCode: retc.toString(),
-                    triggeredBy: triggeredBy
-                };
-                telemetry.logEvent("preConfigure", telemetryProperties, telemetryMeasures);
-
-                cancelPreConfigure = false;
-
-                if (retc !== ConfigureBuildReturnCodeTypes.success) {
-                  logger.showOutputChannel();
-                }
-
-                return retc;
-            },
-        );
-    } finally {
-        setIsPreConfiguring(false);
-    }
+    // Assert that scriptFile is not undefined at this point since we've checked above.
+    return await prePostConfigureHelper(
+        { configuringScript: `Pre-configuring ${scriptFile}`, cancelling: "Cancelling pre-configure"},
+        (progress) => runPreConfigureScript(progress, scriptFile!), 
+        (value) => setIsPreConfiguring(value), 
+        (elapsedTime, exitCode) => {
+            const telemetryMeasures: telemetry.Measures = {
+            preConfigureElapsedTime: elapsedTime,
+            };
+            const telemetryProperties: telemetry.Properties = {
+            exitCode: exitCode.toString(),
+            triggeredBy: triggeredBy,
+            };
+            telemetry.logEvent(
+            "preConfigure",
+            telemetryProperties,
+            telemetryMeasures
+            );
+    });
 }
 
-export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
-    if (blockedByOp(Operations.preConfigure)) {
-        return ConfigureBuildReturnCodeTypes.blocked;
-    }
-
-    if (blockedByOp(Operations.postConfigure)) {
-        return ConfigureBuildReturnCodeTypes.blocked;
-    }
-
-    let postConfigureStartTime: number = Date.now();
-
+export async function postConfigure(triggeredBy: TriggeredBy, ): Promise<number> {
     let scriptFile: string | undefined = configuration.getPostConfigureScript();
     if (!scriptFile) {
         vscode.window.showErrorMessage("Post-configure failed: no script provided.");
@@ -704,62 +712,21 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
         return ConfigureBuildReturnCodeTypes.notFound;
     }
 
-    let cancelPostConfigure: boolean = false; // when the post-configure was cancelled by the user
-
-    try {
-        return await vscode.window.withProgress({
-                location: vscode.ProgressLocation.Notification,
-                title: `Post-configuring: ${scriptFile}`,
-                cancellable: true,
-            },
-            async (progress, cancel) => {
-                cancel.onCancellationRequested(async () => {
-                    progress.report({increment: 1, message: "Cancelling..."});
-                    cancelPostConfigure = true;
-
-                    logger.message("The user is cancelling the post-configure...");
-                    logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
-
-                    await vscode.window.withProgress({
-                        location: vscode.ProgressLocation.Notification,
-                        title: "Cancelling post-configure",
-                        cancellable: false,
-                    },
-                    async (progress) => {
-                        await util.killTree(progress, curPID);
-                    });
-                });
-
-                setIsPostConfiguring(true);
-
-                let retc: number = await runPostConfigureScript(progress, scriptFile || "");
-
-                if (cancelPostConfigure) {
-                    retc = ConfigureBuildReturnCodeTypes.cancelled;
-                }
-
-                let postConfigureElapsedTime: number = util.elapsedTimeSince(postConfigureStartTime);
+    // Assert that scriptFile is not undefined at this point since we've checked above.
+    return await prePostConfigureHelper(
+        { configuringScript: `Post-configuring: ${scriptFile}`, cancelling: "Cancelling post-configure"},
+        (progress) => runPostConfigureScript(progress, scriptFile!), 
+        (value) => setIsPostConfiguring(value), 
+        (elapsedTime, exitCode) => {
                 const telemetryMeasures: telemetry.Measures = {
-                    postConfigureElapsedTime: postConfigureElapsedTime
+                    postConfigureElapsedTime: elapsedTime
                 };
                 const telemetryProperties: telemetry.Properties = {
-                    exitCode: retc.toString(),
+                    exitCode: exitCode.toString(),
                     triggeredBy: triggeredBy
                 };
                 telemetry.logEvent("postConfigure", telemetryProperties, telemetryMeasures);
-
-                cancelPostConfigure = false;
-
-                if (retc !== ConfigureBuildReturnCodeTypes.success) {
-                    logger.showOutputChannel();
-                }
-
-                return retc;
-            },
-        );
-    } finally {
-        setIsPostConfiguring(false);
-    }
+    });
 }
 
 // Applies to the current process all the environment variables that resulted from the pre-configure step.
@@ -778,12 +745,10 @@ async function applyEnvironment(content: string | undefined) : Promise<void> {
     });
 }
 
-export async function runPreConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
-    logger.message(`Pre-configuring...\nScript: "${configuration.getPreConfigureScript()}"`);
-
+export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, scriptFile: string, loggingMessages: { success: string, successWithSomeError: string, failure: string}): Promise<number> {
     // Create a temporary wrapper for the user pre-configure script so that we collect
     // in another temporary output file the environrment variables that were produced.
-    let wrapScriptFile: string = path.join(util.tmpDir(), "wrapPreconfigureScript");
+    let wrapScriptFile: string = path.join(util.tmpDir(), "wrapConfigureScript");
     let wrapScriptOutFile: string = wrapScriptFile + ".out";
     let wrapScriptContent: string;
     if (process.platform === "win32") {
@@ -833,14 +798,12 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
                 // return code into ConfigureBuildReurnCodeTypes.other, which would let us know in telemetry
                 // of this specific situation.
                 result.returnCode = ConfigureBuildReturnCodeTypes.other;
-                logger.message("The pre-configure script returned success code " +
-                               "but somewhere during the preconfigure process there were errors reported. " +
-                               "Double check the preconfigure output in the Makefile Tools channel.");
+                logger.message(loggingMessages.successWithSomeError);
             } else {
-                logger.message("The pre-configure succeeded.");
+                logger.message(loggingMessages.success);
             }
         } else {
-            logger.message("The pre-configure script failed. This project may not configure successfully.");
+            logger.message(loggingMessages.failure);
         }
 
         // Apply the environment produced by running the pre-configure script.
@@ -853,79 +816,30 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
     }
 }
 
+export async function runPreConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
+    logger.message(`Pre-configuring...\nScript: "${configuration.getPreConfigureScript()}"`);
+
+    return await runPrePostConfigureScript(progress, scriptFile, {
+        success: "The pre-configure succeeded.",
+        successWithSomeError: "The pre-configure script returned success code " +
+                               "but somewhere during the preconfigure process there were errors reported. " +
+                               "Double check the preconfigure output in the Makefile Tools channel.",
+        failure: "The pre-configure script failed. This project may not configure successfully."
+    });
+}
+
 export async function runPostConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
     logger.message(`Post-configuring...\nScript: "${configuration.getPostConfigureScript()}"`);
 
-    // Create a temporary wrapper for the user pre-configure script so that we collect
-    // in another temporary output file the environrment variables that were produced.
-    let wrapScriptFile: string = path.join(util.tmpDir(), "wrapPostconfigureScript");
-    let wrapScriptOutFile: string = wrapScriptFile + ".out";
-    let wrapScriptContent: string;
-    if (process.platform === "win32") {
-        wrapScriptContent = `call "${scriptFile}"\r\n`;
-        wrapScriptContent += `set > "${wrapScriptOutFile}"`;
-        wrapScriptFile += ".bat";
-    } else {
-        wrapScriptContent = `source '${scriptFile}'\n`;
-        wrapScriptContent += `printenv > '${wrapScriptOutFile}'`;
-        wrapScriptFile += ".sh";
-    }
-
-    util.writeFile(wrapScriptFile, wrapScriptContent);
-
-    let scriptArgs: string[] = [];
-    let runCommand: string;
-    if (process.platform === 'win32') {
-        runCommand = "cmd";
-        scriptArgs.push("/c");
-        scriptArgs.push(`"${wrapScriptFile}"`);
-    } else {
-        runCommand = "/bin/bash";
-        scriptArgs.push("-c");
-        scriptArgs.push(`"source '${wrapScriptFile}'"`);
-    }
-
-    try {
-        let stdout: any = (result: string): void => {
-            progress.report({increment: 1, message: "..."});
-            logger.messageNoCR(result, "Normal");
-        };
-
-        let someErr: boolean = false;
-        let stderr: any = (result: string): void => {
-            someErr = true;
-            logger.messageNoCR(result, "Normal");
-        };
-
-        // The postconfigure invocation should use the system locale.
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, false, stdout, stderr);
-        if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
-            if (someErr) {
-                // Depending how the postconfigure scripts (and any inner called sub-scripts) are written,
-                // it may happen that the final error code returned by them to be succesful even if
-                // previous steps reported errors.
-                // Until a better error code analysis, simply warn wih a logger message and turn the successful
-                // return code into ConfigureBuildReurnCodeTypes.other, which would let us know in telemetry
-                // of this specific situation.
-                result.returnCode = ConfigureBuildReturnCodeTypes.other;
-                logger.message("The post-configure script returned success code " +
-                               "but somewhere during the postconfigure process there were errors reported. " +
-                               "Double check the postconfigure output in the Makefile Tools channel.");
-            } else {
-                logger.message("The post-configure succeeded.");
-            }
-        } else {
-            logger.message("The post-configure script failed. This project may not configure successfully.");
-        }
-
-        // Apply the environment produced by running the pre-configure script.
-        await applyEnvironment(util.readFile(wrapScriptOutFile));
-
-        return result.returnCode;
-    } catch (error) {
-        logger.message(error);
-        return ConfigureBuildReturnCodeTypes.notFound;
-    }
+    return await runPrePostConfigureScript(progress, scriptFile, {
+      success: "The post-configure succeeded.",
+      successWithSomeError:
+        "The post-configure script returned success code " +
+        "but somewhere during the postconfigure process there were errors reported. " +
+        "Double check the postconfigure output in the Makefile Tools channel.",
+      failure:
+        "The post-configure script failed. This project may not configure successfully.",
+    });
 }
 
 interface ConfigurationCache {
@@ -1187,24 +1101,6 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
 
     if (retc === ConfigureBuildReturnCodeTypes.success) {
       logger.message("Configure succeeded.");
-
-      // Same start time for configure and an eventual pre-configure.
-      let postConfigureStartTime: number = Date.now();
-
-      // do any postConfigureScripts
-
-      if (configuration.getAlwaysPostConfigure()) {
-        postConfigureExitCode = await postConfigure(
-          TriggeredBy.alwaysPostConfigure
-        );
-        if (postConfigureExitCode !== ConfigureBuildReturnCodeTypes.success) {
-          logger.message("Post-configure failed.");
-        }
-
-        postConfigureElapsedTime = util.elapsedTimeSince(
-          postConfigureStartTime
-        );
-      }
     } else {
       logger.message("Configure failed.");
     }
@@ -1300,17 +1196,6 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
       logger.message(`Preconfigure elapsed time: ${preConfigureElapsedTime}`);
     }
 
-    if (postConfigureExitCode !== undefined) {
-        telemetryProperties.postConfigureExitCode = postConfigureExitCode.toString();
-    }
-    if (postConfigureElapsedTime !== undefined) {
-        telemetryMeasures.postConfigureElapsedTime = postConfigureElapsedTime;
-        logger.message(`Postconfigure elapsed time: ${postConfigureElapsedTime}`);
-    }
-
-    telemetryProperties.buildTarget = processTargetForTelemetry(newBuildTarget);
-    telemetry.logEvent("configure", telemetryProperties, telemetryMeasures);
-
     logger.message(`Configure elapsed time: ${configureElapsedTime}`);
 
     setIsConfiguring(false);
@@ -1323,6 +1208,38 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     if (retc !== ConfigureBuildReturnCodeTypes.cancelled) {
       extension.setCompletedConfigureInSession(true);
     }
+
+    if (retc === ConfigureBuildReturnCodeTypes.success) {
+      // Same start time for configure and an eventual pre-configure.
+      let postConfigureStartTime: number = Date.now();
+
+      // do any postConfigureScripts
+
+      if (configuration.getAlwaysPostConfigure()) {
+        postConfigureExitCode = await postConfigure(
+          TriggeredBy.alwaysPostConfigure
+        );
+        if (postConfigureExitCode !== ConfigureBuildReturnCodeTypes.success) {
+          logger.message("Post-configure failed.");
+        }
+
+        postConfigureElapsedTime = util.elapsedTimeSince(
+          postConfigureStartTime
+        );
+      }
+    }
+
+    if (postConfigureExitCode !== undefined) {
+      telemetryProperties.postConfigureExitCode =
+        postConfigureExitCode.toString();
+    }
+    if (postConfigureElapsedTime !== undefined) {
+      telemetryMeasures.postConfigureElapsedTime = postConfigureElapsedTime;
+      logger.message(`Postconfigure elapsed time: ${postConfigureElapsedTime}`);
+    }
+
+    telemetryProperties.buildTarget = processTargetForTelemetry(newBuildTarget);
+    telemetry.logEvent("configure", telemetryProperties, telemetryMeasures);
 
     if (retc !== ConfigureBuildReturnCodeTypes.success) {
       logger.showOutputChannel();

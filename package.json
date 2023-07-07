@@ -484,7 +484,7 @@
                 },
                 "makefile.postConfigureScript": {
                     "type": "string",
-                    "description": "%makefile-tools.configuration.makefile.postConfigureScript.description",
+                    "description": "%makefile-tools.configuration.makefile.postConfigureScript.description%",
                     "default": null,
                     "scope": "resource"
                 },
