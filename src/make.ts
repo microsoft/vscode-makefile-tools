@@ -15,8 +15,7 @@ import * as util from './util';
 import * as telemetry from './telemetry';
 import * as vscode from 'vscode';
 
-import * as nls from 'vscode-nls';
-import { exitCode } from 'process';
+import * as nls from 'vscode-nls';=
 nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
