@@ -2,7 +2,6 @@
 
 ## 0.8
 Improvements:
-
 - Add support for a post configure script. [#391](https://github.com/microsoft/vscode-makefile-tools/issues/391)
 
 ## 0.7.0
