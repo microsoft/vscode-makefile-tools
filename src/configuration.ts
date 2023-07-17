@@ -1638,6 +1638,8 @@ export async function setLaunchConfigurationByName(launchConfigurationName: stri
             // Avoid updating the launchConfigurations array in settings.json for regression tests.
             if (process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
                 await workspaceConfiguration.update("launchConfigurations", launchConfigAsInSettings);
+            } else {
+                await workspaceConfiguration.update("launchConfigurations", launchConfigurations);
             }
             logger.message(`Inserting a new entry for ${launchConfigurationName} in the array of makefile.launchConfigurations. ` +
                            "You may define any additional debug properties for it in settings.");
