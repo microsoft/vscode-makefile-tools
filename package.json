@@ -166,27 +166,27 @@
             },
             {
                "command": "makefile.outline.openMakefilePathSetting",
-               "title": "Open Makefile Path Setting",
+               "title": "%makefile-tools.command.makefile.openMakefilePathSetting.title%",
                "icon": "$(notebook-edit)"
             },
             {
                 "command": "makefile.outline.openMakefileFile",
-                "title": "Open Makefile File",
+                "title": "%makefile-tools.command.makefile.openMakefileFile.title%",
                 "icon": "$(open-preview)"
             },
             {
                 "command": "makefile.outline.openMakePathSetting",
-                "title": "Open Makefile Path Setting",
+                "title": "%makefile-tools.command.makefile.openMakePathSetting.title%",
                 "icon": "$(notebook-edit)"
             },
             {
                 "command": "makefile.outline.openBuildLogSetting",
-                "title": "Open Makefile Path Setting",
+                "title": "%makefile-tools.command.makefile.openBuildLogSetting.title%",
                 "icon": "$(notebook-edit)"
             },
             {
                 "command": "makefile.outline.openBuildLogFile",
-                "title": "Open Build Log File",
+                "title": "%makefile-tools.command.makefile.openBuildLogFile.title%",
                 "icon": "$(open-preview)"
             },
             {
@@ -593,36 +593,44 @@
                     "when": "makefile:localDebugFeature"
                 },
                 {
+                    "command": "makefile.outline.configure",
+                    "when": "never"
+                },
+                {
+                    "command": "makefile.outline.cleanConfigure",
+                    "when": "never"
+                },
+                {
                     "command": "makefile.outline.preConfigure",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "never"
                 },
                 {
                     "command": "makefile.outline.buildTarget",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "never"
                 },
                 {
                     "command": "makefile.outline.buildCleanTarget",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "never"
                 },
                 {
                     "command": "makefile.outline.launchDebug",
-                    "when": "makefile:localDebugFeature"
+                    "when": "never"
                 },
                 {
                     "command": "makefile.outline.launchRun",
-                    "when": "makefile:localRunFeature"
+                    "when": "never"
                 },
                 {
                     "command": "makefile.outline.setBuildConfiguration",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "never"
                 },
                 {
                     "command": "makefile.outline.setBuildTarget",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "never"
                 },
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
-                    "when": "makefile:localDebugFeature"
+                    "when": "never"
                 }
             ],
             "view/title": [
@@ -729,7 +737,7 @@
                     "group": "inline@1"
                 },
                 {
-                    "command": "makefile.outline.openBuildLogFile",
+                    "command": "makefile.outline.openBuildLogSetting",
                     "when": "view == makefile.outline && viewItem =~ /nodeType=buildLogPathInfo/ && makefile.buildLogFilePresent",
                     "group": "inline@1"
                 }

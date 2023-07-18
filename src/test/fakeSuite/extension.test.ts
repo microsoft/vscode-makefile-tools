@@ -61,6 +61,7 @@ suite('Fake dryrun parsing', /*async*/() => {
    test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       extension.getState().reset(false);
+      await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       configuration.setCurrentLaunchConfiguration(undefined);
       configuration.setCurrentMakefileConfiguration("Default");
       configuration.setCurrentTarget(undefined);
@@ -114,6 +115,7 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`Complex scenarios with quotes and escaped quotes - winOnly`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
          configuration.setCurrentTarget(undefined);
@@ -168,6 +170,7 @@ suite('Fake dryrun parsing', /*async*/() => {
       test('Interesting small makefile - windows', async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
          configuration.setCurrentTarget(undefined);
@@ -218,6 +221,9 @@ suite('Fake dryrun parsing', /*async*/() => {
          await configuration.setTargetByName("Execute_Arch3");
          make.prepareBuildTarget("Execute_Arch3");
 
+         extension.getState().reset(false);
+         await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
+
          // Compare the output log with the baseline
          // TODO: incorporate relevant diff snippets into the test log.
          // Until then, print into base and diff files for easier viewing
@@ -241,6 +247,7 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`8cc - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
          configuration.setCurrentTarget(undefined);
@@ -302,6 +309,7 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`Fido - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
          configuration.setCurrentTarget(undefined);
@@ -363,6 +371,7 @@ suite('Fake dryrun parsing', /*async*/() => {
       test(`tinyvm - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
+         await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
          configuration.setCurrentTarget(undefined);
@@ -422,6 +431,7 @@ suite('Fake dryrun parsing', /*async*/() => {
    test(`Test real make - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       extension.getState().reset(false);
+      await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       configuration.setCurrentLaunchConfiguration(undefined);
       configuration.setCurrentMakefileConfiguration("Default");
       configuration.setCurrentTarget(undefined);
@@ -463,6 +473,7 @@ suite('Fake dryrun parsing', /*async*/() => {
    test(`Variables expansion - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       extension.getState().reset(false);
+      await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       configuration.setCurrentLaunchConfiguration(undefined);
       configuration.setCurrentMakefileConfiguration("Default");
       configuration.setCurrentTarget(undefined);

@@ -9,7 +9,6 @@ Deduced command 'c:/some/other/fake/path ' for configuration "complex_escaped_qu
 Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode
 Writing extension log at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/Makefile.out
 Logging level: Debug
-Configurations cached at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/configurationCache.log
 No path to the makefile is defined in the settings file.
 No folder path to the makefile is defined in the settings file.
 Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/dummy_dryrun.log"
