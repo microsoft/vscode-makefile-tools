@@ -737,7 +737,7 @@
                     "group": "inline@1"
                 },
                 {
-                    "command": "makefile.outline.openBuildLogSetting",
+                    "command": "makefile.outline.openBuildLogFile",
                     "when": "view == makefile.outline && viewItem =~ /nodeType=buildLogPathInfo/ && makefile.buildLogFilePresent",
                     "group": "inline@1"
                 }
