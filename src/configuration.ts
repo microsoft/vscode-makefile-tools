@@ -392,7 +392,6 @@ export function setConfigurationCachePath(path: string): void { configurationCac
 // This file is recreated when opening a project, when changing the build configuration or the build target
 // and when the settings watcher detects a change of any properties that may impact the dryrun output.
 export async function readConfigurationCachePath(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     let oldConfigurationCachePath = configurationCachePath;
     configurationCachePath = await util.getExpandedSetting<string>("configurationCachePath");
     if (!configurationCachePath && extensionOutputFolder) {
@@ -937,7 +936,6 @@ let configureOnOpen: boolean | undefined;
 export function getConfigureOnOpen(): boolean | undefined { return configureOnOpen; }
 export function setConfigureOnOpen(configure: boolean): void { configureOnOpen = configure; }
 export async function readConfigureOnOpen(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     configureOnOpen = await util.getExpandedSetting<boolean>("configureOnOpen");
     logger.message(`Configure on open: ${configureOnOpen}`);
 }
@@ -946,7 +944,6 @@ let configureOnEdit: boolean | undefined;
 export function getConfigureOnEdit(): boolean | undefined { return configureOnEdit; }
 export function setConfigureOnEdit(configure: boolean): void { configureOnEdit = configure; }
 export async function readConfigureOnEdit(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     configureOnEdit = await util.getExpandedSetting<boolean>("configureOnEdit");
     logger.message(`Configure on edit: ${configureOnEdit}`);
 }
@@ -955,7 +952,6 @@ let configureAfterCommand: boolean | undefined;
 export function getConfigureAfterCommand(): boolean | undefined { return configureAfterCommand; }
 export function setConfigureAfterCommand(configure: boolean): void { configureAfterCommand = configure; }
 export async function readConfigureAfterCommand(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     configureAfterCommand = await util.getExpandedSetting<boolean>("configureAfterCommand");
     logger.message(`Configure after command: ${configureAfterCommand}`);
 }
@@ -964,7 +960,6 @@ let phonyOnlyTargets: boolean | undefined;
 export function getPhonyOnlyTargets(): boolean | undefined { return phonyOnlyTargets; }
 export function setPhonyOnlyTargets(phony: boolean): void { phonyOnlyTargets = phony; }
 export async function readPhonyOnlyTargets(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     phonyOnlyTargets = await util.getExpandedSetting<boolean>("phonyOnlyTargets");
     logger.message(`Only .PHONY targets: ${phonyOnlyTargets}`);
 }
@@ -1003,7 +998,6 @@ let ignoreDirectoryCommands: boolean | undefined;
 export function getIgnoreDirectoryCommands(): boolean | undefined { return ignoreDirectoryCommands; }
 export function setIgnoreDirectoryCommands(ignore: boolean): void { ignoreDirectoryCommands = ignore; }
 export async function readIgnoreDirectoryCommands(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     ignoreDirectoryCommands = await util.getExpandedSetting<boolean>("ignoreDirectoryCommands");
     logger.message(`Ignore directory commands: ${ignoreDirectoryCommands}`);
 }
