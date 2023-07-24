@@ -15,6 +15,7 @@ No path to the makefile is defined in the settings file.
 No folder path to the makefile is defined in the settings file.
 Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log"
 Always pre-configure: false
+Always post-configure: false
 Dry-run switches: '--always-make', '--keep-going', '--print-directory'
 Additional compiler names: 'MyOwnFakeCompiler'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic

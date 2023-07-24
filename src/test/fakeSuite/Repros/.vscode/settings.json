@@ -79,5 +79,5 @@
             "makePath": "make",
             "makeArgs": ["PEDANTIC=yes"]
         }
-   ]
+]
 }
