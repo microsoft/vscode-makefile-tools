@@ -9,7 +9,6 @@ Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm
 Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode
 Writing extension log at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/Makefile.out
 Logging level: Debug
-Configurations cached at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/configurationCache.log
 No path to the makefile is defined in the settings file.
 No folder path to the makefile is defined in the settings file.
 Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/dummy_dryrun.log"
@@ -185,13 +184,51 @@ dryrunTargets: return code = 0, elapsed time = 0
 parseTargets: return code = 0, elapsed time = 0
 Configure succeeded.
 Configure elapsed time: 0
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
 Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
 Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()"
 Re-reading settings after launch target change.
 Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode
 Writing extension log at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/Makefile.out
 Logging level: Debug
-Configurations cached at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/configurationCache.log
 No path to the makefile is defined in the settings file.
 No folder path to the makefile is defined in the settings file.
 Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/dummy_dryrun.log"
@@ -231,7 +268,6 @@ Re-reading settings after target change.
 Dropping various extension output files at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode
 Writing extension log at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/Makefile.out
 Logging level: Debug
-Configurations cached at {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/configurationCache.log
 No path to the makefile is defined in the settings file.
 No folder path to the makefile is defined in the settings file.
 Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/dummy_dryrun.log"

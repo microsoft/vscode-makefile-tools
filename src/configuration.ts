@@ -392,7 +392,7 @@ export function setConfigurationCachePath(path: string): void { configurationCac
 // This file is recreated when opening a project, when changing the build configuration or the build target
 // and when the settings watcher detects a change of any properties that may impact the dryrun output.
 export async function readConfigurationCachePath(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
+    let oldConfigurationCachePath = configurationCachePath;
     configurationCachePath = await util.getExpandedSetting<string>("configurationCachePath");
     if (!configurationCachePath && extensionOutputFolder) {
         configurationCachePath = path.join(extensionOutputFolder, 'configurationCache.log');
@@ -408,7 +408,9 @@ export async function readConfigurationCachePath(): Promise<void> {
             configurationCachePath = util.resolvePathToRoot(configurationCachePath);
         }
 
-        logger.message(`Configurations cached at ${configurationCachePath}`);
+        if (oldConfigurationCachePath !== configurationCachePath) {
+            logger.message(`Configurations cached at ${configurationCachePath}`);
+        }
     }
 }
 
@@ -934,7 +936,6 @@ let configureOnOpen: boolean | undefined;
 export function getConfigureOnOpen(): boolean | undefined { return configureOnOpen; }
 export function setConfigureOnOpen(configure: boolean): void { configureOnOpen = configure; }
 export async function readConfigureOnOpen(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     configureOnOpen = await util.getExpandedSetting<boolean>("configureOnOpen");
     logger.message(`Configure on open: ${configureOnOpen}`);
 }
@@ -943,7 +944,6 @@ let configureOnEdit: boolean | undefined;
 export function getConfigureOnEdit(): boolean | undefined { return configureOnEdit; }
 export function setConfigureOnEdit(configure: boolean): void { configureOnEdit = configure; }
 export async function readConfigureOnEdit(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     configureOnEdit = await util.getExpandedSetting<boolean>("configureOnEdit");
     logger.message(`Configure on edit: ${configureOnEdit}`);
 }
@@ -952,7 +952,6 @@ let configureAfterCommand: boolean | undefined;
 export function getConfigureAfterCommand(): boolean | undefined { return configureAfterCommand; }
 export function setConfigureAfterCommand(configure: boolean): void { configureAfterCommand = configure; }
 export async function readConfigureAfterCommand(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     configureAfterCommand = await util.getExpandedSetting<boolean>("configureAfterCommand");
     logger.message(`Configure after command: ${configureAfterCommand}`);
 }
@@ -961,7 +960,6 @@ let phonyOnlyTargets: boolean | undefined;
 export function getPhonyOnlyTargets(): boolean | undefined { return phonyOnlyTargets; }
 export function setPhonyOnlyTargets(phony: boolean): void { phonyOnlyTargets = phony; }
 export async function readPhonyOnlyTargets(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     phonyOnlyTargets = await util.getExpandedSetting<boolean>("phonyOnlyTargets");
     logger.message(`Only .PHONY targets: ${phonyOnlyTargets}`);
 }
@@ -1000,7 +998,6 @@ let ignoreDirectoryCommands: boolean | undefined;
 export function getIgnoreDirectoryCommands(): boolean | undefined { return ignoreDirectoryCommands; }
 export function setIgnoreDirectoryCommands(ignore: boolean): void { ignoreDirectoryCommands = ignore; }
 export async function readIgnoreDirectoryCommands(): Promise<void> {
-    // how to get default from package.json to avoid problem with 'undefined' type?
     ignoreDirectoryCommands = await util.getExpandedSetting<boolean>("ignoreDirectoryCommands");
     logger.message(`Ignore directory commands: ${ignoreDirectoryCommands}`);
 }
@@ -1243,23 +1240,13 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
             }
 
             subKey = "configurationCachePath";
-            let updatedConfigurationCachePath : string | undefined = await util.getExpandedSetting<string>(subKey);
-            if (updatedConfigurationCachePath) {
-                // If there is a directory defined within the configuration cache path,
-                // honor it and don't append to extensionOutputFolder.
-                let parsePath: path.ParsedPath = path.parse(updatedConfigurationCachePath);
-                if (extensionOutputFolder && !parsePath.dir) {
-                    updatedConfigurationCachePath = path.join(extensionOutputFolder, updatedConfigurationCachePath);
-                } else {
-                    updatedConfigurationCachePath = util.resolvePathToRoot(updatedConfigurationCachePath);
-                }
-            }
-            if (updatedConfigurationCachePath !== configurationCachePath) {
+            let oldConfigurationCachePath = configurationCachePath;
+            await readConfigurationCachePath();
+            if (oldConfigurationCachePath !== configurationCachePath) {
                 // A change in makefile.configurationCachePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
                 extension.getState().configureDirty = extension.getState().configureDirty ||
                                                       !buildLog || !util.checkFileExistsSync(buildLog);
-                await readConfigurationCachePath();
                 updatedSettingsSubkeys.push(subKey);
             }
 
@@ -1507,7 +1494,7 @@ export async function setNewConfiguration(): Promise<void> {
 
         if (configureAfterCommand) {
             logger.message("Automatically reconfiguring the project after a makefile configuration change.");
-            await make.configure(make.TriggeredBy.configureAfterConfigurationChange);
+            await make.cleanConfigure(make.TriggeredBy.configureAfterConfigurationChange);
         }
 
         // Refresh telemetry for this new makefile configuration
@@ -1608,7 +1595,7 @@ export async function selectTarget(): Promise<void> {
         if (configureAfterCommand) {
             // The set of build targets remains the same even if the current target has changed
             logger.message("Automatically reconfiguring the project after a build target change.");
-            await make.configure(make.TriggeredBy.configureAfterTargetChange, false);
+            await make.cleanConfigure(make.TriggeredBy.configureAfterTargetChange, false);
         }
     }
 }
@@ -1635,12 +1622,7 @@ export async function setLaunchConfigurationByName(launchConfigurationName: stri
             launchConfigAsInSettings.push(currentLaunchConfiguration);
             // Push into the processed 'in-memory' launch configurations array as well.
             launchConfigurations.push(currentLaunchConfiguration);
-            // Avoid updating the launchConfigurations array in settings.json for regression tests.
-            if (process.env['MAKEFILE_TOOLS_TESTING'] !== '1') {
-                await workspaceConfiguration.update("launchConfigurations", launchConfigAsInSettings);
-            } else {
-                await workspaceConfiguration.update("launchConfigurations", launchConfigurations);
-            }
+            await workspaceConfiguration.update("launchConfigurations", launchConfigAsInSettings);
             logger.message(`Inserting a new entry for ${launchConfigurationName} in the array of makefile.launchConfigurations. ` +
                            "You may define any additional debug properties for it in settings.");
         }
