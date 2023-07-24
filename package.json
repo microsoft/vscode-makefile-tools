@@ -129,7 +129,7 @@
             },
             {
                 "command": "makefile.postConfigure",
-                "title": "%makefile-tools.command.makefile.postConfigure.title"
+                "title": "%makefile-tools.command.makefile.postConfigure.title%"
             },
             {
                 "command": "makefile.outline.buildTarget",
