@@ -64,7 +64,14 @@ If the repository needs any special commands before make is successful:
 - Write any commands (./configure, ./bootstrap, etc...) in a script and point to it via  **makefile.preconfigureScript**
   - In the script, we recommend you concatenate all commands into one line, separated by &amp;&amp; (for better return code analysis)
 - From the Command Pallette, run the **Makefile: Pre-Configure** command once before configuring your project.
-- If you need this every time, set  **makefile.alwaysPreConfigure**  to true
+- If you need this every time, set  **makefile.alwaysPreConfigure**  to `true`
+
+If the repository or build needs any special commands to clean up after a build:
+
+- Write any commands in a script and point it via **makefile.postConfigureScript**
+  - In the script, we recommend you concatentate all commands into one line, seperated by &amp;&amp; (for better return code analysis)
+- From the Command Pallette, run the **Makefile: Post-Configure** command once after configuring your project.
+- If you need this every time, set **makefile.alwaysPostConfigure** to `true`
 
 If there is no Makefile in the root:
 

@@ -315,6 +315,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         await make.preConfigure(make.TriggeredBy.preconfigure);
     }));
 
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.postConfigure', async () => {
+        await make.postConfigure(make.TriggeredBy.postConfigure);
+    }))
+
     // Reset state - useful for troubleshooting.
     context.subscriptions.push(vscode.commands.registerCommand('makefile.resetState', () => {
         telemetry.logEvent("commandResetState");
@@ -332,6 +336,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.preConfigure', () => {
         return vscode.commands.executeCommand("makefile.preConfigure");
     }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.postConfigure', () => {
+        return vscode.commands.executeCommand("makefile.postConfigure");
+    }))
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.setLaunchConfiguration', () => {
         return vscode.commands.executeCommand("makefile.setLaunchConfiguration");

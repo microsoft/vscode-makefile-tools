@@ -59,6 +59,7 @@
         "onCommand:makefile.configure",
         "onCommand:makefile.cleanConfigure",
         "onCommand:makefile.preConfigure",
+        "onCommand:makefile.postConfigure",
         "onCommand:makefile.outline.setBuildConfiguration",
         "onCommand:makefile.outline.setBuildTarget",
         "onCommand:makefile.outline.buildTarget",
@@ -69,6 +70,7 @@
         "onCommand:makefile.outline.configure",
         "onCommand:makefile.outline.cleanConfigure",
         "onCommand:makefile.outline.preConfigure",
+        "onCommand:makefile.outline.postConfigure",
         "onCommand:makefile.resetState",
         "workspaceContains:**/makefile",
         "workspaceContains:**/Makefile",
@@ -124,6 +126,10 @@
             {
                 "command": "makefile.preConfigure",
                 "title": "%makefile-tools.command.makefile.preConfigure.title%"
+            },
+            {
+                "command": "makefile.postConfigure",
+                "title": "%makefile-tools.command.makefile.postConfigure.title%"
             },
             {
                 "command": "makefile.outline.buildTarget",
@@ -201,6 +207,10 @@
             {
                 "command": "makefile.outline.preConfigure",
                 "title": "%makefile-tools.command.makefile.preConfigure.title%"
+            },
+            {
+                "command": "makefile.outline.postConfigure",
+                "title": "%makefile-tools.command.makefile.postConfigure.title%"
             },
             {
                 "command": "makefile.resetState",
@@ -472,9 +482,21 @@
                     "default": null,
                     "scope": "resource"
                 },
+                "makefile.postConfigureScript": {
+                    "type": "string",
+                    "description": "%makefile-tools.configuration.makefile.postConfigureScript.description%",
+                    "default": null,
+                    "scope": "resource"
+                },
                 "makefile.alwaysPreConfigure": {
                     "type": "boolean",
                     "description": "%makefile-tools.configuration.makefile.alwaysPreConfigure.description%",
+                    "default": false,
+                    "scope": "resource"
+                },
+                "makefile.alwaysPostConfigure": {
+                    "type": "boolean",
+                    "description": "%makefile-tools.configuration.makefile.alwaysPostConfigure.description%",
                     "default": false,
                     "scope": "resource"
                 },
@@ -557,6 +579,10 @@
                     "when": "makefile:fullFeatureSet"
                 },
                 {
+                    "command": "makefile.postConfigure",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
                     "command": "makefile.buildTarget",
                     "when": "makefile:fullFeatureSet"
                 },
@@ -605,6 +631,10 @@
                     "when": "never"
                 },
                 {
+                    "command": "makefile.outline.postConfigure",
+                    "when": "makefile:fullFeatureSet"
+                },
+                {
                     "command": "makefile.outline.buildTarget",
                     "when": "never"
                 },
@@ -640,14 +670,19 @@
                     "group": "1_makefileOutline@1"
                 },
                 {
-                    "command": "makefile.outline.configure",
+                    "command": "makefile.outline.postConfigure",
                     "when": "view == makefile.outline",
                     "group": "1_makefileOutline@2"
                 },
                 {
-                    "command": "makefile.outline.cleanConfigure",
+                    "command": "makefile.outline.configure",
                     "when": "view == makefile.outline",
                     "group": "1_makefileOutline@3"
+                },
+                {
+                    "command": "makefile.outline.cleanConfigure",
+                    "when": "view == makefile.outline",
+                    "group": "1_makefileOutline@4"
                 },
                 {
                     "command": "makefile.outline.buildTarget",

@@ -360,6 +360,10 @@ let preConfigureScript: string | undefined;
 export function getPreConfigureScript(): string | undefined { return preConfigureScript; }
 export function setPreConfigureScript(path: string): void { preConfigureScript = path; }
 
+let postConfigureScript: string | undefined;
+export function getPostConfigureScript(): string | undefined { return postConfigureScript; }
+export function setPostConfigureScript(path: string): void { postConfigureScript = path; }
+
 // Read from settings the path to a script file that needs to have been run at least once
 // before a sucessful configure of this project.
 export async function readPreConfigureScript(): Promise<void> {
@@ -373,15 +377,35 @@ export async function readPreConfigureScript(): Promise<void> {
     }
 }
 
+export async function readPostConfigureScript(): Promise<void> {
+    postConfigureScript = await util.getExpandedSetting<string>("postConfigureScript");
+    if (postConfigureScript) {
+        postConfigureScript = util.resolvePathToRoot(postConfigureScript);
+        logger.message(`Found post-configure script defined as ${postConfigureScript}`);
+        if (!util.checkFileExistsSync(postConfigureScript)) {
+            logger.message("Post-configure script not found on disk");
+        }
+    }
+}
+
 let alwaysPreConfigure: boolean | undefined;
 export function getAlwaysPreConfigure(): boolean | undefined { return alwaysPreConfigure; }
 export function setAlwaysPreConfigure(path: boolean): void { alwaysPreConfigure = path; }
+
+let alwaysPostConfigure: boolean | undefined;
+export function getAlwaysPostConfigure(): boolean | undefined { return alwaysPostConfigure; }
+export function setAlwaysPostConfigure(path: boolean): void { alwaysPostConfigure = path; }
 
 // Read from settings whether the pre-configure step is supposed to be executed
 // always before the configure operation.
 export async function readAlwaysPreConfigure(): Promise<void> {
     alwaysPreConfigure = await util.getExpandedSetting<boolean>("alwaysPreConfigure");
     logger.message(`Always pre-configure: ${alwaysPreConfigure}`);
+}
+
+export async function readAlwaysPostConfigure(): Promise<void> {
+    alwaysPostConfigure = await util.getExpandedSetting<boolean>("alwaysPostConfigure");
+    logger.message(`Always post-configure: ${alwaysPostConfigure}`);
 }
 
 let configurationCachePath: string | undefined;
@@ -1042,6 +1066,8 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
     extension.updateBuildLogPresent(await readBuildLog());
     await readPreConfigureScript();
     await readAlwaysPreConfigure();
+    await readPostConfigureScript();
+    await readAlwaysPostConfigure();
     await readDryrunSwitches();
     await readAdditionalCompilerNames();
     await readExcludeCompilerNames();
@@ -1231,11 +1257,28 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
                 updatedSettingsSubkeys.push(subKey);
             }
 
+            subKey = "postConfigureScript";
+            let updatedPostConfigureScript: string | undefined = await util.getExpandedSetting<string>(subKey);
+            if (updatedPostConfigureScript) {
+                updatedPostConfigureScript = util.resolvePathToRoot(updatedPostConfigureScript);
+            }
+            if (updatedPostConfigureScript !== postConfigureScript) {
+                await readPostConfigureScript();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
             subKey = "alwaysPreConfigure";
             let updatedAlwaysPreConfigure : boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
             if (updatedAlwaysPreConfigure !== alwaysPreConfigure) {
                 // No IntelliSense update needed.
                 await readAlwaysPreConfigure();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "alwaysPostConfigure";
+            let updatedAlwaysPostConfigure: boolean | undefined = await util.getExpandedSetting<boolean>(subKey);
+            if (updatedAlwaysPostConfigure !== alwaysPostConfigure) {
+                await readAlwaysPostConfigure();
                 updatedSettingsSubkeys.push(subKey);
             }
 
