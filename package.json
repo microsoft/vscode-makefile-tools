@@ -482,11 +482,27 @@
                     "default": null,
                     "scope": "resource"
                 },
+                "makefile.preConfigureArgs": {
+                    "type": "array",
+                    "description": "%makefile-tools.configuration.makefile.preConfigureArgs.description%",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
+                },
                 "makefile.postConfigureScript": {
                     "type": "string",
                     "description": "%makefile-tools.configuration.makefile.postConfigureScript.description%",
                     "default": null,
                     "scope": "resource"
+                },
+                "makefile.postConfigureArgs": {
+                    "type": "array",
+                    "description": "%makefile-tools.configuration.makefile.postConfigureArgs.description%",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
                 },
                 "makefile.alwaysPreConfigure": {
                     "type": "boolean",

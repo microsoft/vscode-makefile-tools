@@ -744,14 +744,14 @@ async function applyEnvironment(content: string | undefined) : Promise<void> {
     });
 }
 
-export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, scriptFile: string, loggingMessages: { success: string, successWithSomeError: string, failure: string}): Promise<number> {
+export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, scriptFile: string, scriptArgs: string[], loggingMessages: { success: string, successWithSomeError: string, failure: string}): Promise<number> {
     // Create a temporary wrapper for the user pre-configure script so that we collect
     // in another temporary output file the environrment variables that were produced.
     let wrapScriptFile: string = path.join(util.tmpDir(), "wrapConfigureScript");
     let wrapScriptOutFile: string = wrapScriptFile + ".out";
     let wrapScriptContent: string;
     if (process.platform === "win32") {
-        wrapScriptContent = `call "${scriptFile}"\r\n`;
+        wrapScriptContent = `call "${scriptFile}" ${scriptArgs.join(" ").toString()}\r\n`;
         wrapScriptContent += `set > "${wrapScriptOutFile}"`;
         wrapScriptFile += ".bat";
     } else {
@@ -762,7 +762,7 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
 
     util.writeFile(wrapScriptFile, wrapScriptContent);
 
-    let scriptArgs: string[] = [];
+    let concreteScriptArgs: string[] = [];
     let runCommand: string;
     if (process.platform === 'win32') {
         runCommand = "cmd";
@@ -787,7 +787,7 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
         };
 
         // The preconfigure invocation should use the system locale.
-        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, scriptArgs, util.getWorkspaceRoot(), false, false, stdout, stderr);
+        const result: util.SpawnProcessResult = await util.spawnChildProcess(runCommand, concreteScriptArgs, util.getWorkspaceRoot(), false, false, stdout, stderr);
         if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
             if (someErr) {
                 // Depending how the preconfigure scripts (and any inner called sub-scripts) are written,
@@ -818,7 +818,7 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
 export async function runPreConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
     logger.message(`Pre-configuring...\nScript: "${configuration.getPreConfigureScript()}"`);
 
-    return await runPrePostConfigureScript(progress, scriptFile, {
+    return await runPrePostConfigureScript(progress, scriptFile, configuration.getPreConfigureArgs(), {
         success: "The pre-configure succeeded.",
         successWithSomeError: "The pre-configure script returned success code " +
                                "but somewhere during the preconfigure process there were errors reported. " +
@@ -830,7 +830,7 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
 export async function runPostConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
     logger.message(`Post-configuring...\nScript: "${configuration.getPostConfigureScript()}"`);
 
-    return await runPrePostConfigureScript(progress, scriptFile, {
+    return await runPrePostConfigureScript(progress, scriptFile, configuration.getPostConfigureArgs(), {
       success: "The post-configure succeeded.",
       successWithSomeError:
         "The post-configure script returned success code " +

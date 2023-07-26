@@ -360,9 +360,17 @@ let preConfigureScript: string | undefined;
 export function getPreConfigureScript(): string | undefined { return preConfigureScript; }
 export function setPreConfigureScript(path: string): void { preConfigureScript = path; }
 
+let preConfigureArgs: string[] = [];
+export function getPreConfigureArgs(): string[] { return preConfigureArgs; }
+export function setPreConfigureArgs(args: string[]): void { preConfigureArgs = args; }
+
 let postConfigureScript: string | undefined;
 export function getPostConfigureScript(): string | undefined { return postConfigureScript; }
 export function setPostConfigureScript(path: string): void { postConfigureScript = path; }
+
+let postConfigureArgs: string[] = [];
+export function getPostConfigureArgs(): string[] { return postConfigureArgs; }
+export function setPostConfigureArgs(args: string[]): void { postConfigureArgs = args; }
 
 // Read from settings the path to a script file that needs to have been run at least once
 // before a sucessful configure of this project.
@@ -377,6 +385,13 @@ export async function readPreConfigureScript(): Promise<void> {
     }
 }
 
+export async function readPreConfigureArgs(): Promise<void> {
+    preConfigureArgs = await util.getExpandedSetting<string[]>("preConfigureArgs") ?? [];
+    if (preConfigureArgs && preConfigureArgs.length > 0) {
+        logger.message(`Pre-configure arguments: '${preConfigureArgs.join("', '")}'`);
+    }
+}
+
 export async function readPostConfigureScript(): Promise<void> {
     postConfigureScript = await util.getExpandedSetting<string>("postConfigureScript");
     if (postConfigureScript) {
@@ -385,6 +400,13 @@ export async function readPostConfigureScript(): Promise<void> {
         if (!util.checkFileExistsSync(postConfigureScript)) {
             logger.message("Post-configure script not found on disk");
         }
+    }
+}
+
+export async function readPostConfigureArgs(): Promise<void> {
+    postConfigureArgs = await util.getExpandedSetting<string[]>("postConfigureArgs") ?? [];
+    if (postConfigureArgs && postConfigureArgs.length > 0) {
+        logger.message(`Post-configure arguments: '${postConfigureArgs.join("', '")}'`);
     }
 }
 
@@ -1065,8 +1087,10 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
     await readMakeDirectory();
     extension.updateBuildLogPresent(await readBuildLog());
     await readPreConfigureScript();
+    await readPreConfigureArgs();
     await readAlwaysPreConfigure();
     await readPostConfigureScript();
+    await readPostConfigureArgs();
     await readAlwaysPostConfigure();
     await readDryrunSwitches();
     await readAdditionalCompilerNames();
@@ -1257,6 +1281,13 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
                 updatedSettingsSubkeys.push(subKey);
             }
 
+            subKey = "preConfigureArgs";
+            let updatedPreConfigureArgs: string[] | undefined = await util.getExpandedSetting<string[]>(subKey);
+            if (updatedPreConfigureArgs && !util.areEqual(updatedPreConfigureArgs, preConfigureArgs)) {
+                await readPreConfigureArgs();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
             subKey = "postConfigureScript";
             let updatedPostConfigureScript: string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedPostConfigureScript) {
@@ -1264,6 +1295,13 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
             }
             if (updatedPostConfigureScript !== postConfigureScript) {
                 await readPostConfigureScript();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "postConfigureArgs";
+            let updatedPostConfigureArgs: string[] | undefined = await util.getExpandedSetting<string[]>(subKey);
+            if (updatedPostConfigureArgs && !util.areEqual(updatedPostConfigureArgs, postConfigureArgs)) {
+                await readPostConfigureArgs();
                 updatedSettingsSubkeys.push(subKey);
             }
 
