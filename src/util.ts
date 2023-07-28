@@ -12,6 +12,10 @@ import * as path from 'path';
 import * as telemetry from './telemetry';
 import * as vscode from 'vscode';
 
+import * as nls from "vscode-nls";
+nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+
 // C/CPP standard versions
 export type StandardVersion = 'c89' | 'c99' | 'c11' | 'c17' | 'c++98' | 'c++03' | 'c++11' | 'c++14' | 'c++17' | 'c++20' | 'c++23' |
                               'gnu89' | 'gnu99' | 'gnu11' | 'gnu17' | 'gnu++98' | 'gnu++03' | 'gnu++11' | 'gnu++14' | 'gnu++17' | 'gnu++20' | 'gnu++23' | undefined;
@@ -214,7 +218,7 @@ export async function killTree(progress: vscode.Progress<{}>, pid: number): Prom
 
     try {
         logger.message(`Killing process PID = ${pid}`);
-        progress.report({ increment: 1, message: `Terminating process PID=${pid} ...` });
+        progress.report({ increment: 1, message: localize("utils.terminate.process", "Terminating process PID=${0} ...", pid) });
         process.kill(pid, 'SIGINT');
     } catch (e) {
         if (e.code !== 'ESRCH') {

@@ -18,6 +18,7 @@ import * as vscode from 'vscode';
 import * as nls from 'vscode-nls';
 nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
 const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+const recursiveString = localize("recursive", "(recursive)");
 
 let isBuilding: boolean = false;
 export function getIsBuilding(): boolean { return isBuilding; }
@@ -250,7 +251,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
     }
 
     configAndTarget = `"${configAndTarget}"`;
-    let popupStr: string = `Building ${clean ? "clean " : ""}the current makefile configuration ${configAndTarget}`;
+    let popupStr: string = localize("make.popupStr", "Building ${0} the current makefile configuration ${0}", clean ? "clean " : "", configAndTarget);
 
     let cancelBuild: boolean = false; // when the build was cancelled by the user
 
@@ -262,7 +263,7 @@ export async function buildTarget(triggeredBy: TriggeredBy, target: string, clea
             },
             async (progress, cancel) => {
                 cancel.onCancellationRequested(async () => {
-                    progress.report({increment: 1, message: "Cancelling..."});
+                    progress.report({increment: 1, message: localize("make.build.cancelling", "Cancelling...")});
                     logger.message("The user is cancelling the build...");
                     cancelBuild = true;
 
@@ -433,10 +434,12 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         }
     }
 
+    const dryRunString = localize("make.generating.dryrun", "Generating dry-run output");
+    const forTargetsString = localize("make.generating.forTargets", "(for targets specifically)");
     progress.report({
-        increment: 1, message: "Generating dry-run output" +
-            ((recursive) ? " (recursive)" : "") +
-            ((forTargets) ? " (for targets specifically)" : "" +
+        increment: 1, message: dryRunString +
+            ((recursive) ? ` ${recursiveString}` : "") +
+            ((forTargets) ? ` ${forTargetsString}` : "" +
                 "...")
     });
 
@@ -515,10 +518,15 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
             const appendStr: string = `${result} ${lineEnding}`;
             completeOutput += appendStr;
             fs.appendFileSync(dryrunFile, appendStr);
-            progress.report({increment: 1, message: "Generating dry-run output" +
-                                                    ((recursive) ? " (recursive)" : "") +
-                                                    ((forTargets) ? " (for targets specifically)" : "" +
-                                                    "...")});
+
+            progress.report({
+              increment: 1,
+              message:
+                dryRunString +
+                (recursive ? ` ${recursiveString}` : "") +
+                (forTargets ? ` ${forTargetsString}` : "" + "..."),
+            });
+                                                    
 
             heartBeat = Date.now();
         };
@@ -618,7 +626,7 @@ export async function prePostConfigureHelper(titles: {configuringScript: string,
         },
         async (progress, cancel) => {
             cancel.onCancellationRequested(async () => {
-                    progress.report({increment: 1, message: "Cancelling..."});
+                    progress.report({increment: 1, message: localize("make.prePostConfigure.cancelling", "Cancelling...")});
                     cancelConfigureScript = true;
 
                     logger.message(`Attempting to kill the console process (PID = ${curPID}) and all its children subprocesses...`);
@@ -677,7 +685,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
 
     // Assert that scriptFile is not undefined at this point since we've checked above.
     return await prePostConfigureHelper(
-        { configuringScript: `Pre-configuring ${scriptFile}`, cancelling: "Cancelling pre-configure"},
+        { configuringScript: localize("make.preconfigure.title", "Pre-configuring ${0}", scriptFile), cancelling: localize("make.preconfigure.cancel.title", "Cancelling pre-configure")},
         (progress) => runPreConfigureScript(progress, scriptFile!), 
         (value) => setIsPreConfiguring(value), 
         (elapsedTime, exitCode) => {
@@ -713,7 +721,7 @@ export async function postConfigure(triggeredBy: TriggeredBy, ): Promise<number>
 
     // Assert that scriptFile is not undefined at this point since we've checked above.
     return await prePostConfigureHelper(
-        { configuringScript: `Post-configuring: ${scriptFile}`, cancelling: "Cancelling post-configure"},
+        { configuringScript: localize("make.postconfigure.title", "Post-configuring: ${0}", scriptFile), cancelling: localize("make.postconfigure.cancelling.title", "Cancelling post-configure")},
         (progress) => runPostConfigureScript(progress, scriptFile!), 
         (value) => setIsPostConfiguring(value), 
         (elapsedTime, exitCode) => {
@@ -1045,7 +1053,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     subphaseStats = await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: "Configuring",
+        title: localize("make.configuring.title", "Configuring"),
         cancellable: true,
       },
       (progress, cancel) => {
@@ -1057,7 +1065,7 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
             await vscode.window.withProgress(
               {
                 location: vscode.ProgressLocation.Notification,
-                title: "Cancelling configure",
+                title: localize("make.confiuring.cancel.title", "Cancelling configure"),
                 cancellable: false,
               },
               async (progress) => {
@@ -1260,7 +1268,7 @@ async function parseLaunchConfigurations(progress: vscode.Progress<{}>, cancel: 
     let launchConfigurations: configuration.LaunchConfiguration[] = [];
 
     let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""}...` });
+        progress.report({ increment: 1, message: `${status}${(recursive) ? recursiveString : ""}...` });
     };
 
     let onFoundLaunchConfiguration: any = (launchConfiguration: configuration.LaunchConfiguration): void => {
@@ -1323,7 +1331,7 @@ async function parseTargets(progress: vscode.Progress<{}>, cancel: vscode.Cancel
     let targets: string[] = [];
 
     let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""}` });
+        progress.report({ increment: 1, message: `${status}${(recursive) ? recursiveString : ""}` });
     };
 
     let onFoundTarget: any = (target: string): void => {
@@ -1372,7 +1380,7 @@ async function updateProvider(progress: vscode.Progress<{}>, cancel: vscode.Canc
     logger.message(`Updating the CppTools IntelliSense Configuration Provider.${(recursive) ? "(recursive)" : ""}`);
 
     let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""} ...` });
+        progress.report({ increment: 1, message: `${status}${(recursive) ? recursiveString : ""} ...` });
     };
 
     let onFoundCustomConfigProviderItem: any = (customConfigProviderItem: parser.CustomConfigProviderItem): void => {
@@ -1421,7 +1429,7 @@ export async function preprocessDryRun(progress: vscode.Progress<{}>, cancel: vs
     }
 
     let onStatus: any = (status: string): void => {
-        progress.report({ increment: 1, message: `${status}${(recursive) ? "(recursive)" : ""} ...` });
+        progress.report({ increment: 1, message: `${status}${(recursive) ? recursiveString : ""} ...` });
     };
 
     return parser.preprocessDryRunOutput(cancel, dryrunOutput, onStatus);
@@ -1444,7 +1452,7 @@ export async function loadConfigurationFromCache(progress: vscode.Progress<{}>, 
         let content: string | undefined = util.readFile(cachePath);
         if (content) {
             try {
-                progress.report({ increment: 1, message: "Configuring from cache" });
+                progress.report({ increment: 1, message: localize("make.configure.cache", "Configuring from cache") });
                 logger.message(`Configuring from cache: ${cachePath}`);
                 let configurationCache: ConfigurationCache = {
                     buildTargets: [],
