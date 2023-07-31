@@ -752,7 +752,7 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
     let wrapScriptContent: string;
     if (process.platform === "win32") {
         wrapScriptContent = `call "${scriptFile}"`;
-        wrapScriptContent += scriptArgs.length > 0 ? `${scriptArgs.join(" ").toString()}\r\n` : "";
+        wrapScriptContent += scriptArgs.length > 0 ? `${scriptArgs.join(" ").toString()}\r\n` : "\r\n";
         wrapScriptContent += `set > "${wrapScriptOutFile}"`;
         wrapScriptFile += ".bat";
     } else {
