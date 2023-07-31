@@ -57,6 +57,12 @@ export interface MakefileConfiguration {
     // instead of the dry-run output of the make tool
     buildLog?: string;
 
+    // arguments for the pre configure script
+    preConfigureArgs?: string[];
+
+    // arguments for the post configure script
+    postConfigureArgs?: string[]
+
     // TODO: investigate how flexible this is to integrate with other build systems than the MAKE family
     // (basically anything that can produce a dry-run output is sufficient)
     // Implement set-able dry-run, verbose, change-directory and always-make switches
@@ -672,6 +678,14 @@ let configurationBuildLog: string | undefined;
 export function getConfigurationBuildLog(): string | undefined { return configurationBuildLog; }
 export function setConfigurationBuildLog(name: string): void { configurationBuildLog = name; }
 
+let configurationPreConfigureArgs: string[] = [];
+export function getConfigurationPreConfigureArgs(): string[] { return configurationPreConfigureArgs; }
+export function setConfigurationPreConfigureArgs(args: string[]): void { configurationPreConfigureArgs = args; }
+
+let configurationPostConfigureArgs: string[] = [];
+export function getConfigurationPostConfigureArgs(): string[] { return configurationPostConfigureArgs; }
+export function setConfigurationPostConfigureArgs(args: string[]): void { configurationPostConfigureArgs = args; }
+
 // Analyze the settings of the current makefile configuration and the global workspace settings,
 // according to various merging rules and decide what make command and build log
 // apply to the current makefile configuration.
@@ -679,9 +693,11 @@ async function analyzeConfigureParams(): Promise<void> {
     getBuildLogForConfiguration(currentMakefileConfiguration);
     await getCommandForConfiguration(currentMakefileConfiguration);
     getProblemMatchersForConfiguration(currentMakefileConfiguration);
+    getPreConfigureArgsForConfiguration(currentMakefileConfiguration);
+    getPostConfigureArgsForConfiguration(currentMakefileConfiguration);
 }
 
-function getMakefileConfiguration(configuration: string | undefined): MakefileConfiguration | undefined {
+export function getMakefileConfiguration(configuration: string | undefined): MakefileConfiguration | undefined {
    return makefileConfigurations.find(k => {
       if (k.name === configuration) {
           return k;
@@ -885,6 +901,28 @@ export function getBuildLogForConfiguration(configuration: string | undefined): 
         // Default to an eventual build log defined in settings
         // If that one is not found on disk, the setting reader already warned about it.
         configurationBuildLog = buildLog;
+    }
+}
+
+export function getPreConfigureArgsForConfiguration(configuration: string | undefined): void {
+    let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
+    const preConfigArgs = makefileConfiguration?.preConfigureArgs;
+
+    if (preConfigArgs) {
+        configurationPreConfigureArgs = preConfigArgs;
+    } else {
+        configurationPreConfigureArgs = preConfigureArgs;
+    }
+}
+
+export function getPostConfigureArgsForConfiguration(configuration: string | undefined): void {
+    let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
+    const postConfigArgs = makefileConfiguration?.postConfigureArgs;
+
+    if (postConfigArgs) {
+        configurationPostConfigureArgs = postConfigArgs;
+    } else {
+        configurationPostConfigureArgs = postConfigureArgs;
     }
 }
 

@@ -766,12 +766,12 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
     let runCommand: string;
     if (process.platform === 'win32') {
         runCommand = "cmd";
-        scriptArgs.push("/c");
-        scriptArgs.push(`"${wrapScriptFile}"`);
+        concreteScriptArgs.push("/c");
+        concreteScriptArgs.push(`"${wrapScriptFile}"`);
     } else {
         runCommand = "/bin/bash";
-        scriptArgs.push("-c");
-        scriptArgs.push(`"source '${wrapScriptFile}'"`);
+        concreteScriptArgs.push("-c");
+        concreteScriptArgs.push(`"source '${wrapScriptFile}'"`);
     }
 
     try {
@@ -818,7 +818,8 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
 export async function runPreConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
     logger.message(`Pre-configuring...\nScript: "${configuration.getPreConfigureScript()}"`);
 
-    return await runPrePostConfigureScript(progress, scriptFile, configuration.getPreConfigureArgs(), {
+    const currentConfigPreConfigureArgs = configuration.getConfigurationPreConfigureArgs();
+    return await runPrePostConfigureScript(progress, scriptFile, currentConfigPreConfigureArgs.length > 0 ? currentConfigPreConfigureArgs : configuration.getPreConfigureArgs(), {
         success: "The pre-configure succeeded.",
         successWithSomeError: "The pre-configure script returned success code " +
                                "but somewhere during the preconfigure process there were errors reported. " +
@@ -830,7 +831,8 @@ export async function runPreConfigureScript(progress: vscode.Progress<{}>, scrip
 export async function runPostConfigureScript(progress: vscode.Progress<{}>, scriptFile: string): Promise<number> {
     logger.message(`Post-configuring...\nScript: "${configuration.getPostConfigureScript()}"`);
 
-    return await runPrePostConfigureScript(progress, scriptFile, configuration.getPostConfigureArgs(), {
+    const currentConfigPostConfigureArgs = configuration.getConfigurationPostConfigureArgs();
+    return await runPrePostConfigureScript(progress, scriptFile, currentConfigPostConfigureArgs.length > 0 ? currentConfigPostConfigureArgs : configuration.getPostConfigureArgs(), {
       success: "The post-configure succeeded.",
       successWithSomeError:
         "The post-configure script returned success code " +
