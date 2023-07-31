@@ -696,7 +696,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
     });
 }
 
-export async function postConfigure(triggeredBy: TriggeredBy, ): Promise<number> {
+export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
     let scriptFile: string | undefined = configuration.getPostConfigureScript();
     if (!scriptFile) {
         vscode.window.showErrorMessage("Post-configure failed: no script provided.");
