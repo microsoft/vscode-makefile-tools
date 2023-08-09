@@ -10,5 +10,8 @@
 	"tree.launch.target": "Startziel: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Das aktuell für das Debuggen und Ausführen im Terminal ausgewählte Startziel.\n{0}",
 	"tree.configuration": "Konfiguration: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "Löschen"
 }

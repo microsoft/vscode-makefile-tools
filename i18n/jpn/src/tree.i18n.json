@@ -10,5 +10,8 @@
 	"tree.launch.target": "起動ターゲット: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "デバッグ用に現在選択され、ターミナルで実行されている起動ターゲット。\n{0}",
 	"tree.configuration": "構成: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "設定解除"
 }

@@ -10,5 +10,8 @@
 	"tree.launch.target": "Element docelowy uruchamiania: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Element docelowy uruchamiania aktualnie wybrany do debugowania i uruchamiania w terminalu.\n{0}",
 	"tree.configuration": "Konfiguracja: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "Cofnij ustawienie"
 }

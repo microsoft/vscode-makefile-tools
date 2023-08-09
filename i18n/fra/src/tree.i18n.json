@@ -10,5 +10,8 @@
 	"tree.launch.target": "Cible de lancement : {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "La cible de lancement actuellement sélectionnée pour le débogage et l’exécution dans le terminal.\n{0}",
 	"tree.configuration": "Configuration : {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "Désactiver"
 }

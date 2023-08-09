@@ -10,5 +10,8 @@
 	"tree.launch.target": "Hedefi Başlat: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Şu anda hata ayıklama ve terminalde çalıştırma için seçilen başlatma hedefi.\n{0}",
 	"tree.configuration": "Yapılandırma: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "Ayarı Kaldır"
 }

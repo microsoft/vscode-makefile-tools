@@ -10,5 +10,8 @@
 	"tree.launch.target": "Destino de inicio: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Destino de inicio seleccionado actualmente para depurar y ejecutar en el terminal.\n{0}",
 	"tree.configuration": "Configuración: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "Anular"
 }
