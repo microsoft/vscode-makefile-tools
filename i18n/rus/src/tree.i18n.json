@@ -10,5 +10,8 @@
 	"tree.launch.target": "Целевой объект запуска: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Целевой объект запуска, выбранный для отладки и запуска в терминале.\n{0}",
 	"tree.configuration": "Конфигурация: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "Удалить"
 }

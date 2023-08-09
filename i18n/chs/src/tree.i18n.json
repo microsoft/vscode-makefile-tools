@@ -10,5 +10,8 @@
 	"tree.launch.target": "启动目标: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "当前选择用于调试并在终端中运行的启动目标。\n{0}",
 	"tree.configuration": "配置: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "取消设置"
 }

@@ -10,5 +10,8 @@
 	"tree.launch.target": "Inicializar destino: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "O destino de inicialização selecionado atualmente para depuração e execução no terminal.\n{0}",
 	"tree.configuration": "Configuração: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "Remover Definição"
 }

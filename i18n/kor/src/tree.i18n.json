@@ -10,5 +10,8 @@
 	"tree.launch.target": "시작 대상: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "현재 터미널에서 디버그 및 실행을 위해 선택한 시작 대상입니다.\n{0}",
 	"tree.configuration": "구성: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "설정 해제"
 }

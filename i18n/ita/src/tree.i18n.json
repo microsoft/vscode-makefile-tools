@@ -10,5 +10,8 @@
 	"tree.launch.target": "Destinazione di avvio: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Destinazione di avvio attualmente selezionata per il debug ed eseguita nel terminale.\n{0}",
 	"tree.configuration": "Configurazione: {0}",
+	"tree.makefile.path.info": "{0}",
+	"tree.make.path.info": "{0}",
+	"tree.build.log.path.info": "{0}",
 	"Unset": "Non impostato"
 }
