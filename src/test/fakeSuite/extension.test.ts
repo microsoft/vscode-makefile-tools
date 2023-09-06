@@ -64,7 +64,6 @@ suite('Fake dryrun parsing', /*async*/() => {
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       configuration.setCurrentLaunchConfiguration(undefined);
       configuration.setCurrentMakefileConfiguration("Default");
-      configuration.setCurrentTarget(undefined);
       configuration.initFromState();
       await configuration.initFromSettings();
 
@@ -118,7 +117,6 @@ suite('Fake dryrun parsing', /*async*/() => {
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
-         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
    
@@ -173,7 +171,6 @@ suite('Fake dryrun parsing', /*async*/() => {
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
-         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
 
@@ -250,7 +247,6 @@ suite('Fake dryrun parsing', /*async*/() => {
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
-         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
    
@@ -312,7 +308,6 @@ suite('Fake dryrun parsing', /*async*/() => {
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
-         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
    
@@ -374,7 +369,6 @@ suite('Fake dryrun parsing', /*async*/() => {
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          configuration.setCurrentLaunchConfiguration(undefined);
          configuration.setCurrentMakefileConfiguration("Default");
-         configuration.setCurrentTarget(undefined);
          configuration.initFromState();
          await configuration.initFromSettings();
    
@@ -434,7 +428,6 @@ suite('Fake dryrun parsing', /*async*/() => {
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       configuration.setCurrentLaunchConfiguration(undefined);
       configuration.setCurrentMakefileConfiguration("Default");
-      configuration.setCurrentTarget(undefined);
       configuration.initFromState();
       await configuration.initFromSettings();
 
@@ -476,7 +469,6 @@ suite('Fake dryrun parsing', /*async*/() => {
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       configuration.setCurrentLaunchConfiguration(undefined);
       configuration.setCurrentMakefileConfiguration("Default");
-      configuration.setCurrentTarget(undefined);
       configuration.initFromState();
       await configuration.initFromSettings();
 

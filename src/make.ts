@@ -446,17 +446,6 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
     // Continue with the make dryrun invocation
     let makeArgs: string[] = [];
 
-    // Prepend the target to the arguments given in the makefile.configurations object,
-    // unless we want to parse for the full set of available targets.
-    if (forTargets) {
-        makeArgs.push("all");
-    } else {
-        let currentTarget: string | undefined = configuration.getCurrentTarget();
-        if (currentTarget) {
-            makeArgs.push(currentTarget);
-        }
-    }
-
     // Include all the make arguments defined in makefile.configurations.makeArgs
     makeArgs = makeArgs.concat(configuration.getConfigurationMakeArgs());
 
@@ -491,6 +480,9 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
                 makeArgs.push(sw);
             }
         });
+
+        // Append the target to the arguments given in the makefile.configurations object
+        makeArgs.push(configuration.getCurrentTarget());
 
         logger.messageNoCR(`Generating ${getConfigureIsInBackground() ? "in the background a new " : ""}configuration cache with command: `);
     }

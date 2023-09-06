@@ -936,24 +936,22 @@ export async function readMakefileConfigurations(): Promise<void> {
 // Last target picked from the set of targets that are run by the makefiles
 // when building for the current configuration.
 // Saved into the settings storage. Also reflected in the configuration status bar button
-let currentTarget: string | undefined;
-export function getCurrentTarget(): string | undefined { return currentTarget; }
-export function setCurrentTarget(target: string | undefined): void { currentTarget = target; }
+// Assume the well-known "all" target for the default goal
+let currentTarget: string = "all";
+export function getCurrentTarget(): string { return currentTarget; }
+// Set the current target, or 'all' if none was given
+export function setCurrentTarget(target: string = "all"): void { currentTarget = target; }
 
 // Read current target from workspace state, update status bar item
 function readCurrentTarget(): void {
     let buildTarget : string | undefined = extension.getState().buildTarget;
+    setCurrentTarget(buildTarget);
     if (!buildTarget) {
-        logger.message("No target defined in the workspace state. Assuming 'Default'.");
-        statusBar.setTarget("Default");
-        // If no particular target is defined in settings, use 'Default' for the button
-        // but keep the variable empty, to not append it to the make command.
-        currentTarget = "";
+        logger.message(`No target defined in the workspace state. Assuming '${currentTarget}'.`);
     } else {
-        currentTarget = buildTarget;
         logger.message(`Reading current build target "${currentTarget}" from the workspace state.`);
-        statusBar.setTarget(currentTarget);
     }
+    statusBar.setTarget(currentTarget);
 }
 
 let configureOnOpen: boolean | undefined;
