@@ -906,10 +906,10 @@ export function getBuildLogForConfiguration(configuration: string | undefined): 
 
 export function getPreConfigureArgsForConfiguration(configuration: string | undefined): void {
     let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
-    const preConfigArgs = makefileConfiguration?.preConfigureArgs;
+    const localPreConfigArgs = makefileConfiguration?.preConfigureArgs;
 
-    if (preConfigArgs) {
-        configurationPreConfigureArgs = preConfigArgs;
+    if (localPreConfigArgs) {
+        configurationPreConfigureArgs = localPreConfigArgs;
     } else {
         configurationPreConfigureArgs = preConfigureArgs;
     }
@@ -917,10 +917,10 @@ export function getPreConfigureArgsForConfiguration(configuration: string | unde
 
 export function getPostConfigureArgsForConfiguration(configuration: string | undefined): void {
     let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
-    const postConfigArgs = makefileConfiguration?.postConfigureArgs;
+    const localPostConfigArgs = makefileConfiguration?.postConfigureArgs;
 
-    if (postConfigArgs) {
-        configurationPostConfigureArgs = postConfigArgs;
+    if (localPostConfigArgs) {
+        configurationPostConfigureArgs = localPostConfigArgs;
     } else {
         configurationPostConfigureArgs = postConfigureArgs;
     }
