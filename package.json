@@ -293,6 +293,22 @@
                             "buildLog": {
                                 "type": "string",
                                 "description": "%makefile-tools.configuration.makefile.configurations.buildLog.description%"
+                            },
+                            "preConfigureArgs": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [],
+                                "description": "%makefile-tools.configuration.makefile.preConfigureArgs.description%"
+                            },
+                            "postConfigureArgs": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [],
+                                "description": "%makefile-tools.configuration.makefile.postConfigureArgs.description%"
                             }
                         }
                     },
@@ -482,11 +498,27 @@
                     "default": null,
                     "scope": "resource"
                 },
+                "makefile.preConfigureArgs": {
+                    "type": "array",
+                    "description": "%makefile-tools.configuration.makefile.preConfigureArgs.description%",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
+                },
                 "makefile.postConfigureScript": {
                     "type": "string",
                     "description": "%makefile-tools.configuration.makefile.postConfigureScript.description%",
                     "default": null,
                     "scope": "resource"
+                },
+                "makefile.postConfigureArgs": {
+                    "type": "array",
+                    "description": "%makefile-tools.configuration.makefile.postConfigureArgs.description%",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
                 },
                 "makefile.alwaysPreConfigure": {
                     "type": "boolean",

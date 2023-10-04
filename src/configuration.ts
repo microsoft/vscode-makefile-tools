@@ -57,6 +57,12 @@ export interface MakefileConfiguration {
     // instead of the dry-run output of the make tool
     buildLog?: string;
 
+    // arguments for the pre configure script
+    preConfigureArgs?: string[];
+
+    // arguments for the post configure script
+    postConfigureArgs?: string[]
+
     // TODO: investigate how flexible this is to integrate with other build systems than the MAKE family
     // (basically anything that can produce a dry-run output is sufficient)
     // Implement set-able dry-run, verbose, change-directory and always-make switches
@@ -360,9 +366,17 @@ let preConfigureScript: string | undefined;
 export function getPreConfigureScript(): string | undefined { return preConfigureScript; }
 export function setPreConfigureScript(path: string): void { preConfigureScript = path; }
 
+let preConfigureArgs: string[] = [];
+export function getPreConfigureArgs(): string[] { return preConfigureArgs; }
+export function setPreConfigureArgs(args: string[]): void { preConfigureArgs = args; }
+
 let postConfigureScript: string | undefined;
 export function getPostConfigureScript(): string | undefined { return postConfigureScript; }
 export function setPostConfigureScript(path: string): void { postConfigureScript = path; }
+
+let postConfigureArgs: string[] = [];
+export function getPostConfigureArgs(): string[] { return postConfigureArgs; }
+export function setPostConfigureArgs(args: string[]): void { postConfigureArgs = args; }
 
 // Read from settings the path to a script file that needs to have been run at least once
 // before a sucessful configure of this project.
@@ -377,6 +391,13 @@ export async function readPreConfigureScript(): Promise<void> {
     }
 }
 
+export async function readPreConfigureArgs(): Promise<void> {
+    preConfigureArgs = await util.getExpandedSetting<string[]>("preConfigureArgs") ?? [];
+    if (preConfigureArgs && preConfigureArgs.length > 0) {
+        logger.message(`Pre-configure arguments: '${preConfigureArgs.join("', '")}'`);
+    }
+}
+
 export async function readPostConfigureScript(): Promise<void> {
     postConfigureScript = await util.getExpandedSetting<string>("postConfigureScript");
     if (postConfigureScript) {
@@ -385,6 +406,13 @@ export async function readPostConfigureScript(): Promise<void> {
         if (!util.checkFileExistsSync(postConfigureScript)) {
             logger.message("Post-configure script not found on disk");
         }
+    }
+}
+
+export async function readPostConfigureArgs(): Promise<void> {
+    postConfigureArgs = await util.getExpandedSetting<string[]>("postConfigureArgs") ?? [];
+    if (postConfigureArgs && postConfigureArgs.length > 0) {
+        logger.message(`Post-configure arguments: '${postConfigureArgs.join("', '")}'`);
     }
 }
 
@@ -650,6 +678,14 @@ let configurationBuildLog: string | undefined;
 export function getConfigurationBuildLog(): string | undefined { return configurationBuildLog; }
 export function setConfigurationBuildLog(name: string): void { configurationBuildLog = name; }
 
+let configurationPreConfigureArgs: string[] = [];
+export function getConfigurationPreConfigureArgs(): string[] { return configurationPreConfigureArgs; }
+export function setConfigurationPreConfigureArgs(args: string[]): void { configurationPreConfigureArgs = args; }
+
+let configurationPostConfigureArgs: string[] = [];
+export function getConfigurationPostConfigureArgs(): string[] { return configurationPostConfigureArgs; }
+export function setConfigurationPostConfigureArgs(args: string[]): void { configurationPostConfigureArgs = args; }
+
 // Analyze the settings of the current makefile configuration and the global workspace settings,
 // according to various merging rules and decide what make command and build log
 // apply to the current makefile configuration.
@@ -657,9 +693,11 @@ async function analyzeConfigureParams(): Promise<void> {
     getBuildLogForConfiguration(currentMakefileConfiguration);
     await getCommandForConfiguration(currentMakefileConfiguration);
     getProblemMatchersForConfiguration(currentMakefileConfiguration);
+    getPreConfigureArgsForConfiguration(currentMakefileConfiguration);
+    getPostConfigureArgsForConfiguration(currentMakefileConfiguration);
 }
 
-function getMakefileConfiguration(configuration: string | undefined): MakefileConfiguration | undefined {
+export function getMakefileConfiguration(configuration: string | undefined): MakefileConfiguration | undefined {
    return makefileConfigurations.find(k => {
       if (k.name === configuration) {
           return k;
@@ -866,6 +904,28 @@ export function getBuildLogForConfiguration(configuration: string | undefined): 
     }
 }
 
+export function getPreConfigureArgsForConfiguration(configuration: string | undefined): void {
+    let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
+    const localPreConfigArgs = makefileConfiguration?.preConfigureArgs;
+
+    if (localPreConfigArgs) {
+        configurationPreConfigureArgs = localPreConfigArgs;
+    } else {
+        configurationPreConfigureArgs = preConfigureArgs;
+    }
+}
+
+export function getPostConfigureArgsForConfiguration(configuration: string | undefined): void {
+    let makefileConfiguration: MakefileConfiguration | undefined = getMakefileConfiguration(configuration);
+    const localPostConfigArgs = makefileConfiguration?.postConfigureArgs;
+
+    if (localPostConfigArgs) {
+        configurationPostConfigureArgs = localPostConfigArgs;
+    } else {
+        configurationPostConfigureArgs = postConfigureArgs;
+    }
+}
+
 let makefileConfigurations: MakefileConfiguration[] = [];
 export function getMakefileConfigurations(): MakefileConfiguration[] { return makefileConfigurations; }
 export function setMakefileConfigurations(configurations: MakefileConfiguration[]): void { makefileConfigurations = configurations; }
@@ -1065,8 +1125,10 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
     await readMakeDirectory();
     extension.updateBuildLogPresent(await readBuildLog());
     await readPreConfigureScript();
+    await readPreConfigureArgs();
     await readAlwaysPreConfigure();
     await readPostConfigureScript();
+    await readPostConfigureArgs();
     await readAlwaysPostConfigure();
     await readDryrunSwitches();
     await readAdditionalCompilerNames();
@@ -1257,6 +1319,13 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
                 updatedSettingsSubkeys.push(subKey);
             }
 
+            subKey = "preConfigureArgs";
+            let updatedPreConfigureArgs: string[] | undefined = await util.getExpandedSetting<string[]>(subKey);
+            if (updatedPreConfigureArgs && !util.areEqual(updatedPreConfigureArgs, preConfigureArgs)) {
+                await readPreConfigureArgs();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
             subKey = "postConfigureScript";
             let updatedPostConfigureScript: string | undefined = await util.getExpandedSetting<string>(subKey);
             if (updatedPostConfigureScript) {
@@ -1264,6 +1333,13 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
             }
             if (updatedPostConfigureScript !== postConfigureScript) {
                 await readPostConfigureScript();
+                updatedSettingsSubkeys.push(subKey);
+            }
+
+            subKey = "postConfigureArgs";
+            let updatedPostConfigureArgs: string[] | undefined = await util.getExpandedSetting<string[]>(subKey);
+            if (updatedPostConfigureArgs && !util.areEqual(updatedPostConfigureArgs, postConfigureArgs)) {
+                await readPostConfigureArgs();
                 updatedSettingsSubkeys.push(subKey);
             }
 
