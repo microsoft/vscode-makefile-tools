@@ -1,0 +1,27 @@
+name: Handling stale issues
+
+on:
+    schedule:
+    - cron: "0 0 * * *"
+    workflow_dispatch:
+
+jobs:
+    stale:
+        runs-on: ubuntu-latest
+        env:
+            stale-days: 30
+            close-days: 14
+            stale-label: stale
+            only-label: more info needed
+        steps:
+        - uses: actions/stale@v4.1.1
+          with:
+            stale-issue-label: ${{ env.stale-label }}
+            only-labels: ${{ env.only-label }}
+            days-before-pr-stale: -1
+            days-before-pr-close: -1
+            days-before-stale: ${{ env.stale-days }}
+            stale-issue-message: "This issue is now marked as '${{ env.stale-label }}' due to there being no activity on it for the past ${{ env.stale-days }} days and being labeled '${{ env.only-label }}'. Unless the '${{ env.stale-label }}' label is removed or the issue is commented on, this will be closed in ${{ env.close-days }} days. If you would like to make this issue exempt from getting stale, please provide the information needed for the maintainers to understand the issue better."
+            days-before-close: ${{ env.close-days }}
+            close-issue-message: "This issue is now closed due to there being no activity on it for the past ${{ env.close-days }} days since being marked as '${{ env.stale-label }}'."
+            operations-per-run: 100
