@@ -568,12 +568,41 @@
             "makefile__viewContainer": [
                 {
                     "id": "makefile.outline",
+                    "when": "isWorkspaceTrusted",
                     "name": "%makefile-tools.configuration.views.makefile.outline.description%"
                 }
             ]
         },
         "menus": {
             "commandPalette": [
+                {
+                    "command": "makefile.configure",
+                    "when": "isWorkspaceTrusted"
+                },
+                {
+                    "command": "makefile.cleanConfigure",
+                    "when": "isWorkspaceTrusted"
+                },
+                {
+                  "command": "makefile.outline.openMakefilePathSetting",
+                  "when": "isWorkspaceTrusted"
+                },
+                {
+                   "command": "makefile.outline.openMakefileFile",
+                   "when": "isWorkspaceTrusted"
+                },
+                {
+                   "command": "makefile.outline.openMakePathSetting",
+                   "when": "isWorkspaceTrusted"
+                },
+                {
+                   "command": "makefile.outline.openBuildLogSetting",
+                   "when": "isWorkspaceTrusted"
+                },
+                {
+                   "command": "makefile.outline.openBuildLogFile",
+                   "when": "isWorkspaceTrusted"
+                },
                 {
                     "command": "makefile.preConfigure",
                     "when": "makefile:fullFeatureSet"
@@ -661,6 +690,10 @@
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
                     "when": "never"
+                },
+                {
+                    "command": "makefile.resetState",
+                    "when": "isWorkspaceTrusted"
                 }
             ],
             "view/title": [
@@ -837,6 +870,12 @@
         "nanoid": "^3.1.20",
         "minimatch": "^3.0.5",
         "xml2js": "^0.5.0"
+    },
+    "capabilities": {
+      "untrustedWorkspaces": {
+         "supported": false,
+         "description": ""
+      }
     }
 
 }
