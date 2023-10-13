@@ -467,7 +467,11 @@ export async function generateParseContent(progress: vscode.Progress<{}>,
         makeArgs.push("--question");
         logger.messageNoCR("Generating targets information with command: ");
     } else {
+        const makefilePath :string = configuration.getMakefilePath();
         makeArgs.push("--dry-run");
+        makeArgs.push(`--assume-old=${makefilePath}`);
+        makeArgs.push(makefilePath);
+        makeArgs.push("AM_MAKEFLAGS=--assume-old=Makefile Makefile");
 
         // If this is not a clean configure, remove --always-make from the arguments list.
         // We need to have --always-make in makefile.dryrunSwitches and remove it for not clean configure
