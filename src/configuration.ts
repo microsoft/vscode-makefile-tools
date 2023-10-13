@@ -699,37 +699,80 @@ export async function getCommandForConfiguration(configuration: string | undefin
         configurationMakeCommand += ".exe";
     }
 
-    // Add the makefile path via the -f make switch.
-    // makefile.configurations.makefilePath overwrites makefile.makefilePath.
-    configurationMakefile = makefileConfiguration?.makefilePath ? util.resolvePathToRoot(makefileConfiguration?.makefilePath) : makefilePath;
-    if (configurationMakefile) {
-        // check if the makefile path is a directory. If so, try adding `Makefile` or `makefile`
-        if (util.checkDirectoryExistsSync(configurationMakefile)) {
-            let makeFileTest: string = path.join(configurationMakefile, "Makefile");
-            if (!util.checkFileExistsSync(makeFileTest)) {
-                makeFileTest = path.join(configurationMakefile, "makefile");
-            }
-
-            // if we found the makefile in the directory, set the `configurationMakefile` to the found file path.
-            if (util.checkFileExistsSync(makeFileTest)) {
-                configurationMakefile = makeFileTest;
-            }
-        }
-
-        configurationMakeArgs.push("-f");
-        configurationMakeArgs.push(`${configurationMakefile}`);
-        // Need to rethink this (GitHub 59).
-        // Some repos don't work when we automatically add -C, others don't work when we don't.
-        // configurationMakeArgs.push("-C");
-        // configurationMakeArgs.push(path.parse(configurationMakefile).dir);
-    }
-
     // Add the working directory path via the -C switch.
     // makefile.configurations.makeDirectory overwrites makefile.makeDirectory.
     let makeDirectoryUsed: string | undefined = makefileConfiguration?.makeDirectory ? util.resolvePathToRoot(makefileConfiguration?.makeDirectory) : makeDirectory;
     if (makeDirectoryUsed) {
         configurationMakeArgs.push("-C");
         configurationMakeArgs.push(`${makeDirectoryUsed}`);
+        configurationMakefile = makeDirectoryUsed;
+    }
+
+    // Add the makefile path via the -f make switch.
+    // The make file is in makeDirectory or in the workspace directory,
+    // and is named "Makefile" or "makefile".
+    // makefile.configurations.makefilePath overwrites makefile.makefilePath.
+    let makeFileTest: string | undefined;
+    // filename of makefile relative to makeDirectory
+    let relativeMakefile: string | undefined;
+    let makefileExists : boolean = false;
+    if (makeDirectoryUsed) {
+        // check if the makefile path is a directory. If so, try adding
+        // the configuration makefilePath, then the makefilePath, then `Makefile` or `makefile`
+        if (util.checkDirectoryExistsSync(makeDirectoryUsed)) {
+            if (makefileConfiguration?.makefilePath) {
+                makeFileTest = path.join(makeDirectoryUsed, makefileConfiguration?.makefilePath);
+                relativeMakefile = makefileConfiguration?.makefilePath;
+                makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                if (!makefileExists) {
+                    makeFileTest = makefilePath;
+                    relativeMakefile = util.resolvePathToRoot(makeFileTest);
+                    makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                }
+            }
+            if (!makefileExists) {
+                makeFileTest = path.join(makeDirectoryUsed, makefilePath);
+                relativeMakefile = makefilePath;
+                makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                if (!makefileExists) {
+                    if (makefilePath != "Makefile") {
+                        relativeMakefile = "Makefile";
+                        makeFileTest = path.join(makeDirectoryUsed, relativeMakefile);
+                        makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                    }
+                    if (!makefileExists) {
+                        relativeMakefile = "makefile";
+                        makeFileTest = path.join(makeDirectoryUsed, relativeMakefile);
+                        makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                    }
+                }
+            }
+        }
+    }
+    if (!makefileExists) {
+        if (!makeDirectoryUsed && makefileConfiguration?.makefilePath) {
+            relativeMakefile = makefileConfiguration?.makefilePath;
+            makeFileTest = makefileConfiguration?.makefilePath;
+            makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+        }
+    }
+    if (!makefileExists) {
+        makeFileTest = makefilePath;
+        relativeMakefile = makefilePath;
+        makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+    }
+
+    // if we found the makefile in the directory, set the `configurationMakefile` to the found file path.
+    if (makefileExists) {
+        configurationMakefile = relativeMakefile;
+        configurationMakeArgs.push("-f");
+        configurationMakeArgs.push(`${relativeMakefile}`);
+        setMakefilePath(relativeMakefile);
+        setConfigurationMakefile(makeFileTest);
+        // Need to rethink this (GitHub 59).
+        // Some repos don't work when we automatically add -C, others don't work when we don't.
+        // configurationMakeArgs.push("-C");
+        // configurationMakeArgs.push(path.parse(configurationMakefile).dir);
     }
 
     // Make sure we append "makefile.configurations[].makeArgs" last, in case the developer wants to overwrite any arguments that the extension
@@ -753,22 +796,6 @@ export async function getCommandForConfiguration(configuration: string | undefin
 
     if (configurationMakeCommand) {
         logger.message(`Deduced command '${configurationMakeCommand} ${configurationMakeArgs.join(" ")}' for configuration "${configuration}"`);
-    }
-
-    // Check for makefile path on disk: we search first for any makefile specified via the makefilePath setting,
-    // then via the makeDirectory setting and then in the root of the workspace. On linux/mac, it often is 'Makefile', so verify that we default to the right filename.
-    if (!configurationMakefile) {
-       if (makeDirectoryUsed) {
-          configurationMakefile = util.resolvePathToRoot(path.join(makeDirectoryUsed, "Makefile"));
-          if (!util.checkFileExistsSync(configurationMakefile)) {
-             configurationMakefile = util.resolvePathToRoot(path.join(makeDirectoryUsed, "makefile"));
-          }
-       } else {
-          configurationMakefile = util.resolvePathToRoot("./Makefile");
-          if (!util.checkFileExistsSync(configurationMakefile)) {
-             configurationMakefile = util.resolvePathToRoot("./makefile");
-          }
-       }
     }
 
  // Validation and warnings about properly defining the makefile and make tool.
@@ -808,7 +835,7 @@ export async function getCommandForConfiguration(configuration: string | undefin
             }
         }
 
-        if (!util.checkFileExistsSync(util.resolvePathToRoot(configurationMakefile))) {
+        if (!makefileExists) {
             logger.message("The makefile entry point was not found. " +
                 "Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, " +
                 "makefile.makeDirectory, makefile.configurations[].makeDirectory" +
