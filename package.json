@@ -570,10 +570,6 @@
                     "when": "makefile:localRunFeature"
                 },
                 {
-                    "command": "makefile.setBuildConfiguration",
-                    "when": "makefile:fullFeatureSet"
-                },
-                {
                     "command": "makefile.setBuildTarget",
                     "when": "makefile:fullFeatureSet"
                 },
@@ -681,7 +677,7 @@
                 },
                 {
                     "command": "makefile.outline.setBuildConfiguration",
-                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=configuration/",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=configuration/",
                     "group": "inline@1"
                 },
                 {
