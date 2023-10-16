@@ -11,6 +11,7 @@ Improvements:
 - Add support for post-configure and pre-configure script arguments, both globally and per configuration. [#151](https://github.com/microsoft/vscode-makefile-tools/issues/151)
 - Honor workspace trust in VS Code and warn about code being run during dry-run. [#514](https://github.com/microsoft/vscode-makefile-tools/pull/514)
 - Ship the parseCompilerArgs script with the extension to avoid race conditions. [#516](https://github.com/microsoft/vscode-makefile-tools/issues/516), [#475](https://github.com/microsoft/vscode-makefile-tools/issues/475)
+- Avoid relativizing paths in the project outline. [#519](https://github.com/microsoft/vscode-makefile-tools/pull/519) [@drok sponsored by @Mergesium](https://github.com/drok)
 
 ## 0.7.0
 Improvements:
