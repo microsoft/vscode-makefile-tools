@@ -863,13 +863,18 @@ export async function getCommandForConfiguration(configuration: string | undefin
             await extension.setFullFeatureSet(false);
             disableAllOptionallyVisibleCommands();
         } else {
+            if (vscode.workspace.isTrusted) { // full feature set ON only for trusted workspaces
+                await extension.setFullFeatureSet(true);
+                enableOptionallyVisibleCommands();
+            }
+        }
+    } else {
+        // If we have a build log, then we want Makefile Tools to be fully active and the UI visible,
+        // unless the workspace is untrusted.
+        if (vscode.workspace.isTrusted) {
             await extension.setFullFeatureSet(true);
             enableOptionallyVisibleCommands();
         }
-    } else {
-        // If we have a build log, then we want Makefile Tools to be fully active and the UI visible.
-        await extension.setFullFeatureSet(true);
-        enableOptionallyVisibleCommands();
     }
 }
 
@@ -1157,6 +1162,11 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
                                              getConfigurationMakefile(),
                                              getConfigurationMakeCommand(),
                                              getConfigurationBuildLog());
+
+    // Listen to the workspace trust change event
+    vscode.workspace.onDidGrantWorkspaceTrust(async e => {
+        await getCommandForConfiguration(currentMakefileConfiguration); // this refreshes fullFeatureSet and enables visible features
+    });
 
     // Verify the dirty state of the IntelliSense config provider and update accordingly.
     // The makefile.configureOnEdit setting can be set to false when this behavior is inconvenient.
@@ -1514,7 +1524,9 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
             let wasLocalDebugEnabled: boolean = isOptionalFeatureEnabled("debug");
             let wasLocalRunningEnabled: boolean   = isOptionalFeatureEnabled("run");
             await readFeaturesVisibility();
-            enableOptionallyVisibleCommands();
+            if (vscode.workspace.isTrusted) {
+                enableOptionallyVisibleCommands();
+            }
             let isLocalDebugEnabled: boolean = isOptionalFeatureEnabled("debug");
             let isLocalRunningEnabled: boolean   = isOptionalFeatureEnabled("run");
             if ((wasLocalDebugEnabled !== isLocalDebugEnabled) || (wasLocalRunningEnabled !== isLocalRunningEnabled)) {
