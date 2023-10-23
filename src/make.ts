@@ -995,7 +995,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     logger.showOutputChannel();
     let yesButton: string = localize("yes.dont.show.again", "Yes (don't show again)");
     let noButton: string = localize("no", "No");
-    const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>("Configuring project. Code can still execute in --dry-run mode. Do you want to continue?",
+    const chosen: vscode.MessageItem | undefined = await vscode.window.showErrorMessage<vscode.MessageItem>(localize("code.can.execute.dryrun.mode.continue",
+                                                                                       "Configuring project. Code can still execute in --dry-run mode. Do you want to continue?"),
     {
       title: yesButton,
       isCloseAffordance: false,

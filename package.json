@@ -584,24 +584,24 @@
                     "when": "isWorkspaceTrusted"
                 },
                 {
-                  "command": "makefile.outline.openMakefilePathSetting",
-                  "when": "isWorkspaceTrusted"
+                    "command": "makefile.outline.openMakefilePathSetting",
+                    "when": "isWorkspaceTrusted"
                 },
                 {
-                   "command": "makefile.outline.openMakefileFile",
-                   "when": "isWorkspaceTrusted"
+                    "command": "makefile.outline.openMakefileFile",
+                    "when": "isWorkspaceTrusted"
                 },
                 {
-                   "command": "makefile.outline.openMakePathSetting",
-                   "when": "isWorkspaceTrusted"
+                    "command": "makefile.outline.openMakePathSetting",
+                    "when": "isWorkspaceTrusted"
                 },
                 {
-                   "command": "makefile.outline.openBuildLogSetting",
-                   "when": "isWorkspaceTrusted"
+                    "command": "makefile.outline.openBuildLogSetting",
+                    "when": "isWorkspaceTrusted"
                 },
                 {
-                   "command": "makefile.outline.openBuildLogFile",
-                   "when": "isWorkspaceTrusted"
+                    "command": "makefile.outline.openBuildLogFile",
+                    "when": "isWorkspaceTrusted"
                 },
                 {
                     "command": "makefile.preConfigure",
