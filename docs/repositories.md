@@ -1,3 +1,6 @@
+Below is a table that describes various repositories and how they do or don't work in this extension. 
+The table is very wide, so make sure to scroll right and left to view the whole table.
+
 | Repository  | GitHub URL | Prerequisites (commands to run in terminal before using Makefile Tools)  | Extension settings | Notes | Works? (Y/N) |
 |--|--|--|--|--|--|
 | 8cc | [https://github.com/rui314/8cc.git](https://github.com/rui314/8cc.git) | | | | Yes |
