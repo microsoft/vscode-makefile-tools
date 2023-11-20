@@ -1,6 +1,9 @@
 # What's New?
 
 ## 0.8
+Bug Fixes:
+- Fix a bug where the first argument for pre/post-configure args didn't have the proper spacing in front of it [PR #530](https://github.com/microsoft/vscode-makefile-tools/pull/530)
+
 Improvements:
 - Add support for a post configure script. [#391](https://github.com/microsoft/vscode-makefile-tools/issues/391)
 - Add support for post-configure and pre-configure script arguments, both globally and per configuration. [#151](https://github.com/microsoft/vscode-makefile-tools/issues/151)
