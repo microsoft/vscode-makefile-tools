@@ -6,7 +6,7 @@ import * as path from 'path';
 
 //import { runTests } from 'vscode-test';
 //import * as tests from 'vscode-test';
-import * as testRunner from 'vscode-test/out/runTest';
+import * as testRunner from '@vscode/test-electron/out/runTest';
 
 async function main(): Promise<void> {
     try {
@@ -22,18 +22,18 @@ async function main(): Promise<void> {
         const reproRootPath : string = path.resolve(extensionDevelopmentPath, "./src/test/fakeSuite/Repros/");
 
         // Download VS Code, unzip it and run the integration test
-        let myOpt : testRunner.TestOptions = {
-            extensionPath: extensionDevelopmentPath,
-            additionalLaunchArgs: [
-                "--disable-workspace-trust",
-                "--disable-extensions"
-            ],
-            testRunnerPath: extensionTestsPath,
-            testRunnerEnv: {
-                "MAKEFILE_TOOLS_TESTING": "1",
-                "WindowsSDKVersion": "12.3.45678.9\\"
-            },
-            testWorkspace: reproRootPath
+        let myOpt: testRunner.TestOptions = {
+          extensionDevelopmentPath: extensionDevelopmentPath,
+          launchArgs: [
+            "--disable-workspace-trust",
+            "--disable-extensions",
+            reproRootPath,
+          ],
+          extensionTestsPath: extensionTestsPath,
+          extensionTestsEnv: {
+            MAKEFILE_TOOLS_TESTING: "1",
+            WindowsSDKVersion: "12.3.45678.9\\",
+          },
         };
         await testRunner.runTests(myOpt);
     } catch (err) {
