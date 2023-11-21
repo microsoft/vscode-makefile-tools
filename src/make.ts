@@ -773,7 +773,7 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
         wrapScriptContent += `set > "${wrapScriptOutFile}"`;
         wrapScriptFile += ".bat";
     } else {
-        wrapScriptContent = `source '${scriptFile}'\n`;
+        wrapScriptContent = `source '${scriptFile}' ${scriptArgs.length > 0 ? scriptArgs.join(" ").toString() : ""}\n`;
         wrapScriptContent += `printenv > '${wrapScriptOutFile}'`;
         wrapScriptFile += ".sh";
     }
