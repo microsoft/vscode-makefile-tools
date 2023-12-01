@@ -18,6 +18,8 @@
 	"make.preconfigure.cancel.title": "Vorkonfiguration wird abgebrochen",
 	"make.postconfigure.title": "Nachkonfiguration von ${0}",
 	"make.postconfigure.cancelling.title": "Die Nachkonfiguration wird abgebrochen",
+	"yes.dont.show.again": "Ja (nicht mehr anzeigen)",
+	"code.can.execute.dryrun.mode.continue": "Projekt wird konfiguriert. Code kann weiterhin im Modus \"--dry-run\" ausgeführt werden. Möchten Sie den Vorgang fortsetzen?",
 	"make.configuring.title": "Wird konfiguriert",
 	"make.confiuring.cancel.title": "Konfiguration wird abgebrochen",
 	"make.configure.cache": "Konfiguration aus dem Cache"

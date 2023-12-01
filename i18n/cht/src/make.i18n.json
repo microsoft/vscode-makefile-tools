@@ -18,6 +18,8 @@
 	"make.preconfigure.cancel.title": "正在取消預先設定",
 	"make.postconfigure.title": "後續設定: ${0}",
 	"make.postconfigure.cancelling.title": "正在取消後續設定",
+	"yes.dont.show.again": "是的 (不要再顯示)",
+	"code.can.execute.dryrun.mode.continue": "正在設定專案。程式碼仍可在 --dry-run 模式中執行。是否要繼續?",
 	"make.configuring.title": "正在設定",
 	"make.confiuring.cancel.title": "正在取消設定",
 	"make.configure.cache": "正在從快取設定"

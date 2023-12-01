@@ -18,6 +18,8 @@
 	"make.preconfigure.cancel.title": "事前構成の取り消し",
 	"make.postconfigure.title": "構成後: ${0}",
 	"make.postconfigure.cancelling.title": "構成後の取り消し",
+	"yes.dont.show.again": "はい (今後は表示しません)",
+	"code.can.execute.dryrun.mode.continue": "プロジェクトを構成しています。コードは --dry-run モードで引き続き実行できます。続行しますか?",
 	"make.configuring.title": "構成",
 	"make.confiuring.cancel.title": "構成を取り消しています",
 	"make.configure.cache": "キャッシュからの構成"

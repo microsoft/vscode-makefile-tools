@@ -18,6 +18,8 @@
 	"make.preconfigure.cancel.title": "Ruší se předběžná konfigurace",
 	"make.postconfigure.title": "Následná konfigurace: ${0}",
 	"make.postconfigure.cancelling.title": "Ruší se následná konfigurace",
+	"yes.dont.show.again": "Ano (už nezobrazovat)",
+	"code.can.execute.dryrun.mode.continue": "Konfiguruje se projekt. Kód se může stále spouštět v režimu --dry-run. Chcete pokračovat?",
 	"make.configuring.title": "Probíhá konfigurace",
 	"make.confiuring.cancel.title": "Ruší se konfigurace",
 	"make.configure.cache": "Konfigurace z mezipaměti"
