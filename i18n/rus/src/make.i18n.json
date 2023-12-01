@@ -18,6 +18,8 @@
 	"make.preconfigure.cancel.title": "Отмена предварительной настройки",
 	"make.postconfigure.title": "Последующая настройка: ${0}",
 	"make.postconfigure.cancelling.title": "Отмена после настройки",
+	"yes.dont.show.again": "Да (больше не показывать)",
+	"code.can.execute.dryrun.mode.continue": "Выполняется настройка проекта. Код все еще может выполняться в режиме --dry-run. Вы хотите продолжить?",
 	"make.configuring.title": "Настройка",
 	"make.confiuring.cancel.title": "Отмена настройки",
 	"make.configure.cache": "Настройка из кэша"
