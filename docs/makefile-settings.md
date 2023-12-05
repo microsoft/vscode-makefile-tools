@@ -28,7 +28,7 @@ Supported macros for substitution:
 |`${userHome}`| The path to the user's home folder (i.e. `C:/Users`). |
 |`${env:ENVIRONMENT_VARIABLE}`| A given `EVNIRONMENT_VARIBLE` for the current development environment. | 
 |`${command:ANY_EXTENSION_SCOPE.ANY_COMMAND_ID}` | Any commands for a given extension in VS Code (i.e. any of the ones listed above, like `command:makefile.getLaunchTargetPath`|
-|`${config:ANY_EXTENSION_SCOPE.ANY_SETTING_ID}` |
+|`${config:ANY_EXTENSION_SCOPE.ANY_SETTING_ID}` | Any setting ID associated with another given extension in VS Code (i.e. `{config:C_Cpp.default.compileCommands}` expands to the path to your `compile_commands.json` for C++) |
 |`${configuration}`| The active configuration of your makefile project (i.e. `debug_x86`) |
 |`${command:makefile.getConfiguration}`| The active configuration of your makefile project (i.e. `debug_x86`) |
 |`${buildTarget}`| The active build target of your makefile target {i.e. `target.exe`} |
