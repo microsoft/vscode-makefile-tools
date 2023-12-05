@@ -449,7 +449,6 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
     }
 
     let parseCompilerArgsScriptFile: string = util.parseCompilerArgsScriptFile();
-    logger.message(`Testing finding the parseCompilerScript: ${parseCompilerArgsScriptFile}`, "Normal");
 
     if (process.platform === "win32") {
         // There is a potential problem with the windows version of the script:
