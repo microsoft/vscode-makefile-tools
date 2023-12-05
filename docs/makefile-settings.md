@@ -14,3 +14,22 @@ Supported commands for substitution:
 |`makefile.launchTargetPath`|The full path to the target executable, including the filename. If `makefile.buildBeforeLaunch` is true, invoking this substitution will also start a build.|
 |`makefile.launchTargetFileName`|The name of the target executable file without any path or extension information. If `makefile.buildBeforeLaunch` is true, invoking this substitution will also start a build.|
 |`makefile.makeBaseDirectory`|The folder where `make` will be starting from: passed with -C or otherwise the workspace folder.|
+
+# Variable substitution
+
+Makefile Tools supports the usage of macros in your `settings.json` as well.
+
+Supported macros for substitution:
+
+|macro|definition|
+|-----|----------|
+|`${workspaceFolder}`| The path to your workspace folder (i.e. `C:/Users/Projects/MyProject`). |
+|`${workspaceFolderBasename}`| The name of your workspace folder (i.e. `MyProject`). |
+|`${userHome}`| The path to the user's home folder (i.e. `C:/Users`). |
+|`${env:ENVIRONMENT_VARIABLE}`| A given `EVNIRONMENT_VARIBLE` for the current development environment. | 
+|`${command:ANY_EXTENSION_SCOPE.ANY_COMMAND_ID}` | Any commands for a given extension in VS Code (i.e. any of the ones listed above, like `command:makefile.getLaunchTargetPath`|
+|`${config:ANY_EXTENSION_SCOPE.ANY_SETTING_ID}` |
+|`${configuration}`|
+|`${command:makefile.getConfiguration}`|
+|`${buildTarget}`|
+|`${command:makefile.getBuildTarget}`|
