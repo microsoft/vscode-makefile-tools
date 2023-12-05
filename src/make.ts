@@ -834,8 +834,7 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
     } catch (error) {
         logger.message(error);
         return ConfigureBuildReturnCodeTypes.notFound;
-    }
-    finally {
+    } finally {
         util.deleteFileSync(wrapScriptFile);
         util.deleteFileSync(wrapScriptOutFile);
     }
