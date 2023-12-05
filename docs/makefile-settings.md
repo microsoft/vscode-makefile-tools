@@ -21,13 +21,13 @@ Makefile Tools supports the usage of macros in your `settings.json` as well.
 
 Supported macros for substitution:
 
-|macro|definition|
+|macro|expands to|
 |-----|----------|
 |`${workspaceFolder}`| The path to your workspace folder (i.e. `C:/Users/Projects/MyProject`). |
 |`${workspaceFolderBasename}`| The name of your workspace folder (i.e. `MyProject`). |
 |`${userHome}`| The path to the user's home folder (i.e. `C:/Users`). |
 |`${env:ENVIRONMENT_VARIABLE}`| A given `EVNIRONMENT_VARIBLE` for the current development environment. | 
-|`${command:ANY_EXTENSION_SCOPE.ANY_COMMAND_ID}` | Any commands for a given extension in VS Code (i.e. any of the ones listed above, like `command:makefile.getLaunchTargetPath` expands to the launch target path)|
+|`${command:ANY_EXTENSION_SCOPE.ANY_COMMAND_ID}` | The expanded value for any command for a given extension in VS Code (i.e. any of the ones listed above, like `command:makefile.getLaunchTargetPath` expands to the launch target path)|
 |`${config:ANY_EXTENSION_SCOPE.ANY_SETTING_ID}` | The expanded value for any setting associated with another given extension in VS Code (i.e. `{config:C_Cpp.default.compileCommands}` expands to the path to your `compile_commands.json`) |
 |`${configuration}`| The active configuration of your makefile project (i.e. `debug_x86`) |
 |`${command:makefile.getConfiguration}`| The active configuration of your makefile project (i.e. `debug_x86`) |
