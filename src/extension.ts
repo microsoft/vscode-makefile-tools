@@ -421,18 +421,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         }
     }));
 
-    // Delete the script that is created by this extension in the temporary folder
-    // with the purpose of spliting a compilation command fragment into switch arguments
-    // as the shell sees them. See more about this script in parser.ts, parseAnySwitchFromToolArguments.
-    // We need to delete this file occasionally to ensure that the extension will not use indefinitely
-    // an eventual old version, especially because for performance reasons we don't create this file
-    // every time we use it (the configure process creates it every time it's not found on disk).
-    // Deleting this script here ensures that every new VSCode instance will operate on up to date script functionality.
-    let parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
-    if (util.checkFileExistsSync(parseCompilerArgsScript)) {
-        util.deleteFileSync(parseCompilerArgsScript);
-    }
-
     if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
         // Always clean configure on open
         await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);

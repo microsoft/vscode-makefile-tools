@@ -252,6 +252,15 @@ const generateJsonSchemaLoc = () => {
         .pipe(gulp.dest('dist'));
 };
 
+const bundleScriptsPatterns = [
+    "assets/*"
+];
+
+const bundleScripts = () => {
+    return gulp.src(bundleScriptsPatterns).pipe(gulp.dest("assets"));
+}
+
+gulp.task('bundle-assets', bundleScripts);
 gulp.task('translations-generate', gulp.series(generatedSrcLocBundle, generatedAdditionalLocFiles, generateJsonSchemaLoc));
 
 const allTypeScript = [
