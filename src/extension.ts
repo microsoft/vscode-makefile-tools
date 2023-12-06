@@ -6,7 +6,7 @@
 import * as configuration from './configuration';
 import * as cpptools from './cpptools';
 import * as launch from './launch';
-import * as fs from 'fs';
+import { promises as fs } from "fs";
 import * as logger from './logger';
 import * as make from './make';
 import * as parser from './parser';
@@ -425,6 +425,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         // Always clean configure on open
         await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
     }
+
+    const parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
+
+    // The extension VSIX stripped the executable bit, so we need to set it.
+    // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
+    await fs.chmod(parseCompilerArgsScript, 0o755);
 
     // Analyze settings for type validation and telemetry
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
