@@ -421,16 +421,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         }
     }));
 
-    if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
-        // Always clean configure on open
-        await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
-    }
-
     const parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
 
     // The extension VSIX stripped the executable bit, so we need to set it.
     // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
     await fs.chmod(parseCompilerArgsScript, 0o755);
+
+    if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
+        // Always clean configure on open
+        await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
+    }
 
     // Analyze settings for type validation and telemetry
     let workspaceConfiguration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("makefile");
