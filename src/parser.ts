@@ -1479,7 +1479,7 @@ function getTargetArchitecture(compilerArgs: string): util.TargetArchitecture {
             targetArch = "arm";
         } else {
             // Check if ARM version is 7 or earlier.
-            const verStr: string | undefined = arch?.substr(5, 1);
+            const verStr: string | undefined = arch?.substr(4, 1);
             if (verStr) {
                 const verNum: number = +verStr;
                 if (verNum <= 7) {
