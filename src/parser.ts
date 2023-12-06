@@ -449,7 +449,7 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
     }
 
     let parseCompilerArgsScriptFile: string = util.parseCompilerArgsScriptFile();
-    let parseCompilerArgsScriptContent: string;
+
     if (process.platform === "win32") {
         // There is a potential problem with the windows version of the script:
         // A fragment like "-sw1,-sw2,-sw3" gets split by comma and a fragment like
@@ -460,20 +460,6 @@ async function parseAnySwitchFromToolArguments(args: string, excludeArgs: string
         // Until a better fix is implemented for 149, use a temporary marker that we replace from and into.
         compilerArgRegions = compilerArgRegions.replace(/\,/mg, "DONT_USE_COMMA_AS_SEPARATOR");
         compilerArgRegions = compilerArgRegions.replace(/\=/mg, "DONT_USE_EQUAL_AS_SEPARATOR");
-        parseCompilerArgsScriptContent = `@echo off\r\n`;
-        parseCompilerArgsScriptContent += `for %%i in (%*) do echo %%i \r\n`;
-    } else {
-        parseCompilerArgsScriptContent = `#!/bin/bash \n`;
-        parseCompilerArgsScriptContent += `while (( "$#" )); do \n`;
-        parseCompilerArgsScriptContent += `  echo $1 \n`;
-        parseCompilerArgsScriptContent += `  shift \n`;
-        parseCompilerArgsScriptContent += `done \n`;
-    }
-
-    // Create the script only when not found. The extension makes sure to delete it regularly
-    // (at project load time).
-    if (!util.checkFileExistsSync(parseCompilerArgsScriptFile)) {
-        util.writeFile(parseCompilerArgsScriptFile, parseCompilerArgsScriptContent);
     }
 
     let scriptArgs: string[] = [];

@@ -847,7 +847,8 @@
     "scripts": {
         "vscode:prepublish": "yarn compile-production",
         "compile": "yarn install && tsc -p ./",
-        "compile-production": "yarn install && yarn run translations-generate",
+        "compile-production": "yarn install && yarn run translations-generate && yarn run bundle-assets",
+        "bundle-assets": "gulp bundle-assets",
         "translations-export": "gulp translations-export",
         "translations-generate": "gulp translations-generate",
         "translations-import": "gulp translations-import",
@@ -859,6 +860,7 @@
     "devDependencies": {
         "@types/mocha": "^9.0.0",
         "@types/node": "^10.17.17",
+        "@types/uuid": "^9.0.7",
         "@types/vscode": "^1.74.0",
         "tslint": "^5.20.1",
         "tslint-microsoft-contrib": "^6.2.0",
@@ -889,6 +891,7 @@
         "@types/glob": "^7.1.1",
         "glob": "^7.1.6",
         "module-alias": "^2.2.2",
+        "uuid": "^9.0.1",
         "vscode-cpptools": "^6.1.0",
         "vscode-nls": "^5.0.0",
         "@vscode/extension-telemetry": "^0.6.2",

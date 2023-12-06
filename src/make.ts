@@ -14,6 +14,7 @@ import * as path from 'path';
 import * as util from './util';
 import * as telemetry from './telemetry';
 import * as vscode from 'vscode';
+import { v4 as uuidv4 } from "uuid";
 
 import * as nls from 'vscode-nls';
 nls.config({ messageFormat: nls.MessageFormat.bundle, bundleFormat: nls.BundleFormat.standalone })();
@@ -764,7 +765,10 @@ async function applyEnvironment(content: string | undefined) : Promise<void> {
 export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, scriptFile: string, scriptArgs: string[], loggingMessages: { success: string, successWithSomeError: string, failure: string}): Promise<number> {
     // Create a temporary wrapper for the user pre-configure script so that we collect
     // in another temporary output file the environrment variables that were produced.
-    let wrapScriptFile: string = path.join(util.tmpDir(), "wrapConfigureScript");
+    // generate a random guid to attach to the `wrapConfigureScript` to ensure we don't have races for the file. 
+    // We split at the first dash to avoid having excessively long filenames.
+    const shortenedUniqueIdentifier = uuidv4().split("-")[0];
+    let wrapScriptFile: string = path.join(util.tmpDir(), `wrapConfigureScript-${shortenedUniqueIdentifier}`);
     let wrapScriptOutFile: string = wrapScriptFile + ".out";
     let wrapScriptContent: string;
     if (process.platform === "win32") {
@@ -830,6 +834,9 @@ export async function runPrePostConfigureScript(progress: vscode.Progress<{}>, s
     } catch (error) {
         logger.message(error);
         return ConfigureBuildReturnCodeTypes.notFound;
+    } finally {
+        util.deleteFileSync(wrapScriptFile);
+        util.deleteFileSync(wrapScriptOutFile);
     }
 }
 

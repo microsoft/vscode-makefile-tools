@@ -6,7 +6,7 @@
 import * as configuration from './configuration';
 import * as cpptools from './cpptools';
 import * as launch from './launch';
-import * as fs from 'fs';
+import { promises as fs } from "fs";
 import * as logger from './logger';
 import * as make from './make';
 import * as parser from './parser';
@@ -421,17 +421,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         }
     }));
 
-    // Delete the script that is created by this extension in the temporary folder
-    // with the purpose of spliting a compilation command fragment into switch arguments
-    // as the shell sees them. See more about this script in parser.ts, parseAnySwitchFromToolArguments.
-    // We need to delete this file occasionally to ensure that the extension will not use indefinitely
-    // an eventual old version, especially because for performance reasons we don't create this file
-    // every time we use it (the configure process creates it every time it's not found on disk).
-    // Deleting this script here ensures that every new VSCode instance will operate on up to date script functionality.
-    let parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
-    if (util.checkFileExistsSync(parseCompilerArgsScript)) {
-        util.deleteFileSync(parseCompilerArgsScript);
-    }
+    const parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
+
+    // The extension VSIX stripped the executable bit, so we need to set it.
+    // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
+    await fs.chmod(parseCompilerArgsScript, 0o755);
 
     if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
         // Always clean configure on open
