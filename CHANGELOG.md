@@ -4,11 +4,13 @@
 Bug Fixes:
 - Fix a bug where the first argument for pre/post-configure args didn't have the proper spacing in front of it [PR #530](https://github.com/microsoft/vscode-makefile-tools/pull/530)
 - Fix a bug where we weren't handling pre/post-configure args for the non-windows scenarios. [#531](https://github.com/microsoft/vscode-makefile-tools/issues/531)
+- Fix a bug where we were checking the wrong character of the architecture. [#499](https://github.com/microsoft/vscode-makefile-tools/issues/499)
 
 Improvements:
 - Add support for a post configure script. [#391](https://github.com/microsoft/vscode-makefile-tools/issues/391)
 - Add support for post-configure and pre-configure script arguments, both globally and per configuration. [#151](https://github.com/microsoft/vscode-makefile-tools/issues/151)
 - Honor workspace trust in VS Code and warn about code being run during dry-run. [#514](https://github.com/microsoft/vscode-makefile-tools/pull/514)
+- Ship the parseCompilerArgs script with the extension to avoid race conditions. [#516](https://github.com/microsoft/vscode-makefile-tools/issues/516), [#475](https://github.com/microsoft/vscode-makefile-tools/issues/475)
 
 ## 0.7.0
 Improvements:
