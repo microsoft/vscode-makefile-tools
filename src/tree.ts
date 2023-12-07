@@ -336,9 +336,9 @@ export class ProjectOutlineProvider implements vscode.TreeDataProvider<BaseNode>
         this._currentConfigurationItem.update(configuration || this._unsetString);
         this._currentBuildTargetItem.update(buildTarget || this._unsetString);
         await this._currentLaunchTargetItem.update(launchTarget || this._unsetString);
-        this._currentMakefilePathInfoItem.update(makefilePathInfo || this._unsetString, this.pathDisplayed(makefilePathInfo, "Makefile", false, true));
+        this._currentMakefilePathInfoItem.update(makefilePathInfo || this._unsetString, this.pathDisplayed(makefilePathInfo, "Makefile", false, false));
         this._currentMakePathInfoItem.update(makePathInfo || this._unsetString, this.pathDisplayed(makePathInfo, "Make", true, false));
-        this._currentBuildLogPathInfoItem.update(buildLogInfo || this._unsetString, this.pathDisplayed(buildLogInfo, "Build Log", false, true));
+        this._currentBuildLogPathInfoItem.update(buildLogInfo || this._unsetString, this.pathDisplayed(buildLogInfo, "Build Log", false, false));
 
         this.updateTree();
     }
