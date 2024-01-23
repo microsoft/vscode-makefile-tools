@@ -95,7 +95,14 @@ export function tmpDir(): string {
     if (process.platform === 'win32') {
         return process.env['TEMP'] || "";
     } else {
-        return process.env['XDG_RUNTIME_DIR'] || '/tmp';
+        const xdg = process.env['XDG_RUNTIME_DIR'];
+        if (xdg) {
+            if (!fs.existsSync(xdg)) {
+                fs.mkdirSync(xdg);
+            }
+            return xdg;
+        }
+        return '/tmp';
     }
 }
 
