@@ -43,10 +43,7 @@ extends:
             displayName: 'Publish VSIX'
             targetPath: $(Build.ArtifactStagingDirectory)/vsix
             artifactName: vsix
-          - output: pipelineArtifact
-            displayName: SBOM
-            targetPath: $(Build.ArtifactStagingDirectory)/_manifest
-            artifactName: sbom
+          # No need for the SBOM, it's now located in the vsix artifact
         steps:
         - checkout: self
           clean: true
