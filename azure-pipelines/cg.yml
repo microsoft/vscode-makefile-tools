@@ -20,6 +20,8 @@ variables:
   value: true
 - name: Codeql.TSAEnabled
   value: true
+- name: TeamName
+  value: C++ Cross Platform and Cloud
 
 extends:
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
