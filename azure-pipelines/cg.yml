@@ -35,6 +35,9 @@ extends:
         name: AzurePipelines-EO
         image: AzurePipelinesWindows2022compliantGPT
         os: windows
+      componentgovernance:
+        ignoreDirectories: node_modules,dist,i18n
+        alertWarningLevel: Medium
     customBuildTags:
     - ES365AIMigrationTooling
     stages:
