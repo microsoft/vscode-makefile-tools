@@ -101,6 +101,8 @@ steps:
       mkdir $(Build.ArtifactStagingDirectory)\vsix
       if "${{parameters.IsPreRelease}}"=="1" (vsce package --yarn -o $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix --pre-release) else (vsce package --yarn -o $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix)
 
+- template: /jobs/shared/install-nuget.yml@self
+
 - script: nuget restore $(Build.SourcesDirectory)\build\SignFiles.proj -PackagesDirectory $(Build.SourcesDirectory)\build\packages
   displayName: Restore MicroBuild Core
 
