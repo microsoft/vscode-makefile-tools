@@ -17,13 +17,13 @@ name: $(Date:yyyyMMdd).$(Rev:r)
 
 parameters:
 - name: SignTypeOverride
-    displayName: Signing Type Override
-    type: string
-    default: default
-    values:
-      - default
-      - test
-      - real
+  displayName: Signing Type Override
+  type: string
+  default: default
+  values:
+    - default
+    - test
+    - real
 
 variables:
   IsPreRelease: 0
