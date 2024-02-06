@@ -37,44 +37,7 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:makefile.setBuildConfiguration",
-        "onCommand:makefile.getConfiguration",
-        "onCommand:makefile.setBuildTarget",
-        "onCommand:makefile.getBuildTarget",
-        "onCommand:makefile.buildTarget",
-        "onCommand:makefile.buildCleanTarget",
-        "onCommand:makefile.buildAll",
-        "onCommand:makefile.buildCleanAll",
-        "onCommand:makefile.setLaunchConfiguration",
-        "onCommand:makefile.launchDebug",
-        "onCommand:makefile.launchRun",
-        "onCommand:makefile.launchTargetPath",
-        "onCommand:makefile.getLaunchTargetPath",
-        "onCommand:makefile.launchTargetFileName",
-        "onCommand:makefile.getLaunchTargetFileName",
-        "onCommand:makefile.getLaunchTargetDirectory",
-        "onCommand:makefile.getLaunchTargetArgs",
-        "onCommand:makefile.getLaunchTargetArgsConcat",
-        "onCommand:makefile.makeBaseDirectory",
-        "onCommand:makefile.configure",
-        "onCommand:makefile.cleanConfigure",
-        "onCommand:makefile.preConfigure",
-        "onCommand:makefile.postConfigure",
-        "onCommand:makefile.outline.setBuildConfiguration",
-        "onCommand:makefile.outline.setBuildTarget",
-        "onCommand:makefile.outline.buildTarget",
-        "onCommand:makefile.outline.buildCleanTarget",
-        "onCommand:makefile.outline.setLaunchConfiguration",
-        "onCommand:makefile.outline.launchDebug",
-        "onCommand:makefile.outline.launchRun",
-        "onCommand:makefile.outline.configure",
-        "onCommand:makefile.outline.cleanConfigure",
-        "onCommand:makefile.outline.preConfigure",
-        "onCommand:makefile.outline.postConfigure",
-        "onCommand:makefile.resetState",
-        "workspaceContains:**/makefile",
-        "workspaceContains:**/Makefile",
-        "workspaceContains:**/GNUmakefile"
+        "*"
     ],
     "main": "./out/src/extension.js",
     "contributes": {
@@ -668,10 +631,6 @@
                     "when": "makefile:localRunFeature"
                 },
                 {
-                    "command": "makefile.setBuildConfiguration",
-                    "when": "makefile:fullFeatureSet"
-                },
-                {
                     "command": "makefile.setBuildTarget",
                     "when": "makefile:fullFeatureSet"
                 },
@@ -783,7 +742,7 @@
                 },
                 {
                     "command": "makefile.outline.setBuildConfiguration",
-                    "when": "makefile:fullFeatureSet && view == makefile.outline && viewItem =~ /nodeType=configuration/",
+                    "when": "view == makefile.outline && viewItem =~ /nodeType=configuration/",
                     "group": "inline@1"
                 },
                 {

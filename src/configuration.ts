@@ -200,35 +200,37 @@ async function readMakePath(): Promise<void> {
     }
 }
 
-let makefilePath: string | undefined;
-export function getMakefilePath(): string | undefined { return makefilePath; }
-export function setMakefilePath(path: string): void { makefilePath = path; }
+let makefilePath: string = "Makefile";
+export function getMakefilePath(): string { return makefilePath; }
+export function setMakefilePath(path: string = "Makefile"): void { makefilePath = path; }
 // Read the full path to the makefile if defined in settings.
 // It represents a default to look for if no other makefile is already provided
 // in makefile.configurations.makefilePath.
 // TODO: validate and integrate with "-f [Makefile]" passed in makefile.configurations.makeArgs.
 async function readMakefilePath(): Promise<void> {
-    makefilePath = await util.getExpandedSetting<string>("makefilePath");
-    if (!makefilePath) {
+    let makefilePathSetting: string | undefined = await util.getExpandedSetting<string>("makefilePath");
+    if (!makefilePathSetting) {
         logger.message("No path to the makefile is defined in the settings file.");
+        setMakefilePath();
     } else {
-        makefilePath = util.resolvePathToRoot(makefilePath);
+        setMakefilePath(makefilePathSetting);
     }
 }
 
 let makeDirectory: string | undefined;
 export function getMakeDirectory(): string | undefined { return makeDirectory; }
-export function setMakeDirectory(dir: string): void { makeDirectory = dir; }
+export function setMakeDirectory(dir: string = ''): void { makeDirectory = dir; }
 // Read the make working directory path if defined in settings.
 // It represents a default to look for if no other makeDirectory is already provided
 // in makefile.configurations.makeDirectory.
 // TODO: validate and integrate with "-C [DIR_PATH]" passed in makefile.configurations.makeArgs.
 async function readMakeDirectory(): Promise<void> {
-    makeDirectory = await util.getExpandedSetting<string>("makeDirectory");
-    if (!makeDirectory) {
+    let makeDirectorySetting: string | undefined = await util.getExpandedSetting<string>("makeDirectory");
+    if (!makeDirectorySetting) {
         logger.message("No folder path to the makefile is defined in the settings file.");
+        setMakeDirectory();
     } else {
-      makeDirectory = util.resolvePathToRoot(makeDirectory);
+        setMakeDirectory(makeDirectorySetting);
     }
 }
 
@@ -735,37 +737,80 @@ export async function getCommandForConfiguration(configuration: string | undefin
         configurationMakeCommand += ".exe";
     }
 
-    // Add the makefile path via the -f make switch.
-    // makefile.configurations.makefilePath overwrites makefile.makefilePath.
-    configurationMakefile = makefileConfiguration?.makefilePath ? util.resolvePathToRoot(makefileConfiguration?.makefilePath) : makefilePath;
-    if (configurationMakefile) {
-        // check if the makefile path is a directory. If so, try adding `Makefile` or `makefile`
-        if (util.checkDirectoryExistsSync(configurationMakefile)) {
-            let makeFileTest: string = path.join(configurationMakefile, "Makefile");
-            if (!util.checkFileExistsSync(makeFileTest)) {
-                makeFileTest = path.join(configurationMakefile, "makefile");
-            }
-
-            // if we found the makefile in the directory, set the `configurationMakefile` to the found file path.
-            if (util.checkFileExistsSync(makeFileTest)) {
-                configurationMakefile = makeFileTest;
-            }
-        }
-
-        configurationMakeArgs.push("-f");
-        configurationMakeArgs.push(`${configurationMakefile}`);
-        // Need to rethink this (GitHub 59).
-        // Some repos don't work when we automatically add -C, others don't work when we don't.
-        // configurationMakeArgs.push("-C");
-        // configurationMakeArgs.push(path.parse(configurationMakefile).dir);
-    }
-
     // Add the working directory path via the -C switch.
     // makefile.configurations.makeDirectory overwrites makefile.makeDirectory.
     let makeDirectoryUsed: string | undefined = makefileConfiguration?.makeDirectory ? util.resolvePathToRoot(makefileConfiguration?.makeDirectory) : makeDirectory;
     if (makeDirectoryUsed) {
         configurationMakeArgs.push("-C");
         configurationMakeArgs.push(`${makeDirectoryUsed}`);
+        configurationMakefile = makeDirectoryUsed;
+    }
+
+    // Add the makefile path via the -f make switch.
+    // The make file is in makeDirectory or in the workspace directory,
+    // and is named "Makefile" or "makefile".
+    // makefile.configurations.makefilePath overwrites makefile.makefilePath.
+    let makeFileTest: string | undefined;
+    // filename of makefile relative to makeDirectory
+    let relativeMakefile: string | undefined;
+    let makefileExists : boolean = false;
+    if (makeDirectoryUsed) {
+        // check if the makefile path is a directory. If so, try adding
+        // the configuration makefilePath, then the makefilePath, then `Makefile` or `makefile`
+        if (util.checkDirectoryExistsSync(makeDirectoryUsed)) {
+            if (makefileConfiguration?.makefilePath) {
+                makeFileTest = path.join(makeDirectoryUsed, makefileConfiguration?.makefilePath);
+                relativeMakefile = makefileConfiguration?.makefilePath;
+                makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                if (!makefileExists) {
+                    makeFileTest = makefilePath;
+                    relativeMakefile = util.resolvePathToRoot(makeFileTest);
+                    makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                }
+            }
+            if (!makefileExists) {
+                makeFileTest = path.join(makeDirectoryUsed, makefilePath);
+                relativeMakefile = makefilePath;
+                makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                if (!makefileExists) {
+                    if (makefilePath != "Makefile") {
+                        relativeMakefile = "Makefile";
+                        makeFileTest = path.join(makeDirectoryUsed, relativeMakefile);
+                        makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                    }
+                    if (!makefileExists) {
+                        relativeMakefile = "makefile";
+                        makeFileTest = path.join(makeDirectoryUsed, relativeMakefile);
+                        makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+                    }
+                }
+            }
+        }
+    }
+    if (!makefileExists) {
+        if (!makeDirectoryUsed && makefileConfiguration?.makefilePath) {
+            relativeMakefile = makefileConfiguration?.makefilePath;
+            makeFileTest = makefileConfiguration?.makefilePath;
+            makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+        }
+    }
+    if (!makefileExists) {
+        makeFileTest = makefilePath;
+        relativeMakefile = makefilePath;
+        makefileExists = util.checkFileExistsSync(util.resolvePathToRoot(makeFileTest));
+    }
+
+    // if we found the makefile in the directory, set the `configurationMakefile` to the found file path.
+    if (makefileExists) {
+        configurationMakefile = relativeMakefile;
+        configurationMakeArgs.push("-f");
+        configurationMakeArgs.push(`${relativeMakefile}`);
+        setMakefilePath(relativeMakefile);
+        setConfigurationMakefile(makeFileTest);
+        // Need to rethink this (GitHub 59).
+        // Some repos don't work when we automatically add -C, others don't work when we don't.
+        // configurationMakeArgs.push("-C");
+        // configurationMakeArgs.push(path.parse(configurationMakefile).dir);
     }
 
     // Make sure we append "makefile.configurations[].makeArgs" last, in case the developer wants to overwrite any arguments that the extension
@@ -789,22 +834,6 @@ export async function getCommandForConfiguration(configuration: string | undefin
 
     if (configurationMakeCommand) {
         logger.message(`Deduced command '${configurationMakeCommand} ${configurationMakeArgs.join(" ")}' for configuration "${configuration}"`);
-    }
-
-    // Check for makefile path on disk: we search first for any makefile specified via the makefilePath setting,
-    // then via the makeDirectory setting and then in the root of the workspace. On linux/mac, it often is 'Makefile', so verify that we default to the right filename.
-    if (!configurationMakefile) {
-       if (makeDirectoryUsed) {
-          configurationMakefile = util.resolvePathToRoot(path.join(makeDirectoryUsed, "Makefile"));
-          if (!util.checkFileExistsSync(configurationMakefile)) {
-             configurationMakefile = util.resolvePathToRoot(path.join(makeDirectoryUsed, "makefile"));
-          }
-       } else {
-          configurationMakefile = util.resolvePathToRoot("./Makefile");
-          if (!util.checkFileExistsSync(configurationMakefile)) {
-             configurationMakefile = util.resolvePathToRoot("./makefile");
-          }
-       }
     }
 
  // Validation and warnings about properly defining the makefile and make tool.
@@ -844,7 +873,7 @@ export async function getCommandForConfiguration(configuration: string | undefin
             }
         }
 
-        if (!util.checkFileExistsSync(configurationMakefile)) {
+        if (!makefileExists) {
             logger.message("The makefile entry point was not found. " +
                 "Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, " +
                 "makefile.makeDirectory, makefile.configurations[].makeDirectory" +
@@ -1001,24 +1030,22 @@ export async function readMakefileConfigurations(): Promise<void> {
 // Last target picked from the set of targets that are run by the makefiles
 // when building for the current configuration.
 // Saved into the settings storage. Also reflected in the configuration status bar button
-let currentTarget: string | undefined;
-export function getCurrentTarget(): string | undefined { return currentTarget; }
-export function setCurrentTarget(target: string | undefined): void { currentTarget = target; }
+// Assume the well-known "all" target for the default goal
+let currentTarget: string = "all";
+export function getCurrentTarget(): string { return currentTarget; }
+// Set the current target, or 'all' if none was given
+export function setCurrentTarget(target: string = "all"): void { currentTarget = target; }
 
 // Read current target from workspace state, update status bar item
 function readCurrentTarget(): void {
     let buildTarget : string | undefined = extension.getState().buildTarget;
+    setCurrentTarget(buildTarget);
     if (!buildTarget) {
-        logger.message("No target defined in the workspace state. Assuming 'Default'.");
-        statusBar.setTarget("Default");
-        // If no particular target is defined in settings, use 'Default' for the button
-        // but keep the variable empty, to not append it to the make command.
-        currentTarget = "";
+        logger.message(`No target defined in the workspace state. Assuming '${currentTarget}'.`);
     } else {
-        currentTarget = buildTarget;
         logger.message(`Reading current build target "${currentTarget}" from the workspace state.`);
-        statusBar.setTarget(currentTarget);
     }
+    statusBar.setTarget(currentTarget);
 }
 
 let configureOnOpen: boolean | undefined;
@@ -1393,9 +1420,6 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
 
             subKey = "makefilePath";
             let updatedMakefilePath : string | undefined = await util.getExpandedSetting<string>(subKey);
-            if (updatedMakefilePath) {
-                updatedMakefilePath = util.resolvePathToRoot(updatedMakefilePath);
-            }
             if (updatedMakefilePath !== makefilePath) {
                 // A change in makefile.makefilePath should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
@@ -1407,9 +1431,6 @@ export async function initFromSettings(activation: boolean = false): Promise<voi
 
             subKey = "makeDirectory";
             let updatedMakeDirectory : string | undefined = await util.getExpandedSetting<string>(subKey);
-            if (updatedMakeDirectory) {
-                updatedMakeDirectory = util.resolvePathToRoot(updatedMakeDirectory);
-            }
             if (updatedMakeDirectory !== makeDirectory) {
                 // A change in makefile.makeDirectory should trigger an IntelliSense update
                 // only if the extension is not currently reading from a build log.
