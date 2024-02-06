@@ -38,11 +38,6 @@ extends:
       - job: Job_1
         displayName: Build release
         templateContext:
-          mb:
-          - signing:
-            enabled: true
-            signType: $(SignType)
-            zipSources: false
           outputs:
           - output: pipelineArtifact
             displayName: 'Publish VSIX'
