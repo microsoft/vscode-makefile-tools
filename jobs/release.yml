@@ -15,12 +15,27 @@ resources:
 
 name: $(Date:yyyyMMdd).$(Rev:r)
 
+parameters:
+- name: SignTypeOverride
+    displayName: Signing Type Override
+    type: string
+    default: default
+    values:
+      - default
+      - test
+      - real
+
 variables:
-- name: IsPreRelease
-  value: 0
+  IsPreRelease: 0
 # ReleaseVersion is set in the versions tab so it can be edited.
-- name: TeamName
-  value: C++ Cross Platform and Cloud
+  TeamName: C++ Cross Platform and Cloud
+  # If the user didn't override the signing type, then only real-sign on main.
+  ${{ if ne(parameters.SignTypeOverride, 'default') }}:
+    SignType: ${{ parameters.SignTypeOverride }}
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/vs-release/'))) }}:
+    SignType: real
+  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(or(startsWith(variables['Build.SourceBranch'], 'refs/tags'), eq(variables['Build.SourceBranchName'], 'main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/vs-release/')))) }}:
+    SignType: test
 
 extends:
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
