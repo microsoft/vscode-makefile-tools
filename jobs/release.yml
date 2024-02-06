@@ -1,6 +1,16 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+parameters:
+- name: SignTypeOverride
+  displayName: Signing Type Override
+  type: string
+  default: default
+  values:
+    - default
+    - test
+    - real
+
 trigger: none
 
 resources:
@@ -14,16 +24,6 @@ resources:
     ref: refs/tags/release
 
 name: $(Date:yyyyMMdd).$(Rev:r)
-
-parameters:
-- name: SignTypeOverride
-  displayName: Signing Type Override
-  type: string
-  default: default
-  values:
-    - default
-    - test
-    - real
 
 variables:
   IsPreRelease: 0
