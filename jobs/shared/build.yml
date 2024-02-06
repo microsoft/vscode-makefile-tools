@@ -9,6 +9,7 @@ parameters:
   type: string
   default: $(ReleaseVersion)
 
+steps:
 - task: MicroBuildSigningPlugin@3
   displayName: Install MicroBuild Signing
   inputs:
