@@ -13,7 +13,7 @@
     <FilesToSign Include="$(OutDir)\out\src\**\*.js">
       <Authenticode>Microsoft400</Authenticode>
     </FilesToSign>
-    <FilesToSign Include="$(OutDir)\node_modules\dist\**\*.js">
+    <FilesToSign Include="$(OutDir)\node_modules\**\*.js">
       <Authenticode>3PartyScriptsSHA2</Authenticode>
     </FilesToSign>
   </ItemGroup>
