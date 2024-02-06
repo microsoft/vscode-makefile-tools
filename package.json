@@ -846,8 +846,9 @@
     },
     "scripts": {
         "vscode:prepublish": "yarn compile-production",
-        "compile": "yarn install && tsc -p ./",
-        "compile-production": "yarn install && yarn run translations-generate && yarn run bundle-assets",
+        "compile": "yarn install && webpack --mode development",
+        "compile-watch": "yarn install && webpack --mode development --watch --progress",
+        "compile-production": "yarn install && yarn run translations-generate && yarn run bundle-assets && webpack --env BUILD_VSCODE_NLS=true --mode production",
         "bundle-assets": "gulp bundle-assets",
         "translations-export": "gulp translations-export",
         "translations-generate": "gulp translations-generate",
@@ -885,7 +886,10 @@
         "@octokit/rest": "^18.1.1",
         "parse-git-config": "^3.0.0",
         "jsonc-parser": "^3.0.0",
-        "@vscode/test-electron": "^2.3.8"
+        "@vscode/test-electron": "^2.3.8",
+        "ts-loader": "^8.0.17",
+        "webpack": "^5.76.0",
+        "webpack-cli": "^4.5.0"
     },
     "dependencies": {
         "@types/glob": "^7.1.1",
