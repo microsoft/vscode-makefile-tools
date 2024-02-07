@@ -2,7 +2,7 @@
     "name": "makefile-tools",
     "displayName": "Makefile Tools",
     "description": "Provide makefile support in VS Code: C/C++ IntelliSense, build, debug/run.",
-    "version": "0.7.0",
+    "version": "1.7.0",
     "publisher": "ms-vscode",
     "preview": true,
     "icon": "res/makefile-logo.png",
@@ -855,7 +855,7 @@
         "translations-import": "gulp translations-import",
         "watch": "tsc -watch -p ./",
         "package": "vsce package --yarn -o makefile-tools.vsix",
-        "pretest": "yarn compile",
+        "pretest": "tsc -p test.tsconfig.json",
         "test": "yarn run pretest && node ./out/src/test/runTest.js"
     },
     "devDependencies": {

@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "compile",
+            "label": "build-with-webpack-watch",
             "type": "npm",
             "script": "compile",
             "problemMatcher": [
@@ -34,6 +34,40 @@
                         }
                     }
                 }
+            ],
+            "isBackground": true
+        },
+        {
+            "label": "Pretest",
+            "group": "build",
+            "isBackground": false,
+            "type": "shell",
+            "command": "yarn",
+            "args": [
+                "run",
+                "pretest"
+            ],
+            "dependsOn": [
+                "Compile"
+            ]
+        },
+        {
+            "label": "Compile",
+            "group": "build",
+            "isBackground": false,
+            "type": "shell",
+            "command": "yarn",
+            "args": [
+                "run",
+                "compile"
+            ]
+        },
+        {
+            "label": "compile",
+            "type": "npm",
+            "script": "compile",
+            "problemMatcher": [
+                "$tsc-watch"
             ],
             "isBackground": true
         }
