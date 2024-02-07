@@ -210,6 +210,7 @@ const generatedSrcLocBundle = () => {
         .pipe(nls.createAdditionalLanguageFiles(languages, "i18n"))
         .pipe(nls.bundleMetaDataFiles('ms-vscode.makefile-tools', 'dist'))
         .pipe(nls.bundleLanguageFiles())
+        .pipe(filter(['**/nls.bundle.*.json', '**/nls.metadata.header.json', '**/nls.metadata.json']))
         .pipe(gulp.dest('dist'));
 };
 
