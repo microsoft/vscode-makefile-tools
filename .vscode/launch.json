@@ -31,16 +31,17 @@
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/out/src/test/fakeSuite/index"
             ],
-            "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [
-                "${workspaceFolder}/out/src/test/**/*.js"
+                "${workspaceFolder}/out/*",
+                "${workspaceFolder}/out/src/*",
+                "${workspaceFolder}/out/src/test/**/*"
             ],
             "env": {
                 "MAKEFILE_TOOLS_TESTING": "1",
                 "WindowsSDKVersion": "12.3.45678.9\\"
             },
-            "preLaunchTask": "compile",
+            "preLaunchTask": "Pretest",
         },
         {
             "name": "Node Attach",
