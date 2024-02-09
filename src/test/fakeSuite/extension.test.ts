@@ -42,10 +42,14 @@ suite('Fake dryrun parsing', () => {
 
     suiteSetup(async function (this: Mocha.Context) {
         this.timeout(100000);
+
+        await vscode.commands.executeCommand('makefile.resetState', false);
     });
 
     setup(async function (this: Mocha.Context) {
         this.timeout(100000);
+
+        await vscode.commands.executeCommand('makefile.resetState', false);
     });
 
    // Interesting scenarios with string paths, corner cases in defining includes/defines,
