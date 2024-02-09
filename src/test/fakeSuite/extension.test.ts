@@ -147,8 +147,6 @@ suite('Fake dryrun parsing', () => {
          // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
          // from this extension repository instead of a real installation which may vary from system to system.
 
-         await configuration.setConfigurationByName("complex_escaped_quotes_winOnly");
-
          await vscode.commands.executeCommand('makefile.setPreconfigureScriptByPath', path.join(vscode.workspace.rootPath || "./", systemPlatform === "win32" ? ".vscode/preconfigure.bat" : ".vscode/preconfigure_nonwin.sh"));
          await vscode.commands.executeCommand('makefile.preConfigure');
          
