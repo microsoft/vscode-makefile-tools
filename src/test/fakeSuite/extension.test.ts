@@ -38,7 +38,7 @@ import * as vscode from 'vscode';
 import { extension } from '../../extension';
 
 // TODO: refactor initialization and cleanup of each test
-suite('Fake dryrun parsing', async () => {
+suite('Fake dryrun parsing', () => {
    // Interesting scenarios with string paths, corner cases in defining includes/defines,
    // complex configurations-targets-files associations.
    // For now, this test needs to run in an environment with VS 2019.
@@ -60,7 +60,7 @@ suite('Fake dryrun parsing', async () => {
 
    const ext = vscode.extensions.getExtension("ms-vscode.makefile-tools");
    if (ext) {
-    await ext.activate();
+    ext.activate();
    }
 
 
