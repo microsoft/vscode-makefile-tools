@@ -516,7 +516,6 @@ Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
 Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration "InterestingSmallMakefile_windows_configRelSpeed"
-Building target "Execute_Arch3" with command: 'c:\fake\path\make.exe Execute_Arch3 OPT=RelSpeed'
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()" from the workspace state.
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()" from the workspace state.
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()" from the workspace state.

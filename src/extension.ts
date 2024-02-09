@@ -219,19 +219,6 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     await extension.setFullFeatureSet(false);
 
     telemetry.activate();
-
-    // === Commands only for testing ===
-    // commands that are not exposed via package.json and are used for testing.
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfigurationByName', async (name: string) => {
-        await configuration.setConfigurationByName(name);
-    }));
-
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setPreconfigureScriptByPath', async (path: string) => {
-        await configuration.setPreConfigureScript(path);
-    }));
-
-    // === Commands only for testing ===
-
     
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', async () => {
         await configuration.setNewConfiguration();
@@ -439,6 +426,22 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             }
         }
     }));
+
+        // === Commands only for testing ===
+    // commands that are not exposed via package.json and are used for testing.
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfigurationByName', async (name: string) => {
+        await configuration.setConfigurationByName(name);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setPreconfigureScriptByPath', async (path: string) => {
+        await configuration.setPreConfigureScript(path);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setTargetByName', async (name: string) => {
+        await configuration.setTargetByName(name);
+    }))
+
+    // === Commands only for testing ===
 
     const parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
 

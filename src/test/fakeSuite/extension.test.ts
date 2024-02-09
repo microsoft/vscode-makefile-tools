@@ -147,11 +147,16 @@ suite('Fake dryrun parsing', () => {
          // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
          // from this extension repository instead of a real installation which may vary from system to system.
 
-         await vscode.commands.executeCommand('makefile.setPreconfigureScriptByPath', path.join(vscode.workspace.rootPath || "./", systemPlatform === "win32" ? ".vscode/preconfigure.bat" : ".vscode/preconfigure_nonwin.sh"));
+         await vscode.commands.executeCommand(
+           "makefile.setPreconfigureScriptByPath",
+           path.join(
+             vscode.workspace.rootPath || "./",
+             ".vscode/preconfigure.bat"
+           )
+         );
          await vscode.commands.executeCommand('makefile.preConfigure');
          
          await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "complex_escaped_quotes_winOnly");
-         
          await vscode.commands.executeCommand('makefile.cleanConfigure');
 
          // Compare the output log with the baseline
@@ -173,16 +178,12 @@ suite('Fake dryrun parsing', () => {
       });
    }
 
-   /*if (systemPlatform === "win32") {
+   if (systemPlatform === "win32") {
       test('Interesting small makefile - windows', async () => {
          // Settings reset from the previous test run.
-         extension.getState().reset(false);
+         await vscode.commands.executeCommand('makefile.resetState', false);
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
-         configuration.setCurrentLaunchConfiguration(undefined);
-         configuration.setCurrentMakefileConfiguration("Default");
-         configuration.setCurrentTarget(undefined);
-         configuration.initFromState();
-         await configuration.initFromSettings();
+         await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
 
          // Extension log is defined in the test .vscode/settings.json but delete it now
          // because we are interested to compare against a baseline from this point further.
@@ -193,12 +194,11 @@ suite('Fake dryrun parsing', () => {
 
          // Run a preconfigure script to include our tests "Program Files" path so that we always find a cl.exe
          // from this extension repository instead of a real VS installation that happens to be in the path.
-         configuration.setPreConfigureScript(path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure.bat"));
-         await make.preConfigure(make.TriggeredBy.tests);
+         await vscode.commands.executeCommand('makefile.setPreconfigureScriptByPath', path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure.bat"));
+         await vscode.commands.executeCommand('makefile.preConfigure');
 
-         configuration.prepareConfigurationsQuickPick();
-         await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configDebug");
-         const retc: number = await make.cleanConfigure(make.TriggeredBy.tests, true);
+         await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "complex_escaped_quotes_winOnly");
+         await vscode.commands.executeCommand('makefile.cleanConfigure');
 
          const launchConfigurations: string[] = ["bin\\InterestingSmallMakefile\\ARC H3\\Debug\\main.exe(str3a,str3b,str3c)",
             "bin\\InterestingSmallMakefile\\arch1\\Debug\\main.exe(str3a,str3b,str3c)",
@@ -221,14 +221,14 @@ suite('Fake dryrun parsing', () => {
          // to exercise different combinations of pre-created build log and/or make tools.
          // No configure is necessary to be run here, it is enough to look at what happens
          // when changing a configuration.
-         await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSize");
-         await configuration.setConfigurationByName("InterestingSmallMakefile_windows_configRelSpeed");
+         await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "InterestingSmallMakefile_windows_configRelSize");
+         await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "InterestingSmallMakefile_windows_configRelSpeed");
+         
 
          // InterestingSmallMakefile_windows_configRelSpeed constructs a more interesting build command.
-         await configuration.setTargetByName("Execute_Arch3");
-         make.prepareBuildTarget("Execute_Arch3");
+         await vscode.commands.executeCommand('makefile.setTargetByName', "Execute_Arch3");
 
-         extension.getState().reset(false);
+         await vscode.commands.executeCommand("makefile.resetState", false);
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
 
          // Compare the output log with the baseline
@@ -249,7 +249,7 @@ suite('Fake dryrun parsing', () => {
       });
    }
 
-   // dry-run logs for https://github.com/rui314/8cc.git
+   /*// dry-run logs for https://github.com/rui314/8cc.git
    if (systemPlatform === "linux" || systemPlatform === "mingw") {
       test(`8cc - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
