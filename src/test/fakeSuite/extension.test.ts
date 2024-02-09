@@ -187,7 +187,7 @@ suite('Fake dryrun parsing', () => {
 
          // Extension log is defined in the test .vscode/settings.json but delete it now
          // because we are interested to compare against a baseline from this point further.
-         let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+         let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
          if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
             util.deleteFileSync(extensionLogPath);
          }
@@ -204,16 +204,15 @@ suite('Fake dryrun parsing', () => {
             "bin\\InterestingSmallMakefile\\arch1\\Debug\\main.exe(str3a,str3b,str3c)",
             "bin\\InterestingSmallMakefile\\arch2\\Debug\\main.exe()"];
          for (const config of launchConfigurations) {
-            await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">" + config);
-            let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+            await vscode.commands.executeCommand('makefile.setLaunchConfigurationByName', vscode.workspace.rootPath + ">" + config);
+            let status: string = await vscode.commands.executeCommand('makefile.validateLaunchConfiguration');
             let launchConfiguration: configuration.LaunchConfiguration | undefined;
             if (status === launch.LaunchStatuses.success) {
-               launchConfiguration = configuration.getCurrentLaunchConfiguration();
+               launchConfiguration = await vscode.commands.executeCommand('makefile.getCurrentLaunchConfiguration');
             }
 
             if (launchConfiguration) {
-               launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
-               launch.getLauncher().prepareRunCurrentTarget();
+               await vscode.commands.executeCommand('makefile.prepareDebugAndRunCurrentTarget');
             }
          }
 
@@ -223,7 +222,6 @@ suite('Fake dryrun parsing', () => {
          // when changing a configuration.
          await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "InterestingSmallMakefile_windows_configRelSize");
          await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "InterestingSmallMakefile_windows_configRelSpeed");
-         
 
          // InterestingSmallMakefile_windows_configRelSpeed constructs a more interesting build command.
          await vscode.commands.executeCommand('makefile.setTargetByName', "Execute_Arch3");
