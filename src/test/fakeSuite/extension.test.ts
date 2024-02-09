@@ -247,51 +247,44 @@ suite('Fake dryrun parsing', () => {
       });
    }
 
-   /*// dry-run logs for https://github.com/rui314/8cc.git
+   // dry-run logs for https://github.com/rui314/8cc.git
    if (systemPlatform === "linux" || systemPlatform === "mingw") {
       test(`8cc - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
-         extension.getState().reset(false);
+         await vscode.commands.executeCommand('makefile.resetState', false);
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
-         configuration.setCurrentLaunchConfiguration(undefined);
-         configuration.setCurrentMakefileConfiguration("Default");
-         configuration.setCurrentTarget(undefined);
-         configuration.initFromState();
-         await configuration.initFromSettings();
+         await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
    
          // Extension log is defined in the test .vscode/settings.json but delete it now
          // because we are interested to compare against a baseline from this point further.
-         let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+         let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
          if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
             util.deleteFileSync(extensionLogPath);
          }
 
          // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
          // from this extension repository instead of a real installation which may vary from system to system.
-         configuration.setPreConfigureScript(path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure_nonwin.sh"));
-         await make.preConfigure(make.TriggeredBy.tests);
+         await vscode.commands.executeCommand('makefile.setPreconfigureScriptByPath', path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure_nonwin.bat"));
+         await vscode.commands.executeCommand('makefile.preConfigure');
 
-         configuration.prepareConfigurationsQuickPick();
-         await configuration.setConfigurationByName(process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
-         const retc: number = await make.cleanConfigure(make.TriggeredBy.tests, true);
+         await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', process.platform === "linux" ? "8cc_linux" : "8cc_mingw");
+         await vscode.commands.executeCommand('makefile.cleanConfigure');
 
          const launchConfigurations: string[] = ["8cc()"];
          for (const config of launchConfigurations) {
-            await configuration.setLaunchConfigurationByName(vscode.workspace.rootPath + ">" + config);
-            let status: string = await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+            await vscode.commands.executeCommand('makefile.setLaunchConfigurationByName', vscode.workspace.rootPath + ">" + config);
+            let status: string = await vscode.commands.executeCommand('makefile.validateLaunchConfiguration');
             let launchConfiguration: configuration.LaunchConfiguration | undefined;
             if (status === launch.LaunchStatuses.success) {
-               launchConfiguration = configuration.getCurrentLaunchConfiguration();
+               launchConfiguration = await vscode.commands.executeCommand('makefile.getCurrentLaunchConfiguration');
             }
 
             if (launchConfiguration) {
-               launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
-               launch.getLauncher().prepareRunCurrentTarget();
+               await vscode.commands.executeCommand('makefile.prepareDebugAndRunCurrentTarget', launchConfiguration);
             }
          }
 
-         await configuration.setTargetByName("all");
-         make.prepareBuildTarget("all");
+         await vscode.commands.executeCommand('makefile.setTargetByName', "all");
 
          // Compare the output log with the baseline
          // TODO: incorporate relevant diff snippets into the test log.
@@ -309,7 +302,7 @@ suite('Fake dryrun parsing', () => {
       });
    }
 
-   // dry-run logs for https://github.com/FidoProject/Fido.git
+   /*// dry-run logs for https://github.com/FidoProject/Fido.git
    if (systemPlatform === "linux" || systemPlatform === "mingw") {
       test(`Fido - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.

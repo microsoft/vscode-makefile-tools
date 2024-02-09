@@ -307,4 +307,3 @@ compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repr
 Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
 Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
-Building target "all" with command: 'c:/some/other/fake/path all'
