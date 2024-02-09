@@ -124,7 +124,7 @@ suite('Fake dryrun parsing', () => {
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
 
-   /*if (systemPlatform === "win32") {
+   if (systemPlatform === "win32") {
       test(`Complex scenarios with quotes and escaped quotes - winOnly`, async () => {
          // Settings reset from the previous test run.
          await vscode.commands.executeCommand('makefile.resetState', false);
@@ -175,7 +175,7 @@ suite('Fake dryrun parsing', () => {
       });
    }
 
-   if (systemPlatform === "win32") {
+   /*if (systemPlatform === "win32") {
       test('Interesting small makefile - windows', async () => {
          // Settings reset from the previous test run.
          extension.getState().reset(false);
