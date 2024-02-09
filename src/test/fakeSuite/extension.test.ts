@@ -128,6 +128,7 @@ suite('Fake dryrun parsing', () => {
       test(`Complex scenarios with quotes and escaped quotes - winOnly`, async () => {
          // Settings reset from the previous test run.
          await vscode.commands.executeCommand('makefile.resetState', false);
+         await vscode.commands.executeCommand("makefile.testResetState");
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
    
@@ -182,6 +183,7 @@ suite('Fake dryrun parsing', () => {
       test('Interesting small makefile - windows', async () => {
          // Settings reset from the previous test run.
          await vscode.commands.executeCommand('makefile.resetState', false);
+         await vscode.commands.executeCommand("makefile.testResetState");
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
 
@@ -252,6 +254,7 @@ suite('Fake dryrun parsing', () => {
       test(`8cc - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          await vscode.commands.executeCommand('makefile.resetState', false);
+         await vscode.commands.executeCommand("makefile.testResetState");
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
    
@@ -307,6 +310,7 @@ suite('Fake dryrun parsing', () => {
       test(`Fido - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          await vscode.commands.executeCommand('makefile.resetState', false);
+         await vscode.commands.executeCommand("makefile.testResetState");
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
    
@@ -362,6 +366,7 @@ suite('Fake dryrun parsing', () => {
       test(`tinyvm - ${systemPlatform}`, async () => {
          // Settings reset from the previous test run.
          await vscode.commands.executeCommand('makefile.resetState', false);
+         await vscode.commands.executeCommand("makefile.testResetState");
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
          await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
    
@@ -415,6 +420,7 @@ suite('Fake dryrun parsing', () => {
    test(`Test real make - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       await vscode.commands.executeCommand('makefile.resetState', false);
+      await vscode.commands.executeCommand('makefile.testResetState');
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
 
@@ -451,6 +457,7 @@ suite('Fake dryrun parsing', () => {
    test(`Variables expansion - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       await vscode.commands.executeCommand('makefile.resetState', false);
+      await vscode.commands.executeCommand("makefile.testResetState");
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
 
