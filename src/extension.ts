@@ -214,6 +214,19 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
 
     telemetry.activate();
 
+    // === Commands only for testing ===
+    // commands that are not exposed via package.json and are used for testing.
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfigurationByName', async (name: string) => {
+        await configuration.setConfigurationByName(name);
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.setPreconfigureScriptByPath', async (path: string) => {
+        await configuration.setPreConfigureScript(path);
+    }));
+
+    // === Commands only for testing ===
+
+    
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', async () => {
         await configuration.setNewConfiguration();
     }));
@@ -320,9 +333,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }))
 
     // Reset state - useful for troubleshooting.
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.resetState', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.resetState', (reload?: boolean) => {
         telemetry.logEvent("commandResetState");
-        extension.getState().reset();
+        extension.getState().reset(reload);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.configure', () => {

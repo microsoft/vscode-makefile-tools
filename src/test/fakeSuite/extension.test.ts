@@ -60,13 +60,9 @@ suite('Fake dryrun parsing', /*async*/() => {
 
    test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
-      extension.getState().reset(false);
+      await vscode.commands.executeCommand('makefile.resetState', false);
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
-      configuration.setCurrentLaunchConfiguration(undefined);
-      configuration.setCurrentMakefileConfiguration("Default");
-      configuration.setCurrentTarget(undefined);
-      configuration.initFromState();
-      await configuration.initFromSettings();
+      await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
 
       // We define extension log here as opposed to in the fake repro .vscode/settings.json
       // because the logging produced at the first project load has too few important data to verify and much variations
@@ -76,22 +72,19 @@ suite('Fake dryrun parsing', /*async*/() => {
       // than without debugging/loading the project before.
       // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
       // because at project load time, there is no makefile log identified and no file is deleted on activation.
-      let extensionLogPath: string = configuration.getExtensionLog() || path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+      let extensionLogPath: string = path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
       if (util.checkFileExistsSync(extensionLogPath)) {
          util.deleteFileSync(extensionLogPath);
       }
 
       // Run a preconfigure script to include our tests fake compilers path so that we always find gcc/gpp/clang/...etc...
       // from this extension repository instead of a real installation which may vary from system to system.
-      configuration.setPreConfigureScript(path.join(vscode.workspace.rootPath || "./", systemPlatform === "win32" ? ".vscode/preconfigure.bat" : ".vscode/preconfigure_nonwin.sh"));
-      await make.preConfigure(make.TriggeredBy.tests);
+      await vscode.commands.executeCommand('makefile.setPreconfigureScriptByPath', path.join(vscode.workspace.rootPath || "./", systemPlatform === "win32" ? ".vscode/preconfigure.bat" : ".vscode/preconfigure_nonwin.sh"));
+      await vscode.commands.executeCommand('makefile.preConfigure');
 
-      configuration.prepareConfigurationsQuickPick();
-      await configuration.setConfigurationByName("complex_escaped_quotes");
+      await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "complex_escaped_quotes");
 
-      // No need to setting and building a target, running a launch target, ...etc... like the other tests
-      // Compare log output only from a configure to see how we parse the quotes and escape characters in compiler command lines.
-      let retc: number = await make.cleanConfigure(make.TriggeredBy.tests, true);
+      await vscode.commands.executeCommand('makefile.cleanConfigure');
 
       // Compare the output log with the baseline
       // TODO: incorporate relevant diff snippets into the test log.

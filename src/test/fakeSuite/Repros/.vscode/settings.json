@@ -12,6 +12,8 @@
       "debug": true
     },
     "makefile.configureOnOpen": false,
+    "makefile.configureOnEdit": true,
+    "makefile.configureAfterCommand": true,
     "makefile.configurations": [
         {
             "name": "varexp",

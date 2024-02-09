@@ -14,6 +14,7 @@ Logging level: Debug
 No path to the makefile is defined in the settings file.
 No folder path to the makefile is defined in the settings file.
 Build log defined at "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\dummy_dryrun.log"
+Found pre-configure script defined as {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat
 Always pre-configure: false
 Always post-configure: false
 Dry-run switches: '--always-make', '--keep-going', '--print-directory'
@@ -25,8 +26,8 @@ Default launch configuration: MIMode = undefined,
                     stopAtEntry = undefined,
                     symbolSearchPath = undefined
 Configure on open: false
-Configure on edit: true
-Configure after command: true
+Configure on edit: false
+Configure after command: false
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
@@ -37,12 +38,13 @@ Found build log path setting "./complex_escaped_quotes_dryrun.log" defined for c
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\complex_escaped_quotes_dryrun.log"
 Deduced command 'c:\some\other\fake\path.exe ' for configuration "complex_escaped_quotes"
 Saving opened files before build.
+Loading configurations from cache is not necessary.
 Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\complex_escaped_quotes_dryrun.log"
 Preprocess elapsed time: 0
 Parsing for IntelliSense.
 Updating the CppTools IntelliSense Configuration Provider.
 Parsing dry-run output for CppTools Custom Configuration Provider.
-Found compiler command: MyOwnFakeCompiler "myfile.cpp" -DBETWEEN=\"some.value\" -DBETWEEN_EMPTY=\"\" -DBETWEEN_SPACE=\"some value\" -DBETWEEN_INNER_QUOTE=\"some"value\" -DBETWEEN_INNER_QUOTE_SLASH=\"some\' /"/ \` value\" 
+Found compiler command: MyOwnFakeCompiler "myfile.cpp" -DBETWEEN=\"some.value\" -DBETWEEN_EMPTY=\"\" -DBETWEEN_SPACE=\"some value\" -DBETWEEN_INNER_QUOTE=\"some"value\" -DBETWEEN_INNER_QUOTE_SLASH=\"some\' /"/ \` value\" /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN=\"some.value\";BETWEEN_EMPTY=\"\";BETWEEN_SPACE=\"some value\";BETWEEN_INNER_QUOTE=\"some"value\";BETWEEN_INNER_QUOTE_SLASH=\"some\' /"/ \` value\"
     Includes: 
@@ -53,7 +55,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler '-DBETWEEN=\"some.value\"' -D'"BETWEEN_EMPTY"=\"\"' myfile.cpp -D'BETWEEN_SPACE=\"some value\"' -D "BETWEEN_INNER_QUOTE=\"some value\"" -DBETWEEN_INNER_QUOTE_SLASH='\"some\' /"/ \` value\"' 
+Found compiler command: MyOwnFakeCompiler '-DBETWEEN=\"some.value\"' -D'"BETWEEN_EMPTY"=\"\"' myfile.cpp -D'BETWEEN_SPACE=\"some value\"' -D "BETWEEN_INNER_QUOTE=\"some value\"" -DBETWEEN_INNER_QUOTE_SLASH='\"some\' /"/ \` value\"' /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN=\"some.value\";"BETWEEN_EMPTY"=\"\";BETWEEN_SPACE=\"some value\";BETWEEN_INNER_QUOTE=\"some value\";BETWEEN_INNER_QUOTE_SLASH='\"some\' /"/ \` value\"'
     Includes: 
@@ -64,7 +66,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler "myfile.cpp" -DBETWEEN="some.value" -DBETWEEN_EMPTY="" -DBETWEEN_SPACE="some value" -DBETWEEN_INNER_QUOTE="some\"value" -DBETWEEN_INNER_QUOTE_SLASH="some\' /\"/ \` value" -DEND_WITH_BACKSLASH="value\"
+Found compiler command: MyOwnFakeCompiler "myfile.cpp" -DBETWEEN="some.value" -DBETWEEN_EMPTY="" -DBETWEEN_SPACE="some value" -DBETWEEN_INNER_QUOTE="some\"value" -DBETWEEN_INNER_QUOTE_SLASH="some\' /\"/ \` value" -DEND_WITH_BACKSLASH="value\" /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN="some.value";BETWEEN_EMPTY="";BETWEEN_SPACE="some value";BETWEEN_INNER_QUOTE="some\"value";BETWEEN_INNER_QUOTE_SLASH="some\' /\"/ \` value";END_WITH_BACKSLASH="value\"
     Includes: 
@@ -75,7 +77,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler '-DBETWEEN="some.value"' -D'"BETWEEN_EMPTY"=""' myfile.cpp -D'BETWEEN_SPACE="some value"' -D 'BETWEEN_INNER_QUOTE="some value"' -DBETWEEN_INNER_QUOTE_SLASH='"some\' /\"/ \` value"' 
+Found compiler command: MyOwnFakeCompiler '-DBETWEEN="some.value"' -D'"BETWEEN_EMPTY"=""' myfile.cpp -D'BETWEEN_SPACE="some value"' -D 'BETWEEN_INNER_QUOTE="some value"' -DBETWEEN_INNER_QUOTE_SLASH='"some\' /\"/ \` value"' /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN="some.value";"BETWEEN_EMPTY"="";BETWEEN_SPACE="some value";BETWEEN_INNER_QUOTE="some value";BETWEEN_INNER_QUOTE_SLASH='"some\' /\"/ \` value"'
     Includes: 
@@ -86,7 +88,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/" -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder" -I "../../" -I "../folder with space/subfolder" -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/" -I   "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/" "myfile.cpp"
+Found compiler command: MyOwnFakeCompiler -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/" -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder" -I "../../" -I "../folder with space/subfolder" -I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/" -I   "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/" "myfile.cpp" /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/
@@ -97,7 +99,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/' '-I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder"' -I".." '-I "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/"' '-I "../folder with space/"' "myfile.cpp" -I `{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"` 
+Found compiler command: MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/' '-I"{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder"' -I".." '-I "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/"' '-I "../folder with space/"' "myfile.cpp" -I `{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"` /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder1 with space\'/\"folder2 with space\"/subfolder/"
@@ -108,7 +110,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler "myfile.cpp" -DBETWEEN=\'some.value\' -DBETWEEN_EMPTY=\'\' -DBETWEEN_SPACE=\'some value\' -DBETWEEN_INNER_QUOTE=\'some'value\' -DBETWEEN_INNER_QUOTE_SLASH=\'some\" /'/ \` value\' 
+Found compiler command: MyOwnFakeCompiler "myfile.cpp" -DBETWEEN=\'some.value\' -DBETWEEN_EMPTY=\'\' -DBETWEEN_SPACE=\'some value\' -DBETWEEN_INNER_QUOTE=\'some'value\' -DBETWEEN_INNER_QUOTE_SLASH=\'some\" /'/ \` value\' /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN=\'some.value\';BETWEEN_EMPTY=\'\';BETWEEN_SPACE=\'some value\';BETWEEN_INNER_QUOTE=\'some'value\';BETWEEN_INNER_QUOTE_SLASH=\'some\" /'/ \` value\'
     Includes: 
@@ -119,7 +121,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler '-DBETWEEN=\'some.value\'' -D"'BETWEEN_EMPTY'=\'\'" myfile.cpp -D'BETWEEN_SPACE=\'some value\'' -D "BETWEEN_INNER_QUOTE=\'some value\'" -DBETWEEN_INNER_QUOTE_SLASH='\'some\" /"/ \` value\'' 
+Found compiler command: MyOwnFakeCompiler '-DBETWEEN=\'some.value\'' -D"'BETWEEN_EMPTY'=\'\'" myfile.cpp -D'BETWEEN_SPACE=\'some value\'' -D "BETWEEN_INNER_QUOTE=\'some value\'" -DBETWEEN_INNER_QUOTE_SLASH='\'some\" /"/ \` value\'' /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN=\'some.value\';'BETWEEN_EMPTY'=\'\';BETWEEN_SPACE=\'some value\';BETWEEN_INNER_QUOTE=\'some value\';BETWEEN_INNER_QUOTE_SLASH='\'some\" /"/ \` value\''
     Includes: 
@@ -130,7 +132,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/' -I"../folder with space/" myfile.cpp -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/' 
+Found compiler command: MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/' -I"../folder with space/" myfile.cpp -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/' /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/
@@ -141,7 +143,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler "myfile.cpp" -DBETWEEN='some.value' -DBETWEEN_EMPTY='' -DBETWEEN_SPACE='some value' -DBETWEEN_INNER_QUOTE='some\'value' -DBETWEEN_INNER_QUOTE_SLASH='some\' /\'/ \" value' -DEND_WITH_BACKSLASH='value\'
+Found compiler command: MyOwnFakeCompiler "myfile.cpp" -DBETWEEN='some.value' -DBETWEEN_EMPTY='' -DBETWEEN_SPACE='some value' -DBETWEEN_INNER_QUOTE='some\'value' -DBETWEEN_INNER_QUOTE_SLASH='some\' /\'/ \" value' -DEND_WITH_BACKSLASH='value\' /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN='some.value';BETWEEN_EMPTY='';BETWEEN_SPACE='some value';BETWEEN_INNER_QUOTE='some\'value';BETWEEN_INNER_QUOTE_SLASH='some\' /\'/ \" value';END_WITH_BACKSLASH='value\'
     Includes: 
@@ -152,7 +154,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler '-DBETWEEN=\'some.value\'' -D'\'BETWEEN_EMPTY\'=\'\'' myfile.cpp -D'BETWEEN_SPACE=\'some value\'' -D 'BETWEEN_INNER_QUOTE=\'some value\'' -DBETWEEN_INNER_QUOTE_SLASH='\'some\" /\'/ \` value\'' 
+Found compiler command: MyOwnFakeCompiler '-DBETWEEN=\'some.value\'' -D'\'BETWEEN_EMPTY\'=\'\'' myfile.cpp -D'BETWEEN_SPACE=\'some value\'' -D 'BETWEEN_INNER_QUOTE=\'some value\'' -DBETWEEN_INNER_QUOTE_SLASH='\'some\" /\'/ \` value\'' /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: BETWEEN=\'some.value\';\'BETWEEN_EMPTY\'=\'\';BETWEEN_SPACE=\'some value\';BETWEEN_INNER_QUOTE=\'some value\';BETWEEN_INNER_QUOTE_SLASH='\'some\" /\'/ \` value\''
     Includes: 
@@ -163,7 +165,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder' -I '../../' -I '../folder with space/subfolder' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' -I   '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/' "myfile.cpp"
+Found compiler command: MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder' -I '../../' -I '../folder with space/subfolder' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' -I   '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/' "myfile.cpp" /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/
@@ -174,7 +176,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     Compiler Arguments: 
     Windows SDK Version: 12.3.45678.9\
 ---------------------------------------------------------------------------------------------------
-Found compiler command: MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/' -I '../folder with space/' "myfile.cpp" -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/' 
+Found compiler command: MyOwnFakeCompiler -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/' '-I{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder' -I'..' -I'{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/' -I '../folder with space/' "myfile.cpp" -I '{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/' /std:c++17
 Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\myfile.cpp -----------------------------------
     Defines: 
     Includes: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/;{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\folder with space\;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\`folder2 with space\`/subfolder/
@@ -268,7 +270,6 @@ No build targets have been detected.
 Complete list of build targets: 
 Parsing build targets elapsed time: 0
 Configure finished. The status for all the subphases that ran:
-loadFromCache: return code = -3, elapsed time = 0
 generateParseContent: return code = 0, elapsed time = 0
 preprocessParseContent: return code = 0, elapsed time = 0
 parseIntelliSense: return code = 0, elapsed time = 0
