@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Build the extension
+        run: yarn compile-production 
+        
       - name: Build the extension and run tests
         run: |
-          yarn run test
+          yarn test
