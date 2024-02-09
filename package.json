@@ -722,10 +722,6 @@
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
                     "when": "never"
-                },
-                {
-                    "command": "makefile.resetState",
-                    "when": "isWorkspaceTrusted"
                 }
             ],
             "view/title": [
