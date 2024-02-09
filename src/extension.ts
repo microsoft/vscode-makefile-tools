@@ -427,37 +427,38 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         }
     }));
 
-        // === Commands only for testing ===
+    // === Commands only for testing ===
     // commands that are not exposed via package.json and are used for testing.
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfigurationByName', async (name: string) => {
+    if (process.env["MAKEFILE_TOOLS_TESTING"] === "1") {
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfigurationByName', async (name: string) => {
         await configuration.setConfigurationByName(name);
-    }));
+        }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setPreconfigureScriptByPath', async (path: string) => {
-        await configuration.setPreConfigureScript(path);
-    }));
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.setPreconfigureScriptByPath', async (path: string) => {
+            await configuration.setPreConfigureScript(path);
+        }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setTargetByName', async (name: string) => {
-        await configuration.setTargetByName(name);
-    }))
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.setTargetByName', async (name: string) => {
+            await configuration.setTargetByName(name);
+        }))
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfigurationByName', async (name: string) => {
-        await configuration.setLaunchConfigurationByName(name);
-    }));
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfigurationByName', async (name: string) => {
+            await configuration.setLaunchConfigurationByName(name);
+        }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.validateLaunchConfiguration', async () => {
-        return await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
-    }));
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.validateLaunchConfiguration', async () => {
+            return await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+        }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.getCurrentLaunchConfiguration', async () => {
-        return configuration.getCurrentLaunchConfiguration();
-    }))
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.getCurrentLaunchConfiguration', async () => {
+            return configuration.getCurrentLaunchConfiguration();
+        }))
 
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.prepareDebugAndRunCurrentTarget', async (launchConfiguration: configuration.LaunchConfiguration) => {
-        launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
-        launch.getLauncher().prepareRunCurrentTarget();
-    }))
-
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.prepareDebugAndRunCurrentTarget', async (launchConfiguration: configuration.LaunchConfiguration) => {
+            launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
+            launch.getLauncher().prepareRunCurrentTarget();
+        }));
+    }
     // === Commands only for testing ===
 
     const parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();

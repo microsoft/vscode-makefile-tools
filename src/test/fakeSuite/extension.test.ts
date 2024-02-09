@@ -212,7 +212,7 @@ suite('Fake dryrun parsing', () => {
             }
 
             if (launchConfiguration) {
-               await vscode.commands.executeCommand('makefile.prepareDebugAndRunCurrentTarget');
+               await vscode.commands.executeCommand('makefile.prepareDebugAndRunCurrentTarget', launchConfiguration);
             }
          }
 
