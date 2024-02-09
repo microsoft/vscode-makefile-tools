@@ -66,7 +66,6 @@ suite('Fake dryrun parsing', () => {
 
    test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
-      await vscode.commands.executeCommand("makefile.resetState", false);
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
 
