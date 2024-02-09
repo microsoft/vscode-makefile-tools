@@ -39,6 +39,15 @@ import { extension } from '../../extension';
 
 // TODO: refactor initialization and cleanup of each test
 suite('Fake dryrun parsing', () => {
+
+    suiteSetup(async function (this: Mocha.Context) {
+        this.timeout(100000);
+    });
+
+    setup(async function (this: Mocha.Context) {
+        this.timeout(100000);
+    });
+
    // Interesting scenarios with string paths, corner cases in defining includes/defines,
    // complex configurations-targets-files associations.
    // For now, this test needs to run in an environment with VS 2019.
@@ -66,6 +75,7 @@ suite('Fake dryrun parsing', () => {
 
    test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
+      await vscode.commands.executeCommand("makefile.resetState", false);
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
       await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "Default");
 
