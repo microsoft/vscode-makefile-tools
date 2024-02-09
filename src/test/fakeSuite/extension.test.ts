@@ -197,7 +197,7 @@ suite('Fake dryrun parsing', () => {
          await vscode.commands.executeCommand('makefile.setPreconfigureScriptByPath', path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure.bat"));
          await vscode.commands.executeCommand('makefile.preConfigure');
 
-         await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "complex_escaped_quotes_winOnly");
+         await vscode.commands.executeCommand('makefile.setBuildConfigurationByName', "InterestingSmallMakefile_windows_configDebug");
          await vscode.commands.executeCommand('makefile.cleanConfigure');
 
          const launchConfigurations: string[] = ["bin\\InterestingSmallMakefile\\ARC H3\\Debug\\main.exe(str3a,str3b,str3c)",
