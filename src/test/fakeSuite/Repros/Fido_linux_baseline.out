@@ -339,4 +339,3 @@ compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repr
 Found build log path setting "./Fido_linux_dryrun.log" defined for configuration "Fido_linux"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/Fido_linux_dryrun.log"
 Deduced command 'c:/some/other/fake/path ' for configuration "Fido_linux"
-Building target "bin/foo.o" with command: 'c:/some/other/fake/path bin/foo.o'
