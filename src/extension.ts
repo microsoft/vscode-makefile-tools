@@ -207,6 +207,12 @@ export class MakefileToolsExtension {
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+    if (process.env["MAKEFILE_TOOLS_TESTING"] === "1") {
+        await vscode.commands.executeCommand('setContext', "makefile:testing", true);
+    } else {
+        await vscode.commands.executeCommand('setContext', "makefile:testing", false);
+    }
+
     statusBar = ui.getUI();
     extension = new MakefileToolsExtension(context);
     configuration.disableAllOptionallyVisibleCommands();

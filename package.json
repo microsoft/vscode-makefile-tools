@@ -600,7 +600,7 @@
             "makefile__viewContainer": [
                 {
                     "id": "makefile.outline",
-                    "when": "isWorkspaceTrusted",
+                    "when": "isWorkspaceTrusted || makefile:testing",
                     "name": "%makefile-tools.configuration.views.makefile.outline.description%"
                 }
             ]
@@ -609,31 +609,31 @@
             "commandPalette": [
                 {
                     "command": "makefile.configure",
-                    "when": "isWorkspaceTrusted"
+                    "when": "isWorkspaceTrusted || makefile:testing"
                 },
                 {
                     "command": "makefile.cleanConfigure",
-                    "when": "isWorkspaceTrusted"
+                    "when": "isWorkspaceTrusted || makefile:testing"
                 },
                 {
                     "command": "makefile.outline.openMakefilePathSetting",
-                    "when": "isWorkspaceTrusted"
+                    "when": "isWorkspaceTrusted || makefile:testing"
                 },
                 {
                     "command": "makefile.outline.openMakefileFile",
-                    "when": "isWorkspaceTrusted"
+                    "when": "isWorkspaceTrusted || makefile:testing"
                 },
                 {
                     "command": "makefile.outline.openMakePathSetting",
-                    "when": "isWorkspaceTrusted"
+                    "when": "isWorkspaceTrusted || makefile:testing"
                 },
                 {
                     "command": "makefile.outline.openBuildLogSetting",
-                    "when": "isWorkspaceTrusted"
+                    "when": "isWorkspaceTrusted || makefile:testing"
                 },
                 {
                     "command": "makefile.outline.openBuildLogFile",
-                    "when": "isWorkspaceTrusted"
+                    "when": "isWorkspaceTrusted || makefile:testing"
                 },
                 {
                     "command": "makefile.preConfigure",
@@ -722,6 +722,10 @@
                 {
                     "command": "makefile.outline.setLaunchConfiguration",
                     "when": "never"
+                },
+                {
+                    "command": "makefile.resetState",
+                    "when": "isWorkspaceTrusted || makefile:testing"
                 }
             ],
             "view/title": [
