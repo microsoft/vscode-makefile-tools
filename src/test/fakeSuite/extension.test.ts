@@ -472,15 +472,14 @@ suite('Fake dryrun parsing', () => {
          util.deleteFileSync(extensionLogPath);
       }
 
-      configuration.setExtensionLog(extensionLogPath);
-      await util.getExpandedSettingVal("buildLog", "./${workspaceFolder}/${configuration}/${buildTarget}/something/${configuration}/${buildTarget}/build.log");
+      await vscode.commands.executeCommand('makefile.getExpandedSettingValue', "buildLog", "./${workspaceFolder}/${configuration}/${buildTarget}/something/${configuration}/${buildTarget}/build.log");
 
-      let stopAtEntry: string = await util.expandVariablesInSetting("defaultLaunchConfiguration.stopAtEntry", "${config:makefile.panel.visibility.debug}");
+      let stopAtEntry: string = await vscode.commands.executeCommand('makefile.expandVariablesInSetting', 'defaultLaunchConfiguration.stopAtEntry', "${config:makefile.panel.visibility.debug}");
       let tmpDefaultLaunchConfiguration: configuration.DefaultLaunchConfiguration = {
          miDebuggerPath: "./${workspaceRoot}/${command:makefile.getConfiguration}/${command:makefile.getBuildTarget}",
          stopAtEntry: util.booleanify(stopAtEntry)
       };
-      await util.getExpandedSettingVal<configuration.DefaultLaunchConfiguration>("defaultLaunchConfiguration", tmpDefaultLaunchConfiguration);
+      await vscode.commands.executeCommand('makefile.getExpandedSettingValue', "defaultLaunchConfiguration", tmpDefaultLaunchConfiguration);
 
       let tmpConfigurations: configuration.MakefileConfiguration[] = [{
          name: "MyTmpName",
@@ -490,7 +489,7 @@ suite('Fake dryrun parsing', () => {
                     "try_\\${escape_varexp1}_various_\\${escape_varexp2}_escapes",
                     "${command:makefile.inexistentCommand}",
                     "${config:makefile.inexistentSetting}"]}];
-      await util.getExpandedSettingVal<configuration.MakefileConfiguration>("configurations", tmpConfigurations);
+      await vscode.commands.executeCommand('makefile.getExpandedSettingValue', "configurations", tmpConfigurations);
 
       // Compare the output log with the baseline
       // TODO: incorporate relevant diff snippets into the test log.

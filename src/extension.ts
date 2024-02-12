@@ -466,6 +466,14 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             configuration.initFromState();
             await configuration.initFromSettings();
         }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.getExpandedSettingValue', async (key: string, value: any) => {
+            await util.getExpandedSettingVal(key, value);
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.expandVariablesInSetting', async (key: string, value: string) => {
+            return util.expandVariablesInSetting(key, value);
+        }));
     }
     // === Commands only for testing ===
 
