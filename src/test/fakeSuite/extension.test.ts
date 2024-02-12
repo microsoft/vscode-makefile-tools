@@ -227,6 +227,7 @@ suite('Fake dryrun parsing', () => {
 
          // InterestingSmallMakefile_windows_configRelSpeed constructs a more interesting build command.
          await vscode.commands.executeCommand('makefile.setTargetByName', "Execute_Arch3");
+         await vscode.commands.executeCommand('makefile.prepareBuildTarget', "Execute_Arch3")
 
          await vscode.commands.executeCommand("makefile.resetState", false);
          await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
@@ -288,6 +289,7 @@ suite('Fake dryrun parsing', () => {
          }
 
          await vscode.commands.executeCommand('makefile.setTargetByName', "all");
+         await vscode.commands.executeCommand('makefile.prepareBuildTarget', "all");
 
          // Compare the output log with the baseline
          // TODO: incorporate relevant diff snippets into the test log.
@@ -344,6 +346,7 @@ suite('Fake dryrun parsing', () => {
          }
 
          await vscode.commands.executeCommand('makefile.setTargetByName', "bin/foo.o");
+         await vscode.commands.executeCommand('makefile.prepareBuildTarget', "bin/foo.o");
 
          // Compare the output log with the baseline
          // TODO: incorporate relevant diff snippets into the test log.
@@ -400,6 +403,7 @@ suite('Fake dryrun parsing', () => {
          }
 
          await vscode.commands.executeCommand('makefile.setTargetByName', "tvmi");
+         await vscode.commands.executeCommand('makefile.prepareBuildTarget', "tvmi");
 
          // Compare the output log with the baseline
          // TODO: incorporate relevant diff snippets into the test log.

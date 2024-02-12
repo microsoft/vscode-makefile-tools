@@ -459,6 +459,10 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             launch.getLauncher().prepareRunCurrentTarget();
         }));
 
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.prepareBuildTarget', async (target: string) => {
+            make.prepareBuildTarget(target);
+        }));
+
         context.subscriptions.push(vscode.commands.registerCommand('makefile.testResetState', async () => {
             await configuration.setCurrentLaunchConfiguration(undefined);
             await configuration.setCurrentMakefileConfiguration("Default");

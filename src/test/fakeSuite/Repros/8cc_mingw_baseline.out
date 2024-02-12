@@ -274,6 +274,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     IntelliSense Mode: msvc-x64
     Compiler Path: C:\msys64\usr\bin\cc.exe
 ---------------------------------------------------------------------------------------------------
+Building the current target. Command c:\some\other\fake\path all
 Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\8cc_mingw_dryrun.log" for launch configurations...
 Parsing dry-run output for Launch (debug/run) configuration.
 Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>8cc()

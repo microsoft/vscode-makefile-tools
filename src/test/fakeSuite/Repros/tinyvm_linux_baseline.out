@@ -224,6 +224,15 @@ Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm
 Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
 Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
+Found build log path setting "./tinyvm_linux_dryrunPedantic.log" defined for configuration "tinyvm_linux_pedantic"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
 Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
 Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()"
 Re-reading settings after launch target change.

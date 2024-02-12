@@ -268,6 +268,12 @@ Deduced command 'c:/some/other/fake/path ' for configuration "Fido_linux"
 Found build log path setting "./Fido_linux_dryrun.log" defined for configuration "Fido_linux"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/Fido_linux_dryrun.log"
 Deduced command 'c:/some/other/fake/path ' for configuration "Fido_linux"
+Found build log path setting "./Fido_linux_dryrun.log" defined for configuration "Fido_linux"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/Fido_linux_dryrun.log"
+Deduced command 'c:/some/other/fake/path ' for configuration "Fido_linux"
+Found build log path setting "./Fido_linux_dryrun.log" defined for configuration "Fido_linux"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/Fido_linux_dryrun.log"
+Deduced command 'c:/some/other/fake/path ' for configuration "Fido_linux"
 Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/foo.o() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
 Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/foo.o()"
 Re-reading settings after launch target change.
@@ -339,3 +345,4 @@ compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repr
 Found build log path setting "./Fido_linux_dryrun.log" defined for configuration "Fido_linux"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/Fido_linux_dryrun.log"
 Deduced command 'c:/some/other/fake/path ' for configuration "Fido_linux"
+Building target "bin/foo.o" with command: 'c:/some/other/fake/path bin/foo.o'

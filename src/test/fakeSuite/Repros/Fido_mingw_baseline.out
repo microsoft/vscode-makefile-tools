@@ -292,6 +292,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\R
     IntelliSense Mode: gcc-x64
     Compiler Path: C:\msys64\usr\bin\g++.exe
 ---------------------------------------------------------------------------------------------------
+Building the current target. Command: c:\some\other\fake\path bin/foo.o
 Parsing the provided build log "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\Fido_mingw_dryrun.log" for launch configurations...
 Parsing dry-run output for Launch (debug/run) configuration.
 Found the following launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\foo.o()
