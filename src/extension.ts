@@ -428,7 +428,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }));
 
     // === Commands only for testing ===
-    // commands that are not exposed via package.json and are used for testing.
+    // commands that are not exposed via package.json and are used only for testing.
+    // TODO: In the future, we should refactor such that our tests can use already exposed commands, and/or refactor so 
+    // that some of our tests that are more unit-like tests can be done with direct dependencies on the code.
     if (process.env["MAKEFILE_TOOLS_TESTING"] === "1") {
         context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfigurationByName', async (name: string) => {
         await configuration.setConfigurationByName(name);
