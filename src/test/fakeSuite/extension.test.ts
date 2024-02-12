@@ -77,7 +77,7 @@ suite('Fake dryrun parsing', () => {
    }
 
 
-   /*test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async () => {
+   test(`Complex scenarios with quotes and escaped quotes - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       await vscode.commands.executeCommand("makefile.resetState", false);
       await vscode.workspace.getConfiguration("makefile").update("launchConfigurations", undefined);
@@ -454,7 +454,7 @@ suite('Fake dryrun parsing', () => {
       expect(extensionLogContent).to.be.equal(baselineLogContent);
    });
 
-   */test(`Variables expansion - ${systemPlatform}`, async () => {
+   test(`Variables expansion - ${systemPlatform}`, async () => {
       // Settings reset from the previous test run.
       await vscode.commands.executeCommand('makefile.resetState', false);
       await vscode.commands.executeCommand("makefile.testResetState");
