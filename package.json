@@ -693,7 +693,7 @@
                 },
                 {
                     "command": "makefile.outline.postConfigure",
-                    "when": "makefile:fullFeatureSet"
+                    "when": "never"
                 },
                 {
                     "command": "makefile.outline.buildTarget",
