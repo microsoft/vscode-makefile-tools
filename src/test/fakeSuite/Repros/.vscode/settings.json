@@ -1,85 +1,85 @@
 {
-    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
-    "makefile.buildLog": "./dummy_dryrun.log",
-    "makefile.extensionOutputFolder": "./.vscode",
-    "makefile.extensionLog": "./.vscode/Makefile.out",
-    "makefile.makePath": "c:/some/other/fake/path",
-    "makefile.buildBeforeLaunch": false,
-    "makefile.loggingLevel": "Debug",
-    "makefile.additionalCompilerNames": ["MyOwnFakeCompiler"],
-    "makefile.compileCommandsPath": "./.vscode/compile_commands.json",
-    "makefile.panel.visibility": {
-      "debug": true
+  "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
+  "makefile.buildLog": "./dummy_dryrun.log",
+  "makefile.extensionOutputFolder": "./.vscode",
+  "makefile.extensionLog": "./.vscode/Makefile.out",
+  "makefile.makePath": "c:/some/other/fake/path",
+  "makefile.buildBeforeLaunch": false,
+  "makefile.loggingLevel": "Debug",
+  "makefile.additionalCompilerNames": ["MyOwnFakeCompiler"],
+  "makefile.compileCommandsPath": "./.vscode/compile_commands.json",
+  "makefile.panel.visibility": {
+    "debug": true
+  },
+  "makefile.configureOnOpen": false,
+  "makefile.configureOnEdit": true,
+  "makefile.configureAfterCommand": true,
+  "makefile.configurations": [
+    {
+      "name": "varexp"
     },
-    "makefile.configureOnOpen": false,
-    "makefile.configureOnEdit": true,
-    "makefile.configureAfterCommand": true,
-    "makefile.configurations": [
-        {
-            "name": "varexp",
-        },
-        {
-            "name": "test-make-f",
-            "makePath": "./doesnt/exist/make",
-            "buildLog": "./doesnt_exist.log",
-            "makeArgs": ["-f", "./SubDir/makefile with space"]
-        },
-        {
-            "name": "test-make-C",
-            "makePath": "./doesnt/exist/make",
-            "buildLog": "./doesnt_exist.log",
-            "makeArgs": ["-C", "./SubDir with space/"]
-        },
-        {
-            "name": "complex_escaped_quotes",
-            "buildLog": "./complex_escaped_quotes_dryrun.log"
-        },
-        {
-            "name": "complex_escaped_quotes_winOnly",
-            "buildLog": "./complex_escaped_quotes_winOnly_dryrun.log"
-        },
-        {
-            "name": "InterestingSmallMakefile_windows_configDebug",
-            "buildLog": "./InterestingSmallMakefile_windows_dryrunDebug.log"
-        },
-        {
-            "name": "InterestingSmallMakefile_windows_configRelSize",
-            "makePath": "make",
-            "makeArgs": ["OPT=RelSize"],
-            "buildLog": "./InterestingSmallMakefile_windows_dryrunRelSize.log"
-        },
-        {
-            "name": "InterestingSmallMakefile_windows_configRelSpeed",
-            "makePath": "c:/fake/path/make.exe",
-            "makeArgs": ["OPT=RelSpeed"]
-        },
-        {
-            "name": "8cc_linux",
-            "buildLog": "./8cc_linux_dryrun.log"
-        },
-        {
-            "name": "8cc_mingw",
-            "buildLog": "./8cc_mingw_dryrun.log"
-        },
-        {
-            "name": "Fido_linux",
-            "buildLog": "./Fido_linux_dryrun.log"
-        },
-        {
-            "name": "Fido_mingw",
-            "buildLog": "./Fido_mingw_dryrun.log"
-        },
-        {
-            "name": "tinyvm_linux_pedantic",
-            "buildLog": "./tinyvm_linux_dryrunPedantic.log",
-            "makePath": "make",
-            "makeArgs": ["PEDANTIC=yes"]
-        },
-        {
-            "name": "tinyvm_mingw_pedantic",
-            "buildLog": "./tinyvm_mingw_dryrunPedantic.log",
-            "makePath": "make",
-            "makeArgs": ["PEDANTIC=yes"]
-        }
-]
+    {
+      "name": "test-make-f",
+      "makePath": "./doesnt/exist/make",
+      "buildLog": "./doesnt_exist.log",
+      "makeArgs": ["-f", "./SubDir/makefile with space"]
+    },
+    {
+      "name": "test-make-C",
+      "makePath": "./doesnt/exist/make",
+      "buildLog": "./doesnt_exist.log",
+      "makeArgs": ["-C", "./SubDir with space/"]
+    },
+    {
+      "name": "complex_escaped_quotes",
+      "buildLog": "./complex_escaped_quotes_dryrun.log"
+    },
+    {
+      "name": "complex_escaped_quotes_winOnly",
+      "buildLog": "./complex_escaped_quotes_winOnly_dryrun.log"
+    },
+    {
+      "name": "InterestingSmallMakefile_windows_configDebug",
+      "buildLog": "./InterestingSmallMakefile_windows_dryrunDebug.log"
+    },
+    {
+      "name": "InterestingSmallMakefile_windows_configRelSize",
+      "makePath": "make",
+      "makeArgs": ["OPT=RelSize"],
+      "buildLog": "./InterestingSmallMakefile_windows_dryrunRelSize.log"
+    },
+    {
+      "name": "InterestingSmallMakefile_windows_configRelSpeed",
+      "makePath": "c:/fake/path/make.exe",
+      "makeArgs": ["OPT=RelSpeed"]
+    },
+    {
+      "name": "8cc_linux",
+      "buildLog": "./8cc_linux_dryrun.log"
+    },
+    {
+      "name": "8cc_mingw",
+      "buildLog": "./8cc_mingw_dryrun.log"
+    },
+    {
+      "name": "Fido_linux",
+      "buildLog": "./Fido_linux_dryrun.log"
+    },
+    {
+      "name": "Fido_mingw",
+      "buildLog": "./Fido_mingw_dryrun.log"
+    },
+    {
+      "name": "tinyvm_linux_pedantic",
+      "buildLog": "./tinyvm_linux_dryrunPedantic.log",
+      "makePath": "make",
+      "makeArgs": ["PEDANTIC=yes"]
+    },
+    {
+      "name": "tinyvm_mingw_pedantic",
+      "buildLog": "./tinyvm_mingw_dryrunPedantic.log",
+      "makePath": "make",
+      "makeArgs": ["PEDANTIC=yes"]
+    }
+  ]
 }

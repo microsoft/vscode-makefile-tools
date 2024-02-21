@@ -1,55 +1,51 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
 {
-    "version": "0.1.0",
-    "configurations": [
-        {
-            "name": "Launch Extension",
-            "type": "extensionHost",
-            "request": "launch",
-            "runtimeExecutable": "${execPath}",
-            "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}",
-            ],
-            "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ],
-            "env": {
-                "MAKEFILE_TOOLS_TESTING": "1",
-                "WindowsSDKVersion": "12.3.45678.9\\",
-                "CMT_DEVRUN": "1"
-            },
-            "preLaunchTask": "build-with-webpack-watch",
-        },
-        {
-            "name": "Launch Tests",
-            "type": "extensionHost",
-            "request": "launch",
-            "runtimeExecutable": "${execPath}",
-            "args": [
-                "${workspaceFolder}/src/test/fakeSuite/Repros",
-                "--disable-workspace-trust",
-                "--disable-extensions",
-                "--extensionDevelopmentPath=${workspaceFolder}",
-                "--extensionTestsPath=${workspaceFolder}/out/src/test/fakeSuite/index"
-            ],
-            "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/out/*",
-                "${workspaceFolder}/out/src/*",
-                "${workspaceFolder}/out/src/test/**/*"
-            ],
-            "env": {
-                "MAKEFILE_TOOLS_TESTING": "1",
-                "WindowsSDKVersion": "12.3.45678.9\\"
-            },
-            "preLaunchTask": "Pretest",
-        },
-        {
-            "name": "Node Attach",
-            "type": "node",
-            "request": "attach",
-            "port": 5858
-        }
-    ]
+  "version": "0.1.0",
+  "configurations": [
+    {
+      "name": "Launch Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/**/*.js"],
+      "env": {
+        "MAKEFILE_TOOLS_TESTING": "1",
+        "WindowsSDKVersion": "12.3.45678.9\\",
+        "CMT_DEVRUN": "1"
+      },
+      "preLaunchTask": "build-with-webpack-watch"
+    },
+    {
+      "name": "Launch Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "${workspaceFolder}/src/test/fakeSuite/Repros",
+        "--disable-workspace-trust",
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/src/test/fakeSuite/index"
+      ],
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceFolder}/out/*",
+        "${workspaceFolder}/out/src/*",
+        "${workspaceFolder}/out/src/test/**/*"
+      ],
+      "env": {
+        "MAKEFILE_TOOLS_TESTING": "1",
+        "WindowsSDKVersion": "12.3.45678.9\\"
+      },
+      "preLaunchTask": "Pretest"
+    },
+    {
+      "name": "Node Attach",
+      "type": "node",
+      "request": "attach",
+      "port": 5858
+    }
+  ]
 }

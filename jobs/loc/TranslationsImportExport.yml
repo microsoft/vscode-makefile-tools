@@ -4,26 +4,26 @@
 # ==================================================================================
 resources:
   repositories:
-  - repository: self
-    clean: true
-  - repository: MicroBuildTemplate
-    type: git
-    name: 1ESPipelineTemplates/MicroBuildTemplate
-    ref: refs/tags/release
+    - repository: self
+      clean: true
+    - repository: MicroBuildTemplate
+      type: git
+      name: 1ESPipelineTemplates/MicroBuildTemplate
+      ref: refs/tags/release
 
 trigger: none
 pr: none
 schedules:
-- cron: "0 7 * * *"
-  displayName: Daily 7 AM
-  branches:
-    include:
-    - main
-  always: true
+  - cron: "0 7 * * *"
+    displayName: Daily 7 AM
+    branches:
+      include:
+        - main
+    always: true
 
 variables:
-- name: TeamName
-  value: C++ Cross Platform and Cloud
+  - name: TeamName
+    value: C++ Cross Platform and Cloud
 
 extends:
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
@@ -33,50 +33,50 @@ extends:
       image: AzurePipelinesWindows2022compliantGPT
       os: windows
     sdl:
-      sourceAnalysisPool: 
+      sourceAnalysisPool:
         name: AzurePipelines-EO
         image: AzurePipelinesWindows2022compliantGPT
         os: windows
     customBuildTags:
-    - ES365AIMigrationTooling
+      - ES365AIMigrationTooling
     stages:
-    - stage: stage
-      jobs:
-      - job: job
-        templateContext:
-          outputs:
-          - output: pipelineArtifact
-            targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: 'drop'
-            publishLocation: 'Container'
-        steps:
-        - task: NodeTool@0
-          inputs:
-            versionSpec: '16.x'
-          displayName: 'Install Node.js'
-        
-        - task: CmdLine@2
-          inputs:
-            script: 'yarn install'
-        
-        - task: CmdLine@2
-          inputs:
-            script: 'yarn run translations-export'
-        
-        - task: OneLocBuild@2
-          env:
-            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-          inputs:
-            locProj: 'jobs/loc/LocProject.json'
-            outDir: '$(Build.ArtifactStagingDirectory)'
-            isCreatePrSelected: false
-            prSourceBranchPrefix: 'locfiles'
-            packageSourceAuth: 'patAuth'
-            patVariable: '$(OneLocBuildPat)'
-            LclSource: lclFilesfromPackage
-            LclPackageId: 'LCL-JUNO-PROD-VMAKEFILE'
-            lsBuildXLocPackageVersion: '7.0.30510'
-        
-        - task: CmdLine@2
-          inputs:
-            script: 'node ./translations_auto_pr.js microsoft vscode-makefile-tools csigs $(csigsPat) csigs csigs@users.noreply.github.com "$(Build.ArtifactStagingDirectory)/loc" vscode-extensions-localization-export/vscode-extensions'
+      - stage: stage
+        jobs:
+          - job: job
+            templateContext:
+              outputs:
+                - output: pipelineArtifact
+                  targetPath: "$(Build.ArtifactStagingDirectory)"
+                  artifactName: "drop"
+                  publishLocation: "Container"
+            steps:
+              - task: NodeTool@0
+                inputs:
+                  versionSpec: "16.x"
+                displayName: "Install Node.js"
+
+              - task: CmdLine@2
+                inputs:
+                  script: "yarn install"
+
+              - task: CmdLine@2
+                inputs:
+                  script: "yarn run translations-export"
+
+              - task: OneLocBuild@2
+                env:
+                  SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+                inputs:
+                  locProj: "jobs/loc/LocProject.json"
+                  outDir: "$(Build.ArtifactStagingDirectory)"
+                  isCreatePrSelected: false
+                  prSourceBranchPrefix: "locfiles"
+                  packageSourceAuth: "patAuth"
+                  patVariable: "$(OneLocBuildPat)"
+                  LclSource: lclFilesfromPackage
+                  LclPackageId: "LCL-JUNO-PROD-VMAKEFILE"
+                  lsBuildXLocPackageVersion: "7.0.30510"
+
+              - task: CmdLine@2
+                inputs:
+                  script: 'node ./translations_auto_pr.js microsoft vscode-makefile-tools csigs $(csigsPat) csigs csigs@users.noreply.github.com "$(Build.ArtifactStagingDirectory)/loc" vscode-extensions-localization-export/vscode-extensions'
