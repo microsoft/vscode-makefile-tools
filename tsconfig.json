@@ -4,6 +4,7 @@
 		"target": "es2019",
 		"outDir": "out",
 		"alwaysStrict":true,
+        "baseUrl": "./",
 		"lib": [
 			"es2019",
 		],
@@ -11,6 +12,7 @@
 		"rootDir": ".",
         "useUnknownInCatchVariables": false,
 		"strict": true,   /* enable all strict type-checking options */
+        "forceConsistentCasingInFileNames": true
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
@@ -20,7 +22,7 @@
 		"node_modules",
 		".vscode-test"
 	],
-	"include": [
-		"**/*.ts"
-	]
+    "include": [
+        "**/*.ts",
+    ]
 }

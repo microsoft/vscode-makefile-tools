@@ -133,7 +133,7 @@ export async function preprocessDryRunOutput(cancel: vscode.CancellationToken, d
     // A real user scenario wouldn't need this construct.
     preprocessTasks.push(function (): void {
         if (process.env['MAKEFILE_TOOLS_TESTING'] === '1') {
-            let extensionRootPath: string = path.resolve(__dirname, "../../");
+            let extensionRootPath: string = path.resolve(__dirname, "../");
             preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(/{REPO:VSCODE-MAKEFILE-TOOLS}/mg, extensionRootPath);
         }
     });

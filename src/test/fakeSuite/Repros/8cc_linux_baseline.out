@@ -236,6 +236,9 @@ Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
 Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
 Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
+Found build log path setting "./8cc_linux_dryrun.log" defined for configuration "8cc_linux"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
+Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
 Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>8cc() in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
 Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>8cc()"
 Re-reading settings after launch target change.

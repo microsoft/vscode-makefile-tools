@@ -45,7 +45,8 @@ export function telemetryLogger(str: string, loggingLevel?: string) {
 }
 
 export function logEvent(eventName: string, properties?: Properties, measures?: Measures): void {
-    if (telemetryReporter) {
+    // We don't want to log telemetry in testing.
+    if (telemetryReporter && process.env["MAKEFILE_TOOLS_TESTING"] !== "1") {
         try {
             telemetryReporter.sendTelemetryEvent(eventName, properties, measures);
         } catch (e) {

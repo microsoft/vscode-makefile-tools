@@ -207,13 +207,19 @@ export class MakefileToolsExtension {
 }
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
+    if (process.env["MAKEFILE_TOOLS_TESTING"] === "1") {
+        await vscode.commands.executeCommand('setContext', "makefile:testing", true);
+    } else {
+        await vscode.commands.executeCommand('setContext', "makefile:testing", false);
+    }
+
     statusBar = ui.getUI();
     extension = new MakefileToolsExtension(context);
     configuration.disableAllOptionallyVisibleCommands();
     await extension.setFullFeatureSet(false);
 
     telemetry.activate();
-
+    
     context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfiguration', async () => {
         await configuration.setNewConfiguration();
     }));
@@ -320,9 +326,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     }))
 
     // Reset state - useful for troubleshooting.
-    context.subscriptions.push(vscode.commands.registerCommand('makefile.resetState', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('makefile.resetState', (reload?: boolean) => {
         telemetry.logEvent("commandResetState");
-        extension.getState().reset();
+        extension.getState().reset(reload);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand('makefile.outline.configure', () => {
@@ -420,6 +426,62 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             }
         }
     }));
+
+    // === Commands only for testing ===
+    // commands that are not exposed via package.json and are used only for testing.
+    // TODO: In the future, we should refactor such that our tests can use already exposed commands, and/or refactor so 
+    // that some of our tests that are more unit-like tests can be done with direct dependencies on the code.
+    if (process.env["MAKEFILE_TOOLS_TESTING"] === "1") {
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.setBuildConfigurationByName', async (name: string) => {
+        await configuration.setConfigurationByName(name);
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.setPreconfigureScriptByPath', async (path: string) => {
+            await configuration.setPreConfigureScript(path);
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.setTargetByName', async (name: string) => {
+            await configuration.setTargetByName(name);
+        }))
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.setLaunchConfigurationByName', async (name: string) => {
+            await configuration.setLaunchConfigurationByName(name);
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.validateLaunchConfiguration', async () => {
+            return await launch.getLauncher().validateLaunchConfiguration(make.Operations.debug);
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.getCurrentLaunchConfiguration', async () => {
+            return configuration.getCurrentLaunchConfiguration();
+        }))
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.prepareDebugAndRunCurrentTarget', async (launchConfiguration: configuration.LaunchConfiguration) => {
+            launch.getLauncher().prepareDebugCurrentTarget(launchConfiguration);
+            launch.getLauncher().prepareRunCurrentTarget();
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.prepareBuildTarget', async (target: string) => {
+            make.prepareBuildTarget(target);
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.testResetState', async () => {
+            await configuration.setCurrentLaunchConfiguration(undefined);
+            await configuration.setCurrentMakefileConfiguration("Default");
+            configuration.setCurrentTarget(undefined);
+            configuration.initFromState();
+            await configuration.initFromSettings();
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.getExpandedSettingValue', async (key: string, value: any) => {
+            await util.getExpandedSettingVal(key, value);
+        }));
+
+        context.subscriptions.push(vscode.commands.registerCommand('makefile.expandVariablesInSetting', async (key: string, value: string) => {
+            return util.expandVariablesInSetting(key, value);
+        }));
+    }
+    // === Commands only for testing ===
 
     const parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
 

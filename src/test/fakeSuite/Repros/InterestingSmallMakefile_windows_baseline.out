@@ -252,6 +252,12 @@ Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSma
 Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
 Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
 Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c) in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
 Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c)"
 Re-reading settings after launch target change.
@@ -317,6 +323,12 @@ Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSma
 Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
 Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
 Inserting a new entry for {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch1\Debug\main.exe(str3a,str3b,str3c) in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.
 Setting current launch target "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch1\Debug\main.exe(str3a,str3b,str3c)"
 Re-reading settings after launch target change.
@@ -358,6 +370,12 @@ Created the following debug config:
    stopAtEntry = undefined
    symbolSearchPath = undefined
 Running command '"{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\bin\InterestingSmallMakefile\arch1\Debug\main.exe" str3a str3b str3c' in the terminal from location '{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros'
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
+Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
+Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
 Found build log path setting "./InterestingSmallMakefile_windows_dryrunDebug.log" defined for configuration "InterestingSmallMakefile_windows_configDebug"
 Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
 Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
@@ -530,6 +548,10 @@ Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fake
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()" from the workspace state.
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()" from the workspace state.
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()" from the workspace state.
+Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()" from the workspace state.
+Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>bin\InterestingSmallMakefile\arch2\Debug\main.exe()" from the workspace state.
+Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration "InterestingSmallMakefile_windows_configRelSpeed"
+Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration "InterestingSmallMakefile_windows_configRelSpeed"
 Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration "InterestingSmallMakefile_windows_configRelSpeed"
 Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration "InterestingSmallMakefile_windows_configRelSpeed"
 Deduced command 'c:\fake\path\make.exe OPT=RelSpeed' for configuration "InterestingSmallMakefile_windows_configRelSpeed"

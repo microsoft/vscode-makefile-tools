@@ -3,6 +3,25 @@
     "version": "0.1.0",
     "configurations": [
         {
+            "name": "Launch Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}",
+            ],
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/**/*.js"
+            ],
+            "env": {
+                "MAKEFILE_TOOLS_TESTING": "1",
+                "WindowsSDKVersion": "12.3.45678.9\\",
+                "CMT_DEVRUN": "1"
+            },
+            "preLaunchTask": "build-with-webpack-watch",
+        },
+        {
             "name": "Launch Tests",
             "type": "extensionHost",
             "request": "launch",
@@ -14,31 +33,17 @@
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/out/src/test/fakeSuite/index"
             ],
-            "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [
-                "${workspaceFolder}/out/src/test/**/*.js"
+                "${workspaceFolder}/out/*",
+                "${workspaceFolder}/out/src/*",
+                "${workspaceFolder}/out/src/test/**/*"
             ],
             "env": {
                 "MAKEFILE_TOOLS_TESTING": "1",
                 "WindowsSDKVersion": "12.3.45678.9\\"
             },
-            "preLaunchTask": "compile",
-        },
-        {
-            "name": "Launch Extension",
-            "type": "extensionHost",
-            "request": "launch",
-            "runtimeExecutable": "${execPath}",
-            "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}",
-            ],
-            "stopOnEntry": false,
-            "sourceMaps": true,
-            "outFiles": [
-                "${workspaceFolder}/out/**/*.js"
-            ],
-            "preLaunchTask": "compile",
+            "preLaunchTask": "Pretest",
         },
         {
             "name": "Node Attach",

@@ -10,6 +10,12 @@ parameters:
   default: $(ReleaseVersion)
 
 steps:
+- task: MicroBuildSigningPlugin@3
+  displayName: Install MicroBuild Signing
+  inputs:
+    signType: $(SignType)
+    zipSources: false
+
 - task: NodeTool@0
   displayName: Use Node 16.x
   inputs:
@@ -94,12 +100,35 @@ steps:
     script: |
       if "${{parameters.IsPreRelease}}"=="1" (type nul > "insiders.flag") else (type nul > "release.flag")
 
+- template: /jobs/shared/install-nuget.yml@self
+
+- script: nuget restore $(Build.SourcesDirectory)\build\SignFiles.proj -PackagesDirectory $(Build.SourcesDirectory)\build\packages
+  displayName: Restore MicroBuild Core
+
+- task: CmdLine@2
+  displayName: Build files
+  inputs:
+    script: |
+      npm run vscode:prepublish
+
+- task: MSBuild@1
+  displayName: Sign files
+  inputs:
+    solution: $(Build.SourcesDirectory)\build\SignFiles.proj
+    msbuildArguments: /p:SignType=$(SignType)
+
 - task: CmdLine@2
   displayName: vsce package
   inputs:
     script: |
       mkdir $(Build.ArtifactStagingDirectory)\vsix
       if "${{parameters.IsPreRelease}}"=="1" (vsce package --yarn -o $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix --pre-release) else (vsce package --yarn -o $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix)
+
+- task: MSBuild@1
+  displayName: Sign VSIX
+  inputs:
+    solution: $(Build.SourcesDirectory)\build\SignVsix.proj
+    msbuildArguments: /p:SignType=$(SignType)
 
 - task: CmdLine@2
   displayName: Write the version to version.txt

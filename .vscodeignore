@@ -1,28 +1,29 @@
-# Files/Folders to ignore when packaging the extension
-
-# ignore vscode settings for extension development
-.vscode/**
-
-# ignore GitHub actions
-.github/**
-
-# ignore source files
-src/**
-out/src/test/**
-
-# ignore development files
-.gitignore
-.vscodeignore
-tsconfig.json
-tslint.json
 *.log
-*.vsix
-translations_auto_pr.js
-gulpfile.js
-vscode-extensions-localization-export/
-vscode-translations-import/
-i18n/
-jobs/
+.devcontainer/
+.github/
+.vscode/
 build/
 docs/
+i18n/
+jobs/
+node_modules/
+out/
 scripts/
+src/
+test/
+vscode-extensions-localization-export/
+vscode-translations-import/
+**/*.map
+*.yml
+.editorconfig
+.eslintignore
+.eslintrc.js
+.gitattributes
+.gitignore
+gulpfile.js
+tsconfig.json
+test.tsconfig.json
+translations_auto_pr.js
+tslint.json
+webpack.config.js
+yarn.lock
