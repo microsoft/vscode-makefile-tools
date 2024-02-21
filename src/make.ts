@@ -1020,8 +1020,8 @@ export async function configure(triggeredBy: TriggeredBy, updateTargets: boolean
     // This is when the user may not expect this to happen. Does not apply for a build or debug/launch and even for pre/post configure which,
     // if set by the user, they represent intentional commands.
 
-    // If the user answered yes, to continue with the --dry-run (configure) `dryRunApproved` will be true.
-    // If the user decided not to continue with the --dry-run (configure), it will be false.
+    // If the user answered yes to continue with the --dry-run (configure), `dryRunApproved` will be true.
+    // If the user decided not to continue with the --dry-run (configure), `dryRunApproved` will be false.
     const telemetryProperties: telemetry.Properties = {
       dryRunApproved: chosen?.title === yesButton ? "true" : "false",
       triggeredBy: triggeredBy,
