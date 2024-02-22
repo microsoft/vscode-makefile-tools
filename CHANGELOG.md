@@ -5,6 +5,10 @@ Bug Fixes:
 
 - Fix an issue with XDG_RUNTIME_DIR where we tried to reference the directory, but it didn't exist. [#553](https://github.com/microsoft/vscode-makefile-tools/pull/555)
 
+Improvements:
+
+- Add telemetry about how many users are hitting the dry-run warning and how many users are stopping the dry-run process due to it. [#565](https://github.com/microsoft/vscode-makefile-tools/pull/565)
+
 ## 0.8
 Bug Fixes:
 - Fix a bug where the first argument for pre/post-configure args didn't have the proper spacing in front of it [PR #530](https://github.com/microsoft/vscode-makefile-tools/pull/530)
