@@ -479,7 +479,7 @@
         },
         "makefile.configureOnOpen": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "%makefile-tools.configuration.makefile.configureOnOpen.description%",
           "scope": "resource"
         },
