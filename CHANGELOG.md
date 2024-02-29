@@ -8,6 +8,7 @@ Bug Fixes:
 Improvements:
 
 - Add telemetry about how many users are hitting the dry-run warning and how many users are stopping the dry-run process due to it. [#565](https://github.com/microsoft/vscode-makefile-tools/pull/565)
+- Switch the default for `makefile.configureOnOpen` to `false`. This will cause less unintentional configuring. [#569](https://github.com/microsoft/vscode-makefile-tools/pull/569)
 
 ## 0.8
 Bug Fixes:
