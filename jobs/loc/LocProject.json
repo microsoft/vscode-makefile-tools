@@ -1,14 +1,14 @@
 {
-    "Projects": [
+  "Projects": [
+    {
+      "LanguangeSet": "VS_Main_Languages",
+      "LocItems": [
         {
-            "LanguangeSet": "VS_Main_Languages",
-            "LocItems": [
-                {
-                    "SourceFile": "vscode-extensions-localization-export\\vscode-extensions\\vscode-makefile-tools.xlf",
-                    "Languages": "cs;de;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant",
-                    "LclFile": "jobs\\loc\\LCL\\{Lang}\\vscode-makefile-tools.xlf.lcl"
-                }
-            ]
+          "SourceFile": "vscode-extensions-localization-export\\vscode-extensions\\vscode-makefile-tools.xlf",
+          "Languages": "cs;de;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant",
+          "LclFile": "jobs\\loc\\LCL\\{Lang}\\vscode-makefile-tools.xlf.lcl"
         }
-    ]
+      ]
+    }
+  ]
 }

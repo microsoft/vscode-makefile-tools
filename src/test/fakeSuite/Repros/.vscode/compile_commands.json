@@ -1,7 +1,7 @@
 [
-    {
-        "command": "MyOwnFakeCompiler -I'd:\\Proj/src/test/fakeSuite/repros/\\'folder with space\\'/subfolder/' '-Id:\\Proj/src/test/fakeSuite/repros/folder' -I'..' -I'd:\\Proj/src/test/fakeSuite/repros/folder/' -I '../folder with space/' \"myfile.cpp\" -I 'd:\\Proj/src/test/fakeSuite/repros/\\\"folder1 with space\\\"/\\`folder2 with space\\`/subfolder/' /std:c++17\r",
-        "directory": "d:\\Proj\\vscode-makefile-tools\\src\\test\\fakeSuite\\Repros",
-        "file": "d:\\Proj\\vscode-makefile-tools\\src\\test\\fakeSuite\\Repros\\myfile.cpp"
-    }
+  {
+    "command": "MyOwnFakeCompiler -I'd:\\Proj/src/test/fakeSuite/repros/\\'folder with space\\'/subfolder/' '-Id:\\Proj/src/test/fakeSuite/repros/folder' -I'..' -I'd:\\Proj/src/test/fakeSuite/repros/folder/' -I '../folder with space/' \"myfile.cpp\" -I 'd:\\Proj/src/test/fakeSuite/repros/\\\"folder1 with space\\\"/\\`folder2 with space\\`/subfolder/' /std:c++17\r",
+    "directory": "d:\\Proj\\vscode-makefile-tools\\src\\test\\fakeSuite\\Repros",
+    "file": "d:\\Proj\\vscode-makefile-tools\\src\\test\\fakeSuite\\Repros\\myfile.cpp"
+  }
 ]

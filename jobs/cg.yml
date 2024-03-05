@@ -4,27 +4,27 @@
 trigger:
   branches:
     include:
-    - refs/heads/main
+      - refs/heads/main
 
 resources:
   repositories:
-  - repository: self
-    type: git
-    ref: refs/heads/main
-  - repository: MicroBuildTemplate
-    type: git
-    name: 1ESPipelineTemplates/MicroBuildTemplate
-    ref: refs/tags/release
+    - repository: self
+      type: git
+      ref: refs/heads/main
+    - repository: MicroBuildTemplate
+      type: git
+      name: 1ESPipelineTemplates/MicroBuildTemplate
+      ref: refs/tags/release
 
 name: $(Date:yyyyMMdd).$(Rev:r)
 
 variables:
-- name: Codeql.Enabled
-  value: true
-- name: Codeql.TSAEnabled
-  value: true
-- name: TeamName
-  value: C++ Cross Platform and Cloud
+  - name: Codeql.Enabled
+    value: true
+  - name: Codeql.TSAEnabled
+    value: true
+  - name: TeamName
+    value: C++ Cross Platform and Cloud
 
 extends:
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
@@ -42,51 +42,51 @@ extends:
         ignoreDirectories: node_modules,dist,i18n
         alertWarningLevel: Medium
     customBuildTags:
-    - ES365AIMigrationTooling
+      - ES365AIMigrationTooling
     stages:
-    - stage: stage
-      jobs:
-      - job: Job_1
-        displayName: Agent job 1
-        steps:
-        - checkout: self
-          fetchTags: false
-        
-        - task: NodeTool@0
-          displayName: Use Node 16.x
-          inputs:
-            versionSpec: 16.x
-        
-        - task: geeklearningio.gl-vsts-tasks-yarn.yarn-installer-task.YarnInstaller@3
-          displayName: Use Yarn 1.x
-        
-        - task: geeklearningio.gl-vsts-tasks-yarn.yarn-task.Yarn@3
-          displayName: Yarn install
-          inputs:
-            arguments: install
-        
-        - task: Npm@0
-          displayName: npm install vsce
-          inputs:
-            arguments: -g vsce
-        
-        - task: CmdLine@2
-          displayName: Run VSCE to package vsix
-          inputs:
-            script: |-
-              echo Building VSIX
-              vsce package --yarn -o $(Build.StagingDirectory)\makefile-tools.vsix
-        
-        - task: Npm@0
-          displayName: npm uninstall vsce
-          inputs:
-            command: uninstall
-            arguments: -g vsce
-        
-        - task: DeleteFiles@1
-          displayName: Remove code that should not be scanned
-          inputs:
-            Contents: |-
-              node_modules
-              dist
-              i18n
+      - stage: stage
+        jobs:
+          - job: Job_1
+            displayName: Agent job 1
+            steps:
+              - checkout: self
+                fetchTags: false
+
+              - task: NodeTool@0
+                displayName: Use Node 16.x
+                inputs:
+                  versionSpec: 16.x
+
+              - task: geeklearningio.gl-vsts-tasks-yarn.yarn-installer-task.YarnInstaller@3
+                displayName: Use Yarn 1.x
+
+              - task: geeklearningio.gl-vsts-tasks-yarn.yarn-task.Yarn@3
+                displayName: Yarn install
+                inputs:
+                  arguments: install
+
+              - task: Npm@0
+                displayName: npm install vsce
+                inputs:
+                  arguments: -g vsce
+
+              - task: CmdLine@2
+                displayName: Run VSCE to package vsix
+                inputs:
+                  script: |-
+                    echo Building VSIX
+                    vsce package --yarn -o $(Build.StagingDirectory)\makefile-tools.vsix
+
+              - task: Npm@0
+                displayName: npm uninstall vsce
+                inputs:
+                  command: uninstall
+                  arguments: -g vsce
+
+              - task: DeleteFiles@1
+                displayName: Remove code that should not be scanned
+                inputs:
+                  Contents: |-
+                    node_modules
+                    dist
+                    i18n
