@@ -740,6 +740,7 @@ export async function activate(
   // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
   await fs.chmod(parseCompilerArgsScript, 0o755);
 
+  // TODO: Need to add logging and/or telemetry.
   if (extension.getFullFeatureSet()) {
     let shouldConfigure = configuration.getConfigureOnOpen();
     if (shouldConfigure === null) {
@@ -786,7 +787,7 @@ export async function activate(
           persistMode: "user" | "workspace";
         }
 
-        const prompt = vscode.window
+        vscode.window
           .showInformationMessage<Choice2>(
             persistMessage,
             {},
@@ -814,13 +815,15 @@ export async function activate(
                 );
             }
           });
+
+        shouldConfigure = chosen.doConfigure;
+
+        if (shouldConfigure === true) {
+          // We've opened a new workspace folder, and the user wants us to configure it now.
+          await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
+        }
       }
     }
-  }
-
-  if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
-    // Always clean configure on open
-    await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
   }
 
   // Analyze settings for type validation and telemetry
