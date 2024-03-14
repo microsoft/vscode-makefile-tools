@@ -732,13 +732,91 @@ export async function activate(
       )
     );
   }
-  // === Commands only for testing ===
+  // === End of commands only for testing ===
 
   const parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
 
   // The extension VSIX stripped the executable bit, so we need to set it.
   // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
   await fs.chmod(parseCompilerArgsScript, 0o755);
+
+  if (extension.getFullFeatureSet()) {
+    let shouldConfigure = configuration.getConfigureOnOpen();
+    if (shouldConfigure === null) {
+      // Ask if the user wants to configure on open with the Makefile Tools extension.
+      interface Choice1 {
+        title: string;
+        doConfigure: boolean;
+      }
+      const chosen = await vscode.window.showInformationMessage<Choice1>(
+        localize(
+          "extension.configureOnOpen",
+          "Would you like to configure with the Makefile Tools extension?"
+        ),
+        {},
+        { title: localize("yes", "Yes"), doConfigure: true },
+        { title: localize("no", "No"), doConfigure: false }
+      );
+      if (!chosen) {
+        // User cancelled, they don't want to configure.
+        shouldConfigure = false;
+      } else {
+        // ask them if they always want to configure on open.
+        // TODO: More work to do here to have the right flow.
+        const persistMessage = chosen.doConfigure
+          ? localize(
+              "always.configure.on.open",
+              "Always configure projects upon opening?"
+            )
+          : localize(
+              "never.configure.on.open",
+              "Configure projects upon opening?"
+            );
+        const buttonMessages = chosen.doConfigure
+          ? [localize("yes.button", "Yes"), localize("no.button", "No")]
+          : [
+              localize("never.button", "Never"),
+              localize(
+                "never.for.this.workspace.button",
+                "Not for this workspace"
+              ),
+            ];
+        interface Choice2 {
+          title: string;
+          persistMode: "user" | "workspace";
+        }
+
+        const prompt = vscode.window
+          .showInformationMessage<Choice2>(
+            persistMessage,
+            {},
+            { title: buttonMessages[0], persistMode: "user" },
+            { title: buttonMessages[1], persistMode: "workspace" }
+          )
+          .then(async (choice) => {
+            if (!choice) {
+              // User cancelled. Do nothing.
+              return;
+            }
+
+            let configTarget = vscode.ConfigurationTarget.Global;
+            if (choice.persistMode === "workspace") {
+              configTarget = vscode.ConfigurationTarget.Workspace;
+            }
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (workspaceFolder) {
+              await vscode.workspace
+                .getConfiguration(undefined, workspaceFolder)
+                .update(
+                  "makefile.configureOnOpen",
+                  chosen.doConfigure,
+                  configTarget
+                );
+            }
+          });
+      }
+    }
+  }
 
   if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
     // Always clean configure on open
