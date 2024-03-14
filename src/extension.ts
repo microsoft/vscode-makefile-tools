@@ -7,7 +7,6 @@ import * as configuration from "./configuration";
 import * as cpptools from "./cpptools";
 import * as launch from "./launch";
 import { promises as fs } from "fs";
-import * as logger from "./logger";
 import * as make from "./make";
 import * as parser from "./parser";
 import * as path from "path";
@@ -20,7 +19,7 @@ import * as vscode from "vscode";
 import * as cpp from "vscode-cpptools";
 
 import * as nls from "vscode-nls";
-import { readBuildLog } from "./configuration";
+import { TelemetryEventProperties } from "@vscode/extension-telemetry";
 nls.config({
   messageFormat: nls.MessageFormat.bundle,
   bundleFormat: nls.BundleFormat.standalone,
@@ -761,6 +760,7 @@ export async function activate(
       if (!chosen) {
         // User cancelled, they don't want to configure.
         shouldConfigure = false;
+        telemetry.logConfigureOnOpenTelemetry(false);
       } else {
         // ask them if they always want to configure on open.
         // TODO: More work to do here to have the right flow.
@@ -784,7 +784,7 @@ export async function activate(
             ];
         interface Choice2 {
           title: string;
-          persistMode: "user" | "workspace";
+          persistMode: telemetry.ConfigureOnOpenScope;
         }
 
         vscode.window
@@ -797,6 +797,7 @@ export async function activate(
           .then(async (choice) => {
             if (!choice) {
               // User cancelled. Do nothing.
+              telemetry.logConfigureOnOpenTelemetry(chosen.doConfigure);
               return;
             }
 
@@ -814,6 +815,11 @@ export async function activate(
                   configTarget
                 );
             }
+
+            telemetry.logConfigureOnOpenTelemetry(
+              chosen.doConfigure,
+              choice.persistMode
+            );
           });
 
         shouldConfigure = chosen.doConfigure;
