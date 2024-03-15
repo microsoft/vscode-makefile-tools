@@ -1267,66 +1267,6 @@ export async function configure(
   triggeredBy: TriggeredBy,
   updateTargets: boolean = true
 ): Promise<number> {
-  // Before running the --dry-run type of configure for the first time, even in a trusted workspace,
-  // notify the user that it is possible some code to be executed even under "--dry-run" mode.
-  // Note that this is a state variable and can be reseted via the command resetState, causing the popup to show again
-  // even if a successfull --dry-run configure has been run in the past.
-  let ranDryRunInCodebaseLifetime: boolean =
-    extension.getState().ranDryRunInCodebaseLifetime;
-  if (!ranDryRunInCodebaseLifetime && !configuration.getBuildLog()) {
-    // The window popup message should be concise but more logging can be useful in the output channel.
-    logger.message(
-      "The Makefile Tools extension process of configuring your project is about to run 'make --dry-run' in order to parse the output for useful information. " +
-        "This is needed to calculate accurate IntelliSense and targets information. " +
-        "Although in general 'make --dry-run' only lists (without executing) the operations 'make' would do in the current context, " +
-        "it is still possible some code to be executed, like $(shell) syntax in the makefile or recursive invocations of the $(MAKE) variable."
-    );
-    logger.message(
-      "If you don't feel comfortable allowing this configure process and 'make --dry-run' to be invoked by the extension, " +
-        "you can chose a recent full, clean, verbose and up-to-date build log as an alternative, via the setting 'makefile.buildLog'. "
-    );
-    // Also, show the output channel for that message to be visible.
-    logger.showOutputChannel();
-    let yesButton: string = localize(
-      "yes.dont.show.again",
-      "Yes (don't show again)"
-    );
-    let noButton: string = localize("no", "No");
-    const chosen: vscode.MessageItem | undefined =
-      await vscode.window.showErrorMessage<vscode.MessageItem>(
-        localize(
-          "code.can.execute.dryrun.mode.continue",
-          "Configuring project. Code can still execute in --dry-run mode. Do you want to continue?"
-        ),
-        {
-          title: yesButton,
-          isCloseAffordance: false,
-        },
-        {
-          title: noButton,
-          isCloseAffordance: true,
-        }
-      );
-
-    // The 'code possibly executed under --dry-run' warning makes sense only for the configure operation.
-    // This is when the user may not expect this to happen. Does not apply for a build or debug/launch and even for pre/post configure which,
-    // if set by the user, they represent intentional commands.
-
-    // If the user answered yes to continue with the --dry-run (configure), `dryRunApproved` will be true.
-    // If the user decided not to continue with the --dry-run (configure), `dryRunApproved` will be false.
-    const telemetryProperties: telemetry.Properties = {
-      dryRunApproved: chosen?.title === yesButton ? "true" : "false",
-      triggeredBy: triggeredBy,
-    };
-    telemetry.logEvent("dryRunWarning", telemetryProperties);
-
-    if (chosen === undefined || chosen.title === noButton) {
-      return ConfigureBuildReturnCodeTypes.untrusted;
-    }
-
-    extension.getState().ranDryRunInCodebaseLifetime = true;
-  }
-
   // Mark that this workspace had at least one attempt at configuring (of any kind: --dry-run or buildLog), before any chance of early return,
   // to accurately identify in telemetry whether this project configured successfully out of the box or not.
   let ranConfigureInCodebaseLifetime: boolean =
