@@ -767,11 +767,11 @@ export async function activate(
         const persistMessage = chosen.doConfigure
           ? localize(
               "always.configure.on.open",
-              "Always configure projects upon opening?"
+              "Always configure C++ IntelliSense using information from your Makefiles upon opening?"
             )
           : localize(
               "never.configure.on.open",
-              "Configure projects upon opening?"
+              "Configure C++ IntelliSense using information from your Makefiles upon opening?"
             );
         const buttonMessages = chosen.doConfigure
           ? [localize("yes.button", "Yes"), localize("no.button", "No")]
