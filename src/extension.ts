@@ -751,7 +751,7 @@ export async function activate(
       const chosen = await vscode.window.showInformationMessage<Choice1>(
         localize(
           "extension.configureOnOpen",
-          "Would you like to configure this workspace with the Makefile Tools extension?"
+          "Would you like to configure C++ IntelliSense for this workspace using information from your Makefiles?"
         ),
         {},
         { title: localize("yes", "Yes"), doConfigure: true },
