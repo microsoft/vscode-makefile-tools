@@ -739,7 +739,6 @@ export async function activate(
   // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
   await fs.chmod(parseCompilerArgsScript, 0o755);
 
-  // TODO: Need to add logging and/or telemetry.
   if (extension.getFullFeatureSet()) {
     let shouldConfigure = configuration.getConfigureOnOpen();
     if (shouldConfigure === null) {
