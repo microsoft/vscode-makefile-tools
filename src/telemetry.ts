@@ -422,3 +422,14 @@ function getPackageInfo(): IPackageInfo {
     aiKey: "AIF-d9b70cd4-b9f9-4d70-929b-a071c400b217",
   };
 }
+
+export type ConfigureOnOpenScope = "user" | "workspace";
+export function logConfigureOnOpenTelemetry(
+  configureOnOpen: boolean,
+  scope: ConfigureOnOpenScope | undefined = undefined
+) {
+  logEvent("configureOnOpenPopup", {
+    configureOnOpen: configureOnOpen.toString(),
+    scope: scope ?? "N/A",
+  });
+}
