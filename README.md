@@ -14,7 +14,7 @@ or `makefile.makeDirectory` (which generates the make switch -C) settings to ins
 If you need any environment variables to be set or any terminal operations to be run before configure/build
 (like the usual `./autogen.sh`, `./configure` or `vcvarsall.bat`), you need to launch VSCode from a terminal
 that is already set up according to your project requirements OR you can point the `makefile.preConfigureScript`
-setting to a batch script file and invoke it at any time via the command `makefile.preconfigure` in the pallette.
+setting to a batch script file and invoke it at any time via the command `makefile.preconfigure` in the palette.
 By setting `makefile.alwaysPreConfigure` to true, you don't need to run the pre-configure command separately.
 The extension is going to invoke the script before every configure operation.
 
@@ -48,7 +48,7 @@ give your configurations a unique `name` so that you can tell them apart.
 If you need any environment variables to be set, modified, or deleted, or any terminal operations to be run after configure/build,
 you need to launch VSCode from a terminal that is already set up according to your project requirements OR
 you can point the `makefile.postConfigureScript` setting to a batch script file and invoke it at any time via the
-command `makefile.postConfigure` in the pallette. By setting `makefile.alwaysPostConfigure` to true,
+command `makefile.postConfigure` in the palette. By setting `makefile.alwaysPostConfigure` to true,
 you don't need to run the post-configure command separately. The extension is going to invoke the script after every configure operation.
 
 ### Building targets
