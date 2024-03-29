@@ -227,10 +227,11 @@ export async function preprocessDryRunOutput(
   // Don't remove lines with $ without paranthesis, there are valid compilation lines that would be ignored otherwise.
   preprocessTasks.push(function (): void {
     regexp = /.*\$\(.*/gm;
-    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
-      regexp,
-      ""
-    );
+    if (preprocessedDryRunOutputStr.indexOf("$(") >= 0)
+      preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
+        regexp,
+        ""
+      );
   });
 
   // Extract the link command
