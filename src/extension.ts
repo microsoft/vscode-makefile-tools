@@ -7,7 +7,6 @@ import * as configuration from "./configuration";
 import * as cpptools from "./cpptools";
 import * as launch from "./launch";
 import { promises as fs } from "fs";
-import * as logger from "./logger";
 import * as make from "./make";
 import * as parser from "./parser";
 import * as path from "path";
@@ -20,7 +19,7 @@ import * as vscode from "vscode";
 import * as cpp from "vscode-cpptools";
 
 import * as nls from "vscode-nls";
-import { readBuildLog } from "./configuration";
+import { TelemetryEventProperties } from "@vscode/extension-telemetry";
 nls.config({
   messageFormat: nls.MessageFormat.bundle,
   bundleFormat: nls.BundleFormat.standalone,
@@ -732,7 +731,7 @@ export async function activate(
       )
     );
   }
-  // === Commands only for testing ===
+  // === End of commands only for testing ===
 
   const parseCompilerArgsScript: string = util.parseCompilerArgsScriptFile();
 
@@ -740,9 +739,96 @@ export async function activate(
   // 0x755 means rwxr-xr-x (read and execute for everyone, write for owner).
   await fs.chmod(parseCompilerArgsScript, 0o755);
 
-  if (configuration.getConfigureOnOpen() && extension.getFullFeatureSet()) {
-    // Always clean configure on open
-    await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
+  if (extension.getFullFeatureSet()) {
+    let shouldConfigure = configuration.getConfigureOnOpen();
+    if (shouldConfigure === null) {
+      // Ask if the user wants to configure on open with the Makefile Tools extension.
+      interface Choice1 {
+        title: string;
+        doConfigure: boolean;
+      }
+      const chosen = await vscode.window.showInformationMessage<Choice1>(
+        localize(
+          "extension.configureOnOpen",
+          "Would you like to configure C++ IntelliSense for this workspace using information from your Makefiles?"
+        ),
+        {},
+        { title: localize("yes", "Yes"), doConfigure: true },
+        { title: localize("no", "No"), doConfigure: false }
+      );
+      if (!chosen) {
+        // User cancelled, they don't want to configure.
+        shouldConfigure = false;
+        telemetry.logConfigureOnOpenTelemetry(false);
+      } else {
+        // ask them if they always want to configure on open.
+        // TODO: More work to do here to have the right flow.
+        const persistMessage = chosen.doConfigure
+          ? localize(
+              "always.configure.on.open",
+              "Always configure C++ IntelliSense using information from your Makefiles upon opening?"
+            )
+          : localize(
+              "never.configure.on.open",
+              "Configure C++ IntelliSense using information from your Makefiles upon opening?"
+            );
+        const buttonMessages = chosen.doConfigure
+          ? [localize("yes.button", "Yes"), localize("no.button", "No")]
+          : [
+              localize("never.button", "Never"),
+              localize(
+                "never.for.this.workspace.button",
+                "Not for this workspace"
+              ),
+            ];
+        interface Choice2 {
+          title: string;
+          persistMode: telemetry.ConfigureOnOpenScope;
+        }
+
+        vscode.window
+          .showInformationMessage<Choice2>(
+            persistMessage,
+            {},
+            { title: buttonMessages[0], persistMode: "user" },
+            { title: buttonMessages[1], persistMode: "workspace" }
+          )
+          .then(async (choice) => {
+            if (!choice) {
+              // User cancelled. Do nothing.
+              telemetry.logConfigureOnOpenTelemetry(chosen.doConfigure);
+              return;
+            }
+
+            let configTarget = vscode.ConfigurationTarget.Global;
+            if (choice.persistMode === "workspace") {
+              configTarget = vscode.ConfigurationTarget.Workspace;
+            }
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (workspaceFolder) {
+              await vscode.workspace
+                .getConfiguration(undefined, workspaceFolder)
+                .update(
+                  "makefile.configureOnOpen",
+                  chosen.doConfigure,
+                  configTarget
+                );
+            }
+
+            telemetry.logConfigureOnOpenTelemetry(
+              chosen.doConfigure,
+              choice.persistMode
+            );
+          });
+
+        shouldConfigure = chosen.doConfigure;
+
+        if (shouldConfigure === true) {
+          // We've opened a new workspace folder, and the user wants us to configure it now.
+          await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
+        }
+      }
+    }
   }
 
   // Analyze settings for type validation and telemetry

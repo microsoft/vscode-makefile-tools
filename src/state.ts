@@ -53,18 +53,6 @@ export class StateManager {
     this._update("ranConfigureInCodebaseLifetime", v);
   }
 
-  // Whether this project had any --dry-run specific configure attempt before
-  // (it didn't have to succeed or even complete).
-  // This is used in order to notify the user via a Yes(don't show again)/No popup
-  // that some makefile code could still execute even in --dry-run mode.
-  // Once the user decides 'Yes(don't show again)' the popup is not shown.
-  get ranDryRunInCodebaseLifetime(): boolean {
-    return this._get<boolean>("ranDryRunInCodebaseLifetime") || false;
-  }
-  set ranDryRunInCodebaseLifetime(v: boolean) {
-    this._update("ranDryRunInCodebaseLifetime", v);
-  }
-
   // If the project needs a clean configure as a result
   // of an operation that alters the configure state
   // (makefile configuration change, build target change,
@@ -87,7 +75,6 @@ export class StateManager {
     this.buildTarget = undefined;
     this.launchConfiguration = undefined;
     this.ranConfigureInCodebaseLifetime = false;
-    this.ranDryRunInCodebaseLifetime = false;
     this.configureDirty = false;
 
     if (reloadWindow) {
