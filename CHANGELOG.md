@@ -1,5 +1,10 @@
 # What's New?
 
+## 0.10
+Improvements:
+
+- Remove dry-run pop-up and improve initial configureOnOpen experience. [#573](https://github.com/microsoft/vscode-makefile-tools/pull/573)
+
 ## 0.9
 Bug Fixes:
 
