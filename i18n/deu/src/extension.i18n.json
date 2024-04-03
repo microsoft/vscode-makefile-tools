@@ -6,5 +6,14 @@
 {
 	"makefile.outline.makefileFileNotFound": "Die Makefile-Datei konnte nicht geöffnet werden.",
 	"makefile.outline.buildLogFileNotFound": "Die Buildprotokolldatei konnte nicht geöffnet werden.",
+	"extension.configureOnOpen": "Möchten Sie C++-IntelliSense für diesen Arbeitsbereich mithilfe von Informationen aus Ihren Makefiles konfigurieren?",
+	"yes": "Ja",
+	"no": "Nein",
+	"always.configure.on.open": "C++-IntelliSense beim Öffnen immer mithilfe von Informationen aus Ihren Makefiles konfigurieren?",
+	"never.configure.on.open": "C++-IntelliSense beim Öffnen mithilfe von Informationen aus Ihren Makefiles konfigurieren?",
+	"yes.button": "Ja",
+	"no.button": "Nein",
+	"never.button": "Nie",
+	"never.for.this.workspace.button": "Nicht für diesen Arbeitsbereich",
 	"extension.deactivated": "Die Erweiterung {0} ist deaktiviert."
 }

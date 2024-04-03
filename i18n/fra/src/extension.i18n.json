@@ -6,5 +6,14 @@
 {
 	"makefile.outline.makefileFileNotFound": "Le fichier makefile n'a pas pu être ouvert.",
 	"makefile.outline.buildLogFileNotFound": "Le fichier journal de construction n'a pas pu être ouvert.",
+	"extension.configureOnOpen": "Voulez-vous configurer C++ IntelliSense pour cet espace de travail à l’aide des informations de vos Makefiles ?",
+	"yes": "Oui",
+	"no": "Non",
+	"always.configure.on.open": "Toujours configurer C++ IntelliSense à l’aide des informations de vos Makefiles à l’ouverture ?",
+	"never.configure.on.open": "Configurer C++ IntelliSense à l’aide des informations de vos Makefiles à l’ouverture ?",
+	"yes.button": "Oui",
+	"no.button": "Non",
+	"never.button": "Jamais",
+	"never.for.this.workspace.button": "Pas pour cet espace de travail",
 	"extension.deactivated": "L’extension {0} est désactivée."
 }

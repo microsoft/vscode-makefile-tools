@@ -6,5 +6,14 @@
 {
 	"makefile.outline.makefileFileNotFound": "無法開啟 Makefile 檔案。",
 	"makefile.outline.buildLogFileNotFound": "無法開啟組建記錄檔。",
+	"extension.configureOnOpen": "要使用 Makefiles 的資訊為此工作區設定 C++ IntelliSense 嗎?",
+	"yes": "是",
+	"no": "否",
+	"always.configure.on.open": "開啟 Makefiles 時一律使用 Makefiles 的資訊來設定 C++ IntelliSense？",
+	"never.configure.on.open": "開啟 Makefiles 時使用 Makefiles 的資訊來設定 C++ IntelliSense？",
+	"yes.button": "是",
+	"no.button": "否",
+	"never.button": "永遠不要",
+	"never.for.this.workspace.button": "不適用於此工作區",
 	"extension.deactivated": "延伸模組 {0} 已停用。"
 }

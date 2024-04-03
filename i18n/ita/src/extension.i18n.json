@@ -6,5 +6,14 @@
 {
 	"makefile.outline.makefileFileNotFound": "Non è stato possibile aprire il file Makefile.",
 	"makefile.outline.buildLogFileNotFound": "Non è stato possibile aprire il file di log di compilazione.",
+	"extension.configureOnOpen": "Configurare IntelliSense C++ per questa area di lavoro usando le informazioni dei makefile?",
+	"yes": "Sì",
+	"no": "No",
+	"always.configure.on.open": "Configurare sempre IntelliSense C++ usando le informazioni dei makefile all'apertura?",
+	"never.configure.on.open": "Configurare IntelliSense C++ usando le informazioni dei makefile all'apertura?",
+	"yes.button": "Sì",
+	"no.button": "No",
+	"never.button": "Mai",
+	"never.for.this.workspace.button": "Non per questa area di lavoro",
 	"extension.deactivated": "L'estensione {0} viene disattivata."
 }

@@ -18,8 +18,6 @@
 	"make.preconfigure.cancel.title": "사전 구성을 취소하는 중",
 	"make.postconfigure.title": "사전 구성 중: ${0}",
 	"make.postconfigure.cancelling.title": "사후 구성 취소하는 중",
-	"yes.dont.show.again": "예(다시 표시 안 함)",
-	"code.can.execute.dryrun.mode.continue": "프로젝트를 구성하는 중 코드는 --dry-run 모드에서 계속 실행할 수 있습니다. 계속하시겠습니까?",
 	"make.configuring.title": "구성하는 중",
 	"make.confiuring.cancel.title": "구성을 취소하는 중",
 	"make.configure.cache": "캐시에서 구성하는 중"

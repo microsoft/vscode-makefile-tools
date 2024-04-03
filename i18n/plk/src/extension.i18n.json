@@ -6,5 +6,14 @@
 {
 	"makefile.outline.makefileFileNotFound": "Nie można otworzyć pliku reguł programu make.",
 	"makefile.outline.buildLogFileNotFound": "Nie można otworzyć pliku dziennika kompilacji.",
+	"extension.configureOnOpen": "Czy chcesz skonfigurować funkcję IntelliSense języka C++ dla tego obszaru roboczego przy użyciu informacji z plików reguł programu make podczas otwierania?",
+	"yes": "Tak",
+	"no": "Nie",
+	"always.configure.on.open": "Zawsze konfigurować funkcję IntelliSense języka C++ przy użyciu informacji z plików reguł programu make podczas otwierania?",
+	"never.configure.on.open": "Skonfigurować funkcję IntelliSense języka C++ przy użyciu informacji z plików reguł programu make podczas otwierania?",
+	"yes.button": "Tak",
+	"no.button": "Nie",
+	"never.button": "Nigdy",
+	"never.for.this.workspace.button": "Nie dla tego obszaru roboczego",
 	"extension.deactivated": "Rozszerzenie {0} zostało dezaktywowane."
 }

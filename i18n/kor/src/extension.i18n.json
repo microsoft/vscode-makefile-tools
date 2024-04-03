@@ -6,5 +6,14 @@
 {
 	"makefile.outline.makefileFileNotFound": "메이크파일 파일을 열 수 없습니다.",
 	"makefile.outline.buildLogFileNotFound": "빌드 로그 파일을 열 수 없습니다.",
+	"extension.configureOnOpen": "메이크파일의 정보를 사용하여 이 작업 영역에 대해 C++ IntelliSense를 구성하시겠습니까?",
+	"yes": "예",
+	"no": "아니요",
+	"always.configure.on.open": "메이크파일을 열 때 항상 메이크파일의 정보를 사용하여 C++ IntelliSense를 구성하시겠습니까?",
+	"never.configure.on.open": "메이크파일을 열 때 메이크파일의 정보를 사용하여 C++ IntelliSense를 구성하시겠습니까?",
+	"yes.button": "예",
+	"no.button": "아니요",
+	"never.button": "안 함",
+	"never.for.this.workspace.button": "이 작업 영역에 대한 것이 아님",
 	"extension.deactivated": "확장 {0}이(가) 비활성화되었습니다."
 }
