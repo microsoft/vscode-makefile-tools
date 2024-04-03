@@ -226,11 +226,12 @@ export async function preprocessDryRunOutput(
   // about them anyway and also there will be a correspondent line in the dryrun with these variables expanded.
   // Don't remove lines with $ without paranthesis, there are valid compilation lines that would be ignored otherwise.
   preprocessTasks.push(function (): void {
-    regexp = /.*\$\(.*/gm;
-    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
-      regexp,
-      ""
-    );
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr
+      .split("\n")
+      .map((e) => {
+        return e.indexOf("$(") >= 0 ? "" : e;
+      })
+      .join("\n");
   });
 
   // Extract the link command
