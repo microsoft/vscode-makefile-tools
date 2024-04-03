@@ -18,8 +18,6 @@
 	"make.preconfigure.cancel.title": "Cancelando a pré-configuração",
 	"make.postconfigure.title": "Pós-configuração: ${0}",
 	"make.postconfigure.cancelling.title": "Cancelando pós-configuração",
-	"yes.dont.show.again": "Sim (não mostrar novamente)",
-	"code.can.execute.dryrun.mode.continue": "Configurando o projeto. O código ainda pode ser executado no modo --dry-run. Deseja continuar?",
 	"make.configuring.title": "Configurando",
 	"make.confiuring.cancel.title": "Cancelando configuração",
 	"make.configure.cache": "Configurando a partir do cache"

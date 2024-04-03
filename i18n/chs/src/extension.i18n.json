@@ -6,5 +6,14 @@
 {
 	"makefile.outline.makefileFileNotFound": "无法打开生成文件文件。",
 	"makefile.outline.buildLogFileNotFound": "无法打开生成日志文件。",
+	"extension.configureOnOpen": "是否要使用生成文件中的信息为此工作区配置 C++ IntelliSense?",
+	"yes": "是",
+	"no": "否",
+	"always.configure.on.open": "打开时始终使用生成文件中的信息配置 C++ IntelliSense?",
+	"never.configure.on.open": "打开时使用生成文件中的信息配置 C++ IntelliSense?",
+	"yes.button": "是",
+	"no.button": "否",
+	"never.button": "从不",
+	"never.for.this.workspace.button": "不适用于此工作区",
 	"extension.deactivated": "扩展 {0} 已取消激活。"
 }

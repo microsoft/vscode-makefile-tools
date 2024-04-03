@@ -18,8 +18,6 @@
 	"make.preconfigure.cancel.title": "Yapılandırma öncesi iptal ediliyor",
 	"make.postconfigure.title": "Yapılandırma sonrası: ${0}",
 	"make.postconfigure.cancelling.title": "Yapılandırma sonrası iptal ediliyor",
-	"yes.dont.show.again": "Evet (bir daha gösterme)",
-	"code.can.execute.dryrun.mode.continue": "Proje yapılandırılıyor. Kod hala --dry-run modunda yürütülebilir. Devam etmek istiyor musunuz?",
 	"make.configuring.title": "Yapılandırılıyor",
 	"make.confiuring.cancel.title": "Yapılandırma iptal ediliyor",
 	"make.configure.cache": "Önbellekten yapılandırılıyor"
