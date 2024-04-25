@@ -588,6 +588,22 @@ export function removeQuotes(str: string): string {
   return str;
 }
 
+export function removeSplitUpParenthesis(strArray: string[]): string[] {
+  const resultArray: string[] = [];
+
+  for (const str of strArray) {
+    let result: string = str.trim();
+    if (result.startsWith("(") && !result.endsWith(")")) {
+      result = result.substring(1, str.length - 1);
+    } else if (result.endsWith(")") && !result.startsWith("(")) {
+      result = result.substring(0, str.length - 2);
+    }
+    resultArray.push(result);
+  }
+
+  return resultArray;
+}
+
 // Remove only the quotes (", ' or `) that are surrounding the given string.
 export function removeSurroundingQuotes(str: string): string {
   let result: string = str.trim();
