@@ -822,12 +822,12 @@ export async function activate(
           });
 
         shouldConfigure = chosen.doConfigure;
-
-        if (shouldConfigure === true) {
-          // We've opened a new workspace folder, and the user wants us to configure it now.
-          await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
-        }
       }
+    }
+
+    if (shouldConfigure === true) {
+      // We've opened a new workspace folder, and the user wants us to configure it now.
+      await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
     }
   }
 
