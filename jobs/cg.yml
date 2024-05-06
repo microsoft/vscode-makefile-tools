@@ -57,6 +57,9 @@ extends:
           iterationPath: $(Tsa.AdoProject)
           allTools: true
           repositoryName: vscode-makefile-tools
+      policheck:
+        enabled: true
+        exclusionsFile: $(Build.SourcesDirectory)\jobs\policheckExclusions.xml
     customBuildTags:
       - ES365AIMigrationTooling
     stages:
@@ -67,13 +70,6 @@ extends:
             steps:
               - checkout: self
                 fetchTags: false
-
-              - task: PoliCheck@2
-                displayName: Run PoliCheck
-                inputs:
-                  targetType: "F"
-                  targetArgument: "$(Build.SourcesDirectory)"
-                  optionsUEPATH: '$(Build.SourcesDirectory)\jobs\policheckExclusions.xml'
 
               - task: NodeTool@0
                 displayName: Use Node 16.x
