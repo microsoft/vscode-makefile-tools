@@ -41,8 +41,6 @@ extends:
       componentgovernance:
         ignoreDirectories: node_modules,dist,i18n
         alertWarningLevel: Medium
-      policheck:
-        enabled: true
       tsa:
         enabled: true
         config:
@@ -69,6 +67,13 @@ extends:
             steps:
               - checkout: self
                 fetchTags: false
+
+              - task: PoliCheck@2
+                displayName: Run PoliCheck
+                inputs:
+                  targetType: "F"
+                  targetArgument: "$(Build.SourcesDirectory)"
+                  optionsUEPATH: '$(Build.SourcesDirectory)\jobs\policheckExclusions.xml'
 
               - task: NodeTool@0
                 displayName: Use Node 16.x
