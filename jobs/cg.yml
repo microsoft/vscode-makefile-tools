@@ -41,8 +41,6 @@ extends:
       componentgovernance:
         ignoreDirectories: node_modules,dist,i18n
         alertWarningLevel: Medium
-      policheck:
-        enabled: true
       tsa:
         enabled: true
         config:
@@ -59,6 +57,9 @@ extends:
           iterationPath: $(Tsa.AdoProject)
           allTools: true
           repositoryName: vscode-makefile-tools
+      policheck:
+        enabled: true
+        exclusionsFile: $(Build.SourcesDirectory)\jobs\policheckExclusions.xml
     customBuildTags:
       - ES365AIMigrationTooling
     stages:
