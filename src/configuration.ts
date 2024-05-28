@@ -2096,7 +2096,12 @@ export async function setNewConfiguration(): Promise<void> {
     items,
     options
   );
-  if (chosen && chosen !== getCurrentMakefileConfiguration()) {
+
+  if (
+    chosen &&
+    (chosen !== getCurrentMakefileConfiguration() ||
+      !extension.getState().buildConfiguration)
+  ) {
     let telemetryProperties: telemetry.Properties | null = {
       state: "makefileConfiguration",
     };
