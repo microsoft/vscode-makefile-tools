@@ -131,12 +131,6 @@ export class LaunchTargetNode extends BaseNode {
         "The launch target currently selected for debug and run in terminal.\n{0}",
         this._toolTip
       );
-      // enablement in makefile.outline.setLaunchConfiguration is not
-      // disabling this TreeItem
-      item.command = {
-        command: "makefile.outline.setLaunchConfiguration",
-        title: "%makefile-tools.command.makefile.setLaunchConfiguration.title%",
-      };
       item.contextValue = [`nodeType=launchTarget`].join(",");
       return item;
     } catch (e) {
