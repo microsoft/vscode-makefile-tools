@@ -405,11 +405,7 @@ export async function analyzeSettings(
 function createReporter(): TelemetryReporter | null {
   const packageInfo: IPackageInfo = getPackageInfo();
   if (packageInfo && packageInfo.aiKey) {
-    return new TelemetryReporter(
-      packageInfo.name,
-      packageInfo.version,
-      packageInfo.aiKey
-    );
+    return new TelemetryReporter(packageInfo.aiKey);
   }
   return null;
 }
