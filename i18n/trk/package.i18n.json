@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Derlemenin başındaki çıkış kanalını temizleyin",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Derleme veritabanı dosyasına giden yol",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Bu uzantı tarafından oluşturulan görüntülerde yerel olarak (bu konakta) hata ayıklamayı etkinleştir",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Bu uzantı tarafından oluşturulan görüntüleri yerel olarak (bu konakta) çalıştırmayı etkinleştir"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Bu uzantı tarafından oluşturulan görüntüleri yerel olarak (bu konakta) çalıştırmayı etkinleştir",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "Bu ayarı, Makefile Projesi Ana Hat panelindeki görünürlük ayarını kontrol etmek için değiştirin."
 }

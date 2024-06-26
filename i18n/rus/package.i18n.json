@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Очистить канал вывода в начале сборки",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Путь к файлу базы данных компиляции",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Включить локальную (в этом узле) отладку образов, созданных этим расширением",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Включить локальный (в этом узле) запуск образов, созданных этим расширением"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Включить локальный (в этом узле) запуск образов, созданных этим расширением",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "Измените этот параметр, чтобы управлять параметром видимости на панели структуры проекта Makefile."
 }

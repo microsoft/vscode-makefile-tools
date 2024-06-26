@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "ビルドの開始時に出力チャネルをクリアする",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "コンパイル データベース ファイルへのパス",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "この拡張機能によってビルドされたイメージの、ローカル (このホスト内) でのデバッグを有効にする",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "この拡張機能によってビルドされたイメージの、ローカル (このホスト内) での実行を有効にする"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "この拡張機能によってビルドされたイメージの、ローカル (このホスト内) での実行を有効にする",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "この設定を変更して、[Makefile プロジェクト アウトライン] パネルの表示設定を制御します。"
 }

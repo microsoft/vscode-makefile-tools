@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "在生成开始时清除输出通道",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "编译数据库文件的路径",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "启用此扩展生成的本地(在此主机中)映像的调试",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "启用此扩展生成的本地(在此主机中)运行映像"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "启用此扩展生成的本地(在此主机中)运行映像",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "修改此设置即可控制“生成文件项目概要”面板中的可见性设置。"
 }

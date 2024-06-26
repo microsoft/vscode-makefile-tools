@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Na začátku sestavování vyčistit výstupní kanál",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Cesta k souboru kompilační databáze",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Povolit místní ladění imagí (v tomto hostiteli) sestavených tímto rozšířením",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Povolit místní spouštění imagí (v tomto hostiteli) sestavených tímto rozšířením"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Povolit místní spouštění imagí (v tomto hostiteli) sestavených tímto rozšířením",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "Úpravou tohoto nastavení můžete řídit nastavení viditelnosti na panelu Osnova projektu souboru pravidel."
 }
