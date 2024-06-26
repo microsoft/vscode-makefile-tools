@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Ausgabekanal am Anfang eines Builds löschen",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Der Pfad zur Datenbankdatei der Kompilierung",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Aktivieren Sie das lokale Debuggen (in diesem Host) von Images, die von dieser Erweiterung erstellt wurden",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Aktivieren Sie die lokale Ausführung (in diesem Host) von Images, die von dieser Erweiterung erstellt wurden"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Aktivieren Sie die lokale Ausführung (in diesem Host) von Images, die von dieser Erweiterung erstellt wurden",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "Ändern Sie diese Einstellung, um die Sichtbarkeitseinstellung im Bereich „Makefile-Projektgliederung“ zu steuern."
 }

@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "清除組建開頭的輸出通道",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "編譯資料庫檔案的路徑",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "在本機 (在此主機) 啟用此延伸模組建置的偵錯映像",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "在本機 (在此主機) 執行此延伸模組建置的偵錯映像"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "在本機 (在此主機) 執行此延伸模組建置的偵錯映像",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "修改此設定以控制 Makefile 專案大綱面板中的可見度設定。"
 }

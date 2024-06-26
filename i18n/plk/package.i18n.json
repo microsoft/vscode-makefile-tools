@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Wyczyść kanał wyjściowy na początku kompilacji",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Ścieżka do pliku bazy danych kompilacji",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Włącz debugowanie obrazów lokalnie (na tym hoście) utworzonych przez to rozszerzenie",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Włącz uruchamianie obrazów lokalnie (na tym hoście) utworzonych przez to rozszerzenie"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Włącz uruchamianie obrazów lokalnie (na tym hoście) utworzonych przez to rozszerzenie",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "Zmodyfikuj to ustawienie, aby sterować ustawieniem widoczności w panelu Konspekt projektu Makefile."
 }

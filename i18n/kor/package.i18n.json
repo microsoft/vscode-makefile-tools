@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "빌드 시작 시 출력 채널 지우기",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "컴파일 데이터베이스 파일의 경로",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "이 확장으로 빌드된 이미지를 (이 호스트에서) 로컬로 디버깅 활성화",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "이 확장으로 빌드된 이미지를 (이 호스트에서) 로컬로 실행 활성화"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "이 확장으로 빌드된 이미지를 (이 호스트에서) 로컬로 실행 활성화",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "메이크파일 프로젝트 개요 패널에서 표시 여부 설정을 제어하도록 이 설정을 수정합니다."
 }

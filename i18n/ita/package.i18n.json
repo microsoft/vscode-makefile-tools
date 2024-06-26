@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Cancellare il canale di output all'inizio di una compilazione",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Percorso del file del database di compilazione",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Consente di abilitare il debug locale (in questo host) delle immagini compilate da questa estensione",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Consente di abilitare l'esecuzione locale (in questo host) delle immagini compilate da questa estensione"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Consente di abilitare l'esecuzione locale (in questo host) delle immagini compilate da questa estensione",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "Modificare questa impostazione per controllare l'impostazione di visibilità nel pannello Struttura progetto Makefile."
 }

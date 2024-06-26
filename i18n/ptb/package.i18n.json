@@ -73,5 +73,6 @@
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Limpar o canal de saída no início de uma compilação",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "O caminho para o arquivo de banco de dados da compilação",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Habilitar a depuração local (neste host) de imagens criadas por esta extensão",
-	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Habilitar a execução local (neste host) de imagens criadas por esta extensão"
+	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Habilitar a execução local (neste host) de imagens criadas por esta extensão",
+	"makefile-tools.configuration.makefile.panel.visibility.description": "Modifique essa configuração para controlar a configuração de visibilidade no painel Estrutura de Tópicos do Projeto Makefile."
 }
