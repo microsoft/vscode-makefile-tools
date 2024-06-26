@@ -82,7 +82,7 @@ export class LaunchTargetNode extends BaseNode {
     let shortName: string;
 
     if (!launchConfiguration) {
-      shortName = "Unset";
+      shortName = localize("Unset", "Unset");
     } else {
       if (vscode.workspace.workspaceFolders) {
         // In a complete launch target string, the binary path is relative to cwd.
@@ -169,8 +169,10 @@ export class ConfigurationNode extends BaseNode {
     try {
       const item: vscode.TreeItem = new vscode.TreeItem(this._name);
       item.collapsibleState = vscode.TreeItemCollapsibleState.None;
-      item.tooltip =
-        "The makefile configuration currently selected from settings ('makefile.configurations').";
+      item.tooltip = localize(
+        "makefile.currently.selected.configuration",
+        "The makefile configuration currently selected from settings ('makefile.configurations')."
+      );
       item.contextValue = [`nodeType=configuration`].join(",");
       return item;
     } catch (e) {
@@ -377,10 +379,12 @@ export class ProjectOutlineProvider
     if (!pathInSettings) {
       if (kind === "Build Log") {
         extension.updateBuildLogPresent(false);
+        kind = localize("build.log", "Build Log");
       } else if (kind === "Makefile") {
         extension.updateMakefileFilePresent(false);
       }
-      return `${kind}: [Unset]`;
+      const unset = localize("Unset", "Unset");
+      return `${kind}: ${unset}`;
     }
 
     const pathInSettingsToTest: string | undefined =
@@ -401,12 +405,15 @@ export class ProjectOutlineProvider
 
     if (kind === "Build Log") {
       extension.updateBuildLogPresent(checkFileExists);
+      kind = localize("build.log", "Build Log");
     } else if (kind === "Makefile") {
       extension.updateMakefileFilePresent(checkFileExists);
     }
 
+    const notFound = localize("not.found", "not found");
+
     return (
-      (!checkFileExists ? `${kind} (not found)` : `${kind}`) +
+      (!checkFileExists ? `${kind} (${notFound})` : `${kind}`) +
       `: [${
         makeRelative
           ? util.makeRelPath(finalPath, util.getWorkspaceRoot())
