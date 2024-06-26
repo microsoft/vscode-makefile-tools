@@ -858,7 +858,12 @@ export async function prePostConfigureHelper(
 export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
   let scriptFile: string | undefined = configuration.getPreConfigureScript();
   if (!scriptFile) {
-    vscode.window.showErrorMessage("Pre-configure failed: no script provided.");
+    vscode.window.showErrorMessage(
+      localize(
+        "no.preconfigure.script.provided",
+        "Pre-configure failed: no script provided."
+      )
+    );
     logger.message(
       "No pre-configure script is set in settings. " +
         "Make sure a pre-configuration script path is defined with makefile.preConfigureScript."
@@ -910,7 +915,10 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
   let scriptFile: string | undefined = configuration.getPostConfigureScript();
   if (!scriptFile) {
     vscode.window.showErrorMessage(
-      "Post-configure failed: no script provided."
+      localize(
+        "no.postconfigure.script.provided",
+        "Post-configure failed: no script provided."
+      )
     );
     logger.message(
       "No post-configure script is set in settings. " +
