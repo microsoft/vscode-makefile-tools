@@ -7,11 +7,14 @@
 	"tree.build.target": "組建目標: {0}",
 	"makefile.target.currently.selected.for.build": "目前為組建選取的 Makefile 目標。",
 	"issue.rendering.item": "{0} (轉譯此項目時發生問題)",
+	"Unset": "取消設定",
 	"tree.launch.target": "啟動目標: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "目前為在終端機中偵錯與執行選取的啟動目標。\n{0}",
 	"tree.configuration": "設定: {0}",
+	"makefile.currently.selected.configuration": "目前從設定中選取的 Makefile 設定 ('makefile.configurations')。",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
-	"Unset": "取消設定"
+	"build.log": "組建記錄",
+	"not.found": "找不到"
 }

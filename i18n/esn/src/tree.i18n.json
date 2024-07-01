@@ -7,11 +7,14 @@
 	"tree.build.target": "Destino de compilación: {0}",
 	"makefile.target.currently.selected.for.build": "Destino del archivo Make seleccionado actualmente para la compilación.",
 	"issue.rendering.item": "{0} (hubo un problema al representar este elemento)",
+	"Unset": "Anular",
 	"tree.launch.target": "Destino de inicio: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Destino de inicio seleccionado actualmente para depurar y ejecutar en el terminal.\n{0}",
 	"tree.configuration": "Configuración: {0}",
+	"makefile.currently.selected.configuration": "Configuración del archivo Make seleccionado actualmente de la configuración ('makefile.configurations').",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
-	"Unset": "Anular"
+	"build.log": "Registro de la compilación",
+	"not.found": "no encontrado"
 }

@@ -7,11 +7,14 @@
 	"tree.build.target": "Sestavit cíl: {0}",
 	"makefile.target.currently.selected.for.build": "Cíl souboru pravidel aktuálně vybraný pro sestavení",
 	"issue.rendering.item": "{0} (při vykreslování této položky došlo k problému)",
+	"Unset": "Nenastaveno",
 	"tree.launch.target": "Cíl spuštění: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Cíl spuštěný aktuálně vybraný pro ladění a spuštění v terminálu. \n{0}",
 	"tree.configuration": "Konfigurace: {0}",
+	"makefile.currently.selected.configuration": "Konfigurace souboru pravidel aktuálně vybraná v nastavení (makefile.configurations)",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
-	"Unset": "Nenastaveno"
+	"build.log": "Protokol sestavení",
+	"not.found": "nenalezeno"
 }
