@@ -7,11 +7,14 @@
 	"tree.build.target": "Cible de compilation : {0}",
 	"makefile.target.currently.selected.for.build": "La cible du makefile actuellement sélectionnée pour la construction.",
 	"issue.rendering.item": "{0} (un problème s’est produit lors de l’affichage de cet élément)",
+	"Unset": "Désactiver",
 	"tree.launch.target": "Cible de lancement : {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "La cible de lancement actuellement sélectionnée pour le débogage et l’exécution dans le terminal.\n{0}",
 	"tree.configuration": "Configuration : {0}",
+	"makefile.currently.selected.configuration": "Configuration makefile actuellement sélectionnée dans les paramètres (« makefile.configurations »).",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
-	"Unset": "Désactiver"
+	"build.log": "Journal de génération",
+	"not.found": "introuvable"
 }

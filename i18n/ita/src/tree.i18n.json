@@ -7,11 +7,14 @@
 	"tree.build.target": "Destinazione di compilazione: {0}",
 	"makefile.target.currently.selected.for.build": "Destinazione del makefile attualmente selezionata per la compilazione.",
 	"issue.rendering.item": "{0} (si è verificato un problema durante il rendering dell'elemento)",
+	"Unset": "Non impostato",
 	"tree.launch.target": "Destinazione di avvio: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Destinazione di avvio attualmente selezionata per il debug ed eseguita nel terminale.\n{0}",
 	"tree.configuration": "Configurazione: {0}",
+	"makefile.currently.selected.configuration": "La configurazione del makefile attualmente selezionata dalle impostazioni ('makefile.configurations').",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
-	"Unset": "Non impostato"
+	"build.log": "Log di compilazione",
+	"not.found": "non trovato"
 }

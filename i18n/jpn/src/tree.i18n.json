@@ -7,11 +7,14 @@
 	"tree.build.target": "ターゲットのビルド: {0}",
 	"makefile.target.currently.selected.for.build": "ビルド用に現在選択されているメイクファイル ターゲット。",
 	"issue.rendering.item": "{0} (この項目のレンダリングで問題が発生しました)",
+	"Unset": "設定解除",
 	"tree.launch.target": "起動ターゲット: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "デバッグ用に現在選択され、ターミナルで実行されている起動ターゲット。\n{0}",
 	"tree.configuration": "構成: {0}",
+	"makefile.currently.selected.configuration": "設定 ('makefile.configurations') から現在選択されているメイクファイル構成。",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
-	"Unset": "設定解除"
+	"build.log": "ビルド ログ",
+	"not.found": "見つかりません"
 }

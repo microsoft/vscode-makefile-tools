@@ -7,11 +7,14 @@
 	"tree.build.target": "Цель сборки: {0}",
 	"makefile.target.currently.selected.for.build": "Целевой файл makefile, выбранный для сборки.",
 	"issue.rendering.item": "{0} (возникла проблема при отрисовке этого элемента)",
+	"Unset": "Удалить",
 	"tree.launch.target": "Целевой объект запуска: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Целевой объект запуска, выбранный для отладки и запуска в терминале.\n{0}",
 	"tree.configuration": "Конфигурация: {0}",
+	"makefile.currently.selected.configuration": "Конфигурация make-файла, выбранная в данный момент в настройках («makefile.configurations»).",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
-	"Unset": "Удалить"
+	"build.log": "Журнал сборки",
+	"not.found": "не найдено"
 }

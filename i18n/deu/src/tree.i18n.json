@@ -7,11 +7,14 @@
 	"tree.build.target": "Ziel erstellen: {0}",
 	"makefile.target.currently.selected.for.build": "Das „Makefile“-Ziel, dass derzeit für den Build ausgewählt ist.",
 	"issue.rendering.item": "{0} (beim Rendern dieses Elements ist ein Problem aufgetreten)",
+	"Unset": "Löschen",
 	"tree.launch.target": "Startziel: {0}",
 	"launch.target.currently.selected.for.debug.run.in.terminal": "Das aktuell für das Debuggen und Ausführen im Terminal ausgewählte Startziel.\n{0}",
 	"tree.configuration": "Konfiguration: {0}",
+	"makefile.currently.selected.configuration": "Die makefile-Konfiguration, die derzeit aus den Einstellungen („makefile.configurations“) ausgewählt ist.",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
-	"Unset": "Löschen"
+	"build.log": "Buildprotokoll",
+	"not.found": "Nicht gefunden"
 }
