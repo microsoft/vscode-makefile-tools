@@ -245,28 +245,20 @@ export class Launcher implements vscode.Disposable {
     };
 
     logger.message(
-      "Created the following debug config:\n   type = " +
-        debugConfig.type +
-        "\n   cwd = " +
-        debugConfig.cwd +
-        " (= " +
-        this.getLaunchTargetDirectory() +
-        ")" +
-        "\n   args = " +
-        args.join(" ") +
-        "\n   program = " +
-        debugConfig.program +
-        " (= " +
-        this.getLaunchTargetPath() +
-        ")" +
-        "\n   MIMode = " +
-        debugConfig.MIMode +
-        "\n   miDebuggerPath = " +
-        debugConfig.miDebuggerPath +
-        "\n   stopAtEntry = " +
-        debugConfig.stopAtEntry +
-        "\n   symbolSearchPath = " +
+      localize(
+        "created.debug.config",
+        "Created the following debug config:\n\ttype = {0}\n\tcwd = {1} (= {2})\n\targs = {3}\n\tprogram = {4} (= {5})\n\tMIMode = {6}\n\tmiDebuggerPath = {7}\n\tstopAtEntry = {8}\n\tsymbolSearchPath = {9}",
+        dbg,
+        debugConfig.cwd,
+        this.getLaunchTargetDirectory(),
+        args.join(" "),
+        debugConfig.program,
+        this.getLaunchTargetPath(),
+        debugConfig.MIMode,
+        debugConfig.miDebuggerPath,
+        debugConfig.stopAtEntry,
         debugConfig.symbolSearchPath
+      )
     );
 
     return debugConfig;
@@ -281,7 +273,11 @@ export class Launcher implements vscode.Disposable {
     if (configuration.getBuildBeforeLaunch()) {
       let currentBuildTarget: string = configuration.getCurrentTarget() || "";
       logger.message(
-        `Building current target before launch: "${currentBuildTarget}"`
+        localize(
+          "building.current.target.before.launch",
+          'Building current target before launch: "{0}"',
+          currentBuildTarget
+        )
       );
       let buildSuccess: boolean =
         (await make.buildTarget(
@@ -290,7 +286,13 @@ export class Launcher implements vscode.Disposable {
           false
         )) === make.ConfigureBuildReturnCodeTypes.success;
       if (!buildSuccess) {
-        logger.message(`Building target "${currentBuildTarget}" failed.`);
+        logger.message(
+          localize(
+            "building.target.failed",
+            'Building target "{0}" failed.',
+            currentBuildTarget
+          )
+        );
         let noButton: string = localize("no", "No");
         let yesButton: string = localize("yes", "Yes");
         const message: string = localize(
@@ -418,11 +420,11 @@ export class Launcher implements vscode.Disposable {
     // Log the message for high verbosity only because the output channel will become visible over the terminal,
     // even if the terminal show() is called after the logger show().
     logger.message(
-      "Running command '" +
-        terminalCommand +
-        "' in the terminal from location '" +
-        this.getLaunchTargetDirectory() +
-        "'",
+      localize(
+        "Running command '{0}' in the terminal from location '{1}'.",
+        terminalCommand,
+        this.getLaunchTargetDirectory()
+      ),
       "Debug"
     );
     return terminalCommand;
