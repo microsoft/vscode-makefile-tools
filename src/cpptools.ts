@@ -11,6 +11,7 @@ import * as path from "path";
 import * as util from "./util";
 import * as vscode from "vscode";
 import * as cpp from "vscode-cpptools";
+import { localize } from "vscode-nls";
 
 export interface SourceFileConfigurationItem
   extends cpp.SourceFileConfigurationItem {
@@ -50,13 +51,21 @@ export class CppConfigurationProvider
         .getDeltaCustomConfigurationProvider()
         .fileIndex.get(norm_path);
       logger.message(
-        `Configuration for file ${norm_path} was not found. Searching in the current configure temporary file index.`
+        localize(
+          "configuration.for.file.not.found",
+          "Configuration for file {0} was not found. Searching in the current configure temporary file index.",
+          norm_path
+        )
       );
     }
 
     if (!sourceFileConfiguration) {
       logger.message(
-        `Configuration for file ${norm_path} was not found. CppTools will set a default configuration.`
+        localize(
+          "configuration.for.file.not.found.default",
+          "Configuration for file {0} was not found. CppTools will set a default configuration",
+          norm_path
+        )
       );
     }
 
@@ -139,7 +148,12 @@ export class CppConfigurationProvider
     _uri: vscode.Uri
   ): Promise<cpp.WorkspaceBrowseConfiguration> {
     if (_uri.fsPath !== util.getWorkspaceRoot()) {
-      logger.message("Makefile Tools supports single root for now.");
+      logger.message(
+        localize(
+          "support.only.single.root",
+          "Makefile Tools supports single root for now."
+        )
+      );
     }
 
     return this.workspaceBrowseConfiguration;
@@ -160,25 +174,42 @@ export class CppConfigurationProvider
 
   public logConfigurationProviderBrowse(): void {
     logger.message(
-      "Sending Workspace Browse Configuration: -----------------------------------",
+      localize(
+        "sending.workspace.browse.configuration",
+        "Sending Workspace Browse Configuration: -----------------------------------"
+      ),
       "Verbose"
     );
     logger.message(
-      "    Browse Path: " +
-        this.workspaceBrowseConfiguration.browsePath.join(";"),
+      localize(
+        "browse.path",
+        "\tBrowse Path: {0}",
+        this.workspaceBrowseConfiguration.browsePath.join(";")
+      ),
       "Verbose"
     );
     logger.message(
-      "    Standard: " + this.workspaceBrowseConfiguration.standard,
+      localize(
+        "standard",
+        "\tStandard: {0}",
+        this.workspaceBrowseConfiguration.standard
+      ),
       "Verbose"
     );
     logger.message(
-      "    Compiler Path: " + this.workspaceBrowseConfiguration.compilerPath,
+      localize(
+        "compiler.path",
+        "\tCompiler Path: {0}",
+        this.workspaceBrowseConfiguration.compilerPath
+      ),
       "Verbose"
     );
     logger.message(
-      "    Compiler Arguments: " +
-        this.workspaceBrowseConfiguration.compilerArgs?.join(";"),
+      localize(
+        "compiler.arguments",
+        "\tCompiler Arguments: {0}",
+        this.workspaceBrowseConfiguration.compilerArgs?.join(";")
+      ),
       "Verbose"
     );
     if (
@@ -186,8 +217,11 @@ export class CppConfigurationProvider
       this.workspaceBrowseConfiguration.windowsSdkVersion
     ) {
       logger.message(
-        "    Windows SDK Version: " +
-          this.workspaceBrowseConfiguration.windowsSdkVersion,
+        localize(
+          "windows.sdk.version",
+          "\tWindows SDK Version: {0}",
+          this.workspaceBrowseConfiguration.windowsSdkVersion
+        ),
         "Verbose"
       );
     }
@@ -203,42 +237,70 @@ export class CppConfigurationProvider
   ): void {
     let uriObj: vscode.Uri = <vscode.Uri>filePath.uri;
     logger.message(
-      "Sending configuration " +
-        (fromCache ? "(from cache) " : "") +
-        "for file " +
-        uriObj.fsPath +
-        " -----------------------------------",
+      localize(
+        "sending.configuration.from.cache",
+        "Sending configuration {0} for file {1} -----------------------------------",
+        fromCache ? "(from cache)" : "",
+        uriObj.fsPath
+      ),
       "Normal"
     );
     logger.message(
-      "    Defines: " + filePath.configuration.defines.join(";"),
+      localize(
+        "defines",
+        "\tDefines: {0}",
+        filePath.configuration.defines.join(";")
+      ),
       "Verbose"
     );
     logger.message(
-      "    Includes: " + filePath.configuration.includePath.join(";"),
+      localize(
+        "include.path",
+        "\tIncludes: {0}",
+        filePath.configuration.includePath.join(";")
+      ),
       "Verbose"
     );
     if (filePath.configuration.forcedInclude) {
       logger.message(
-        "    Force Includes: " + filePath.configuration.forcedInclude.join(";"),
+        localize(
+          "force.includes",
+          "\tForce Includes: {0}",
+          filePath.configuration.forcedInclude.join(";")
+        ),
         "Verbose"
       );
     }
     logger.message(
-      "    Standard: " + filePath.configuration.standard,
+      localize(
+        "standard.2",
+        "\tStandard: {0}",
+        filePath.configuration.standard
+      ),
       "Verbose"
     );
     logger.message(
-      "    IntelliSense Mode: " + filePath.configuration.intelliSenseMode,
+      localize(
+        "intellisense.mode",
+        "\tIntelliSense Mode: {0}",
+        filePath.configuration.intelliSenseMode
+      ),
       "Verbose"
     );
     logger.message(
-      "    Compiler Path: " + filePath.configuration.compilerPath,
+      localize(
+        "compiler.path",
+        "\tCompiler Path: {0}",
+        filePath.configuration.compilerPath
+      ),
       "Verbose"
     );
     logger.message(
-      "    Compiler Arguments: " +
-        filePath.configuration.compilerArgs?.join(";"),
+      localize(
+        "compiler.args.2",
+        "\tCompiler Arguments: {0}",
+        filePath.configuration.compilerArgs?.join(";")
+      ),
       "Verbose"
     );
     if (
@@ -246,7 +308,11 @@ export class CppConfigurationProvider
       filePath.configuration.windowsSdkVersion
     ) {
       logger.message(
-        "    Windows SDK Version: " + filePath.configuration.windowsSdkVersion,
+        localize(
+          "windows.sdk.version.2",
+          "\tWindows SDK Version: {0}",
+          filePath.configuration.windowsSdkVersion
+        ),
         "Verbose"
       );
     }
