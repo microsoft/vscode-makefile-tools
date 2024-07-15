@@ -19,9 +19,9 @@ Additional compiler names: 'MyOwnFakeCompiler'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
 No current launch configuration is set in the workspace state.
 Default launch configuration: MIMode = undefined,
-                    miDebuggerPath = undefined,
-                    stopAtEntry = undefined,
-                    symbolSearchPath = undefined
+                miDebuggerPath = undefined,
+                stopAtEntry = undefined,
+                symbolSearchPath = undefined
 Configure on open: false
 Configure on edit: true
 Configure after command: true
@@ -249,9 +249,9 @@ Additional compiler names: 'MyOwnFakeCompiler'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()" from the workspace state.
 Default launch configuration: MIMode = undefined,
-                    miDebuggerPath = undefined,
-                    stopAtEntry = undefined,
-                    symbolSearchPath = undefined
+                miDebuggerPath = undefined,
+                stopAtEntry = undefined,
+                symbolSearchPath = undefined
 Configure on open: false
 Configure on edit: true
 Configure after command: true
@@ -289,9 +289,9 @@ Additional compiler names: 'MyOwnFakeCompiler'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()" from the workspace state.
 Default launch configuration: MIMode = undefined,
-                    miDebuggerPath = undefined,
-                    stopAtEntry = undefined,
-                    symbolSearchPath = undefined
+                miDebuggerPath = undefined,
+                stopAtEntry = undefined,
+                symbolSearchPath = undefined
 Configure on open: false
 Configure on edit: true
 Configure after command: true

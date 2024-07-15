@@ -422,7 +422,7 @@ export class Launcher implements vscode.Disposable {
     logger.message(
       localize(
         "running.command.in.terminal",
-        "Running command '{0}' in the terminal from location '{1}'.",
+        "Running command '{0}' in the terminal from location '{1}'",
         terminalCommand,
         this.getLaunchTargetDirectory()
       ),
