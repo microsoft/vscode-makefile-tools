@@ -421,6 +421,7 @@ export class Launcher implements vscode.Disposable {
     // even if the terminal show() is called after the logger show().
     logger.message(
       localize(
+        "running.command.in.terminal",
         "Running command '{0}' in the terminal from location '{1}'.",
         terminalCommand,
         this.getLaunchTargetDirectory()

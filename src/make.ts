@@ -967,6 +967,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
     vscode.window.showErrorMessage("Could not find pre-configure script.");
     logger.message(
       localize(
+        "could.not.find.pre.configure.on.disk",
         'Could not find the given pre-configure script "{0}" on disk.',
         scriptFile
       )
