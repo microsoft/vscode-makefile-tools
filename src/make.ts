@@ -1946,13 +1946,15 @@ async function updateProvider(
   }
 
   let startTime: number = Date.now();
-  logger.message(
-    localize(
-      "updating.cpptools.configuration.provider",
-      "Updating the CppTools IntelliSense Configuration Provider. {0}",
-      recursive ? "(recursive)" : ""
-    )
+  const recursiveString = localize(
+    "updating.cpptools.configuration.provider.recursive",
+    "Updating the CppTools IntelliSense Configuration Provider. (recursive)"
   );
+  const nonRecursiveString = localize(
+    "updating.cpptools.configuration.provider",
+    "Updating the CppTools IntelliSense Configuration Provider."
+  );
+  logger.message(recursive ? recursiveString : nonRecursiveString);
 
   let onStatus: any = (status: string): void => {
     progress.report({

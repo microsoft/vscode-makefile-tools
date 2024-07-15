@@ -189,7 +189,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "browse.path",
-        "\tBrowse Path: {0}",
+        " Browse Path: {0}",
         this.workspaceBrowseConfiguration.browsePath.join(";")
       ),
       "Verbose"
@@ -197,7 +197,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "standard",
-        "\tStandard: {0}",
+        " Standard: {0}",
         this.workspaceBrowseConfiguration.standard
       ),
       "Verbose"
@@ -205,7 +205,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "compiler.path",
-        "\tCompiler Path: {0}",
+        " Compiler Path: {0}",
         this.workspaceBrowseConfiguration.compilerPath
       ),
       "Verbose"
@@ -213,7 +213,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "compiler.arguments",
-        "\tCompiler Arguments: {0}",
+        " Compiler Arguments: {0}",
         this.workspaceBrowseConfiguration.compilerArgs?.join(";")
       ),
       "Verbose"
@@ -225,7 +225,7 @@ export class CppConfigurationProvider
       logger.message(
         localize(
           "windows.sdk.version",
-          "\tWindows SDK Version: {0}",
+          " Windows SDK Version: {0}",
           this.workspaceBrowseConfiguration.windowsSdkVersion
         ),
         "Verbose"
@@ -256,7 +256,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "defines",
-        "\tDefines: {0}",
+        " Defines: {0}",
         filePath.configuration.defines.join(";")
       ),
       "Verbose"
@@ -264,7 +264,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "include.path",
-        "\tIncludes: {0}",
+        " Includes: {0}",
         filePath.configuration.includePath.join(";")
       ),
       "Verbose"
@@ -273,24 +273,20 @@ export class CppConfigurationProvider
       logger.message(
         localize(
           "force.includes",
-          "\tForce Includes: {0}",
+          " Force Includes: {0}",
           filePath.configuration.forcedInclude.join(";")
         ),
         "Verbose"
       );
     }
     logger.message(
-      localize(
-        "standard.2",
-        "\tStandard: {0}",
-        filePath.configuration.standard
-      ),
+      localize("standard.2", " Standard: {0}", filePath.configuration.standard),
       "Verbose"
     );
     logger.message(
       localize(
         "intellisense.mode",
-        "\tIntelliSense Mode: {0}",
+        " IntelliSense Mode: {0}",
         filePath.configuration.intelliSenseMode
       ),
       "Verbose"
@@ -298,7 +294,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "compiler.path",
-        "\tCompiler Path: {0}",
+        " Compiler Path: {0}",
         filePath.configuration.compilerPath
       ),
       "Verbose"
@@ -306,7 +302,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "compiler.args.2",
-        "\tCompiler Arguments: {0}",
+        " Compiler Arguments: {0}",
         filePath.configuration.compilerArgs?.join(";")
       ),
       "Verbose"
@@ -318,7 +314,7 @@ export class CppConfigurationProvider
       logger.message(
         localize(
           "windows.sdk.version.2",
-          "\tWindows SDK Version: {0}",
+          " Windows SDK Version: {0}",
           filePath.configuration.windowsSdkVersion
         ),
         "Verbose"
