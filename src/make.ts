@@ -247,7 +247,7 @@ export function prepareBuildTarget(target: string): string[] {
   logger.message(
     localize(
       "building.target.with.command",
-      'Building target "{0}" with command: "{1} {2}"',
+      "Building target \"{0}\" with command: '{1} {2}'",
       target,
       configuration.getConfigurationMakeCommand(),
       makeArgs.join(" ")

@@ -404,7 +404,7 @@ export function spawnChildProcess(
           "utils.quoting",
           "Spawning child process with:\n process name: {0}\n process args: {1}\n working directory: {2}\n shell type: {3}",
           qProcessName,
-          qArgs.join(" "),
+          qArgs.join(","),
           workingDirectory,
           shellType || "default"
         ),
@@ -1024,7 +1024,7 @@ export async function expandVariablesInSetting(
         logger.message(
           localize(
             "exception.executing",
-            'Exception while executing command "{0}": "{1}"',
+            "Exception while executing command \"{0}\": '{1}'",
             result[5],
             e.message
           )
