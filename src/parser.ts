@@ -1681,7 +1681,7 @@ export async function parseLaunchConfigurations(
         logger.message(
           localize(
             "adding.launch.configuration",
-            "Adding launch configuration:\n {0}",
+            "Adding launch configuration:\n{0}",
             configuration.launchConfigurationToString(launchConfiguration)
           ),
           "Verbose"

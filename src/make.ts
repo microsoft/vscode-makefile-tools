@@ -1800,8 +1800,8 @@ async function parseLaunchConfigurations(
       );
       logger.message(
         getConfigureIsClean()
-          ? cleanLaunchTargetsString
-          : notCleanLaunchTargetsString
+          ? notCleanLaunchTargetsString
+          : cleanLaunchTargetsString
       );
     }
 

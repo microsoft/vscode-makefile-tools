@@ -247,7 +247,7 @@ export class Launcher implements vscode.Disposable {
     logger.message(
       localize(
         "created.debug.config",
-        "Created the following debug config:\n type = {0}\n cwd = {1} (= {2})\n args = {3}\n program = {4} (= {5})\n MIMode = {6}\n miDebuggerPath = {7}\n stopAtEntry = {8}\n symbolSearchPath = {9}",
+        "Created the following debug config:\n   type = {0}\n   cwd = {1} (= {2})\n   args = {3}\n   program = {4} (= {5})\n   MIMode = {6}\n   miDebuggerPath = {7}\n   stopAtEntry = {8}\n   symbolSearchPath = {9}",
         dbg,
         debugConfig.cwd,
         this.getLaunchTargetDirectory(),

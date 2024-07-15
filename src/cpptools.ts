@@ -189,7 +189,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "browse.path",
-        " Browse Path: {0}",
+        "\tBrowse Path: {0}",
         this.workspaceBrowseConfiguration.browsePath.join(";")
       ),
       "Verbose"
@@ -197,7 +197,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "standard",
-        " Standard: {0}",
+        "\tStandard: {0}",
         this.workspaceBrowseConfiguration.standard
       ),
       "Verbose"
@@ -205,7 +205,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "compiler.path",
-        " Compiler Path: {0}",
+        "\tCompiler Path: {0}",
         this.workspaceBrowseConfiguration.compilerPath
       ),
       "Verbose"
@@ -213,7 +213,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "compiler.arguments",
-        " Compiler Arguments: {0}",
+        "\tCompiler Arguments: {0}",
         this.workspaceBrowseConfiguration.compilerArgs?.join(";")
       ),
       "Verbose"
