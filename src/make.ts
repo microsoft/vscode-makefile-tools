@@ -1191,7 +1191,7 @@ export async function runPreConfigureScript(
   logger.message(
     localize(
       "pre.configuring.script",
-      'Pre-configuring... \nScript: "{0}"',
+      'Pre-configuring...\nScript: "{0}"',
       configuration.getPreConfigureScript()
     )
   );
