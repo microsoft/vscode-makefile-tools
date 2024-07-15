@@ -14,7 +14,13 @@ import * as make from "./make";
 import * as path from "path";
 import * as util from "./util";
 import * as vscode from "vscode";
-import { localize } from "vscode-nls";
+
+import * as nls from "vscode-nls";
+nls.config({
+  messageFormat: nls.MessageFormat.bundle,
+  bundleFormat: nls.BundleFormat.standalone,
+})();
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
 
 // List of compiler tools plus the most common aliases cc and c++
 // ++ needs to be escaped for the regular expression in parseLineAsTool.
