@@ -957,7 +957,7 @@ export async function readDefaultLaunchConfiguration(): Promise<void> {
   logger.message(
     localize(
       "default.launch.configuration",
-      "Default launch configuration: MIMode = {0}, miDebuggerPath = {1}, stopAtEntry = {2}, symbolSearchPath = {3}",
+      "Default launch configuration: MIMode = {0}\n\t\t\t\t, miDebuggerPath = {1}\n\t\t\t\t, stopAtEntry = {2}\n\t\t\t\t, symbolSearchPath = {3}\n\t\t\t\t",
       defaultLaunchConfiguration?.MIMode,
       defaultLaunchConfiguration?.miDebuggerPath,
       defaultLaunchConfiguration?.stopAtEntry,
@@ -1165,7 +1165,7 @@ export async function getCommandForConfiguration(
     logger.message(
       localize(
         "deduced.command.configuration",
-        'Deduced command "{0}" for configuration "{1}"',
+        "Deduced command '{0}' for configuration \"{1}\"",
         `${configurationMakeCommand} ${configurationMakeArgs.join(" ")}`,
         configuration
       )

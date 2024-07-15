@@ -1949,7 +1949,7 @@ async function updateProvider(
   logger.message(
     localize(
       "updating.cpptools.configuration.provider",
-      "Updating CppTools IntelliSense Configuration Provider. {0}",
+      "Updating the CppTools IntelliSense Configuration Provider. {0}",
       recursive ? "(recursive)" : ""
     )
   );

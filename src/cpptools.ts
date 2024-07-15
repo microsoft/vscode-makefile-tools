@@ -242,15 +242,17 @@ export class CppConfigurationProvider
     fromCache: boolean = false
   ): void {
     let uriObj: vscode.Uri = <vscode.Uri>filePath.uri;
-    logger.message(
-      localize(
-        "sending.configuration.from.cache",
-        "Sending configuration {0} for file {1} -----------------------------------",
-        fromCache ? "(from cache)" : "",
-        uriObj.fsPath
-      ),
-      "Normal"
+    const fromCacheString = localize(
+      "sending.configuration.from.cache",
+      "Sending configuration (from cache) for file {1} -----------------------------------",
+      uriObj.fsPath
     );
+    const notFromCacheString = localize(
+      "sending.configuration.for.file",
+      "Sending configuration for file {1} -----------------------------------",
+      uriObj.fsPath
+    );
+    logger.message(fromCache ? fromCacheString : notFromCacheString, "Normal");
     logger.message(
       localize(
         "defines",
