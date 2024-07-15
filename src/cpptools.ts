@@ -225,7 +225,7 @@ export class CppConfigurationProvider
       logger.message(
         localize(
           "windows.sdk.version",
-          " Windows SDK Version: {0}",
+          "    Windows SDK Version: {0}",
           this.workspaceBrowseConfiguration.windowsSdkVersion
         ),
         "Verbose"
