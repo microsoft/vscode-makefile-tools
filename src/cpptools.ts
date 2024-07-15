@@ -256,7 +256,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "defines",
-        " Defines: {0}",
+        "\tDefines: {0}",
         filePath.configuration.defines.join(";")
       ),
       "Verbose"
@@ -264,7 +264,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "include.path",
-        " Includes: {0}",
+        "\tIncludes: {0}",
         filePath.configuration.includePath.join(";")
       ),
       "Verbose"
@@ -273,7 +273,7 @@ export class CppConfigurationProvider
       logger.message(
         localize(
           "force.includes",
-          " Force Includes: {0}",
+          "\tForce Includes: {0}",
           filePath.configuration.forcedInclude.join(";")
         ),
         "Verbose"
@@ -286,7 +286,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "intellisense.mode",
-        " IntelliSense Mode: {0}",
+        "\tIntelliSense Mode: {0}",
         filePath.configuration.intelliSenseMode
       ),
       "Verbose"
@@ -294,7 +294,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "compiler.path",
-        " Compiler Path: {0}",
+        "\tCompiler Path: {0}",
         filePath.configuration.compilerPath
       ),
       "Verbose"
@@ -302,7 +302,7 @@ export class CppConfigurationProvider
     logger.message(
       localize(
         "compiler.args.2",
-        " Compiler Arguments: {0}",
+        "\tCompiler Arguments: {0}",
         filePath.configuration.compilerArgs?.join(";")
       ),
       "Verbose"
