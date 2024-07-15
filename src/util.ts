@@ -773,8 +773,7 @@ export function reportDryRunError(dryrunOutputFile: string): void {
   logger.message(
     localize(
       "utils.dryrun.error.github",
-      "If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: " +
-        "https://github.com/microsoft/vscode-makefile-tools/issues"
+      "If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: https://github.com/microsoft/vscode-makefile-tools/issues"
     )
   );
 }
