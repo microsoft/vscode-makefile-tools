@@ -329,7 +329,7 @@ export class Launcher implements vscode.Disposable {
           localize(
             "cannot.op.no.launch.config.targets",
             "Cannot {0} because there is no launch configuration set and the list of launch targets is empty. Double check the makefile configuration and the build target.",
-            `'${op}'`
+            op
           )
         );
         return LaunchStatuses.launchTargetsListEmpty;
@@ -338,7 +338,7 @@ export class Launcher implements vscode.Disposable {
           localize(
             "cannot.op.choose.launch.config",
             "Cannot {0} because there is no launch configuration set. Choose one from the quick pick.",
-            `'${op}'`
+            op
           )
         );
         await configuration.selectLaunchConfiguration();
@@ -352,7 +352,7 @@ export class Launcher implements vscode.Disposable {
             localize(
               "cannot.op.without.launch.config",
               "Cannot {0} until you select an active launch configuration.",
-              `'${op}'`
+              op
             )
           );
           return LaunchStatuses.noLaunchConfigurationSet;
