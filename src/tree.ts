@@ -384,7 +384,7 @@ export class ProjectOutlineProvider
         extension.updateMakefileFilePresent(false);
       }
       const unset = localize("Unset", "Unset");
-      return `${kind}: ${unset}`;
+      return `${kind}: [${unset}]`;
     }
 
     const pathInSettingsToTest: string | undefined =
