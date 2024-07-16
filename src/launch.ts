@@ -245,28 +245,20 @@ export class Launcher implements vscode.Disposable {
     };
 
     logger.message(
-      "Created the following debug config:\n   type = " +
-        debugConfig.type +
-        "\n   cwd = " +
-        debugConfig.cwd +
-        " (= " +
-        this.getLaunchTargetDirectory() +
-        ")" +
-        "\n   args = " +
-        args.join(" ") +
-        "\n   program = " +
-        debugConfig.program +
-        " (= " +
-        this.getLaunchTargetPath() +
-        ")" +
-        "\n   MIMode = " +
-        debugConfig.MIMode +
-        "\n   miDebuggerPath = " +
-        debugConfig.miDebuggerPath +
-        "\n   stopAtEntry = " +
-        debugConfig.stopAtEntry +
-        "\n   symbolSearchPath = " +
+      localize(
+        "created.debug.config",
+        "Created the following debug config:\n   type = {0}\n   cwd = {1} (= {2})\n   args = {3}\n   program = {4} (= {5})\n   MIMode = {6}\n   miDebuggerPath = {7}\n   stopAtEntry = {8}\n   symbolSearchPath = {9}",
+        dbg,
+        debugConfig.cwd,
+        this.getLaunchTargetDirectory(),
+        args.join(" "),
+        debugConfig.program,
+        this.getLaunchTargetPath(),
+        debugConfig.MIMode,
+        debugConfig.miDebuggerPath,
+        debugConfig.stopAtEntry,
         debugConfig.symbolSearchPath
+      )
     );
 
     return debugConfig;
@@ -281,7 +273,11 @@ export class Launcher implements vscode.Disposable {
     if (configuration.getBuildBeforeLaunch()) {
       let currentBuildTarget: string = configuration.getCurrentTarget() || "";
       logger.message(
-        `Building current target before launch: "${currentBuildTarget}"`
+        localize(
+          "building.current.target.before.launch",
+          'Building current target before launch: "{0}"',
+          currentBuildTarget
+        )
       );
       let buildSuccess: boolean =
         (await make.buildTarget(
@@ -290,7 +286,13 @@ export class Launcher implements vscode.Disposable {
           false
         )) === make.ConfigureBuildReturnCodeTypes.success;
       if (!buildSuccess) {
-        logger.message(`Building target "${currentBuildTarget}" failed.`);
+        logger.message(
+          localize(
+            "building.target.failed",
+            'Building target "{0}" failed.',
+            currentBuildTarget
+          )
+        );
         let noButton: string = localize("no", "No");
         let yesButton: string = localize("yes", "Yes");
         const message: string = localize(
@@ -327,7 +329,7 @@ export class Launcher implements vscode.Disposable {
           localize(
             "cannot.op.no.launch.config.targets",
             "Cannot {0} because there is no launch configuration set and the list of launch targets is empty. Double check the makefile configuration and the build target.",
-            `'${op}'`
+            op
           )
         );
         return LaunchStatuses.launchTargetsListEmpty;
@@ -336,7 +338,7 @@ export class Launcher implements vscode.Disposable {
           localize(
             "cannot.op.choose.launch.config",
             "Cannot {0} because there is no launch configuration set. Choose one from the quick pick.",
-            `'${op}'`
+            op
           )
         );
         await configuration.selectLaunchConfiguration();
@@ -350,7 +352,7 @@ export class Launcher implements vscode.Disposable {
             localize(
               "cannot.op.without.launch.config",
               "Cannot {0} until you select an active launch configuration.",
-              `'${op}'`
+              op
             )
           );
           return LaunchStatuses.noLaunchConfigurationSet;
@@ -418,11 +420,12 @@ export class Launcher implements vscode.Disposable {
     // Log the message for high verbosity only because the output channel will become visible over the terminal,
     // even if the terminal show() is called after the logger show().
     logger.message(
-      "Running command '" +
-        terminalCommand +
-        "' in the terminal from location '" +
-        this.getLaunchTargetDirectory() +
-        "'",
+      localize(
+        "running.command.in.terminal",
+        "Running command '{0}' in the terminal from location '{1}'",
+        terminalCommand,
+        this.getLaunchTargetDirectory()
+      ),
       "Debug"
     );
     return terminalCommand;

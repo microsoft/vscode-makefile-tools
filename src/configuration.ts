@@ -93,12 +93,19 @@ export function readCurrentMakefileConfiguration(): void {
     extension.getState().buildConfiguration;
   if (!buildConfiguration) {
     logger.message(
-      "No current configuration is defined in the workspace state. Assuming 'Default'."
+      localize(
+        "no.current.configuration.defined.workspace.state",
+        "No current configuration is defined in the workspace state. Assuming 'Default'."
+      )
     );
     currentMakefileConfiguration = "Default";
   } else {
     logger.message(
-      `Reading current configuration "${buildConfiguration}" from the workspace state.`
+      localize(
+        "reading.current.configuration.workspace.state",
+        'Reading current configuration "{0}" from the workspace state.',
+        buildConfiguration
+      )
     );
     currentMakefileConfiguration = buildConfiguration;
   }
@@ -229,7 +236,12 @@ export function setMakePath(path: string): void {
 async function readMakePath(): Promise<void> {
   makePath = await util.getExpandedSetting<string>("makePath");
   if (!makePath) {
-    logger.message("No path to the make tool is defined in the settings file.");
+    logger.message(
+      localize(
+        "no.make.tool.defined",
+        "No path to the make tool is defined in the settings file."
+      )
+    );
   }
 }
 
@@ -247,7 +259,12 @@ export function setMakefilePath(path: string): void {
 async function readMakefilePath(): Promise<void> {
   makefilePath = await util.getExpandedSetting<string>("makefilePath");
   if (!makefilePath) {
-    logger.message("No path to the makefile is defined in the settings file.");
+    logger.message(
+      localize(
+        "no.makefile.defined.in.settings",
+        "No path to the makefile is defined in the settings file."
+      )
+    );
   } else {
     makefilePath = util.resolvePathToRoot(makefilePath);
   }
@@ -268,7 +285,10 @@ async function readMakeDirectory(): Promise<void> {
   makeDirectory = await util.getExpandedSetting<string>("makeDirectory");
   if (!makeDirectory) {
     logger.message(
-      "No folder path to the makefile is defined in the settings file."
+      localize(
+        "no.folder.path.defined.in.settings",
+        "No folder path to the makefile is defined in the settings file."
+      )
     );
   } else {
     makeDirectory = util.resolvePathToRoot(makeDirectory);
@@ -333,9 +353,13 @@ export async function readBuildLog(): Promise<boolean> {
   buildLog = await util.getExpandedSetting<string>("buildLog");
   if (buildLog) {
     buildLog = util.resolvePathToRoot(buildLog);
-    logger.message(`Build log defined at "${buildLog}"`);
+    logger.message(
+      localize("build.log.defined.at", 'Build log defined at "{0}"', buildLog)
+    );
     if (!util.checkFileExistsSync(buildLog)) {
-      logger.message("Build log not found on disk.");
+      logger.message(
+        localize("build.log.not.found.disk", "Build log not found on disk.")
+      );
       return false;
     }
   }
@@ -354,7 +378,7 @@ export function setLoggingLevel(logLevel: string): void {
 export async function readLoggingLevel(): Promise<void> {
   loggingLevel =
     (await util.getExpandedSetting<string>("loggingLevel")) || "Normal";
-  logger.message(`Logging level: ${loggingLevel}`);
+  logger.message(localize("logging.level", "Logging level: {0}", loggingLevel));
 }
 
 let extensionOutputFolder: string | undefined;
@@ -384,16 +408,28 @@ export async function readExtensionOutputFolder(): Promise<void> {
       if (!util.createDirectorySync(extensionOutputFolder)) {
         extensionOutputFolder = extension.extensionContext.storagePath;
         logger.message(
-          `Extension output folder does not exist and could not be created: ${extensionOutputFolder}.`
+          localize(
+            "extension.output.folder.does.not.exist.no.creation",
+            "Extension output folder does not exist and could not be created: {0}.",
+            extensionOutputFolder
+          )
         );
         logger.message(
-          `Reverting to '${extensionOutputFolder}' default for extension output folder.`
+          localize(
+            "reverting.to.default.output.folder",
+            "Reverting to '{0}' default for extension output folder.",
+            extensionOutputFolder
+          )
         );
         return;
       }
     }
     logger.message(
-      `Dropping various extension output files at ${extensionOutputFolder}`
+      localize(
+        "dropping.various.extension.output.files",
+        "Dropping various extension output files at {0}",
+        extensionOutputFolder
+      )
     );
   }
 }
@@ -426,7 +462,13 @@ export async function readExtensionLog(): Promise<void> {
       extensionLog = util.resolvePathToRoot(extensionLog);
     }
 
-    logger.message(`Writing extension log at ${extensionLog}`);
+    logger.message(
+      localize(
+        "writing.extension.log",
+        "Writing extension log at {0}",
+        extensionLog
+      )
+    );
   }
 }
 
@@ -471,10 +513,19 @@ export async function readPreConfigureScript(): Promise<void> {
   if (preConfigureScript) {
     preConfigureScript = util.resolvePathToRoot(preConfigureScript);
     logger.message(
-      `Found pre-configure script defined as ${preConfigureScript}`
+      localize(
+        "found.preconfigure.script",
+        "Found pre-configure script defined as {0}",
+        preConfigureScript
+      )
     );
     if (!util.checkFileExistsSync(preConfigureScript)) {
-      logger.message("Pre-configure script not found on disk.");
+      logger.message(
+        localize(
+          "preconfigure.script.not.found.on.disk",
+          "Pre-configure script not found on disk."
+        )
+      );
     }
   }
 }
@@ -484,7 +535,11 @@ export async function readPreConfigureArgs(): Promise<void> {
     (await util.getExpandedSetting<string[]>("preConfigureArgs")) ?? [];
   if (preConfigureArgs && preConfigureArgs.length > 0) {
     logger.message(
-      `Pre-configure arguments: '${preConfigureArgs.join("', '")}'`
+      localize(
+        "preconfigure.arguments",
+        "Pre-configure arguments: '{0}'",
+        preConfigureArgs.join("', '")
+      )
     );
   }
 }
@@ -496,10 +551,19 @@ export async function readPostConfigureScript(): Promise<void> {
   if (postConfigureScript) {
     postConfigureScript = util.resolvePathToRoot(postConfigureScript);
     logger.message(
-      `Found post-configure script defined as ${postConfigureScript}`
+      localize(
+        "post.configure.script.defined.as",
+        "Found post-configure script defined as {0}",
+        postConfigureScript
+      )
     );
     if (!util.checkFileExistsSync(postConfigureScript)) {
-      logger.message("Post-configure script not found on disk");
+      logger.message(
+        localize(
+          "post.configure.not.found.on.disk",
+          "Post-configure script not found on disk"
+        )
+      );
     }
   }
 }
@@ -509,7 +573,11 @@ export async function readPostConfigureArgs(): Promise<void> {
     (await util.getExpandedSetting<string[]>("postConfigureArgs")) ?? [];
   if (postConfigureArgs && postConfigureArgs.length > 0) {
     logger.message(
-      `Post-configure arguments: '${postConfigureArgs.join("', '")}'`
+      localize(
+        "post.configure.arguments.listed",
+        "Post-configure arguments: '{0}'",
+        postConfigureArgs.join("', '")
+      )
     );
   }
 }
@@ -536,14 +604,26 @@ export async function readAlwaysPreConfigure(): Promise<void> {
   alwaysPreConfigure = await util.getExpandedSetting<boolean>(
     "alwaysPreConfigure"
   );
-  logger.message(`Always pre-configure: ${alwaysPreConfigure}`);
+  logger.message(
+    localize(
+      "always.pre.configure",
+      "Always pre-configure: {0}",
+      alwaysPreConfigure
+    )
+  );
 }
 
 export async function readAlwaysPostConfigure(): Promise<void> {
   alwaysPostConfigure = await util.getExpandedSetting<boolean>(
     "alwaysPostConfigure"
   );
-  logger.message(`Always post-configure: ${alwaysPostConfigure}`);
+  logger.message(
+    localize(
+      "always.post.configure",
+      "Always post-configure: {0}",
+      alwaysPostConfigure
+    )
+  );
 }
 
 let configurationCachePath: string | undefined;
@@ -583,7 +663,13 @@ export async function readConfigurationCachePath(): Promise<void> {
     }
 
     if (oldConfigurationCachePath !== configurationCachePath) {
-      logger.message(`Configurations cached at ${configurationCachePath}`);
+      logger.message(
+        localize(
+          "configurations.cached",
+          "Configurations cached at {0}",
+          configurationCachePath
+        )
+      );
     }
   }
 }
@@ -603,7 +689,13 @@ export async function readCompileCommandsPath(): Promise<void> {
     compileCommandsPath = util.resolvePathToRoot(compileCommandsPath);
   }
 
-  logger.message(`compile_commands.json path: ${compileCommandsPath}`);
+  logger.message(
+    localize(
+      "compile.commands.json.path",
+      "compile_commands.json path: {0}",
+      compileCommandsPath
+    )
+  );
 }
 
 let additionalCompilerNames: string[] | undefined;
@@ -619,7 +711,11 @@ export async function readAdditionalCompilerNames(): Promise<void> {
   );
   if (additionalCompilerNames && additionalCompilerNames.length > 0) {
     logger.message(
-      `Additional compiler names: '${additionalCompilerNames?.join("', '")}'`
+      localize(
+        "additional.compiler.names",
+        "Additional compiler names: '{0}'",
+        additionalCompilerNames?.join("', '")
+      )
     );
   }
 }
@@ -637,7 +733,11 @@ export async function readExcludeCompilerNames(): Promise<void> {
   );
   if (excludeCompilerNames && excludeCompilerNames.length > 0) {
     logger.message(
-      `Exclude compiler names: '${excludeCompilerNames?.join("', '")}'`
+      localize(
+        "exclude.compiler.names",
+        "Exclude compiler names: '{0}'",
+        excludeCompilerNames?.join("', '")
+      )
     );
   }
 }
@@ -661,7 +761,13 @@ export function setDryrunSwitches(switches: string[]): void {
 export async function readDryrunSwitches(): Promise<void> {
   dryrunSwitches = await util.getExpandedSetting<string[]>("dryrunSwitches");
   if (dryrunSwitches && dryrunSwitches.length > 0) {
-    logger.message(`Dry-run switches: '${dryrunSwitches?.join("', '")}'`);
+    logger.message(
+      localize(
+        "dry.run.switches",
+        "Dry-run switches: '{0}'",
+        dryrunSwitches?.join("', '")
+      )
+    );
   }
 }
 
@@ -790,7 +896,11 @@ async function readCurrentLaunchConfiguration(): Promise<void> {
   if (currentLaunchConfiguration) {
     launchConfigStr = launchConfigurationToString(currentLaunchConfiguration);
     logger.message(
-      `Reading current launch configuration "${launchConfigStr}" from the workspace state.`
+      localize(
+        "reading.current.launch.configuration",
+        'Reading current launch configuration "{0}" from the workspace state.',
+        launchConfigStr
+      )
     );
   } else {
     // A null launch configuration after a non empty launch configuration string name
@@ -803,12 +913,19 @@ async function readCurrentLaunchConfiguration(): Promise<void> {
       currentLaunchConfigurationName !== ""
     ) {
       logger.message(
-        `Launch configuration "${currentLaunchConfigurationName}" is no longer defined in settings "makefile.launchConfigurations".`
+        localize(
+          "launch.configuration.no.longer.defined.settings",
+          'Launch configuration "{0}" is no longer defined in settings "makefile.launchConfigurations".',
+          currentLaunchConfigurationName
+        )
       );
       await setLaunchConfigurationByName("");
     } else {
       logger.message(
-        "No current launch configuration is set in the workspace state."
+        localize(
+          "no.current.launch.configurations.in.state",
+          "No current launch configuration is set in the workspace state."
+        )
       );
     }
   }
@@ -837,10 +954,16 @@ export async function readDefaultLaunchConfiguration(): Promise<void> {
     await util.getExpandedSetting<DefaultLaunchConfiguration>(
       "defaultLaunchConfiguration"
     );
-  logger.message(`Default launch configuration: MIMode = ${defaultLaunchConfiguration?.MIMode},
-                    miDebuggerPath = ${defaultLaunchConfiguration?.miDebuggerPath},
-                    stopAtEntry = ${defaultLaunchConfiguration?.stopAtEntry},
-                    symbolSearchPath = ${defaultLaunchConfiguration?.symbolSearchPath}`);
+  logger.message(
+    localize(
+      "default.launch.configuration",
+      "Default launch configuration: MIMode = {0},\n                miDebuggerPath = {1},\n                stopAtEntry = {2},\n                symbolSearchPath = {3}",
+      defaultLaunchConfiguration?.MIMode,
+      defaultLaunchConfiguration?.miDebuggerPath,
+      defaultLaunchConfiguration?.stopAtEntry,
+      defaultLaunchConfiguration?.symbolSearchPath
+    )
+  );
 }
 
 // Command name and args are used when building from within the VS Code Makefile Tools Extension,
@@ -1040,9 +1163,12 @@ export async function getCommandForConfiguration(
 
   if (configurationMakeCommand) {
     logger.message(
-      `Deduced command '${configurationMakeCommand} ${configurationMakeArgs.join(
-        " "
-      )}' for configuration "${configuration}"`
+      localize(
+        "deduced.command.configuration",
+        "Deduced command '{0}' for configuration \"{1}\"",
+        `${configurationMakeCommand} ${configurationMakeArgs.join(" ")}`,
+        configuration
+      )
     );
   }
 
@@ -1079,7 +1205,10 @@ export async function getCommandForConfiguration(
         makeParsedPathConfigurations.name === "")
     ) {
       logger.message(
-        "Could not find any make tool file name in makefile.configurations.makePath, nor in makefile.makePath. Assuming make."
+        localize(
+          "could.not.find.make.file.tools.name",
+          "Could not find any make tool file name in makefile.configurations.makePath, nor in makefile.makePath. Assuming make."
+        )
       );
     }
 
@@ -1088,7 +1217,10 @@ export async function getCommandForConfiguration(
     if (configurationCommandPath !== "") {
       if (!util.checkFileExistsSync(configurationMakeCommand)) {
         logger.message(
-          "Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath."
+          localize(
+            "make.was.not.found.on.disk",
+            "Make was not found on disk at the location provided via makefile.makePath or makefile.configurations[].makePath."
+          )
         );
 
         // How often location settings don't work (maybe because not yet expanding variables)?
@@ -1103,7 +1235,10 @@ export async function getCommandForConfiguration(
         util.toolPathInEnv(makeBaseName);
       if (!makePathInEnv) {
         logger.message(
-          "Make was not given any path in settings and is also not found on the environment path."
+          localize(
+            "make.was.not.found.in.settings.not.environment",
+            "Make was not given any path in settings and is also not found on the environment path."
+          )
         );
 
         // Do the users need an environment automatically set by the extension?
@@ -1117,10 +1252,10 @@ export async function getCommandForConfiguration(
 
     if (!util.checkFileExistsSync(configurationMakefile)) {
       logger.message(
-        "The makefile entry point was not found. " +
-          "Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, " +
-          "makefile.makeDirectory, makefile.configurations[].makeDirectory" +
-          "or in the root of the workspace."
+        localize(
+          "makefile.entry.point.not.found",
+          "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace."
+        )
       );
 
       // we may need more advanced ability to process settings
@@ -1175,7 +1310,12 @@ export function getBuildLogForConfiguration(
 
   if (configurationBuildLog) {
     logger.message(
-      `Found build log path setting "${configurationBuildLog}" defined for configuration "${configuration}"`
+      localize(
+        "found.build.log.path.in.setting",
+        'Found build log path setting "{0}" defined for configuration "{1}"',
+        configurationBuildLog,
+        configuration
+      )
     );
 
     if (!path.isAbsolute(configurationBuildLog)) {
@@ -1183,12 +1323,21 @@ export function getBuildLogForConfiguration(
         util.getWorkspaceRoot(),
         configurationBuildLog
       );
-      logger.message(`Resolving build log path to "${configurationBuildLog}"`);
+      logger.message(
+        localize(
+          "resolving.build.log.path.to",
+          'Resolving build log path to "{0}"',
+          configurationBuildLog
+        )
+      );
     }
 
     if (!util.checkFileExistsSync(configurationBuildLog)) {
       logger.message(
-        "Build log not found. Remove the build log setting or provide a build log file on disk at the given location."
+        localize(
+          "build.log.not.found.remove.setting",
+          "Build log not found. Remove the build log setting or provide a build log file on disk at the given location."
+        )
       );
     }
   } else {
@@ -1272,13 +1421,23 @@ export async function readMakefileConfigurations(): Promise<void> {
 
       element.name = autoGeneratedName;
       logger.message(
-        `Defining name ${autoGeneratedName} for unnamed configuration ${element}.`
+        localize(
+          "defining.name.for.unnamed",
+          "Defining name {0} for unnamed configuration {1}.",
+          autoGeneratedName,
+          element.name
+        )
       );
     }
   });
 
   if (detectedUnnamedConfigurations) {
-    logger.message("Updating makefile configurations in settings.");
+    logger.message(
+      localize(
+        "updating.makefile.configurations.settings",
+        "Updating makefile configurations in settings."
+      )
+    );
     await workspaceConfiguration.update(
       "configurations",
       makefileConfigurations
@@ -1299,8 +1458,11 @@ export async function readMakefileConfigurations(): Promise<void> {
   );
   if (makefileConfigurationNames.length > 0) {
     logger.message(
-      "Found the following configurations defined in makefile.configurations setting: " +
+      localize(
+        "found.following.configurations.defined.setting",
+        "Found the following configurations defined in makefile.configurations setting: {0}",
         makefileConfigurationNames.join(";")
+      )
     );
   }
 
@@ -1314,8 +1476,11 @@ export async function readMakefileConfigurations(): Promise<void> {
     !makefileConfigurationNames.includes(currentMakefileConfiguration)
   ) {
     logger.message(
-      `Current makefile configuration ${currentMakefileConfiguration} is no longer present in the available list.` +
-        ` Re-setting the current makefile configuration to default.`
+      localize(
+        "current.makefile.configuration.not.present",
+        "Current makefile configuration ${currentMakefileConfiguration} is no longer present in the available list. Re-setting the current makefile configuration to default.",
+        currentMakefileConfiguration
+      )
     );
     await setConfigurationByName("Default");
   }
@@ -1337,7 +1502,10 @@ function readCurrentTarget(): void {
   let buildTarget: string | undefined = extension.getState().buildTarget;
   if (!buildTarget) {
     logger.message(
-      "No target defined in the workspace state. Assuming 'Default'."
+      localize(
+        "no.target.defined.assuming.default",
+        "No target defined in the workspace state. Assuming 'Default'."
+      )
     );
     statusBar.setTarget("Default");
     // If no particular target is defined in settings, use 'Default' for the button
@@ -1346,7 +1514,11 @@ function readCurrentTarget(): void {
   } else {
     currentTarget = buildTarget;
     logger.message(
-      `Reading current build target "${currentTarget}" from the workspace state.`
+      localize(
+        "reading.current.build.target.from.state",
+        'Reading current build target "{0}" from the workspace state.',
+        currentTarget
+      )
     );
     statusBar.setTarget(currentTarget);
   }
@@ -1361,7 +1533,9 @@ export function setConfigureOnOpen(configure: boolean): void {
 }
 export async function readConfigureOnOpen(): Promise<void> {
   configureOnOpen = await util.getExpandedSetting<boolean>("configureOnOpen");
-  logger.message(`Configure on open: ${configureOnOpen}`);
+  logger.message(
+    localize("configuring.on.open", "Configure on open: {0}", configureOnOpen)
+  );
 }
 
 let configureOnEdit: boolean | undefined;
@@ -1373,7 +1547,9 @@ export function setConfigureOnEdit(configure: boolean): void {
 }
 export async function readConfigureOnEdit(): Promise<void> {
   configureOnEdit = await util.getExpandedSetting<boolean>("configureOnEdit");
-  logger.message(`Configure on edit: ${configureOnEdit}`);
+  logger.message(
+    localize("configure.on.edit", "Configure on edit: {0}", configureOnEdit)
+  );
 }
 
 let configureAfterCommand: boolean | undefined;
@@ -1387,7 +1563,13 @@ export async function readConfigureAfterCommand(): Promise<void> {
   configureAfterCommand = await util.getExpandedSetting<boolean>(
     "configureAfterCommand"
   );
-  logger.message(`Configure after command: ${configureAfterCommand}`);
+  logger.message(
+    localize(
+      "configure.after.command",
+      "Configure after command: {0}",
+      configureAfterCommand
+    )
+  );
 }
 
 let phonyOnlyTargets: boolean | undefined;
@@ -1399,7 +1581,9 @@ export function setPhonyOnlyTargets(phony: boolean): void {
 }
 export async function readPhonyOnlyTargets(): Promise<void> {
   phonyOnlyTargets = await util.getExpandedSetting<boolean>("phonyOnlyTargets");
-  logger.message(`Only .PHONY targets: ${phonyOnlyTargets}`);
+  logger.message(
+    localize("only.phony.targets", "Only .PHONY targets: {0}", phonyOnlyTargets)
+  );
 }
 
 let saveBeforeBuildOrConfigure: boolean | undefined;
@@ -1414,7 +1598,11 @@ export async function readSaveBeforeBuildOrConfigure(): Promise<void> {
     "saveBeforeBuildOrConfigure"
   );
   logger.message(
-    `Save before build or configure: ${saveBeforeBuildOrConfigure}`
+    localize(
+      "save.before.build.or.configure",
+      "Save before build or configure: {0}",
+      saveBeforeBuildOrConfigure
+    )
   );
 }
 
@@ -1429,7 +1617,13 @@ export async function readBuildBeforeLaunch(): Promise<void> {
   buildBeforeLaunch = await util.getExpandedSetting<boolean>(
     "buildBeforeLaunch"
   );
-  logger.message(`Build before launch: ${buildBeforeLaunch}`);
+  logger.message(
+    localize(
+      "build.before.launch",
+      "Build before launch: {0}",
+      buildBeforeLaunch
+    )
+  );
 }
 
 let clearOutputBeforeBuild: boolean | undefined;
@@ -1443,7 +1637,13 @@ export async function readClearOutputBeforeBuild(): Promise<void> {
   clearOutputBeforeBuild = await util.getExpandedSetting<boolean>(
     "clearOutputBeforeBuild"
   );
-  logger.message(`Clear output before build: ${clearOutputBeforeBuild}`);
+  logger.message(
+    localize(
+      "clear.output.before.build",
+      "Clear output before build: {0}",
+      clearOutputBeforeBuild
+    )
+  );
 }
 
 // This setting is useful for some repos where directory changing commands (cd, push, pop)
@@ -1463,7 +1663,13 @@ export async function readIgnoreDirectoryCommands(): Promise<void> {
   ignoreDirectoryCommands = await util.getExpandedSetting<boolean>(
     "ignoreDirectoryCommands"
   );
-  logger.message(`Ignore directory commands: ${ignoreDirectoryCommands}`);
+  logger.message(
+    localize(
+      "ignore.directory.commands",
+      "Ignore directory commands: {0}",
+      ignoreDirectoryCommands
+    )
+  );
 }
 
 // Initialization from the state of the workspace.
@@ -1581,7 +1787,12 @@ export async function initFromSettings(
             extension.getCompletedConfigureInSession() &&
             !make.blockedByOp(make.Operations.configure, false)
           ) {
-            logger.message("Configuring after settings or makefile changes...");
+            logger.message(
+              localize(
+                "configurating.after.settings.or.makefile.changes",
+                "Configuring after settings or makefile changes..."
+              )
+            );
             await make.configure(
               make.TriggeredBy.configureAfterEditorFocusChange
             ); // this sets configureDirty back to false if it succeeds
@@ -2014,7 +2225,10 @@ export async function initFromSettings(
       // information from all the array yet.
       updatedSettingsSubkeys.forEach(async (subKey) => {
         let key: string = keyRoot + "." + subKey;
-        logger.message(`${key} setting changed.`, "Verbose");
+        logger.message(
+          localize("key.setting.changed", "{0} setting changed.", key),
+          "Verbose"
+        );
         try {
           // For settings that use "." in their name, make sure we send the right object
           // to the telemetry function. Currently, the schema for such a setting
@@ -2057,8 +2271,19 @@ export async function setConfigurationByName(
   configurationName: string
 ): Promise<void> {
   extension.getState().buildConfiguration = configurationName;
-  logger.message(`Setting configuration - ${configurationName}`);
-  logger.message("Re-reading settings after configuration change.");
+  logger.message(
+    localize(
+      "setting.configuration",
+      "Setting configuration - {0}",
+      configurationName
+    )
+  );
+  logger.message(
+    localize(
+      "re.reading.settings.after.configuration.change",
+      "Re-reading settings after configuration change."
+    )
+  );
   await setCurrentMakefileConfiguration(configurationName);
   // Refresh settings, they may reference variables or commands reading state configuration var (${configuration}).
   await initFromSettings();
@@ -2111,7 +2336,10 @@ export async function setNewConfiguration(): Promise<void> {
 
     if (configureAfterCommand) {
       logger.message(
-        "Automatically reconfiguring the project after a makefile configuration change."
+        localize(
+          "automatically.reconfiguring.project.after.change",
+          "Automatically reconfiguring the project after a makefile configuration change."
+        )
       );
       await make.cleanConfigure(
         make.TriggeredBy.configureAfterConfigurationChange
@@ -2158,8 +2386,15 @@ export async function setTargetByName(targetName: string): Promise<void> {
   currentTarget = targetName;
   let displayTarget: string = targetName ? currentTarget : "Default";
   statusBar.setTarget(displayTarget);
-  logger.message(`Setting target ${displayTarget}`);
-  logger.message("Re-reading settings after target change.");
+  logger.message(
+    localize("setting.target", "Setting target {0}", displayTarget)
+  );
+  logger.message(
+    localize(
+      "rereading.settings.after.target.change",
+      "Re-reading settings after target change."
+    )
+  );
   // Refresh settings, they may reference variables or commands reading state target var (${buildTarget}).
   extension.getState().buildTarget = currentTarget;
   await initFromSettings();
@@ -2183,7 +2418,10 @@ export async function selectTarget(): Promise<void> {
     (configureOnOpen === false && !extension.getCompletedConfigureInSession())
   ) {
     logger.message(
-      "The project needs a configure to populate the build targets correctly."
+      localize(
+        "project.needs.configure.to.populate",
+        "The project needs a configure to populate the build targets correctly."
+      )
     );
     if (configureAfterCommand) {
       let retc: number = await make.configure(
@@ -2191,7 +2429,10 @@ export async function selectTarget(): Promise<void> {
       );
       if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
         logger.message(
-          "The build targets list may not be accurate because configure failed."
+          localize(
+            "build.targets.list.may.not.be.accurate",
+            "The build targets list may not be accurate because configure failed."
+          )
         );
       }
     }
@@ -2232,7 +2473,10 @@ export async function selectTarget(): Promise<void> {
     if (configureAfterCommand) {
       // The set of build targets remains the same even if the current target has changed
       logger.message(
-        "Automatically reconfiguring the project after a build target change."
+        localize(
+          "automatically.reconfiguring.after.build.target.change",
+          "Automatically reconfiguring the project after a build target change."
+        )
       );
       await make.cleanConfigure(
         make.TriggeredBy.configureAfterTargetChange,
@@ -2277,24 +2521,40 @@ export async function setLaunchConfigurationByName(
         launchConfigAsInSettings
       );
       logger.message(
-        `Inserting a new entry for ${launchConfigurationName} in the array of makefile.launchConfigurations. ` +
-          "You may define any additional debug properties for it in settings."
+        localize(
+          "inserting.new.entry.for.launch.configurations",
+          "Inserting a new entry for {0} in the array of makefile.launchConfigurations. You may define any additional debug properties for it in settings.",
+          launchConfigurationName
+        )
       );
     }
   }
 
   if (currentLaunchConfiguration) {
     logger.message(
-      `Setting current launch target "${launchConfigurationName}"`
+      localize(
+        "setting.current.launch.target",
+        'Setting current launch target "{0}"',
+        launchConfigurationName
+      )
     );
     extension.getState().launchConfiguration = launchConfigurationName;
     statusBar.setLaunchConfiguration(launchConfigurationName);
   } else {
     if (launchConfigurationName === "") {
-      logger.message("Unsetting the current launch configuration.");
+      logger.message(
+        localize(
+          "unsetting.current.launch.configuration",
+          "Unsetting the current launch configuration."
+        )
+      );
     } else {
       logger.message(
-        `A problem occured while analyzing launch configuration name ${launchConfigurationName}. Current launch configuration is unset.`
+        localize(
+          "problem.occured.while.analyzing.launch.configuration",
+          "A problem occured while analyzing launch configuration name {0}. Current launch configuration is unset.",
+          launchConfigurationName
+        )
       );
     }
     extension.getState().launchConfiguration = undefined;
@@ -2302,7 +2562,12 @@ export async function setLaunchConfigurationByName(
   }
 
   // Refresh settings, they may reference variables or commands reading launch targets commands: ${command:makefile.getLaunchTargetPath} and others...
-  logger.message("Re-reading settings after launch target change.");
+  logger.message(
+    localize(
+      "re.reading.settings.after.launch.target.changed",
+      "Re-reading settings after launch target change."
+    )
+  );
   await initFromSettings();
   await extension._projectOutlineProvider.updateLaunchTarget(
     launchConfigurationName
@@ -2326,7 +2591,10 @@ export async function selectLaunchConfiguration(): Promise<void> {
     (configureOnOpen === false && !extension.getCompletedConfigureInSession())
   ) {
     logger.message(
-      "The project needs a configure to populate the launch targets correctly."
+      localize(
+        "project.needs.configure.to.populate",
+        "The project needs a configure to populate the launch targets correctly."
+      )
     );
     if (configureAfterCommand) {
       let retc: number = await make.configure(
@@ -2334,7 +2602,10 @@ export async function selectLaunchConfiguration(): Promise<void> {
       );
       if (retc !== make.ConfigureBuildReturnCodeTypes.success) {
         logger.message(
-          "The launch targets list may not be accurate because configure failed."
+          localize(
+            "launch.targets.list.may.be.innacurate",
+            "The launch targets list may not be accurate because configure failed."
+          )
         );
       }
     }

@@ -237,7 +237,14 @@ export async function killTree(
     try {
       await taskKill(pid);
     } catch (e) {
-      logger.message(`Failed to kill process ${pid}: ${e}`);
+      logger.message(
+        localize(
+          "failed.to.kill.process",
+          "Failed to kill process {0}: {1}",
+          pid,
+          e
+        )
+      );
     }
     return;
   }
@@ -264,7 +271,13 @@ export async function killTree(
         .split("\n")
         .map((line: string) => Number.parseInt(line));
 
-      logger.message(`Found children subprocesses: ${stdoutStr}.`);
+      logger.message(
+        localize(
+          "found.children.subprocesses",
+          "Found children subprocesses: {0}.",
+          stdoutStr
+        )
+      );
       for (const other of children) {
         if (other) {
           await killTree(progress, other);
@@ -277,7 +290,9 @@ export async function killTree(
   }
 
   try {
-    logger.message(`Killing process PID = ${pid}`);
+    logger.message(
+      localize("killing.process", "Killing process PID = {0}", pid)
+    );
     progress.report({
       increment: 1,
       message: localize(
@@ -385,9 +400,14 @@ export function spawnChildProcess(
 
     if (ensureQuoted) {
       logger.message(
-        `Spawning child process with:\n process name: ${qProcessName}\n process args: ${qArgs}\n working directory: ${workingDirectory}\n shell type: ${
+        localize(
+          "utils.quoting",
+          "Spawning child process with:\n process name: {0}\n process args: {1}\n working directory: {2}\n shell type: {3}",
+          qProcessName,
+          qArgs.join(","),
+          workingDirectory,
           shellType || "default"
-        }`,
+        ),
         "Debug"
       );
     }
@@ -691,7 +711,13 @@ export function mergeProperties(dst: any, src: any): any {
 
     if (dst[prop] !== undefined) {
       logger.message(
-        `Destination object already has property ${prop} set to ${dst[prop]}. Overwriting from source with ${src[prop]}`,
+        localize(
+          "utils.overwriting.property",
+          "Destination object already has property {0} set to {1}. Overwriting from source with {2}",
+          prop,
+          dst[prop],
+          src[prop]
+        ),
         "Debug"
       );
     }
@@ -720,20 +746,35 @@ export function sortAndRemoveDuplicates(src: string[]): string[] {
 
 export function reportDryRunError(dryrunOutputFile: string): void {
   logger.message(
-    `You can see the detailed dry-run output at ${dryrunOutputFile}`
+    localize(
+      "utils.dryrun.detailed.output",
+      "You can see the detailed dry-run output at {0}",
+      dryrunOutputFile
+    )
   );
   logger.message(
-    "Make sure that the extension is invoking the same make command as in your development prompt environment."
+    localize(
+      "utils.dryrun.error.environment",
+      "Make sure that the extension is invoking the same make command as in your development prompt environment."
+    )
   );
   logger.message(
-    "You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]"
+    localize(
+      "utils.dryrun.error.makefile",
+      "You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]"
+    )
   );
   logger.message(
-    "Also make sure your code base does not have any known issues with the dry-run switches used by this extension (makefile.dryrunSwitches)."
+    localize(
+      "utils.dryrun.error.knownissues",
+      "Also make sure your code base does not have any known issues with the dry-run switches used by this extension (makefile.dryrunSwitches)."
+    )
   );
   logger.message(
-    "If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: " +
-      "https://github.com/microsoft/vscode-makefile-tools/issues"
+    localize(
+      "utils.dryrun.error.github",
+      "If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: https://github.com/microsoft/vscode-makefile-tools/issues"
+    )
   );
 }
 
@@ -874,7 +915,13 @@ export async function getExpandedSettingVal<T>(
           }
         } catch (e) {
           logger.message(
-            `Exception while expanding string "${settingId}.${prop}": '${e.message}'`
+            localize(
+              "utils.exception.expanding",
+              'Exception while expanding string "{0}.{1}": "{2}"',
+              settingId,
+              prop,
+              e.message
+            )
           );
         }
       }
@@ -930,7 +977,12 @@ export async function expandVariablesInSetting(
   );
   if (preprocStr !== settingVal) {
     logger.message(
-      `Detected escaped variable expansion patterns in setting '${settingId}', within value '${settingVal}'.`
+      localize(
+        "detected.escape.patterns",
+        "Detected escaped variable expansion patterns in setting '{0}', within value '{1}'.",
+        settingId,
+        settingVal
+      )
     );
     telemetryProperties.pattern = "escaped";
     telemetry.logEvent("varexp", telemetryProperties);
@@ -970,7 +1022,12 @@ export async function expandVariablesInSetting(
       } catch (e) {
         toStr = "unknown";
         logger.message(
-          `Exception while executing command "${result[5]}": '${e.message}'`
+          localize(
+            "exception.executing",
+            "Exception while executing command \"{0}\": '{1}'",
+            result[5],
+            e.message
+          )
         );
       }
     } else if (result[4] === "config" && result[5]) {
@@ -1008,7 +1065,13 @@ export async function expandVariablesInSetting(
         }
       }
     } else {
-      logger.message(`Unrecognized variable format: ${result[0]}`);
+      logger.message(
+        localize(
+          "unrecognized.variable.format",
+          "Unrecognized variable format: {0}",
+          result[0]
+        )
+      );
       toStr = "unknown";
       telemetryProperties.pattern = "unrecognized";
     }
@@ -1026,8 +1089,12 @@ export async function expandVariablesInSetting(
     // We will address in future multiple passes.
     if (regexpVSCodeVar.exec(toStr) !== null) {
       logger.message(
-        `"${result[0]}" resolves to "${toStr}" which requires another expansion.` +
-          " We will support multiple expansion passes in the future. "
+        localize(
+          "multiple.expansion.passes",
+          '"{0}" resolves to "{1}" which requires another expansion. We will support multiple expansion passes in the future.',
+          result[0],
+          toStr
+        )
       );
       expandedSetting = expandedSetting.replace(result[0], "unknown");
     } else {
@@ -1040,7 +1107,13 @@ export async function expandVariablesInSetting(
 
   if (expandedSetting !== settingVal) {
     logger.message(
-      `Expanding from '${settingVal}' to '${expandedSetting}' for setting '${settingId}'.`
+      localize(
+        "expanding.setting",
+        "Expanding from '{0}' to '{1}' for setting '{2}'.",
+        settingVal,
+        expandedSetting,
+        settingId
+      )
     );
   }
 

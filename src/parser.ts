@@ -15,6 +15,13 @@ import * as path from "path";
 import * as util from "./util";
 import * as vscode from "vscode";
 
+import * as nls from "vscode-nls";
+nls.config({
+  messageFormat: nls.MessageFormat.bundle,
+  bundleFormat: nls.BundleFormat.standalone,
+})();
+const localize: nls.LocalizeFunc = nls.loadMessageBundle();
+
 // List of compiler tools plus the most common aliases cc and c++
 // ++ needs to be escaped for the regular expression in parseLineAsTool.
 // Versioning and cross compilers naming variations dont' need to be included in this list,
@@ -574,8 +581,13 @@ async function parseAnySwitchFromToolArguments(
 
     let stderr: any = (result: string): void => {
       logger.message(
-        `Error while running the compiler args parser script '${parseCompilerArgsScriptFile}' ` +
-          `for regions ("${compilerArgRegions})": "${result}"`,
+        localize(
+          "error.running.args.parser.script",
+          "Error running the compiler args parser script {0} for regions ({1}): {2}",
+          parseCompilerArgsScriptFile,
+          compilerArgRegions,
+          result
+        ),
         "Normal"
       );
     };
@@ -592,7 +604,12 @@ async function parseAnySwitchFromToolArguments(
     );
     if (result.returnCode !== 0) {
       logger.message(
-        `The compiler args parser script '${parseCompilerArgsScriptFile}' failed with error code ${result.returnCode} for regions (${compilerArgRegions})`,
+        localize(
+          "compiler.args.parser.failed",
+          "The compiler args parser script '{0}' failed with error code {1} for regions ({2})",
+          parseCompilerArgsScriptFile,
+          compilerArgRegions
+        ),
         "Normal"
       );
     }
@@ -925,7 +942,11 @@ function parseFilesFromToolArguments(args: string, exts: string[]): string[] {
       // Debug message to identify easier the scenarios where source files have inner quotes.
       if (result.includes('"')) {
         logger.message(
-          `File argument that contains quotes: \`${result}\``,
+          localize(
+            "file.argument.has.quotes",
+            "File argument that contains quotes: `{0}`",
+            result
+          ),
           "Debug"
         );
       }
@@ -954,6 +975,8 @@ async function currentPathAfterCommand(
       : "";
   let newCurrentPath: string = "";
 
+  const analyzeLine = localize("analyze.line", "Analyzing line: {0}", line);
+
   if (line.startsWith("cd -") && !configuration.getIgnoreDirectoryCommands()) {
     // Swap the last two current paths in the history.
     if (lastCurrentPath) {
@@ -965,12 +988,14 @@ async function currentPathAfterCommand(
         ? currentPathHistory.pop() || ""
         : lastCurrentPath;
 
-    logger.message("Analyzing line: " + line, "Verbose");
+    logger.message(analyzeLine, "Verbose");
     logger.message(
-      "CD- command: leaving directory " +
-        lastCurrentPath +
-        " and entering directory " +
-        lastCurrentPath2,
+      localize(
+        "leaving.directory",
+        "CD- command: leaving directory {0} and entering directory {1}",
+        lastCurrentPath,
+        lastCurrentPath2
+      ),
       "Verbose"
     );
     currentPathHistory.push(lastCurrentPath);
@@ -988,12 +1013,14 @@ async function currentPathAfterCommand(
       currentPathHistory.length > 0
         ? currentPathHistory[currentPathHistory.length - 1]
         : "";
-    logger.message("Analyzing line: " + line, "Verbose");
+    logger.message(analyzeLine, "Verbose");
     logger.message(
-      "POPD command or end of MAKE -C: leaving directory " +
-        lastCurrentPath +
-        " and entering directory " +
-        lastCurrentPath2,
+      localize(
+        "popd.command",
+        "POPD command or end of MAKE -C: leaving directory {0} and entering directory {1}",
+        lastCurrentPath,
+        lastCurrentPath2
+      ),
       "Verbose"
     );
   } else if (
@@ -1012,9 +1039,13 @@ async function currentPathAfterCommand(
     }
 
     currentPathHistory.push(newCurrentPath);
-    logger.message("Analyzing line: " + line, "Verbose");
+    logger.message(analyzeLine, "Verbose");
     logger.message(
-      "CD command: entering directory " + newCurrentPath,
+      localize(
+        "cd.command",
+        "CD command: entering directory {0}",
+        newCurrentPath
+      ),
       "Verbose"
     );
   } else if (
@@ -1023,9 +1054,13 @@ async function currentPathAfterCommand(
   ) {
     newCurrentPath = await util.makeFullPath(line.slice(6), lastCurrentPath);
     currentPathHistory.push(newCurrentPath);
-    logger.message("Analyzing line: " + line, "Verbose");
+    logger.message(analyzeLine, "Verbose");
     logger.message(
-      "PUSHD command: entering directory " + newCurrentPath,
+      localize(
+        "pushd.command",
+        "PUSHD command: entering directory {0}",
+        newCurrentPath
+      ),
       "Verbose"
     );
   } else if (line.includes("Entering directory")) {
@@ -1041,8 +1076,15 @@ async function currentPathAfterCommand(
       newCurrentPath = "Could not parse directory";
     }
 
-    logger.message("Analyzing line: " + line, "Verbose");
-    logger.message("MAKE -C: entering directory " + newCurrentPath, "Verbose");
+    logger.message(analyzeLine, "Verbose");
+    logger.message(
+      localize(
+        "make.c.entering",
+        "MAKE -C: entering directory {0}",
+        newCurrentPath
+      ),
+      "Verbose"
+    );
     currentPathHistory.push(newCurrentPath);
   }
 
@@ -1091,7 +1133,10 @@ export async function parseCustomConfigProvider(
   }
 
   logger.message(
-    "Parsing dry-run output for CppTools Custom Configuration Provider.",
+    localize(
+      "parsing.dryrun.output.cpptools",
+      "Parsing dry-run output for CppTools Custom Configuration Provider."
+    ),
     "Normal"
   );
 
@@ -1140,7 +1185,14 @@ export async function parseCustomConfigProvider(
       }
 
       if (compilerTool) {
-        logger.message("Found compiler command: " + line, "Verbose");
+        logger.message(
+          localize(
+            "found.compiler.command",
+            "Found compiler command: {0}",
+            line
+          ),
+          "Verbose"
+        );
 
         // Compiler path is either what the makefile provides or found in the PATH environment variable or empty
         let compilerFullPath: string = compilerTool.fullPath || "";
@@ -1404,7 +1456,14 @@ export async function parseLaunchConfigurations(
                 "EP",
               ])
             ) {
-              logger.message("Found compiler command:\n" + line, "Verbose");
+              logger.message(
+                localize(
+                  "found.compiler.command",
+                  "Found compiler command:\n{0}",
+                  line
+                ),
+                "Verbose"
+              );
 
               // First read the value of the /Fe switch (for cl.exe)
               compilerTargetBinary = parseSingleSwitchFromToolArguments(
@@ -1425,15 +1484,21 @@ export async function parseLaunchConfigurations(
                   let parsedObjPath: path.ParsedPath = path.parse(objFile);
                   compilerTargetBinary = parsedObjPath.name + ".exe";
                   logger.message(
-                    "The compiler command is not producing a target binary explicitly. Assuming " +
-                      compilerTargetBinary +
-                      " from the first object passed in with /Fo",
+                    localize(
+                      "compiler.command.target.binary",
+                      "The compiler command is not producing a target binary explicitly. Assuming {0} from the first object passed in with /Fo",
+                      compilerTargetBinary
+                    ),
                     "Verbose"
                   );
                 }
               } else {
                 logger.message(
-                  "Producing target binary with /Fe: " + compilerTargetBinary,
+                  localize(
+                    "producing.target.binary",
+                    "Producing target binary with /Fe: {0}",
+                    compilerTargetBinary
+                  ),
                   "Verbose"
                 );
               }
@@ -1453,9 +1518,11 @@ export async function parseLaunchConfigurations(
                   );
                   compilerTargetBinary = parsedSourcePath.name + ".exe";
                   logger.message(
-                    "The compiler command is not producing a target binary explicitly. Assuming " +
-                      compilerTargetBinary +
-                      " from the first source file passed in",
+                    localize(
+                      "compiler.command.not.producing",
+                      "The compiler command is not producing a target binary explicitly. Assuming {0} from the first source file passed in",
+                      compilerTargetBinary
+                    ),
                     "Verbose"
                   );
                 }
@@ -1503,7 +1570,14 @@ export async function parseLaunchConfigurations(
               linkerTool.arguments,
               ["out", "o"]
             );
-            logger.message("Found linker command: " + line, "Verbose");
+            logger.message(
+              localize(
+                "found.linker.command",
+                "Found linker command: {0}",
+                line
+              ),
+              "Verbose"
+            );
 
             if (!linkerTargetBinary) {
               // For Microsoft link.exe, the default output binary takes the base name
@@ -1523,9 +1597,11 @@ export async function parseLaunchConfigurations(
                   let targetBinaryFromFirstObjLib: string =
                     parsedPath.name + ".exe";
                   logger.message(
-                    "The link command is not producing a target binary explicitly. Assuming " +
-                      targetBinaryFromFirstObjLib +
-                      " based on first object passed in",
+                    localize(
+                      "link.not.producing.explicitly",
+                      "The link command is not producing a target binary explicitly. Assuming {0} based on first object passed in",
+                      targetBinaryFromFirstObjLib
+                    ),
                     "Verbose"
                   );
                   linkerTargetBinary = targetBinaryFromFirstObjLib;
@@ -1534,7 +1610,10 @@ export async function parseLaunchConfigurations(
                 // The default output binary from a linking operation is usually a.out on linux/mac,
                 // produced in the same folder where the toolset is run.
                 logger.message(
-                  "The link command is not producing a target binary explicitly. Assuming a.out",
+                  localize(
+                    "assuming.a.out",
+                    "The link command is not producing a target binary explicitly. Assuming a.out"
+                  ),
                   "Verbose"
                 );
                 linkerTargetBinary = "a.out";
@@ -1556,7 +1635,11 @@ export async function parseLaunchConfigurations(
               linkerTargetBinary =
                 util.removeSurroundingQuotes(linkerTargetBinary);
               logger.message(
-                "Producing target binary: " + linkerTargetBinary,
+                localize(
+                  "producing.target.binary",
+                  "Producing target binary: {0}",
+                  linkerTargetBinary
+                ),
                 "Verbose"
               );
               linkerTargetBinary = await util.makeFullPath(
@@ -1596,8 +1679,11 @@ export async function parseLaunchConfigurations(
         };
 
         logger.message(
-          "Adding launch configuration:\n" +
-            configuration.launchConfigurationToString(launchConfiguration),
+          localize(
+            "adding.launch.configuration",
+            "Adding launch configuration:\n{0}",
+            configuration.launchConfigurationToString(launchConfiguration)
+          ),
           "Verbose"
         );
         onFoundLaunchConfiguration(launchConfiguration);
@@ -1717,7 +1803,14 @@ export async function parseLaunchConfigurations(
         }
 
         if (targetBinaryTool) {
-          logger.message("Found binary execution command: " + line, "Verbose");
+          logger.message(
+            localize(
+              "found.binary.execution.command",
+              "Found binary execution command: {0}",
+              line
+            ),
+            "Verbose"
+          );
           // Include complete launch configuration: binary, execution path and args
           // are known from parsing the dry-run
           let splitArgs: string[] = targetBinaryTool.arguments
@@ -1738,8 +1831,11 @@ export async function parseLaunchConfigurations(
           };
 
           logger.message(
-            "Adding launch configuration:\n" +
-              configuration.launchConfigurationToString(launchConfiguration),
+            localize(
+              "adding.launch.configuration",
+              "Adding launch configuration:\n{0}",
+              configuration.launchConfigurationToString(launchConfiguration)
+            ),
             "Verbose"
           );
           onFoundLaunchConfiguration(launchConfiguration);
@@ -1918,12 +2014,26 @@ export function parseStandard(
   } else if (language === "cpp") {
     standard = parseCppStandard(std, canUseGnu, canUseCxx23);
     if (!standard) {
-      logger.message(`Unknown C++ standard control flag: ${std}`, "Normal");
+      logger.message(
+        localize(
+          "unknown.c++.standard.control",
+          "Unknown C++ standard control flag: {0}",
+          std
+        ),
+        "Normal"
+      );
     }
   } else if (language === "c") {
     standard = parseCStandard(std, canUseGnu);
     if (!standard) {
-      logger.message(`Unknown C standard control flag: ${std}`, "Normal");
+      logger.message(
+        localize(
+          "unknown.c.standard.control",
+          "Unknown C standard control flag: {0}",
+          std
+        ),
+        "Normal"
+      );
     }
   } else if (language === undefined) {
     standard = parseCppStandard(std, canUseGnu, canUseCxx23);
@@ -1931,10 +2041,17 @@ export function parseStandard(
       standard = parseCStandard(std, canUseGnu);
     }
     if (!standard) {
-      logger.message(`Unknown standard control flag: ${std}`, "Normal");
+      logger.message(
+        localize(
+          "unknown.standard.control.flag",
+          "Unknown standard control flag: {0}",
+          std
+        ),
+        "Normal"
+      );
     }
   } else {
-    logger.message("Unknown language", "Normal");
+    logger.message(localize("unknown.language", "Unknown language"), "Normal");
   }
 
   return standard;
