@@ -334,12 +334,17 @@ export async function buildTarget(
   }
 
   configAndTarget = `"${configAndTarget}"`;
-  let popupStr: string = localize(
-    "make.popupStr",
-    "Building ${0} the current makefile configuration ${0}",
-    clean ? "clean " : "",
+  const cleanPopup: string = localize(
+    "make.clean.popup",
+    "Building clean the current makefile configuration {0}",
     configAndTarget
   );
+  const notCleanPopup: string = localize(
+    "make.not.clean.popup",
+    "Building the current makefile configuration {0}",
+    configAndTarget
+  );
+  let popupStr: string = clean ? cleanPopup : notCleanPopup;
 
   let cancelBuild: boolean = false; // when the build was cancelled by the user
 
