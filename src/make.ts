@@ -336,7 +336,7 @@ export async function buildTarget(
   configAndTarget = `"${configAndTarget}"`;
   let popupStr: string = localize(
     "make.popupStr",
-    "Building ${0} the current makefile configuration ${0}",
+    "Building {0} the current makefile configuration {0}",
     clean ? "clean " : "",
     configAndTarget
   );
