@@ -2315,12 +2315,7 @@ export async function setNewConfiguration(): Promise<void> {
 
   const items: string[] = prepareConfigurationsQuickPick();
 
-  let options: vscode.QuickPickOptions = {};
-  options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
-  const chosen: string | undefined = await vscode.window.showQuickPick(
-    items,
-    options
-  );
+  const chosen: string | undefined = await vscode.window.showQuickPick(items);
 
   if (
     chosen &&
@@ -2438,9 +2433,6 @@ export async function selectTarget(): Promise<void> {
     }
   }
 
-  let options: vscode.QuickPickOptions = {};
-  options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
-
   // Ensure "all" is always available as a target to select.
   // There are scenarios when "all" might not be present in the list of available targets,
   // for example when the extension is using a build log or dryrun cache of a previous state
@@ -2458,8 +2450,7 @@ export async function selectTarget(): Promise<void> {
   }
 
   const chosen: string | undefined = await vscode.window.showQuickPick(
-    buildTargets,
-    options
+    buildTargets
   );
 
   if (chosen && chosen !== getCurrentTarget()) {
@@ -2624,7 +2615,6 @@ export async function selectLaunchConfiguration(): Promise<void> {
   });
   launchTargetsNames = util.sortAndRemoveDuplicates(launchTargetsNames);
   let options: vscode.QuickPickOptions = {};
-  options.ignoreFocusOut = true; // so that the logger and the quick pick don't compete over focus
   if (launchTargets.length === 0) {
     options.placeHolder = "No launch targets identified";
   }
