@@ -12,6 +12,7 @@ Bug Fixes:
 - Fix issue where selecting "Default" from the configuration drop down doesn't update Makefile Project Outline [#585](https://github.com/microsoft/vscode-makefile-tools/issues/585)
 - Fix issue where CHS and CHT wasn't being localized on Linux. [#609](https://github.com/microsoft/vscode-makefile-tools/issues/609)
 - Fix issue where clicking out of quick pick wasn't closing quick pick. [#604](https://github.com/microsoft/vscode-makefile-tools/issues/604)
+- Fix issue where line endings were being added in the output which broke long compile commands from output of make.exe. [#545](https://github.com/microsoft/vscode-makefile-tools/issues/545)
 
 ## 0.9
 
