@@ -728,7 +728,7 @@ export async function generateParseContent(
     let heartBeat: number = Date.now();
 
     let stdout: any = (result: string): void => {
-      const appendStr: string = `${result} ${lineEnding}`;
+      const appendStr: string = `${result}`;
       completeOutput += appendStr;
       fs.appendFileSync(dryrunFile, appendStr);
 
