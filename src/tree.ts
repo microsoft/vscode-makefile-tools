@@ -267,11 +267,9 @@ export class BuildLogPathInfoNode extends BaseNode {
   constructor(pathInSettings: string, pathDisplayed: string) {
     super(pathDisplayed);
     this._title = pathDisplayed;
-    this._tooltip = pathInSettings;
   }
 
   _title: string;
-  _tooltip: string;
 
   update(pathInSettings: string, pathDisplayed: string): void {
     this._title = localize(
@@ -279,7 +277,6 @@ export class BuildLogPathInfoNode extends BaseNode {
       "{0}",
       `${pathDisplayed}`
     );
-    this._tooltip = pathInSettings;
   }
 
   getChildren(): BaseNode[] {
@@ -290,7 +287,10 @@ export class BuildLogPathInfoNode extends BaseNode {
     try {
       const item: vscode.TreeItem = new vscode.TreeItem(this._title);
       item.collapsibleState = vscode.TreeItemCollapsibleState.None;
-      item.tooltip = this._tooltip;
+      item.tooltip = localize(
+        "build.log.path.info",
+        "The path to the build log that is read to bypass a dry-run."
+      );
       item.contextValue = [`nodeType=buildLogPathInfo`].join(",");
       return item;
     } catch (e) {

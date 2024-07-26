@@ -11,7 +11,7 @@ Bug Fixes:
 - Fix issue where simply clicking on tree item was opening launch target selection. [#588](https://github.com/microsoft/vscode-makefile-tools/issues/588)
 - Fix issue where selecting "Default" from the configuration drop down doesn't update Makefile Project Outline [#585](https://github.com/microsoft/vscode-makefile-tools/issues/585)
 - Fix issue where CHS and CHT wasn't being localized on Linux. [#609](https://github.com/microsoft/vscode-makefile-tools/issues/609)
-- Ensure that tooltips for the project outline are reasonable. If they are path, display the path, if not, provide a description. [#600](https://github.com/microsoft/vscode-makefile-tools/issues/600)
+- Ensure that tooltips for the project outline are reasonable and consistent. [#600](https://github.com/microsoft/vscode-makefile-tools/issues/600)
 
 ## 0.9
 
