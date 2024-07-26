@@ -70,7 +70,6 @@ export class BuildTargetNode extends BaseNode {
 
 export class LaunchTargetNode extends BaseNode {
   _name: string;
-  _toolTip: string;
 
   // Keep the tree node label as short as possible.
   // The binary path is the most important component of a launch target.
@@ -107,15 +106,13 @@ export class LaunchTargetNode extends BaseNode {
   constructor(targetName: string) {
     super(`launchTarget:${targetName}`);
 
-    // Show the complete launch target name as tooltip and the short name as label
+    // Show the short name as label
     this._name = targetName;
-    this._toolTip = targetName;
   }
 
   async update(targetName: string): Promise<void> {
-    // Show the complete launch target name as tooltip and the short name as label
+    // Show short name as label
     this._name = await this.getShortLaunchTargetName(targetName);
-    this._toolTip = targetName;
   }
 
   getChildren(): BaseNode[] {
@@ -128,8 +125,7 @@ export class LaunchTargetNode extends BaseNode {
       item.collapsibleState = vscode.TreeItemCollapsibleState.None;
       item.tooltip = localize(
         "launch.target.currently.selected.for.debug.run.in.terminal",
-        "The launch target currently selected for debug and run in terminal.\n{0}",
-        this._toolTip
+        "The launch target currently selected for debug and run in terminal."
       );
       item.contextValue = [`nodeType=launchTarget`].join(",");
       return item;
