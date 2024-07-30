@@ -9,12 +9,13 @@
 	"issue.rendering.item": "{0} (bu öğeyi oluştururken bir sorun oluştu)",
 	"Unset": "Ayarı Kaldır",
 	"tree.launch.target": "Hedefi Başlat: {0}",
-	"launch.target.currently.selected.for.debug.run.in.terminal": "Şu anda hata ayıklama ve terminalde çalıştırma için seçilen başlatma hedefi.\n{0}",
+	"launch.target.currently.selected.for.debug.run.in.terminal": "Şu anda hata ayıklama ve terminalde çalıştırma için seçilen başlatma hedefi.",
 	"tree.configuration": "Yapılandırma: {0}",
 	"makefile.currently.selected.configuration": "Derleme görevleri dosyası yapılandırması şu anda ayarlardan seçili ('makefile.configurations').",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
+	"build.log.path.info": "Kuru çalıştırmayı atlatmak için okunan yapı günlüğüne giden yol.",
 	"build.log": "Derleme Günlüğü",
 	"not.found": "bulunamadı"
 }

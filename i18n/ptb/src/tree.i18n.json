@@ -9,12 +9,13 @@
 	"issue.rendering.item": "{0} (houve um problema ao renderizar este item)",
 	"Unset": "Remover Definição",
 	"tree.launch.target": "Inicializar destino: {0}",
-	"launch.target.currently.selected.for.debug.run.in.terminal": "O destino de inicialização selecionado atualmente para depuração e execução no terminal.\n{0}",
+	"launch.target.currently.selected.for.debug.run.in.terminal": "O destino de inicialização atualmente selecionado para depuração e execução no terminal.",
 	"tree.configuration": "Configuração: {0}",
 	"makefile.currently.selected.configuration": "A configuração makefile selecionada atualmente nas configurações ('makefile.configurations').",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
+	"build.log.path.info": "O caminho para o registro de compilação que é lido para contornar uma execução a seco.",
 	"build.log": "Log de Compilação",
 	"not.found": "não encontrado"
 }

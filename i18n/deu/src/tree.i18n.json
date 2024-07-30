@@ -9,12 +9,13 @@
 	"issue.rendering.item": "{0} (beim Rendern dieses Elements ist ein Problem aufgetreten)",
 	"Unset": "Löschen",
 	"tree.launch.target": "Startziel: {0}",
-	"launch.target.currently.selected.for.debug.run.in.terminal": "Das aktuell für das Debuggen und Ausführen im Terminal ausgewählte Startziel.\n{0}",
+	"launch.target.currently.selected.for.debug.run.in.terminal": "Das aktuell für das Debuggen und Ausführen im Terminal ausgewählte Startziel.",
 	"tree.configuration": "Konfiguration: {0}",
 	"makefile.currently.selected.configuration": "Die makefile-Konfiguration, die derzeit aus den Einstellungen („makefile.configurations“) ausgewählt ist.",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
+	"build.log.path.info": "Der Pfad zum Buildprotokoll, das gelesen wird, um einen Probelauf zu umgehen.",
 	"build.log": "Buildprotokoll",
 	"not.found": "Nicht gefunden"
 }

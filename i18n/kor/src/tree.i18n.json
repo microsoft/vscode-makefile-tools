@@ -9,12 +9,13 @@
 	"issue.rendering.item": "{0}(이 항목을 렌더링하는 동안 버그로 인해 문제 발생)",
 	"Unset": "설정 해제",
 	"tree.launch.target": "시작 대상: {0}",
-	"launch.target.currently.selected.for.debug.run.in.terminal": "현재 터미널에서 디버그 및 실행을 위해 선택한 시작 대상입니다.\n{0}",
+	"launch.target.currently.selected.for.debug.run.in.terminal": "현재 디버그용으로 선택되어 터미널에서 실행되는 시작 대상입니다.",
 	"tree.configuration": "구성: {0}",
 	"makefile.currently.selected.configuration": "현재 설정('makefile.configurations')에서 선택한 메이크파일 구성입니다.",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
+	"build.log.path.info": "시험 실행을 우회하기 위해 읽은 빌드 로그의 경로입니다.",
 	"build.log": "빌드 로그",
 	"not.found": "찾을 수 없음"
 }

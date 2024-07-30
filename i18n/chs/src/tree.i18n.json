@@ -9,12 +9,13 @@
 	"issue.rendering.item": "{0}(呈现此项时出现问题)",
 	"Unset": "取消设置",
 	"tree.launch.target": "启动目标: {0}",
-	"launch.target.currently.selected.for.debug.run.in.terminal": "当前选择用于调试并在终端中运行的启动目标。\n{0}",
+	"launch.target.currently.selected.for.debug.run.in.terminal": "当前选择用于调试并在终端中运行的启动目标。",
 	"tree.configuration": "配置: {0}",
 	"makefile.currently.selected.configuration": "当前从设置中选择的生成文件配置('makefile.configurations')。",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
+	"build.log.path.info": "为绕过试运行而读取的生成日志的路径。",
 	"build.log": "生成日志",
 	"not.found": "未找到"
 }
