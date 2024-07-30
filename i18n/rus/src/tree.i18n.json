@@ -9,12 +9,13 @@
 	"issue.rendering.item": "{0} (возникла проблема при отрисовке этого элемента)",
 	"Unset": "Удалить",
 	"tree.launch.target": "Целевой объект запуска: {0}",
-	"launch.target.currently.selected.for.debug.run.in.terminal": "Целевой объект запуска, выбранный для отладки и запуска в терминале.\n{0}",
+	"launch.target.currently.selected.for.debug.run.in.terminal": "Целевой объект запуска, выбранный для отладки и запуска в терминале.",
 	"tree.configuration": "Конфигурация: {0}",
 	"makefile.currently.selected.configuration": "Конфигурация make-файла, выбранная в данный момент в настройках («makefile.configurations»).",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
+	"build.log.path.info": "Путь к журналу сборки, который считывается для обхода пробного запуска.",
 	"build.log": "Журнал сборки",
 	"not.found": "не найдено"
 }

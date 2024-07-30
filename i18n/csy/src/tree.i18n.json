@@ -9,12 +9,13 @@
 	"issue.rendering.item": "{0} (při vykreslování této položky došlo k problému)",
 	"Unset": "Nenastaveno",
 	"tree.launch.target": "Cíl spuštění: {0}",
-	"launch.target.currently.selected.for.debug.run.in.terminal": "Cíl spuštěný aktuálně vybraný pro ladění a spuštění v terminálu. \n{0}",
+	"launch.target.currently.selected.for.debug.run.in.terminal": "Cíl spuštěný aktuálně vybraný pro ladění a spuštění v terminálu.",
 	"tree.configuration": "Konfigurace: {0}",
 	"makefile.currently.selected.configuration": "Konfigurace souboru pravidel aktuálně vybraná v nastavení (makefile.configurations)",
 	"tree.makefile.path.info": "{0}",
 	"tree.make.path.info": "{0}",
 	"tree.build.log.path.info": "{0}",
+	"build.log.path.info": "Cesta k protokolu o sestavení, která se přečte, aby se obešlo zkušební spuštění",
 	"build.log": "Protokol sestavení",
 	"not.found": "nenalezeno"
 }
