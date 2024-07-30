@@ -2,7 +2,7 @@
 # Release Pipeline for release
 # ==================================================================================
 
-name: PrereleaseRelease-$(Date:yyyyMMdd).$(Rev:r)
+name: OfficialRelease-$(Date:yyyyMMdd).$(Rev:r)
 trigger: none
 
 resources:
