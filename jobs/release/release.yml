@@ -25,19 +25,14 @@ extends:
     stages:
       - stage: release
         jobs:
-          - job: release
-            templateContext:
-              type: releaseJob
-              isProduction: true
-              inputs:
-                - input: pipelineArtifact
-                  pipeline: BuildReleasePipeline
-                  artifactName: vsix
-                  targetPath: $(Build.StagingDirectory)\vsix
-
+          - job: WaitForValidation
+            displayName: Wait for vscode-makefile-tools validation
+            pool: server
             steps:
+              - download: BuildReleasePipeline
+                artifact: vsix
               - powershell: |
-                  $newVersion = Get-Content -Path $(Build.StagingDirectory)\vsix\version.txt
+                  $newVersion = Get-Content -Path $(Pipeline.Workspace)\vsix\version.txt
                   Write-Host "New version is: $newVersion"
 
                   $str = Get-Date -Format "yyMMdd-HHmm"
@@ -49,9 +44,22 @@ extends:
                 inputs:
                   notifyUsers: makefilecrew@microsoft.com
                   instructions: |
-                    Download and test the vsix from the latest release build: https://devdiv.visualstudio.com/DevDiv/_build?definitionId=18396
+                    Download and test the vsix with the matching version number from the latest release build: https://devdiv.visualstudio.com/DevDiv/_build?definitionId=20336
 
                     The version should match the name of this release.
+
+          - job: ReleaseMakefileTools
+            displayName: Release vscode-makefile-tools
+            dependsOn: WaitForValidation
+            templateContext:
+              type: releaseJob
+              isProduction: true
+              inputs:
+                - input: pipelineArtifact
+                  pipeline: BuildReleasePipeline
+                  artifactName: vsix
+                  targetPath: $(Build.StagingDirectory)\vsix
+            steps:
               - task: NodeTool@0
                 displayName: "Use Node 14.x"
                 inputs:
