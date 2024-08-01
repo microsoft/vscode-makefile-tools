@@ -23,22 +23,26 @@ extends:
       name: VSEngSS-MicroBuild2022-1ES
 
     stages:
-      - stage: release
+      - stage: Validate
         jobs:
-          - job: WaitForValidation
-            displayName: Wait for vscode-makefile-tools validation
-            pool: server
+          - job: UpdateBuildNumber
+            displayName: Update Build Number
             steps:
               - download: BuildReleasePipeline
                 artifact: vsix
               - powershell: |
-                  $newVersion = Get-Content -Path $(Pipeline.Workspace)\vsix\version.txt
+                  $newVersion = Get-Content -Path $(Pipeline.Workspace)\BuildReleasePipeline\vsix\version.txt
                   Write-Host "New version is: $newVersion"
 
                   $str = Get-Date -Format "yyMMdd-HHmm"
                   Write-Host "##vso[build.updatebuildnumber]$newVersion - $str"
                 ignoreLASTEXITCODE: true
                 displayName: "Set the release name"
+          - job: WaitForValidation
+            displayName: Wait for vscode-makefile-tools validation
+            dependsOn: UpdateBuildNumber
+            pool: server
+            steps:
               - task: ManualValidation@0
                 displayName: "Manual Validation"
                 inputs:
@@ -48,9 +52,12 @@ extends:
 
                     The version should match the name of this release.
 
+      - stage: Release
+        dependsOn: Validate
+        condition: succeeded('Validate')
+        jobs:
           - job: ReleaseMakefileTools
             displayName: Release vscode-makefile-tools
-            dependsOn: WaitForValidation
             templateContext:
               type: releaseJob
               isProduction: true
