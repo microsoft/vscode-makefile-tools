@@ -40,6 +40,7 @@ extends:
                 displayName: "Set the release name"
           - job: WaitForValidation
             displayName: Wait for vscode-makefile-tools validation
+            dependsOn: UpdateBuildNumber
             pool: server
             steps:
               - task: ManualValidation@0
