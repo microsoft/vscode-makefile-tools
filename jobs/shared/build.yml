@@ -7,7 +7,7 @@ parameters:
     default: $(IsPreRelease)
   - name: ReleaseVersion
     type: string
-    default: $(ReleaseVersion)
+    default: unset
 
 steps:
   - task: MicroBuildSigningPlugin@3
