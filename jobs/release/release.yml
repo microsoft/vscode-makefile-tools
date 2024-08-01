@@ -53,6 +53,7 @@ extends:
                     The version should match the name of this release.
 
       - stage: Release
+        dependsOn: Validate
         condition: succeeded('Validate')
         jobs:
           - job: ReleaseMakefileTools
