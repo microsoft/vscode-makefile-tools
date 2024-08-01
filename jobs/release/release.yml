@@ -31,7 +31,7 @@ extends:
               - download: BuildReleasePipeline
                 artifact: vsix
               - powershell: |
-                  $newVersion = Get-Content -Path $(Pipeline.WorkingDirectory)\vsix\version.txt
+                  $newVersion = Get-Content -Path $(Pipeline.Workspace)\vsix\version.txt
                   Write-Host "New version is: $newVersion"
 
                   $str = Get-Date -Format "yyMMdd-HHmm"
