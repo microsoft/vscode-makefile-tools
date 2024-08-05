@@ -1020,7 +1020,11 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
       "Post-configure failed: no script provided."
     );
     vscode.window.showErrorMessage(error);
-    logger.message(error);
+    const loggerError = localize(
+      "no.post.configure.script.provided.logger",
+      "No post-configure script is set in settings. Make sure a post-configuration script path is defined with makefile.postConfigureScript."
+    );
+    logger.message(loggerError);
     return ConfigureBuildReturnCodeTypes.notFound;
   }
 
