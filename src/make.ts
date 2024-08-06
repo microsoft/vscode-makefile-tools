@@ -969,7 +969,12 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
   }
 
   if (!util.checkFileExistsSync(scriptFile)) {
-    vscode.window.showErrorMessage("Could not find pre-configure script.");
+    vscode.window.showErrorMessage(
+      localize(
+        "could.not.find.preconfigure.popup",
+        "Could not find pre-configure script."
+      )
+    );
     logger.message(
       localize(
         "could.not.find.pre.configure.on.disk",
@@ -985,7 +990,7 @@ export async function preConfigure(triggeredBy: TriggeredBy): Promise<number> {
     {
       configuringScript: localize(
         "make.preconfigure.title",
-        "Pre-configuring ${0}",
+        "Pre-configuring {0}",
         scriptFile
       ),
       cancelling: localize(
@@ -1214,13 +1219,18 @@ export async function runPreConfigureScript(
       ? currentConfigPreConfigureArgs
       : configuration.getPreConfigureArgs(),
     {
-      success: "The pre-configure succeeded.",
-      successWithSomeError:
-        "The pre-configure script returned success code " +
-        "but somewhere during the preconfigure process there were errors reported. " +
-        "Double check the preconfigure output in the Makefile Tools channel.",
-      failure:
-        "The pre-configure script failed. This project may not configure successfully.",
+      success: localize(
+        "preconfigure.succeeded",
+        "The pre-configure succeeded."
+      ),
+      successWithSomeError: localize(
+        "preconfigure.succeeded.with.some.error",
+        "The pre-configure script returned success code but somewhere during the preconfigure process there were errors reported. Double check the preconfigure output in the Makefile Tools channel."
+      ),
+      failure: localize(
+        "preconfigure.script.failed",
+        "The pre-configure script failed. This project may not configure successfully."
+      ),
     }
   );
 }
