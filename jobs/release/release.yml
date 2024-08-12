@@ -68,9 +68,9 @@ extends:
                   targetPath: $(Build.StagingDirectory)\vsix
             steps:
               - task: NodeTool@0
-                displayName: "Use Node 16.x"
+                displayName: "Use Node 18.x"
                 inputs:
-                  versionSpec: 16.x
+                  versionSpec: 18.x
               - task: Npm@0
                 displayName: "install vsce"
                 inputs:
