@@ -17,9 +17,9 @@ steps:
       zipSources: false
 
   - task: NodeTool@0
-    displayName: Use Node 16.x
+    displayName: Use Node 18.x
     inputs:
-      versionSpec: 16.x
+      versionSpec: 18.x
 
   - task: geeklearningio.gl-vsts-tasks-yarn.yarn-installer-task.YarnInstaller@3
     displayName: Use Yarn 1.x
