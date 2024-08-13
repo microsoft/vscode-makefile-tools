@@ -1,6 +1,12 @@
 # What's New?
 
-## 0.10
+## 0.10.26
+
+Bug Fixes:
+
+- Fix issue where the Makefile Extension was blocked on answering the "Would you like to Configure..." pop-up. [#639](https://github.com/microsoft/vscode-makefile-tools/issues/639)
+
+## 0.10.25
 
 Improvements:
 
