@@ -1,5 +1,11 @@
 # What's New?
 
+## 0.11
+
+Bug Fixes:
+
+- Ensure that we append line endings, which fixes a recent regression. [#641](https://github.com/microsoft/vscode-makefile-tools/issues/641)
+
 ## 0.10.26
 
 Bug Fixes:
