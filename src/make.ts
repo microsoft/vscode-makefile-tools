@@ -1052,7 +1052,7 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
     {
       configuringScript: localize(
         "make.postconfigure.title",
-        "Post-configuring: ${0}",
+        "Post-configuring: {0}",
         scriptFile
       ),
       cancelling: localize(
@@ -1256,13 +1256,18 @@ export async function runPostConfigureScript(
       ? currentConfigPostConfigureArgs
       : configuration.getPostConfigureArgs(),
     {
-      success: "The post-configure succeeded.",
-      successWithSomeError:
-        "The post-configure script returned success code " +
-        "but somewhere during the postconfigure process there were errors reported. " +
-        "Double check the postconfigure output in the Makefile Tools channel.",
-      failure:
-        "The post-configure script failed. This project may not configure successfully.",
+      success: localize(
+        "postconfigure.succeeded",
+        "The post-configure succeeded."
+      ),
+      successWithSomeError: localize(
+        "postconfigure.succeeded.with.some.error",
+        "The post-configure script returned success code but somewhere during the postconfigure process there were errors reported. Double check the postconfigure output in the Makefile Tools channel."
+      ),
+      failure: localize(
+        "postconfigure.script.failed",
+        "The post-configure script failed. This project may not configure successfully."
+      ),
     }
   );
 }
