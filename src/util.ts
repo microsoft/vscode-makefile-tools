@@ -390,6 +390,10 @@ export function spawnChildProcess(
         `integrated.automationShell.${shellPlatform}`
       ); // and replaced with automationProfile
 
+    if (typeof shellType === "object") {
+      shellType = shellType["path"];
+    }
+
     // Final quoting decisions for process name and args before being executed.
     let qProcessName: string = ensureQuoted
       ? quoteStringIfNeeded(processName)
