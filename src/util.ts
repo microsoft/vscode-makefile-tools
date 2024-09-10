@@ -338,6 +338,8 @@ export function mergeEnvironment(
   }, {});
 }
 
+export let modifiedEnvironmentVariables: EnvironmentVariables = {};
+
 export interface SpawnProcessResult {
   returnCode: number;
   signal: string;
