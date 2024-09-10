@@ -417,16 +417,18 @@ export function spawnChildProcess(
       qArgs,
       { cwd: workingDirectory, shell: shellType || true, env: finalEnvironment }
     );
-    make.setCurPID(child.pid);
+    if (child.pid) {
+      make.setCurPID(child.pid);
+    }
 
     if (stdoutCallback) {
-      child.stdout.on("data", (data) => {
+      child.stdout?.on("data", (data) => {
         stdoutCallback(`${data}`);
       });
     }
 
     if (stderrCallback) {
-      child.stderr.on("data", (data) => {
+      child.stderr?.on("data", (data) => {
         stderrCallback(`${data}`);
       });
     }
