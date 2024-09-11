@@ -72,9 +72,9 @@ extends:
                 fetchTags: false
 
               - task: NodeTool@0
-                displayName: Use Node 18.x
+                displayName: Use Node 20.x
                 inputs:
-                  versionSpec: 18.x
+                  versionSpec: 20.x
 
               - task: geeklearningio.gl-vsts-tasks-yarn.yarn-installer-task.YarnInstaller@3
                 displayName: Use Yarn 1.x
@@ -87,7 +87,7 @@ extends:
               - task: Npm@0
                 displayName: npm install vsce
                 inputs:
-                  arguments: -g vsce
+                  arguments: -g @vscode/vsce
 
               - task: CmdLine@2
                 displayName: Run VSCE to package vsix
@@ -100,7 +100,7 @@ extends:
                 displayName: npm uninstall vsce
                 inputs:
                   command: uninstall
-                  arguments: -g vsce
+                  arguments: -g @vscode/vsce
 
               - task: DeleteFiles@1
                 displayName: Remove code that should not be scanned
