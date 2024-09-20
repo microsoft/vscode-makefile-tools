@@ -849,7 +849,6 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn compile-production",
     "compile": "yarn install && webpack --mode development",
     "compile-watch": "yarn install && webpack --mode development --watch --progress",
     "compile-production": "yarn install && yarn run translations-generate && yarn run bundle-assets && webpack --env BUILD_VSCODE_NLS=true --mode production",
