@@ -1,8 +1,8 @@
 {
   "makefile-tools.command.makefile.buildTarget.title": "Makefile: Build the current target",
-  "makefile-tools.command.makefile.buildCleanTarget.title": "Makefile: Build clean the current target",
+  "makefile-tools.command.makefile.buildCleanTarget.title": "Makefile: Clean and build the current target",
   "makefile-tools.command.makefile.buildAll.title": "Makefile: Build the target ALL",
-  "makefile-tools.command.makefile.buildCleanAll.title": "Makefile: Build clean the target ALL",
+  "makefile-tools.command.makefile.buildCleanAll.title": "Makefile: Clean and build the target ALL",
   "makefile-tools.command.makefile.launchDebug.title": "Makefile: Debug the selected binary target",
   "makefile-tools.command.makefile.launchRun.title": "Makefile: Run the selected binary target in the terminal",
   "makefile-tools.command.makefile.setBuildConfiguration.title": "Makefile: Set the current build configuration",
