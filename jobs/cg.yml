@@ -84,10 +84,8 @@ extends:
                 inputs:
                   arguments: install
 
-              - task: Npm@0
-                displayName: npm install vsce
-                inputs:
-                  arguments: -g @vscode/vsce
+              - script: npm install -g @vscode/vsce
+                displayName: "install vsce"
 
               - task: CmdLine@2
                 displayName: Run VSCE to package vsix
@@ -96,11 +94,8 @@ extends:
                     echo Building VSIX
                     vsce package --yarn -o $(Build.StagingDirectory)\makefile-tools.vsix
 
-              - task: Npm@0
-                displayName: npm uninstall vsce
-                inputs:
-                  command: uninstall
-                  arguments: -g @vscode/vsce
+              - script: npm uninstall -g @vscode/vsce
+                displayName: "uninstall vsce"
 
               - task: DeleteFiles@1
                 displayName: Remove code that should not be scanned
