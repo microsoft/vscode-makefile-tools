@@ -278,6 +278,14 @@ export async function preprocessDryRunOutput(
     );
   });
 
+  // Remove
+  preprocessTasks.push(function (): void {
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
+      /\\$/g,
+      ""
+    );
+  });
+
   // Replace multiple "-" sequence because it hangs the regular expression engine.
   // Strings with this pattern do not contain useful information to parse, they are safe to replace
   // in our internal representation of the dryrun or build log.
