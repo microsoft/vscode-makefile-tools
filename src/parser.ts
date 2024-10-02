@@ -436,16 +436,11 @@ async function parseLineAsTool(
     return undefined;
   }
 
-  const args = match[match.length - 1]
-    .split(" ")
-    .filter((arg) => arg !== ")" && arg !== "(")
-    .join(" ");
-
   return {
     // don't use join and neither paths/filenames processed above if we want to keep the exact text in the makefile
     pathInMakefile: match[1] + match[2],
     fullPath: toolFullPath,
-    arguments: args,
+    arguments: match[match.length - 1],
     found: toolFound,
   };
 }
@@ -1414,6 +1409,7 @@ export async function parseLaunchConfigurations(
   // searching for compilers, linkers and directory changing commands
   // to construct information for the launch configuration
   let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
+  dryRunOutputLines = util.removeSplitUpParenthesis(dryRunOutputLines);
   let numberOfLines: number = dryRunOutputLines.length;
   let index: number = 0;
   let done: boolean = false;
