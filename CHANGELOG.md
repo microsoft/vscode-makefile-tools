@@ -1,5 +1,11 @@
 # What's New?
 
+## 0.12
+
+Improvements:
+
+- Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
+
 ## 0.11
 
 Bug Fixes:
