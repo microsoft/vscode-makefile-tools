@@ -2,6 +2,10 @@
 
 ## 0.11
 
+Improvements:
+
+- More wisely pass the modified environment variables, if present, from the pre/post-configure scripts to tasks and debugging options. [#540](https://github.com/microsoft/vscode-makefile-tools/issues/540), [#493](https://github.com/microsoft/vscode-makefile-tools/issues/493), [#554](https://github.com/microsoft/vscode-makefile-tools/issues/554)
+
 Bug Fixes:
 
 - Ensure that we append line endings, which fixes a recent regression. [#641](https://github.com/microsoft/vscode-makefile-tools/issues/641)

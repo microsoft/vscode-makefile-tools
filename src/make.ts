@@ -478,7 +478,13 @@ export async function doBuildTarget(
     }
 
     let myTaskOptions: vscode.ShellExecutionOptions = {
-      env: util.mergeEnvironment(process.env as util.EnvironmentVariables),
+      // Only pass a defined environment if there are modified environment variables.
+      env:
+        Object.keys(util.modifiedEnvironmentVariables).length > 0
+          ? util.mergeEnvironment(
+              util.modifiedEnvironmentVariables as util.EnvironmentVariables
+            )
+          : undefined,
       cwd,
     };
 
@@ -1090,6 +1096,12 @@ async function applyEnvironment(content: string | undefined): Promise<void> {
     if (eqPos !== -1) {
       let envVarName: string = line.substring(0, eqPos);
       let envVarValue: string = line.substring(eqPos + 1, line.length);
+
+      // Only save to the modified environment values if it's different than the process.env.
+      if (!process.env[envVarName] || envVarValue !== process.env[envVarName]) {
+        util.modifiedEnvironmentVariables[envVarName] = envVarValue;
+      }
+
       process.env[envVarName] = envVarValue;
     }
   });

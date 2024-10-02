@@ -338,6 +338,8 @@ export function mergeEnvironment(
   }, {});
 }
 
+export let modifiedEnvironmentVariables: EnvironmentVariables = {};
+
 export interface SpawnProcessResult {
   returnCode: number;
   signal: string;
@@ -387,6 +389,10 @@ export function spawnChildProcess(
       workspaceConfiguration.get<string>(
         `integrated.automationShell.${shellPlatform}`
       ); // and replaced with automationProfile
+
+    if (typeof shellType === "object") {
+      shellType = shellType["path"];
+    }
 
     // Final quoting decisions for process name and args before being executed.
     let qProcessName: string = ensureQuoted
