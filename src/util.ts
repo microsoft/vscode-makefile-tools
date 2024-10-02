@@ -598,7 +598,7 @@ export function removeSplitUpParenthesis(strArray: string[]): string[] {
     } else if (result.endsWith(")") && !result.startsWith("(")) {
       result = result.substring(0, str.length - 2);
     }
-    resultArray.push(result);
+    resultArray.push(result.trim());
   }
 
   return resultArray;
