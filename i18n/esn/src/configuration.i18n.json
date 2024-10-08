@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "No se encontró ningún nombre de archivo de herramienta Make en makefile.configurations.makePath ni en makefile.makePath. Suponiendo \"Make\".",
 	"make.was.not.found.on.disk": "No se encontró Make en el disco en la ubicación proporcionada a través de makefile.makePath o makefile.configurations[].makePath.",
 	"make.was.not.found.in.settings.not.environment": "No se proporcionó ninguna ruta de acceso a Make en la configuración y tampoco se encuentra en la ruta de acceso del entorno.",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "No se encontró el punto de entrada de makefile. Asegúrese de que existe en la ubicación definida por makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory o en la raíz del área de trabajo.",
 	"found.build.log.path.in.setting": "Se encontró la configuración de la ruta de acceso al registro de compilación \"{0}\" definida para la configuración \"{1}\"",
 	"resolving.build.log.path.to": "Resolviendo la ruta de acceso del registro de compilación en \"{0}\"",
 	"build.log.not.found.remove.setting": "No se encontró el registro de compilación. Quite la configuración del registro de compilación o proporcione un archivo de registro de compilación en el disco en la ubicación especificada.",

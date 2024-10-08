@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "Nie można odnaleźć żadnej nazwy pliku narzędzia make w makefile.configurations.makePath ani w pliku makefile.makePath. Przy założeniu, że jest.",
 	"make.was.not.found.on.disk": "Nie znaleziono pliku make na dysku w lokalizacji podanej za pomocą makefile.makePath lub makefile.configurations[].makePath.",
 	"make.was.not.found.in.settings.not.environment": "Make nie ma żadnej ścieżki w ustawieniach i nie został znaleziony w ścieżce środowiska.",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "Nie znaleziono punktu wejścia pliku makefile. Upewnij się, że istnieje w lokalizacji określonej przez pliki makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory lub w katalogu głównym obszaru roboczego.",
 	"found.build.log.path.in.setting": "Znaleziono ustawienie ścieżki dziennika kompilacji „{0}” zdefiniowane dla konfiguracji „{1}”",
 	"resolving.build.log.path.to": "Rozpoznawanie ścieżki dziennika kompilacji do „{0}”",
 	"build.log.not.found.remove.setting": "Nie znaleziono dziennika kompilacji. Usuń ustawienie dziennika kompilacji lub podaj plik dziennika kompilacji na dysku w danej lokalizacji.",
