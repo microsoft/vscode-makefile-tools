@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "Não foi possível localizar nenhum nome de arquivo de ferramenta make em makefile.configurations.makePath, nem em makefile.makePath. Presumindo o make.",
 	"make.was.not.found.on.disk": "Make não foi encontrado no disco no local fornecido por meio de makefile.makePath ou makefile.configurations[].makePath.",
 	"make.was.not.found.in.settings.not.environment": "O make não recebeu nenhum caminho nas configurações e também não foi encontrado no caminho do ambiente.",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "O ponto de entrada do makefile não foi encontrado. Verifique se ele existe no local definido por makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory ou na raiz do workspace.",
 	"found.build.log.path.in.setting": "Configuração do caminho de log de build \"{0}\" encontrada definida para a configuração \"{1}\"",
 	"resolving.build.log.path.to": "Resolvendo o caminho do log de build para \"{0}\"",
 	"build.log.not.found.remove.setting": "Log de build não encontrado. Remova a configuração do log de build ou forneça um arquivo de log de build no disco no local especificado.",

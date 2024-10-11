@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "Makefile.configurations.makePath içinde veya makefile.makePath içinde herhangi bir derleme aracı dosyası adı bulunamadı. Derleme varsayılıyor.",
 	"make.was.not.found.on.disk": "Makefile.makePath veya makefile.configurations[].makePath aracılığıyla sağlanan konumda diskte Make bulunamadı.",
 	"make.was.not.found.in.settings.not.environment": "Ayarlarda derleme için yol belirtilmedi ve ortam yolunda da bulunamadı.",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "Derleme dosyası giriş noktası bulunamadı. makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory ile tanımlanan konumda veya çalışma alanının kökünde bulunduğundan emin olun.",
 	"found.build.log.path.in.setting": "Yapılandırma \"{1}\" için tanımlanan \"{0}\" derleme günlük yolu ayarı bulundu",
 	"resolving.build.log.path.to": "Derleme günlük yolu \"{0}\" olarak çözümleniyor",
 	"build.log.not.found.remove.setting": "Derleme günlüğü bulunamadı. Derleme günlüğü ayarını kaldırın veya belirtilen konumda diskte bir derleme günlüğü dosyası belirtin.",
