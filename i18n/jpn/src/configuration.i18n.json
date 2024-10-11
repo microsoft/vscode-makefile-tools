@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "makefile.configurations.makePath および makefile.makePath に Make ツール ファイル名がありませんでした。Make と見なします。",
 	"make.was.not.found.on.disk": "makefile.makePath または makefile.configurations[].makePath で指定された場所のディスクで、Make が見つかりませんでした。",
 	"make.was.not.found.in.settings.not.environment": "Make は、設定でパスが指定されておらず、環境パスでも見つかりません。",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "メイクファイルのエントリ ポイントが見つかりませんでした。makefile.makefilePath、makefile.configurations[].makefilePath、makefile makefile.makeDirectory、makefile.configurations[].makeDirectory で定義された場所、またはワークスペースのルートに存在することを確認してください。",
 	"found.build.log.path.in.setting": "構成 \"{0}\" に定義されているビルド ログのパス設定 \"{1}\" が見つかりました",
 	"resolving.build.log.path.to": "ビルド ログのパスを \"{0}\" に解決しています",
 	"build.log.not.found.remove.setting": "ビルド ログが見つかりません。ビルド ログ設定を削除するか、指定された場所のディスク上にビルド ログ ファイルを配置してください。",

@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "In \"makefile.configurations.makePath\" oder \"makefile.makePath\" wurde kein Name für die Datei \"makefile.configurations.makePath\" gefunden. Es wird „Make“ angenommen.",
 	"make.was.not.found.on.disk": "„Make“ wurde nicht auf dem Datenträger an dem Speicherort gefunden, der über makefile.makePath oder makefile.configurations[].makePath angegeben wurde.",
 	"make.was.not.found.in.settings.not.environment": "„Make“ hat keinen Pfad in den Einstellungen erhalten und wurde auch nicht im Umgebungspfad gefunden.",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "Der Makefile-Einstiegspunkt wurde nicht gefunden. Stellen Sie sicher, dass er an dem Speicherort vorhanden ist, der durch makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory oder im Stammverzeichnis des Arbeitsbereichs definiert ist.",
 	"found.build.log.path.in.setting": "Die Buildprotokollpfadeinstellung \"{0}\" wurde für die Konfiguration \"{1}\" definiert.",
 	"resolving.build.log.path.to": "Der Buildprotokollpfad wird in \"{0}\" aufgelöst.",
 	"build.log.not.found.remove.setting": "Das Buildprotokoll wurde nicht gefunden. Entfernen Sie die Buildprotokolleinstellung, oder geben Sie eine Buildprotokolldatei auf dem Datenträger am angegebenen Speicherort an.",
