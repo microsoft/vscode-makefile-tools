@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "Désolé, nous n’avons pas pu trouver un nom de fichier d’outil dans makefile.configurations.makePath, ni dans makefile.makePath. En supposant qu’il s’agit d’un make.",
 	"make.was.not.found.on.disk": "Make est introuvable sur le disque à l’emplacement fourni via makefile.makePath ou makefile.configurations[].makePath.",
 	"make.was.not.found.in.settings.not.environment": "Make n’a pas reçu de chemin d’accès dans les paramètres et est également introuvable dans le chemin d’accès de l’environnement.",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "Le point d’entrée Makefile est introuvable. Vérifiez qu’il existe à l’emplacement défini par makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory ou à la racine de l’espace de travail.",
 	"found.build.log.path.in.setting": "Le paramètre de chemin d’accès du journal de build a été trouvé « {0} » défini pour la configuration « {1} »",
 	"resolving.build.log.path.to": "Résolution du chemin d’accès du journal de génération en « {0} »",
 	"build.log.not.found.remove.setting": "Journal de build introuvable. Supprimez le paramètre du journal de build ou fournissez un fichier journal de build sur le disque à l’emplacement donné.",

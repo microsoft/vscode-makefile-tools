@@ -44,3 +44,10 @@ const readmeMessage: string = localize("refer.read.me", "Please refer to {0} for
 * [**ui.ts**](src/ui.ts) deprecated support for status bar buttons.
 * [**util.ts**](src/util.ts) various util helpers for file system operations, paths/strings processing, threads management.
 
+### Adding/Updating package.json dependencies
+
+We maintain a public Azure Artifacts feed that we point the package manager to in the .npmrc file.
+
+Because of this, if you want to add/update a dependency version in package.json, intervention from our team will be required to successfully merge PRs that have dependency updates. Please ping our team in the PR.
+
+For local development before attempting to merge a PR, you can delete the .npmrc file and use the default NPM feed directly. Please do not push any subsequent changes to the yarn.lock file.

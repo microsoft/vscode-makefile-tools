@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "在 makefile.configurations.makePath 中或 makefile.makePath 中找不到任何 make 工具文件名。假定 make。",
 	"make.was.not.found.on.disk": "在通过 makefile.makePath 或 makefile.configurations[].makePath 提供的位置处的磁盘上找不到 Make。",
 	"make.was.not.found.in.settings.not.environment": "未在设置中为 Make 提供任何路径，在环境路径上也找不到它。",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "找不到生成文件入口点。请确保它存在于 makefile.makefilePath、makefile.configurations[].makefilePath、makefile makefile.makeDirectory、makefile.configurations[].makeDirectory 定义的位置或工作区根目录中。",
 	"found.build.log.path.in.setting": "找到了为配置 \"{1}\" 定义的生成日志路径设置 \"{0}\"",
 	"resolving.build.log.path.to": "正在解析 \"{0}\" 的生成日志路径",
 	"build.log.not.found.remove.setting": "找不到生成日志。移除生成日志设置，或在给定位置处的磁盘上提供生成日志文件。",

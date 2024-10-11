@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "V souboru makefile.configurations.makePath ani v souboru makefile.makePath se nenašel žádný název souboru nástroje make. Předpokládá se make.",
 	"make.was.not.found.on.disk": "Na disku se v umístění zadaném prostřednictvím makefile.makePath nebo makefile.configurations[].makePath nenašla hodnota Make.",
 	"make.was.not.found.in.settings.not.environment": "Make nemá v nastavení zadanou žádnou cestu a nenašla se ani v cestě prostředí.",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "Vstupní bod souboru pravidel nebyl nalezen. Ujistěte se, že existuje v umístění definovaném pomocí makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory nebo v kořenovém adresáři pracovního prostoru.",
 	"found.build.log.path.in.setting": "Našlo se nastavení cesty k protokolu sestavení „{0}“ definovanému pro konfiguraci „{1}“.",
 	"resolving.build.log.path.to": "Překládání cesty k protokolu sestavení na „{0}“",
 	"build.log.not.found.remove.setting": "Protokol sestavení se nepodařilo najít. Odeberte nastavení protokolu sestavení nebo zadejte soubor protokolu sestavení na disku v daném umístění.",
