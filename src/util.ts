@@ -338,6 +338,8 @@ export function mergeEnvironment(
   }, {});
 }
 
+export let modifiedEnvironmentVariables: EnvironmentVariables = {};
+
 export interface SpawnProcessResult {
   returnCode: number;
   signal: string;
@@ -387,6 +389,10 @@ export function spawnChildProcess(
       workspaceConfiguration.get<string>(
         `integrated.automationShell.${shellPlatform}`
       ); // and replaced with automationProfile
+
+    if (typeof shellType === "object") {
+      shellType = shellType["path"];
+    }
 
     // Final quoting decisions for process name and args before being executed.
     let qProcessName: string = ensureQuoted
@@ -586,6 +592,22 @@ export function removeQuotes(str: string): string {
   }
 
   return str;
+}
+
+export function removeSplitUpParenthesis(strArray: string[]): string[] {
+  const resultArray: string[] = [];
+
+  for (const str of strArray) {
+    let result: string = str.trim();
+    if (result.startsWith("(") && !result.endsWith(")")) {
+      result = result.substring(1, str.length - 1);
+    } else if (result.endsWith(")") && !result.startsWith("(")) {
+      result = result.substring(0, str.length - 2);
+    }
+    resultArray.push(result.trim());
+  }
+
+  return resultArray;
 }
 
 // Remove only the quotes (", ' or `) that are surrounding the given string.

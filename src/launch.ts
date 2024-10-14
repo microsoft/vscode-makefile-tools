@@ -230,7 +230,13 @@ export class Launcher implements vscode.Disposable {
       request: "launch",
       cwd: this.getLaunchTargetDirectory(),
       args,
-      env: util.mergeEnvironment(process.env as util.EnvironmentVariables),
+      // Only pass a defined environment if there are modified environment variables.
+      env:
+        Object.keys(util.modifiedEnvironmentVariables).length > 0
+          ? util.mergeEnvironment(
+              util.modifiedEnvironmentVariables as util.EnvironmentVariables
+            )
+          : undefined,
       program: this.getLaunchTargetPath(),
       MIMode: miMode,
       miDebuggerPath: miDebuggerPath,
