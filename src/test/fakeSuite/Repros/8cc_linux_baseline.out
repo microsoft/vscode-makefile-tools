@@ -191,7 +191,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Compiler Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin/GitHub/compilers/cc
     Compiler Arguments: -Wall;-Wno-strict-aliasing;-g;-O0;-c;-o;encoding.o;encoding.c
 ---------------------------------------------------------------------------------------------------
-Found compiler command: cc -o 8cc main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o 
+Found compiler command: cc -o 8cc main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o
 Sending Workspace Browse Configuration: -----------------------------------
     Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
     Standard: c11
@@ -200,7 +200,7 @@ Sending Workspace Browse Configuration: -----------------------------------
 ----------------------------------------------------------------------------
 Parsing for IntelliSense elapsed time: 0
 Parsing for launch targets.
-Found linker command: cc -o 8cc main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o 
+Found linker command: cc -o 8cc main.o cpp.o debug.o dict.o gen.o lex.o vector.o parse.o buffer.o map.o error.o path.o file.o set.o encoding.o
 Producing target binary: 8cc
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>8cc()

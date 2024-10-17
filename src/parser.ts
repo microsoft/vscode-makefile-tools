@@ -1148,6 +1148,7 @@ export async function parseCustomConfigProvider(
   // Read the dry-run output line by line, searching for compilers and directory changing commands
   // to construct information for the CppTools custom configuration
   let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
+  dryRunOutputLines = util.removeSplitUpParenthesis(dryRunOutputLines);
   let numberOfLines: number = dryRunOutputLines.length;
   let index: number = 0;
   let done: boolean = false;
@@ -1408,6 +1409,7 @@ export async function parseLaunchConfigurations(
   // searching for compilers, linkers and directory changing commands
   // to construct information for the launch configuration
   let dryRunOutputLines: string[] = dryRunOutputStr.split("\n");
+  dryRunOutputLines = util.removeSplitUpParenthesis(dryRunOutputLines);
   let numberOfLines: number = dryRunOutputLines.length;
   let index: number = 0;
   let done: boolean = false;

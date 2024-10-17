@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "Не удалось найти имя файла инструмента make в makefile.configurations.makePath и makefile.makePath. Предполагается make.",
 	"make.was.not.found.on.disk": "Make не найден на диске в расположении, указанном с помощью makefile.makePath или makefile.configurations[].makePath.",
 	"make.was.not.found.in.settings.not.environment": "Параметру Make не был предоставлен путь в параметрах, и он также не найден в пути среды.",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "Точка входа файла makefile не найдена. Убедитесь, что он существует в расположении, определенном makefile.makefilePath, makefile.configurations[].makefilePath, makefile.makeDirectory, makefile.configurations[].makeDirectory или в корне рабочей области.",
 	"found.build.log.path.in.setting": "Найден параметр пути к журналу сборки \"{0}\", определенный для конфигурации \"{1}\"",
 	"resolving.build.log.path.to": "Разрешение пути к журналу сборки \"{0}\"",
 	"build.log.not.found.remove.setting": "Журнал сборки не найден. Удалите параметр журнала сборки или укажите файл журнала сборки на диске в указанном расположении.",
