@@ -278,10 +278,10 @@ export async function preprocessDryRunOutput(
     );
   });
 
-  // Remove
+  // Remove line continuation characters at the end of a line.
   preprocessTasks.push(function (): void {
     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
-      /\\$/g,
+      /(\\$)|(\\\\$)|(\\(?=\n))|(\\\\(?=\n))/g,
       ""
     );
   });
