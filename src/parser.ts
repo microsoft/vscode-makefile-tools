@@ -189,7 +189,7 @@ export async function preprocessDryRunOutput(
   // Some compiler/linker commands are split on multiple lines.
   // At the end of every intermediate line is at least a space, then a \ and end of line.
   // Concatenate all these lines to see clearly each command on one line.
-  let regexp: RegExp = /\s+\\$\n/gm;
+  let regexp: RegExp = /(\\$\n)|(\\\\$\n)/gm;
   preprocessTasks.push(function (): void {
     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
       regexp,
@@ -275,14 +275,6 @@ export async function preprocessDryRunOutput(
     preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
       /;/g,
       "\n"
-    );
-  });
-
-  // Remove line continuation characters at the end of a line.
-  preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
-      /(\\$)|(\\\\$)|(\\(?=\n))|(\\\\(?=\n))/g,
-      ""
     );
   });
 
