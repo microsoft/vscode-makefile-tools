@@ -20,6 +20,7 @@ Bug Fixes:
 Improvements:
 
 - Update signing to support VSCode extension signing. [#647](https://github.com/microsoft/vscode-makefile-tools/pull/647)
+- Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
 
 ## 0.10.26
 
