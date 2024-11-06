@@ -37,7 +37,7 @@
 	"could.not.find.make.file.tools.name": "在 makefile.configurations.makePath 或makefile.makePath 中找不到任何 make 工具檔案名稱。假設 make。",
 	"make.was.not.found.on.disk": "在透過 makefile.makePath 或 makefile.configurations[].makePath 提供的位置的磁碟上找不到　Make。",
 	"make.was.not.found.in.settings.not.environment": "設定中未幫 make 指定任何路徑，在環境路徑上也找不到 make。",
-	"makefile.entry.point.not.found": "The makefile entry point was not found. Make sure it exists at the location defined by makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory or in the root of the workspace.",
+	"makefile.entry.point.not.found": "找不到 makefile 進入點。請確認其存在於 makefile.makefilePath, makefile.configurations[].makefilePath, makefile makefile.makeDirectory, makefile.configurations[].makeDirectory 定義的位置或在工作區的根之中。",
 	"found.build.log.path.in.setting": "找到為設定「{1}」定義的組建記錄路徑設定「{0}」",
 	"resolving.build.log.path.to": "正在將組建記錄路徑解析為「{0}」",
 	"build.log.not.found.remove.setting": "找不到組建記錄。移除組建記錄設定，或在指定位置的磁碟上提供組建記錄檔案。",
