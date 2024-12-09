@@ -190,6 +190,7 @@ export class MakefileToolsExtension {
       intelliSenseMode: customConfigProviderItem.intelliSenseMode,
       compilerPath: customConfigProviderItem.compilerFullPath,
       compilerArgs: customConfigProviderItem.compilerArgs,
+      compilerFragments: customConfigProviderItem.compilerFragments,
       windowsSdkVersion: customConfigProviderItem.windowsSDKVersion,
     };
 
@@ -243,6 +244,7 @@ export class MakefileToolsExtension {
       standard: customConfigProviderItem.standard,
       compilerPath: customConfigProviderItem.compilerFullPath,
       compilerArgs: customConfigProviderItem.compilerArgs,
+      compilerFragments: customConfigProviderItem.compilerFragments,
       windowsSdkVersion: customConfigProviderItem.windowsSDKVersion,
     };
 

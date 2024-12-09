@@ -1109,6 +1109,7 @@ export interface CustomConfigProviderItem {
   intelliSenseMode?: util.IntelliSenseMode;
   compilerFullPath: string;
   compilerArgs: string[];
+  compilerFragments: string[];
   files: string[];
   windowsSDKVersion?: string;
   currentPath: string;
@@ -1139,6 +1140,9 @@ export async function parseCustomConfigProvider(
     ),
     "Normal"
   );
+
+  let cppToolsVersion = ext.extension.getCppToolsVersion();
+  let useCompilerFragments: boolean = cppToolsVersion !== undefined && cppToolsVersion >= cpp.Version.v6;
 
   // Current path starts with workspace root and can be modified
   // with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -1208,10 +1212,19 @@ export async function parseCustomConfigProvider(
         // Exclude switches that are being processed separately (I, FI, include, D, std)
         // and switches that don't affect IntelliSense but are causing errors.
         let compilerArgs: string[] = [];
-        compilerArgs = await parseAnySwitchFromToolArguments(
-          compilerTool.arguments,
-          ["I", "FI", "include", "D", "std", "MF"]
-        );
+        let compilerFragments: string[] = [];
+        if (useCompilerFragments) {
+          compilerFragments = await parseAnySwitchFromToolArguments(
+            compilerTool.arguments,
+            ["I", "FI", "include", "D", "std", "MF"]
+          );
+        } else {
+          compilerArgs = await parseAnySwitchFromToolArguments(
+            compilerTool.arguments,
+            ["I", "FI", "include", "D", "std", "MF"]
+          );
+        }
+        
 
         // Parse and log the includes, forced includes and the defines
         let includes: string[] = parseMultipleSwitchFromToolArguments(
@@ -1242,7 +1255,7 @@ export async function parseCustomConfigProvider(
           compilerTool.arguments
         );
         let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(
-          ext.extension.getCppToolsVersion(),
+          cppToolsVersion,
           compilerFullPath,
           targetArchitecture
         );
@@ -1287,7 +1300,7 @@ export async function parseCustomConfigProvider(
         if (language) {
           // More standard validation and defaults, in the context of the whole command.
           let standard: util.StandardVersion | undefined = parseStandard(
-            ext.extension.getCppToolsVersion(),
+            cppToolsVersion,
             standardStr,
             language
           );
@@ -1301,6 +1314,7 @@ export async function parseCustomConfigProvider(
               intelliSenseMode,
               compilerFullPath,
               compilerArgs,
+              compilerFragments,
               files,
               windowsSDKVersion,
               currentPath,
@@ -1319,7 +1333,7 @@ export async function parseCustomConfigProvider(
 
             // More standard validation and defaults, in the context of each source file.
             let standard: util.StandardVersion | undefined = parseStandard(
-              ext.extension.getCppToolsVersion(),
+              cppToolsVersion,
               standardStr,
               language
             );
@@ -1333,6 +1347,7 @@ export async function parseCustomConfigProvider(
                 intelliSenseMode,
                 compilerFullPath,
                 compilerArgs,
+                compilerFragments,
                 files: [file],
                 windowsSDKVersion,
                 currentPath,
