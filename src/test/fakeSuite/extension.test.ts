@@ -35,7 +35,100 @@ import * as util from "../../util";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { extension } from "../../extension";
+
+suite("Unit testing replacing characters in and outside of quotes", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  setup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("Test with only double quotes", () => {
+    const tests = [
+      "hey;blah;",
+      "hey;blah",
+      ";hey;blah;",
+      'hey;bl"ah;"',
+      '";hey";"blah;";;"',
+    ];
+    const expectedResults = [
+      "hey\nblah\n",
+      "hey\nblah",
+      "\nhey\nblah\n",
+      'hey\nbl"ah;"',
+      '";hey"\n"blah;"\n\n"',
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringNotInQuotes(tests[i], ";", "\n")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+
+  test("Test with only single quotes", () => {
+    const tests = [
+      "hey;blah;",
+      "hey;blah",
+      ";hey;blah;",
+      "hey;bl'ah;'",
+      "';hey';'blah;';;'",
+    ];
+    const expectedResults = [
+      "hey\nblah\n",
+      "hey\nblah",
+      "\nhey\nblah\n",
+      "hey\nbl'ah;'",
+      "';hey'\n'blah;'\n\n'",
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringNotInQuotes(tests[i], ";", "\n")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+
+  test("Test with both double and single quotes present", () => {
+    const tests = [
+      'hey;"bl;\'ah;";;',
+      "hey\";blah';'\";t'e;st''",
+      "h';\"e\";'blah;test;'",
+    ];
+    const expectedResults = [
+      'hey\n"bl;\'ah;"\n\n',
+      "hey\";blah';'\"\nt'e;st''",
+      "h';\"e\";'blah\ntest\n'",
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringNotInQuotes(tests[i], ";", "\n")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+
+  test("Test various quotes with strings longer than 1 character", () => {
+    const tests = [
+      "hey && blah",
+      '"hey && blah"',
+      '\'hey " && \'blah" && " && ',
+    ];
+    const expectedResults = [
+      "hey\nblah",
+      '"hey && blah"',
+      '\'hey " && \'blah" && "\n',
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringNotInQuotes(tests[i], " && ", "\n")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+});
 
 // TODO: refactor initialization and cleanup of each test
 suite("Fake dryrun parsing", () => {
@@ -142,7 +235,6 @@ suite("Fake dryrun parsing", () => {
       /{REPO:VSCODE-MAKEFILE-TOOLS}/gm,
       extensionRootPath
     );
-    console.log("HEYHEYHEYHEYHEY " + extensionRootPath);
     baselineLogContent = baselineLogContent.replace(/\r\n/gm, "\n");
     // fs.writeFileSync(path.join(parsedPath.dir, "base6.out"), baselineLogContent);
     // fs.writeFileSync(path.join(parsedPath.dir, "diff6.out"), extensionLogContent);
