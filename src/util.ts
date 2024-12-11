@@ -641,6 +641,61 @@ export function quoteStringIfNeeded(str: string): string {
   return `"${str}"`;
 }
 
+export function replaceStringNotInQuotes(
+  value: string,
+  stringToBeReplaced: string,
+  replacementString: string
+): string {
+  let withinDoubleQuotesString = false;
+  let withinSingleQuoteString = false;
+  let result = "";
+  let i = 0;
+  const stringToBeReplacedLength = stringToBeReplaced.length;
+  while (i < value.length) {
+    const testString = value.substring(i, stringToBeReplacedLength + i);
+    const char = value[i];
+    const isSingleQuote = char === "'";
+    const isDoubleQuote = char === '"';
+    const isStringToBeReplaced = testString === stringToBeReplaced;
+
+    const withinString = withinDoubleQuotesString || withinSingleQuoteString;
+
+    switch (withinString) {
+      case true:
+        result += char;
+
+        if (withinDoubleQuotesString) {
+          if (isDoubleQuote) {
+            withinDoubleQuotesString = false;
+          }
+        } else if (withinSingleQuoteString) {
+          if (isSingleQuote) {
+            withinSingleQuoteString = false;
+          }
+        }
+
+        i += 1;
+
+        break;
+      default:
+        if (isStringToBeReplaced) {
+          result += replacementString;
+          i += stringToBeReplacedLength;
+        } else {
+          result += char;
+          i += 1;
+        }
+
+        withinDoubleQuotesString ||= isDoubleQuote;
+        withinSingleQuoteString ||= isSingleQuote;
+
+        break;
+    }
+  }
+
+  return result;
+}
+
 // Used when constructing a regular expression from file names which can contain
 // special characters (+, ", ...etc...).
 const escapeChars: RegExp = /[\\\^\$\*\+\?\{\}\(\)\.\!\=\|\[\]\ \/]/; // characters that should be escaped.

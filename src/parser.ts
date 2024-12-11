@@ -264,16 +264,18 @@ export async function preprocessDryRunOutput(
   // (see MAKE repo, ar.c compiler command, for example).
   // Split multiple commands concatenated by '&&'
   preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
-      / && /g,
+    preprocessedDryRunOutputStr = util.replaceStringNotInQuotes(
+      preprocessedDryRunOutputStr,
+      " && ",
       "\n"
     );
   });
 
   // Split multiple commands concatenated by ";"
   preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr.replace(
-      /;/g,
+    preprocessedDryRunOutputStr = util.replaceStringNotInQuotes(
+      preprocessedDryRunOutputStr,
+      ";",
       "\n"
     );
   });
