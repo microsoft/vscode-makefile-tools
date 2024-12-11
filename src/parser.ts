@@ -1109,6 +1109,7 @@ export interface CustomConfigProviderItem {
   intelliSenseMode?: util.IntelliSenseMode;
   compilerFullPath: string;
   compilerArgs: string[];
+  compilerFragments: string[];
   files: string[];
   windowsSDKVersion?: string;
   currentPath: string;
@@ -1139,6 +1140,9 @@ export async function parseCustomConfigProvider(
     ),
     "Normal"
   );
+
+  let cppToolsVersion = ext.extension.getCppToolsVersion();
+  let useCompilerFragments: boolean = cppToolsVersion !== undefined && cppToolsVersion >= cpp.Version.v6;
 
   // Current path starts with workspace root and can be modified
   // with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -1208,6 +1212,21 @@ export async function parseCustomConfigProvider(
         // Exclude switches that are being processed separately (I, FI, include, D, std)
         // and switches that don't affect IntelliSense but are causing errors.
         let compilerArgs: string[] = [];
+        let compilerFragments: string[] = [];
+
+        if (useCompilerFragments) {
+          // This is a temporary solution where we are only using compiler fragments here to pass the 
+          // -D defines to the compiler (to fix intellisense issues). We still separately parse defines.
+          // There is still an issue tracking using compilerFragments fully instead of compilerArgs: 
+          // https://github.com/microsoft/vscode-makefile-tools/issues/352.
+          let tempFragments: string[] = compilerTool.arguments.trim().split(" -D");
+          if (tempFragments.length > 1) {
+            for (let i: number = 1; i < tempFragments.length; i++) {
+              compilerFragments.push("-D" + tempFragments[i].trim().split("/\s+/")[0]);
+            }
+          }
+        }
+        
         compilerArgs = await parseAnySwitchFromToolArguments(
           compilerTool.arguments,
           ["I", "FI", "include", "D", "std", "MF"]
@@ -1242,7 +1261,7 @@ export async function parseCustomConfigProvider(
           compilerTool.arguments
         );
         let intelliSenseMode: util.IntelliSenseMode = getIntelliSenseMode(
-          ext.extension.getCppToolsVersion(),
+          cppToolsVersion,
           compilerFullPath,
           targetArchitecture
         );
@@ -1287,7 +1306,7 @@ export async function parseCustomConfigProvider(
         if (language) {
           // More standard validation and defaults, in the context of the whole command.
           let standard: util.StandardVersion | undefined = parseStandard(
-            ext.extension.getCppToolsVersion(),
+            cppToolsVersion,
             standardStr,
             language
           );
@@ -1301,6 +1320,7 @@ export async function parseCustomConfigProvider(
               intelliSenseMode,
               compilerFullPath,
               compilerArgs,
+              compilerFragments,
               files,
               windowsSDKVersion,
               currentPath,
@@ -1319,7 +1339,7 @@ export async function parseCustomConfigProvider(
 
             // More standard validation and defaults, in the context of each source file.
             let standard: util.StandardVersion | undefined = parseStandard(
-              ext.extension.getCppToolsVersion(),
+              cppToolsVersion,
               standardStr,
               language
             );
@@ -1333,6 +1353,7 @@ export async function parseCustomConfigProvider(
                 intelliSenseMode,
                 compilerFullPath,
                 compilerArgs,
+                compilerFragments,
                 files: [file],
                 windowsSDKVersion,
                 currentPath,

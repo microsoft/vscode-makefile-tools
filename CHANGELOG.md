@@ -16,6 +16,7 @@ Bug Fixes:
 
 - Ensure that we append line endings, which fixes a recent regression. [#641](https://github.com/microsoft/vscode-makefile-tools/issues/641)
 - Ensure we handle parenthesis without their partner correctly. [#543](https://github.com/microsoft/vscode-makefile-tools/issues/543)
+- Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526)
 
 Improvements:
 
