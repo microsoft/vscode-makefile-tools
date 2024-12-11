@@ -87,6 +87,9 @@ extends:
               - script: npm install -g @vscode/vsce
                 displayName: "install vsce"
 
+              - script: yarn compile-production
+                displayName: "Compile production"
+
               - task: CmdLine@2
                 displayName: Run VSCE to package vsix
                 inputs:
