@@ -68,6 +68,14 @@ export type IntelliSenseMode =
 // Language types
 export type Language = "c" | "cpp" | undefined;
 
+export interface ProcOptions {
+  workingDirectory?: string;
+  forceEnglish?: boolean;
+  ensureQuoted?: boolean;
+  stdoutCallback?: (stdout: string) => void;
+  stderrCallback?: (stderr: string) => void;
+}
+
 export function checkFileExistsSync(filePath: string): boolean {
   try {
     // Often a path is added by the user to the PATH environment variable with surrounding quotes,
@@ -257,14 +265,17 @@ export async function killTree(
   };
 
   try {
+    const opts: ProcOptions = {
+      workingDirectory: getWorkspaceRoot(),
+      forceEnglish: true,
+      ensureQuoted: false,
+      stdoutCallback: stdout,
+    };
     // pgrep should run on english, regardless of the system setting.
     const result: SpawnProcessResult = await spawnChildProcess(
       "pgrep",
       ["-P", pid.toString()],
-      getWorkspaceRoot(),
-      true,
-      false,
-      stdout
+      opts
     );
     if (!!stdoutStr.length) {
       children = stdoutStr
@@ -350,11 +361,7 @@ export interface SpawnProcessResult {
 export function spawnChildProcess(
   processName: string,
   args: string[],
-  workingDirectory: string,
-  forceEnglish: boolean,
-  ensureQuoted: boolean,
-  stdoutCallback?: (stdout: string) => void,
-  stderrCallback?: (stderr: string) => void
+  options: ProcOptions
 ): Promise<SpawnProcessResult> {
   const localeOverride: EnvironmentVariables = {
     LANG: "C",
@@ -362,7 +369,9 @@ export function spawnChildProcess(
   };
 
   // Use english language for this process regardless of the system setting.
-  const environment: EnvironmentVariables = forceEnglish ? localeOverride : {};
+  const environment: EnvironmentVariables = options.forceEnglish
+    ? localeOverride
+    : {};
   const finalEnvironment: EnvironmentVariables = mergeEnvironment(
     process.env as EnvironmentVariables,
     environment
@@ -395,23 +404,23 @@ export function spawnChildProcess(
     }
 
     // Final quoting decisions for process name and args before being executed.
-    let qProcessName: string = ensureQuoted
+    let qProcessName: string = options.ensureQuoted
       ? quoteStringIfNeeded(processName)
       : processName;
-    let qArgs: string[] = ensureQuoted
+    let qArgs: string[] = options.ensureQuoted
       ? args.map((arg) => {
           return quoteStringIfNeeded(arg);
         })
       : args;
 
-    if (ensureQuoted) {
+    if (options.ensureQuoted) {
       logger.message(
         localize(
           "utils.quoting",
           "Spawning child process with:\n process name: {0}\n process args: {1}\n working directory: {2}\n shell type: {3}",
           qProcessName,
           qArgs.join(","),
-          workingDirectory,
+          options.workingDirectory,
           shellType || "default"
         ),
         "Debug"
@@ -421,21 +430,25 @@ export function spawnChildProcess(
     const child: child_process.ChildProcess = child_process.spawn(
       qProcessName,
       qArgs,
-      { cwd: workingDirectory, shell: shellType || true, env: finalEnvironment }
+      {
+        cwd: options.workingDirectory,
+        shell: shellType || true,
+        env: finalEnvironment,
+      }
     );
     if (child.pid) {
       make.setCurPID(child.pid);
     }
 
-    if (stdoutCallback) {
+    if (options.stdoutCallback) {
       child.stdout?.on("data", (data) => {
-        stdoutCallback(`${data}`);
+        options.stdoutCallback?.(`${data}`);
       });
     }
 
-    if (stderrCallback) {
+    if (options.stderrCallback) {
       child.stderr?.on("data", (data) => {
-        stderrCallback(`${data}`);
+        options.stderrCallback?.(`${data}`);
       });
     }
 
@@ -450,6 +463,53 @@ export function spawnChildProcess(
     if (child.pid === undefined) {
       reject(new Error(`Failed to spawn process: ${processName} ${args}`));
     }
+  });
+}
+
+export async function replaceCommands(
+  x: string,
+  safeCommands: string[] | undefined,
+  opt: child_process.SpawnOptions
+): Promise<string> {
+  const regex = /`([^\s]+)\s(.*?)`/g;
+  let match = regex.exec(x);
+  while (match !== null) {
+    if (safeCommands?.some((c) => c === match![1])) {
+      const output = await runCommand(`${match[1]} ${match[2]}`, opt);
+      x = x.replace(match[0], output);
+    } else {
+      logger.message(
+        localize(
+          "unsafe.command",
+          "Commands must be marked as safe before they will be executed in the shell. Add {0} to the {1} setting if this command is safe to execute",
+          match[1],
+          `'makefile.safeCommands'`
+        ),
+        "Normal"
+      );
+      x = x.replace(match[0], `\`${match[1]} ${match[2]}\``);
+    }
+    match = regex.exec(x);
+  }
+  return x;
+}
+
+async function runCommand(
+  x: string,
+  opt: child_process.SpawnOptions
+): Promise<string> {
+  const child = child_process.spawn("/bin/bash", ["-c", `"${x}"`], opt);
+  return new Promise<string>((resolve) => {
+    let output = "";
+    child.stdout?.on("data", (data) => {
+      output += data;
+    });
+    child.on("close", () => {
+      resolve(output.trim());
+    });
+    child.on("exit", () => {
+      resolve(output.trim());
+    });
   });
 }
 
@@ -470,8 +530,14 @@ export async function cygpath(pathStr: string): Promise<string> {
     windowsPath = result.replace(/\n/gm, ""); // remove the end of line
   };
 
+  const opts: ProcOptions = {
+    workingDirectory: "",
+    forceEnglish: false,
+    ensureQuoted: false,
+    stdoutCallback: stdout,
+  };
   // Running cygpath can use the system locale.
-  await spawnChildProcess("cygpath", [pathStr, "-w"], "", false, false, stdout);
+  await spawnChildProcess("cygpath", [pathStr, "-w"], opts);
   return windowsPath;
 }
 

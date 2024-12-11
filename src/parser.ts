@@ -595,14 +595,17 @@ async function parseAnySwitchFromToolArguments(
     };
 
     // Running the compiler arguments parsing script can use the system locale.
+    const opts: util.ProcOptions = {
+      workingDirectory: util.getWorkspaceRoot(),
+      forceEnglish: false,
+      ensureQuoted: false,
+      stdoutCallback: stdout,
+      stderrCallback: stderr,
+    };
     const result: util.SpawnProcessResult = await util.spawnChildProcess(
       runCommand,
       scriptArgs,
-      util.getWorkspaceRoot(),
-      false,
-      false,
-      stdout,
-      stderr
+      opts
     );
     if (result.returnCode !== 0) {
       logger.message(
@@ -1144,7 +1147,8 @@ export async function parseCustomConfigProvider(
   );
 
   let cppToolsVersion = ext.extension.getCppToolsVersion();
-  let useCompilerFragments: boolean = cppToolsVersion !== undefined && cppToolsVersion >= cpp.Version.v6;
+  let useCompilerFragments: boolean =
+    cppToolsVersion !== undefined && cppToolsVersion >= cpp.Version.v6;
 
   // Current path starts with workspace root and can be modified
   // with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -1217,18 +1221,22 @@ export async function parseCustomConfigProvider(
         let compilerFragments: string[] = [];
 
         if (useCompilerFragments) {
-          // This is a temporary solution where we are only using compiler fragments here to pass the 
+          // This is a temporary solution where we are only using compiler fragments here to pass the
           // -D defines to the compiler (to fix intellisense issues). We still separately parse defines.
-          // There is still an issue tracking using compilerFragments fully instead of compilerArgs: 
+          // There is still an issue tracking using compilerFragments fully instead of compilerArgs:
           // https://github.com/microsoft/vscode-makefile-tools/issues/352.
-          let tempFragments: string[] = compilerTool.arguments.trim().split(" -D");
+          let tempFragments: string[] = compilerTool.arguments
+            .trim()
+            .split(" -D");
           if (tempFragments.length > 1) {
             for (let i: number = 1; i < tempFragments.length; i++) {
-              compilerFragments.push("-D" + tempFragments[i].trim().split("/\s+/")[0]);
+              compilerFragments.push(
+                "-D" + tempFragments[i].trim().split("/s+/")[0]
+              );
             }
           }
         }
-        
+
         compilerArgs = await parseAnySwitchFromToolArguments(
           compilerTool.arguments,
           ["I", "FI", "include", "D", "std", "MF"]
