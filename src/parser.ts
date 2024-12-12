@@ -442,7 +442,11 @@ async function parseLineAsTool(
     // don't use join and neither paths/filenames processed above if we want to keep the exact text in the makefile
     pathInMakefile: match[1] + match[2],
     fullPath: toolFullPath,
-    arguments: match[match.length - 1],
+    arguments: await util.replaceCommands(
+      match[match.length - 1],
+      configuration.getSafeCommands(),
+      { cwd: util.getWorkspaceRoot(), shell: true }
+    ),
     found: toolFound,
   };
 }

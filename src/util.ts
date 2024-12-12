@@ -498,6 +498,11 @@ async function runCommand(
   x: string,
   opt: child_process.SpawnOptions
 ): Promise<string> {
+  // backtick doesn't apply on Windows, return early
+  if (process.platform === "win32") {
+    return x;
+  }
+
   const child = child_process.spawn("/bin/bash", ["-c", `"${x}"`], opt);
   return new Promise<string>((resolve) => {
     let output = "";
