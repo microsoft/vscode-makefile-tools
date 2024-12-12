@@ -471,6 +471,11 @@ export async function replaceCommands(
   safeCommands: string[] | undefined,
   opt: child_process.SpawnOptions
 ): Promise<string> {
+  // Early exit, backtick doesn't apply on Windows
+  if (process.platform === "win32") {
+    return x;
+  }
+
   const regex = /`([^\s]+)\s(.*?)`/g;
   let match = regex.exec(x);
   while (match !== null) {
@@ -494,6 +499,12 @@ export async function replaceCommands(
   return x;
 }
 
+/**
+ * This is only designed to run for Linux for commands taken from a backtick context.
+ * @param x command
+ * @param opt SpawnOptions
+ * @returns resulting string
+ */
 async function runCommand(
   x: string,
   opt: child_process.SpawnOptions
