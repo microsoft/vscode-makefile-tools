@@ -332,6 +332,10 @@ interface ToolInvocation {
   // the arguments passed to the tool invocation
   // define as string so that we deal with the separator properly later, via RegExp
   arguments: string;
+
+  // the original arguments pass to the tool invocation
+  // before any parsing or backtick command replacement
+  originalArguments: string;
 }
 
 // Helper that parses the given line as a tool invocation.
@@ -438,16 +442,19 @@ async function parseLineAsTool(
     return undefined;
   }
 
+  const originalArguments = match[match.length - 1];
+
   return {
     // don't use join and neither paths/filenames processed above if we want to keep the exact text in the makefile
     pathInMakefile: match[1] + match[2],
     fullPath: toolFullPath,
     arguments: await util.replaceCommands(
-      match[match.length - 1],
+      originalArguments,
       configuration.getSafeCommands(),
       { cwd: util.getWorkspaceRoot(), shell: true }
     ),
     found: toolFound,
+    originalArguments,
   };
 }
 
@@ -1188,6 +1195,17 @@ export async function parseCustomConfigProvider(
         compilers,
         currentPath
       );
+
+      if (
+        compilerTool &&
+        compilerTool.arguments !== compilerTool.originalArguments
+      ) {
+        line = line.replace(
+          compilerTool.originalArguments,
+          compilerTool.arguments
+        );
+        compilerTool = await parseLineAsTool(line, compilers, currentPath);
+      }
 
       // If ccache wraps the compiler, parse again the remaining command line and we should obtain
       // the real compiler name.
