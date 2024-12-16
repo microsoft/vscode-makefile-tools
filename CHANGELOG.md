@@ -2,6 +2,10 @@
 
 ## 0.12
 
+Bug Fixes:
+
+- Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526), [#465](https://github.com/microsoft/vscode-makefile-tools/issues/465)
+
 Improvements:
 
 - Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
@@ -9,18 +13,14 @@ Improvements:
 
 ## 0.11
 
-Improvements:
-
-- More wisely pass the modified environment variables, if present, from the pre/post-configure scripts to tasks and debugging options. [#540](https://github.com/microsoft/vscode-makefile-tools/issues/540), [#493](https://github.com/microsoft/vscode-makefile-tools/issues/493), [#554](https://github.com/microsoft/vscode-makefile-tools/issues/554)
-
 Bug Fixes:
 
 - Ensure that we append line endings, which fixes a recent regression. [#641](https://github.com/microsoft/vscode-makefile-tools/issues/641)
 - Ensure we handle parenthesis without their partner correctly. [#543](https://github.com/microsoft/vscode-makefile-tools/issues/543)
-- Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526)
 
 Improvements:
 
+- More wisely pass the modified environment variables, if present, from the pre/post-configure scripts to tasks and debugging options. [#540](https://github.com/microsoft/vscode-makefile-tools/issues/540), [#493](https://github.com/microsoft/vscode-makefile-tools/issues/493), [#554](https://github.com/microsoft/vscode-makefile-tools/issues/554)
 - Update signing to support VSCode extension signing. [#647](https://github.com/microsoft/vscode-makefile-tools/pull/647)
 - Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
 
