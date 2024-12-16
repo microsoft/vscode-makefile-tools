@@ -86,6 +86,7 @@ export async function parseTargets(
 
   while (result) {
     extractedLog = result[2];
+
     // Skip lines starting with {#,.} or preceeded by "# Not a target" and extract the target.
     // Additionally, if makefile.phonyOnlyTargets is true, include only targets
     // succeeded by "#  Phony target (prerequisite of .PHONY).".
