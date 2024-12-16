@@ -6,6 +6,7 @@ Improvements:
 
 - Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
 - While parsing, don't replace characters with newlines if they are inside quotes. [#671](https://github.com/microsoft/vscode-makefile-tools/issues/671)
+- Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
 
 Bug Fixes:
 
@@ -17,7 +18,6 @@ Improvements:
 
 - More wisely pass the modified environment variables, if present, from the pre/post-configure scripts to tasks and debugging options. [#540](https://github.com/microsoft/vscode-makefile-tools/issues/540), [#493](https://github.com/microsoft/vscode-makefile-tools/issues/493), [#554](https://github.com/microsoft/vscode-makefile-tools/issues/554)
 - Update signing to support VSCode extension signing. [#647](https://github.com/microsoft/vscode-makefile-tools/pull/647)
-- Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
 
 Bug Fixes:
 
