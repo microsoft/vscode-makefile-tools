@@ -348,11 +348,14 @@ interface ToolInvocation {
 // TODO: handle the following corner cases:
 //     - quotes only around directory (file name outside quotes)
 //     - path containing "toolName(no extension) " in the middle
+// `replaceCommands` is a flag that tells the function to replace any backtick commands, we default it to true, but we can set it to false
+// when we want to reparse the line after the backtick commands have been replaced.
 async function parseLineAsTool(
   line: string,
   toolNames: string[],
   currentPath: string,
-  isCompilerOrLinker: boolean = true
+  isCompilerOrLinker: boolean = true,
+  replaceCommands: boolean = true
 ): Promise<ToolInvocation | undefined> {
   // To avoid hard-coding (and ever maintaining) in the tools list
   // the various compilers/linkers that can have versions, prefixes or suffixes
@@ -448,11 +451,13 @@ async function parseLineAsTool(
     // don't use join and neither paths/filenames processed above if we want to keep the exact text in the makefile
     pathInMakefile: match[1] + match[2],
     fullPath: toolFullPath,
-    arguments: await util.replaceCommands(
-      originalArguments,
-      configuration.getSafeCommands(),
-      { cwd: util.getWorkspaceRoot(), shell: true }
-    ),
+    arguments: replaceCommands
+      ? await util.replaceCommands(
+          originalArguments,
+          configuration.getSafeCommands(),
+          { cwd: util.getWorkspaceRoot(), shell: true }
+        )
+      : originalArguments,
     found: toolFound,
     originalArguments,
   };
@@ -1204,7 +1209,12 @@ export async function parseCustomConfigProvider(
           compilerTool.originalArguments,
           compilerTool.arguments
         );
-        compilerTool = await parseLineAsTool(line, compilers, currentPath);
+        compilerTool = await parseLineAsTool(
+          line,
+          compilers,
+          currentPath,
+          false
+        );
       }
 
       // If ccache wraps the compiler, parse again the remaining command line and we should obtain
@@ -1214,7 +1224,12 @@ export async function parseCustomConfigProvider(
         path.parse(compilerTool.pathInMakefile).name.endsWith("ccache")
       ) {
         line = line.replace(`${compilerTool.pathInMakefile}`, "");
-        compilerTool = await parseLineAsTool(line, compilers, currentPath);
+        compilerTool = await parseLineAsTool(
+          line,
+          compilers,
+          currentPath,
+          false
+        );
       }
 
       if (compilerTool) {
@@ -1497,6 +1512,23 @@ export async function parseLaunchConfigurations(
           compilers,
           currentPath
         );
+
+        if (
+          compilerTool &&
+          compilerTool.arguments !== compilerTool.originalArguments
+        ) {
+          line = line.replace(
+            compilerTool.originalArguments,
+            compilerTool.arguments
+          );
+          compilerTool = await parseLineAsTool(
+            line,
+            compilers,
+            currentPath,
+            false
+          );
+        }
+
         if (compilerTool) {
           // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
           // Note: no need to worry about the DLL case that this extension doesn't support yet
@@ -1599,6 +1631,12 @@ export async function parseLaunchConfigurations(
         linkers,
         currentPath
       );
+
+      if (linkerTool && linkerTool.arguments !== linkerTool.originalArguments) {
+        line = line.replace(linkerTool.originalArguments, linkerTool.arguments);
+        linkerTool = await parseLineAsTool(line, linkers, currentPath, false);
+      }
+
       if (linkerTool) {
         // TODO: implement launch support for DLLs and LIBs, besides executables.
         if (
@@ -1839,6 +1877,22 @@ export async function parseLaunchConfigurations(
         //       - start binary
         let targetBinaryTool: ToolInvocation | undefined =
           await parseLineAsTool(line, targetBinariesNames, currentPath);
+
+        if (
+          targetBinaryTool &&
+          targetBinaryTool.arguments !== targetBinaryTool.originalArguments
+        ) {
+          line = line.replace(
+            targetBinaryTool.originalArguments,
+            targetBinaryTool.arguments
+          );
+          targetBinaryTool = await parseLineAsTool(
+            line,
+            targetBinariesNames,
+            currentPath,
+            false
+          );
+        }
 
         // If the found target binary invocation does not happen from a location
         // where it was built previously, don't include it as a launch target.
