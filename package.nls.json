@@ -52,6 +52,7 @@
   "makefile-tools.configuration.makefile.dryrunSwitches.description": "Arguments to pass to the dry-run make invocation",
   "makefile-tools.configuration.makefile.additionalCompilerNames.description": "Names of compiler tools to be added to the extension known list",
   "makefile-tools.configuration.makefile.excludeCompilerNames.description": "Names of compiler tools to be excluded from the extension known list",
+  "makefile-tools.configuration.makefile.safeCommands.description": "Commands that are safe to perform command substitution with",
   "makefile-tools.configuration.makefile.configureOnOpen.description": "Automatically configure Makefile project directories when they are opened",
   "makefile-tools.configuration.makefile.configureOnEdit.description": "Automatically configure Makefile project directories when any relevant makefiles and/or settings are changed",
   "makefile-tools.configuration.makefile.configureAfterCommand.description": "Automatically configure Makefile project directories after relevant operations, like change build configuration or makefile target",

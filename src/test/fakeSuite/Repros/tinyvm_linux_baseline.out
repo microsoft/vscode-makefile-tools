@@ -16,6 +16,7 @@ Always pre-configure: false
 Always post-configure: false
 Dry-run switches: '--always-make', '--keep-going', '--print-directory'
 Additional compiler names: 'MyOwnFakeCompiler'
+Safe commands: 'echo'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
 No current launch configuration is set in the workspace state.
 Default launch configuration: MIMode = undefined,
@@ -246,6 +247,7 @@ Always pre-configure: false
 Always post-configure: false
 Dry-run switches: '--always-make', '--keep-going', '--print-directory'
 Additional compiler names: 'MyOwnFakeCompiler'
+Safe commands: 'echo'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()" from the workspace state.
 Default launch configuration: MIMode = undefined,
@@ -286,6 +288,7 @@ Always pre-configure: false
 Always post-configure: false
 Dry-run switches: '--always-make', '--keep-going', '--print-directory'
 Additional compiler names: 'MyOwnFakeCompiler'
+Safe commands: 'echo'
 Found the following configurations defined in makefile.configurations setting: varexp;test-make-f;test-make-C;complex_escaped_quotes;complex_escaped_quotes_winOnly;InterestingSmallMakefile_windows_configDebug;InterestingSmallMakefile_windows_configRelSize;InterestingSmallMakefile_windows_configRelSpeed;8cc_linux;8cc_mingw;Fido_linux;Fido_mingw;tinyvm_linux_pedantic;tinyvm_mingw_pedantic
 Reading current launch configuration "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>bin/tvmi()" from the workspace state.
 Default launch configuration: MIMode = undefined,
