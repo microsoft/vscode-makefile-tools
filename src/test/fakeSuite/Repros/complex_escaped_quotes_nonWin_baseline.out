@@ -254,6 +254,11 @@ The link command is not producing a target binary explicitly. Assuming a.out
 Producing target binary: a.out
 Adding launch configuration:
 {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>a.out()
+Found linker command: MyOwnFakeCompiler hello "myfile.cpp" -DBETWEEN=\"some.value\" -DBETWEEN_EMPTY=\"\" -DBETWEEN_SPACE=\"some value\" -DBETWEEN_INNER_QUOTE=\"some"value\" -DBETWEEN_INNER_QUOTE_SLASH=\"some\' /"/ \` value\" /std:c++17
+The link command is not producing a target binary explicitly. Assuming a.out
+Producing target binary: a.out
+Adding launch configuration:
+{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>a.out()
 Found the following 1 launch targets defined in the makefile: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>a.out()
 Complete list of launch targets: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>a.out()
 Parsing for launch targets elapsed time: 0
