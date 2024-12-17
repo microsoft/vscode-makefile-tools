@@ -354,8 +354,8 @@ async function parseLineAsTool(
   line: string,
   toolNames: string[],
   currentPath: string,
-  isCompilerOrLinker: boolean = true,
-  replaceCommands: boolean = true
+  replaceCommands: boolean = true,
+  isCompilerOrLinker: boolean = true
 ): Promise<ToolInvocation | undefined> {
   // To avoid hard-coding (and ever maintaining) in the tools list
   // the various compilers/linkers that can have versions, prefixes or suffixes
