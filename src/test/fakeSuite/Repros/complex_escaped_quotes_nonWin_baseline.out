@@ -179,7 +179,7 @@ Sending configuration for file {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/R
     Standard: c++17
     IntelliSense Mode: gcc-x64
     Compiler Path: MyOwnFakeCompiler
-    Compiler Arguments:
+    Compiler Arguments: 
 ---------------------------------------------------------------------------------------------------
 Sending Workspace Browse Configuration: -----------------------------------
     Browse Path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/folder with space/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/folder with space/subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/"folder with space"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder with space\"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/"folder2 with space"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\"folder2 with space\"/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\"folder1 with space\"/\"folder2 with space\"/subfolder/";{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/\'folder with space\'/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder with space/subfolder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder/;{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/repros/folder\ with\ escaped\ space/subfolder/
