@@ -483,15 +483,14 @@ export async function replaceCommands(
       const output = await runCommand(`${match[1]} ${match[2]}`, opt);
       x = x.replace(match[0], output);
     } else {
-      logger.message(
-        localize(
-          "unsafe.command",
-          "Commands must be marked as safe before they will be executed in the shell. Add {0} to the {1} setting if this command is safe to execute",
-          match[1],
-          `'makefile.safeCommands'`
-        ),
-        "Normal"
+      const unsafeCommandMessage = localize(
+        "unsafe.command",
+        "Commands must be marked as safe before they will be executed in the shell. Add {0} to the {1} setting if this command is safe to execute",
+        match[1],
+        `'makefile.safeCommands'`
       );
+      logger.message(unsafeCommandMessage, "Normal");
+      vscode.window.showWarningMessage(unsafeCommandMessage);
       x = x.replace(match[0], `\`${match[1]} ${match[2]}\``);
     }
     match = regex.exec(x);
