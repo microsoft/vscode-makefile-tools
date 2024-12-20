@@ -81,5 +81,6 @@
       "makePath": "make",
       "makeArgs": ["PEDANTIC=yes"]
     }
-  ]
+  ],
+  "makefile.safeCommands": ["echo"]
 }

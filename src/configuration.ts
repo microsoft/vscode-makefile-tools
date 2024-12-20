@@ -742,6 +742,27 @@ export async function readExcludeCompilerNames(): Promise<void> {
   }
 }
 
+let safeCommands: string[] | undefined;
+export function getSafeCommands(): string[] | undefined {
+  return safeCommands;
+}
+export function setSafeCommands(commands: string[]): void {
+  safeCommands = commands;
+}
+export async function readSafeCommands(): Promise<void> {
+  safeCommands = await util.getExpandedSetting<string[]>("safeCommands");
+  if (safeCommands && safeCommands.length > 0) {
+    logger.message(
+      localize(
+        "safe.commands",
+        "Safe commands: '{0}'",
+        safeCommands?.join("', '")
+      ),
+      "Debug"
+    );
+  }
+}
+
 let dryrunSwitches: string[] | undefined;
 export function getDryrunSwitches(): string[] | undefined {
   return dryrunSwitches;
@@ -1721,6 +1742,7 @@ export async function initFromSettings(
   await readDryrunSwitches();
   await readAdditionalCompilerNames();
   await readExcludeCompilerNames();
+  await readSafeCommands();
   await readMakefileConfigurations();
   await readCurrentLaunchConfiguration();
   await readDefaultLaunchConfiguration();
@@ -2109,6 +2131,14 @@ export async function initFromSettings(
         await util.getExpandedSetting<string[]>(subKey);
       if (!util.areEqual(updatedExcludeCompilerNames, excludeCompilerNames)) {
         await readExcludeCompilerNames();
+        updatedSettingsSubkeys.push(subKey);
+      }
+
+      subKey = "safeCommands";
+      let updatedSafeCommands: string[] | undefined =
+        await util.getExpandedSetting<string[]>(subKey);
+      if (!util.areEqual(updatedSafeCommands, safeCommands)) {
+        readSafeCommands();
         updatedSettingsSubkeys.push(subKey);
       }
 

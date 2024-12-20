@@ -794,14 +794,17 @@ export async function generateParseContent(
     }, 5 * 1000);
 
     // The dry-run analysis should operate on english.
+    const opts: util.ProcOptions = {
+      workingDirectory: util.getWorkspaceRoot(),
+      forceEnglish: true,
+      ensureQuoted: true,
+      stdoutCallback: stdout,
+      stderrCallback: stderr,
+    };
     const result: util.SpawnProcessResult = await util.spawnChildProcess(
       configuration.getConfigurationMakeCommand(),
       makeArgs,
-      util.getWorkspaceRoot(),
-      true,
-      true,
-      stdout,
-      stderr
+      opts
     );
     clearInterval(timeout);
     let elapsedTime: number = util.elapsedTimeSince(startTime);
@@ -1171,14 +1174,17 @@ export async function runPrePostConfigureScript(
     };
 
     // The preconfigure invocation should use the system locale.
+    const opts: util.ProcOptions = {
+      workingDirectory: util.getWorkspaceRoot(),
+      forceEnglish: false,
+      ensureQuoted: false,
+      stdoutCallback: stdout,
+      stderrCallback: stderr,
+    };
     const result: util.SpawnProcessResult = await util.spawnChildProcess(
       runCommand,
       concreteScriptArgs,
-      util.getWorkspaceRoot(),
-      false,
-      false,
-      stdout,
-      stderr
+      opts
     );
     if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
       if (someErr) {
