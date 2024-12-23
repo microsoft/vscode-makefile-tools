@@ -1244,6 +1244,10 @@ export async function parseCustomConfigProvider(
           "D"
         );
 
+        // This is a temporary solution where we are only using compiler fragments here to pass the 
+        // -D defines to the compiler (to fix intellisense issues). We still separately parse defines.
+        // There is still an issue tracking using compilerFragments fully instead of compilerArgs: 
+        // https://github.com/microsoft/vscode-makefile-tools/issues/352.
         if (useCompilerFragments) {
           compilerFragments = defines.map(define => `-D${define}`);
         }
