@@ -332,6 +332,10 @@ interface ToolInvocation {
   // the arguments passed to the tool invocation
   // define as string so that we deal with the separator properly later, via RegExp
   arguments: string;
+
+  // the original arguments pass to the tool invocation
+  // before any parsing or backtick command replacement
+  originalArguments: string;
 }
 
 // Helper that parses the given line as a tool invocation.
@@ -344,10 +348,13 @@ interface ToolInvocation {
 // TODO: handle the following corner cases:
 //     - quotes only around directory (file name outside quotes)
 //     - path containing "toolName(no extension) " in the middle
+// `replaceCommands` is a flag that tells the function to replace any backtick commands, we default it to true, but we can set it to false
+// when we want to reparse the line after the backtick commands have been replaced.
 async function parseLineAsTool(
   line: string,
   toolNames: string[],
   currentPath: string,
+  replaceCommands: boolean = true,
   isCompilerOrLinker: boolean = true
 ): Promise<ToolInvocation | undefined> {
   // To avoid hard-coding (and ever maintaining) in the tools list
@@ -438,12 +445,21 @@ async function parseLineAsTool(
     return undefined;
   }
 
+  const originalArguments = match[match.length - 1];
+
   return {
     // don't use join and neither paths/filenames processed above if we want to keep the exact text in the makefile
     pathInMakefile: match[1] + match[2],
     fullPath: toolFullPath,
-    arguments: match[match.length - 1],
+    arguments: replaceCommands
+      ? await util.replaceCommands(
+          originalArguments,
+          configuration.getSafeCommands(),
+          { cwd: util.getWorkspaceRoot(), shell: true }
+        )
+      : originalArguments,
     found: toolFound,
+    originalArguments,
   };
 }
 
@@ -595,14 +611,17 @@ async function parseAnySwitchFromToolArguments(
     };
 
     // Running the compiler arguments parsing script can use the system locale.
+    const opts: util.ProcOptions = {
+      workingDirectory: util.getWorkspaceRoot(),
+      forceEnglish: false,
+      ensureQuoted: false,
+      stdoutCallback: stdout,
+      stderrCallback: stderr,
+    };
     const result: util.SpawnProcessResult = await util.spawnChildProcess(
       runCommand,
       scriptArgs,
-      util.getWorkspaceRoot(),
-      false,
-      false,
-      stdout,
-      stderr
+      opts
     );
     if (result.returnCode !== 0) {
       logger.message(
@@ -1144,7 +1163,8 @@ export async function parseCustomConfigProvider(
   );
 
   let cppToolsVersion = ext.extension.getCppToolsVersion();
-  let useCompilerFragments: boolean = cppToolsVersion !== undefined && cppToolsVersion >= cpp.Version.v6;
+  let useCompilerFragments: boolean =
+    cppToolsVersion !== undefined && cppToolsVersion >= cpp.Version.v6;
 
   // Current path starts with workspace root and can be modified
   // with prompt commands like cd, cd-, pushd/popd or with -C make switch
@@ -1181,6 +1201,22 @@ export async function parseCustomConfigProvider(
         currentPath
       );
 
+      if (
+        compilerTool &&
+        compilerTool.arguments !== compilerTool.originalArguments
+      ) {
+        line = line.replace(
+          compilerTool.originalArguments,
+          compilerTool.arguments
+        );
+        compilerTool = await parseLineAsTool(
+          line,
+          compilers,
+          currentPath,
+          false
+        );
+      }
+
       // If ccache wraps the compiler, parse again the remaining command line and we should obtain
       // the real compiler name.
       if (
@@ -1188,7 +1224,12 @@ export async function parseCustomConfigProvider(
         path.parse(compilerTool.pathInMakefile).name.endsWith("ccache")
       ) {
         line = line.replace(`${compilerTool.pathInMakefile}`, "");
-        compilerTool = await parseLineAsTool(line, compilers, currentPath);
+        compilerTool = await parseLineAsTool(
+          line,
+          compilers,
+          currentPath,
+          false
+        );
       }
 
       if (compilerTool) {
@@ -1217,18 +1258,22 @@ export async function parseCustomConfigProvider(
         let compilerFragments: string[] = [];
 
         if (useCompilerFragments) {
-          // This is a temporary solution where we are only using compiler fragments here to pass the 
+          // This is a temporary solution where we are only using compiler fragments here to pass the
           // -D defines to the compiler (to fix intellisense issues). We still separately parse defines.
-          // There is still an issue tracking using compilerFragments fully instead of compilerArgs: 
+          // There is still an issue tracking using compilerFragments fully instead of compilerArgs:
           // https://github.com/microsoft/vscode-makefile-tools/issues/352.
-          let tempFragments: string[] = compilerTool.arguments.trim().split(" -D");
+          let tempFragments: string[] = compilerTool.arguments
+            .trim()
+            .split(" -D");
           if (tempFragments.length > 1) {
             for (let i: number = 1; i < tempFragments.length; i++) {
-              compilerFragments.push("-D" + tempFragments[i].trim().split("/\s+/")[0]);
+              compilerFragments.push(
+                "-D" + tempFragments[i].trim().split("/s+/")[0]
+              );
             }
           }
         }
-        
+
         compilerArgs = await parseAnySwitchFromToolArguments(
           compilerTool.arguments,
           ["I", "FI", "include", "D", "std", "MF"]
@@ -1467,6 +1512,23 @@ export async function parseLaunchConfigurations(
           compilers,
           currentPath
         );
+
+        if (
+          compilerTool &&
+          compilerTool.arguments !== compilerTool.originalArguments
+        ) {
+          line = line.replace(
+            compilerTool.originalArguments,
+            compilerTool.arguments
+          );
+          compilerTool = await parseLineAsTool(
+            line,
+            compilers,
+            currentPath,
+            false
+          );
+        }
+
         if (compilerTool) {
           // If a cl.exe is not performing only an obj compilation, deduce the output executable if possible
           // Note: no need to worry about the DLL case that this extension doesn't support yet
@@ -1569,6 +1631,12 @@ export async function parseLaunchConfigurations(
         linkers,
         currentPath
       );
+
+      if (linkerTool && linkerTool.arguments !== linkerTool.originalArguments) {
+        line = line.replace(linkerTool.originalArguments, linkerTool.arguments);
+        linkerTool = await parseLineAsTool(line, linkers, currentPath, false);
+      }
+
       if (linkerTool) {
         // TODO: implement launch support for DLLs and LIBs, besides executables.
         if (
@@ -1809,6 +1877,22 @@ export async function parseLaunchConfigurations(
         //       - start binary
         let targetBinaryTool: ToolInvocation | undefined =
           await parseLineAsTool(line, targetBinariesNames, currentPath);
+
+        if (
+          targetBinaryTool &&
+          targetBinaryTool.arguments !== targetBinaryTool.originalArguments
+        ) {
+          line = line.replace(
+            targetBinaryTool.originalArguments,
+            targetBinaryTool.arguments
+          );
+          targetBinaryTool = await parseLineAsTool(
+            line,
+            targetBinariesNames,
+            currentPath,
+            false
+          );
+        }
 
         // If the found target binary invocation does not happen from a location
         // where it was built previously, don't include it as a launch target.
