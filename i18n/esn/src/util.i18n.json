@@ -9,6 +9,7 @@
 	"killing.process": "Terminando proceso PID = {0}",
 	"utils.terminate.process": "Terminando proceso PID=${0} ...",
 	"utils.quoting": "Generando proceso secundario con:\n nombre del proceso: {0}\n argumentos del proceso: {1}\n directorio de trabajo: {2}\n tipo de shell: {3}",
+	"unsafe.command": "Los comandos deben marcarse como seguros antes de que se ejecuten en el shell. Agregar {0} a la configuración de {1} si se puede ejecutar este comando de forma segura",
 	"utils.overwriting.property": "El objeto de destino ya tiene la propiedad {0} establecida en {1}. Sobrescribiendo desde el origen con {2}",
 	"utils.dryrun.detailed.output": "Puede ver la salida de simulacro detallada en {0}",
 	"utils.dryrun.error.environment": "Asegúrese de que la extensión está invocando el mismo comando Make que en el entorno del símbolo del sistema de desarrollo.",

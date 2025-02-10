@@ -28,6 +28,7 @@
 	"compile.commands.json.path": "Ruta de compile_commands.json: {0}",
 	"additional.compiler.names": "Nombres de compilador adicionales: '{0}'",
 	"exclude.compiler.names": "Excluir nombres de compilador: \"{0}\"",
+	"safe.commands": "Comandos seguros: '{0}'",
 	"dry.run.switches": "Conmutadores de simulacro: '{0}'",
 	"reading.current.launch.configuration": "Leyendo la configuración actual inicial \"{0}\" del estado del área de trabajo.",
 	"launch.configuration.no.longer.defined.settings": "La configuración \"{0}\" de inicio ya no está definida en la configuración \"makefile.launchConfigurations\".",

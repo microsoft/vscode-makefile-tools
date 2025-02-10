@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "Les arguments à passer à l’épreuve font invocation",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "Noms des outils de compilation à ajouter à la liste des extensions connues",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "Noms des outils de compilation à exclure de la liste des extensions connues",
+	"makefile-tools.configuration.makefile.safeCommands.description": "Commandes sécurisées pour effectuer une substitution de commande avec",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Configurer automatiquement les répertoires de projet Makefile lorsqu’ils sont ouverts",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Configurer automatiquement les répertoires de projet Makefile lorsque des makefiles et/ou paramètres pertinents sont modifiés",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Configurez automatiquement les répertoires de projet Makefile après les opérations pertinentes, comme modifier la configuration de la construction ou la cible du makefile",

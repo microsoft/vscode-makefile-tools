@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "Argomenti da passare alla chiamata di dry-run make",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "Nomi degli strumenti del compilatore da aggiungere all'elenco noto dell'estensione",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "Nomi degli strumenti del compilatore da escludere dall'elenco noto dell'estensione",
+	"makefile-tools.configuration.makefile.safeCommands.description": "Comandi sicuri per l'esecuzione della sostituzione dei comandi con",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Configurare automaticamente le directory del progetto Makefile all'apertura",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Configurare automaticamente le directory del progetto Makefile quando vengono modificati i makefile e/o le impostazioni pertinenti",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Configurare automaticamente le directory del progetto Makefile dopo le operazioni rilevanti, ad esempio modificare la configurazione della compilazione o la destinazione makefile",

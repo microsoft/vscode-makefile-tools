@@ -9,6 +9,7 @@
 	"killing.process": "PID de processus de destruction = {0}",
 	"utils.terminate.process": "Fin du processus PID=${0} ...",
 	"utils.quoting": "Génération du processus enfant avec :\n nom du processus : {0}\n arguments de processus : {1}\n répertoire de travail : {2}\n type d’interpréteur de commandes : {3}",
+	"unsafe.command": "Les commandes doivent être marquées comme fiables avant d’être exécutées dans l’interpréteur de commandes. Ajouter {0} au paramètre de {1} si l’exécution de cette commande est sécurisée",
 	"utils.overwriting.property": "L’objet de destination a déjà la propriété {0} définie sur {1}. Remplacement à partir de la source par {2}",
 	"utils.dryrun.detailed.output": "Vous pouvez voir la sortie détaillée de l’exécution à sec sur {0}",
 	"utils.dryrun.error.environment": "Assurez-vous que l’extension appelle la même commande Make que dans votre environnement d’invite de développement.",
