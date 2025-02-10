@@ -28,6 +28,7 @@
 	"compile.commands.json.path": "un chemin d’accès compile_commands.json : {0}",
 	"additional.compiler.names": "Noms de compilateur supplémentaires : « {0} »",
 	"exclude.compiler.names": "Exclure les noms de compilateur : « {0} »",
+	"safe.commands": "Commandes sécurisées : '{0}'",
 	"dry.run.switches": "Commutateurs de test : « {0} »",
 	"reading.current.launch.configuration": "Lecture du lancement de la configuration actuelle « {0} » à partir de l’état de l’espace de travail.",
 	"launch.configuration.no.longer.defined.settings": "Le lancement de la configuration « {0} » n’est plus défini dans les paramètres « makefile.launchConfigurations ».",

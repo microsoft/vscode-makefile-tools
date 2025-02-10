@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "Argumente, die an den Aufruf „dry-run make“ übergeben werden sollen",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "Namen von Compiler-Tools, die zur Liste bekannter Erweiterungen hinzugefügt werden sollen",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "Namen von Compiler-Tools, die aus der Liste bekannter Erweiterungen ausgeschlossen werden sollen",
+	"makefile-tools.configuration.makefile.safeCommands.description": "Befehle, die sicher für die Befehlsersetzung sind mit",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "„Makefile“-Projektverzeichnisse automatisch konfigurieren, wenn sie geöffnet werden",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "„Makefile“-Projektverzeichnisse automatisch konfigurieren, wenn relevante „Makefiles“ und/oder Einstellungen geändert werden",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "„Makefile“-Projektverzeichnisse nach relevanten Vorgängen automatisch konfigurieren, z. B. Änderung von Buildkonfiguration oder „Makefile“-Ziel",

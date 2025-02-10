@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "ドライラン make 呼び出しに渡す引数",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "拡張機能の既知のリストに追加するコンパイラ ツールの名前",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "拡張機能の既知のリストから除外するコンパイラ ツールの名前",
+	"makefile-tools.configuration.makefile.safeCommands.description": "コマンドの置換を安全に実行できるコマンド",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "メイクファイル プロジェクト ディレクトリを開いたときに自動的に構成する",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "関連するメイクファイルや設定が変更されたときにメイクファイル プロジェクト ディレクトリを自動的に構成する",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "ビルド構成の変更やメイクファイル ターゲットなど、関連する操作の後にメイクファイル プロジェクト ディレクトリを自動的に構成する",

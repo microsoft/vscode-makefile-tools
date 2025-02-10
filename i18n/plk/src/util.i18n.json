@@ -9,6 +9,7 @@
 	"killing.process": "Trwa zabijanie procesu PID = {0}",
 	"utils.terminate.process": "Trwa kończenie procesu PID=${0}...",
 	"utils.quoting": "Zduplikowanie procesu podrzędnego za pomocą:\n nazwa procesu: {0}\n argumenty procesu: {1}\n Katalog roboczy: {2}\n typ powłoki: {3}",
+	"unsafe.command": "Polecenia muszą być oznaczone jako bezpieczne, zanim zostaną wykonane w powłoce. Dodaj {0} do ustawienia {1}, jeśli wykonanie tego polecenia jest bezpieczne",
 	"utils.overwriting.property": "Dla miejsca docelowego ustawiono już właściwość {0} na {1}. Zastępowanie ze źródła za pomocą {2}",
 	"utils.dryrun.detailed.output": "Szczegółowe dane wyjściowe uruchomienia próbnego można zobaczyć na stronie {0}",
 	"utils.dryrun.error.environment": "Upewnij się, że rozszerzenie wywołuje to samo polecenie make co w środowisku monitu programistycznego.",

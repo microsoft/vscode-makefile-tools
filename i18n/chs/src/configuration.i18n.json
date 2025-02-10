@@ -28,6 +28,7 @@
 	"compile.commands.json.path": "compile_commands.json path: {0}",
 	"additional.compiler.names": "其他编译程序名称: '{0}'",
 	"exclude.compiler.names": "排除编译程序名称: \"{0}\"",
+	"safe.commands": "安全命令： '{0}'",
 	"dry.run.switches": "干运行交换机: '{0}'",
 	"reading.current.launch.configuration": "正在从工作区状态读取当前启动配置 \"{0}\"。",
 	"launch.configuration.no.longer.defined.settings": "在设置 \"makefile.launchConfigurations\" 中不再定义启动配置 \"{0}\"。",

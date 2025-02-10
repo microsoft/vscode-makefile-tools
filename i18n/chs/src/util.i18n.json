@@ -9,6 +9,7 @@
 	"killing.process": "正在终止进程 PID = {0}",
 	"utils.terminate.process": "正在终止进程 PID=${0} ...",
 	"utils.quoting": "正在通过以下方式生成子进程:\n 进程名称: {0}\n 进程参数: {1}\n 工作目录: {2}\n shell 类型: {3}",
+	"unsafe.command": "命令必须在 shell 中执行之前标记为安全。如果此命令可以安全执行，请将 {0} 添加到 {1} 设置",
 	"utils.overwriting.property": "目标对象已将属性 {0} 设置为 {1}。正在使用 {2} 从源覆盖",
 	"utils.dryrun.detailed.output": "可以在 {0} 查看详细的试运行输出",
 	"utils.dryrun.error.environment": "确保扩展调用的 make 命令与在开发提示器环境中调用的命令相同。",

@@ -9,6 +9,7 @@
 	"killing.process": "Prozess-PID wird beendet = {0}",
 	"utils.terminate.process": "Prozess PID=${0} wird beendet...",
 	"utils.quoting": "Untergeordneter Prozess wird erzeugt mit:\n Prozessname: {0}\n Prozessargumente: {1}\n Arbeitsverzeichnis: {2}\n Shelltyp: {3}",
+	"unsafe.command": "Befehle müssen als sicher markiert werden, bevor sie in der Shell ausgeführt werden. Der {1} Einstellung {0} hinzufügen, wenn dieser Befehl sicher ausgeführt werden kann",
 	"utils.overwriting.property": "Für das Zielobjekt ist die Eigenschaft „{0}“ bereits auf „{1}“ festgelegt. Überschreiben aus der Quelle mit {2}",
 	"utils.dryrun.detailed.output": "Die detaillierte Ausgabe des Probelaufs finden Sie unter {0}",
 	"utils.dryrun.error.environment": "Stellen Sie sicher, dass die Erweiterung den gleichen Make-Befehl aufruft wie in Ihrer Entwicklungsaufforderungsumgebung.",

@@ -9,6 +9,7 @@
 	"killing.process": "終止流程 PID = {0}",
 	"utils.terminate.process": "正在終止流程 PID=${0} ...",
 	"utils.quoting": "使用下列方式繁衍子流程：\n 流程名稱：{0}\n 流程引數：{1}\n 工作目錄：{2}\n 殼層類型：{3}",
+	"unsafe.command": "命令必須先標示為安全，才能在殼層中執行。如果這個命令可以安全執行，請將 {0} 新增到 {1} 設定",
 	"utils.overwriting.property": "目的地物件已將屬性 {0} 設為 {1}。正在使用 {2} 覆寫來源",
 	"utils.dryrun.detailed.output": "您可以在 {0} 看到詳細的空運行輸出",
 	"utils.dryrun.error.environment": "請確定延伸模組叫用的 Make 命令與開發提示環境中的命令相同。",

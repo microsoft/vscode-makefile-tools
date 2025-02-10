@@ -9,6 +9,7 @@
 	"killing.process": "プロセス PID = {0} を強制終了しています",
 	"utils.terminate.process": "プロセス PID=${0} を終了しています...",
 	"utils.quoting": "次の子プロセスを生成しています:\n プロセス名: {0}\n プロセス引数: {1}\n 作業ディレクトリ: {2}\n シェルの種類: {3}",
+	"unsafe.command": "コマンドをシェルで実行する前に、安全とマークする必要があります。このコマンドを安全に実行できる場合は、{1} 設定に {0} を追加します",
 	"utils.overwriting.property": "対象オブジェクトでは既にプロパティ {0} が {1} に設定されています。ソースから {2} で上書きしています",
 	"utils.dryrun.detailed.output": "詳細なドライラン出力は、{0} で確認できます",
 	"utils.dryrun.error.environment": "拡張機能が、開発プロンプト環境と同じ make コマンドを呼び出していることを確認してください。",

@@ -9,6 +9,7 @@
 	"killing.process": "Ukončuje se proces s PID = {0}.",
 	"utils.terminate.process": "Ukončuje se proces PID=${0}...",
 	"utils.quoting": "Vytváří se podřízený proces s:\n název procesu: {0}\n argumenty procesu: {1}\n pracovní adresář: {2}\n typ prostředí: {3}",
+	"unsafe.command": "Příkazy musí být před spuštěním v prostředí označeny jako bezpečné. Přidat {0} do nastavení {1}, pokud je provedení tohoto příkazu bezpečné",
 	"utils.overwriting.property": "Cílový objekt už má vlastnost {0} nastavenou na {1}. Přepisování ze zdroje pomocí {2}",
 	"utils.dryrun.detailed.output": "Podrobný výstup zkušebního běhu si můžete zobrazit tady: {0}",
 	"utils.dryrun.error.environment": "Ujistěte se, že rozšíření vyvolává stejný příkaz make jako v prostředí výzvy pro vývoj.",

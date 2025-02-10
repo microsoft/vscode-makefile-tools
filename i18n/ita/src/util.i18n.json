@@ -9,6 +9,7 @@
 	"killing.process": "Arresto del processo PID = {0}",
 	"utils.terminate.process": "Terminazione del processo PID=${0} in corso...",
 	"utils.quoting": "Generazione del processo figlio con:\n nome del processo: {0}\n argomento del processo: {1}\n directory di lavoro: {2}\n tipo di shell: {3}",
+	"unsafe.command": "I comandi devono essere contrassegnati come sicuri prima di essere eseguiti nella shell. Aggiungere {0} all'impostazione {1} se l'esecuzione del comando è sicura",
 	"utils.overwriting.property": "L'oggetto di destinazione ha già una proprietà {0} impostata su {1}. Sovrascrittura dall'origine con {2}",
 	"utils.dryrun.detailed.output": "È possibile visualizzare l'output dettagliato di prova in {0}",
 	"utils.dryrun.error.environment": "Assicurati che l'interno stia richiamando lo stesso comando make dell'ambiente del prompt di sviluppo.",
