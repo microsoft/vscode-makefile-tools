@@ -1,10 +1,14 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
-trigger:
-  branches:
-    include:
-      - refs/heads/main
+trigger: none
+
+schedules:
+  - cron: 0 6 * * 0
+    branches:
+      include:
+        - main
+    always: true
 
 resources:
   repositories:
