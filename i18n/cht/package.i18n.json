@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "要傳遞至試執行 Make 引動過程的引數",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "要新增至延伸模組已知清單的編譯器工具名稱",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "要從延伸模組已知清單中排除的編譯器工具名稱",
+	"makefile-tools.configuration.makefile.safeCommands.description": "可安全地使用下列命令執行替代命令的命令",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "開啟 Makefile 專案目錄時自動加以設定。",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "當變更任何相關的 Makefile 和/或設定時，自動設定 Makefile 專案目錄",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "在相關作業之後自動設定 Makefile 專案目錄，像是變更組建設定或 Makefile 目標",

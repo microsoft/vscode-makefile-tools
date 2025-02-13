@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "要传递给试运行 make 调用的参数",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "要添加到扩展已知列表的编译器工具的名称",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "要从扩展已知列表中排除的编译器工具的名称",
+	"makefile-tools.configuration.makefile.safeCommands.description": "可安全执行命令替换的命令",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "打开生成文件项目目录时自动配置它们",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "更改任何相关生成文件和/或设置时自动配置生成文件项目目录",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "在执行相关操作(例如更改生成配置或生成文件目标)后自动配置生成文件项目目录",

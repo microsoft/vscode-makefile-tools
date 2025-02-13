@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "시험 실행 make 호출에 전달할 인수",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "알려진 확장 목록에서 추가할 컴파일러 도구의 이름",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "알려진 확장 목록에서 제외할 컴파일러 도구의 이름",
+	"makefile-tools.configuration.makefile.safeCommands.description": "명령 대체를 수행하는 데 안전한 명령",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "메이크파일 프로젝트 디렉터리가 열릴 때 자동으로 구성",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "관련 메이크파일 및/또는 설정이 변경되면 메이크파일 프로젝트 디렉터리를 자동으로 구성",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "빌드 구성 변경 또는 메이크파일 대상과 같은 관련 작업 후에 메이크파일 프로젝트 디렉터리를 자동으로 구성",

@@ -28,6 +28,7 @@
 	"compile.commands.json.path": "compile_commands.json-Pfad: {0}",
 	"additional.compiler.names": "Zusätzliche Compilernamen: \"{0}\"",
 	"exclude.compiler.names": "Compilernamen ausschließen: „{0}“",
+	"safe.commands": "Sichere Befehle: '{0}'",
 	"dry.run.switches": "Probelaufschalter: \"{0}\"",
 	"reading.current.launch.configuration": "Die aktuelle Startkonfiguration \"{0}\" wird aus dem Arbeitsbereichszustand gelesen.",
 	"launch.configuration.no.longer.defined.settings": "Die Startkonfiguration \"{0}\" ist in den Einstellungen \"makefile.launchConfigurations\" nicht mehr definiert.",

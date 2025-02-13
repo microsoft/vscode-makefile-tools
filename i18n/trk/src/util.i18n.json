@@ -9,6 +9,7 @@
 	"killing.process": "PID = {0} işlemi sonlandırılıyor",
 	"utils.terminate.process": "PID=${0} süreci sonlandırılıyor ...",
 	"utils.quoting": "Alt işlem şu öğeyle üretiliyor:\n işlem adı: {0}\n işlem bağımsız değişkenleri: {1}\n çalışma dizini: {2}\n kabuk türü: {3}",
+	"unsafe.command": "Komutlar kabukta yürütülmeden önce güvenli olarak işaretlenmeli. Bu {0} yürütülmeye {1} güvenli ise bu ayara bir komut ekleyin",
 	"utils.overwriting.property": "Hedef nesnede {0} özelliği zaten {1} olarak ayarlanmış. {2} ile kaynaktan üzerine yazılıyor",
 	"utils.dryrun.detailed.output": "Ayrıntılı deneme çıkışını şu konumda görüntüleyebilirsiniz: {0}",
 	"utils.dryrun.error.environment": "Uzantının, geliştirme istemi ortamınızla aynı derleme komutunu çağırdığından emin olun.",
