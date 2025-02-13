@@ -28,6 +28,7 @@
 	"compile.commands.json.path": "compile_commands.json yolu: {0}",
 	"additional.compiler.names": "Ek derleyici adları: '{0}'",
 	"exclude.compiler.names": "Derleyici adlarını dışla: '{0}'",
+	"safe.commands": "Güvenli komutlar: '{0}'",
 	"dry.run.switches": "Deneme anahtarları: '{0}'",
 	"reading.current.launch.configuration": "Geçerli başlatma yapılandırması \"{0}\" çalışma alanı durumundan okunuyor.",
 	"launch.configuration.no.longer.defined.settings": "Başlatma yapılandırması \"{0}\" artık \"makefile.launchConfigurations\" ayarlarında tanımlı değil.",

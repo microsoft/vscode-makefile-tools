@@ -9,6 +9,7 @@
 	"killing.process": "Encerrando o processo PID = {0}",
 	"utils.terminate.process": "Finalizando PID do processo=${0} ...",
 	"utils.quoting": "Gerando o processo filho com:\n nome do processo: {0}\n argumentos do processo: {1}\n diretório de trabalho: {2}\n tipo de shell: {3}",
+	"unsafe.command": "Os comandos devem ser marcados como seguros antes de serem executados no shell. Adicionar {0} à configuração de {1} se este comando for seguro para execução",
 	"utils.overwriting.property": "O objeto de destino já tem a propriedade {0} definida como {1}. Substituindo a origem com {2}",
 	"utils.dryrun.detailed.output": "Você pode ver a saída detalhada da simulação em {0}",
 	"utils.dryrun.error.environment": "Certifique-se de que a extensão esteja invocando o mesmo comando make do seu ambiente de prompt de desenvolvimento.",
