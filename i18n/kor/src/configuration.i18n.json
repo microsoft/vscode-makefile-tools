@@ -28,6 +28,7 @@
 	"compile.commands.json.path": "compile_commands.json 경로: {0}",
 	"additional.compiler.names": "추가 컴파일러 이름: '{0}'",
 	"exclude.compiler.names": "컴파일러 이름 '{0}' 제외",
+	"safe.commands": "안전 명령: '{0}'",
 	"dry.run.switches": "시험 실행 스위치: '{0}'",
 	"reading.current.launch.configuration": "작업 영역 상태에서 현재 시작 구성 \"{0}\"을(를) 읽습니다.",
 	"launch.configuration.no.longer.defined.settings": "\"makefile.launchConfigurations\" 설정에서 시작 구성 \"{0}\"이(가) 더 이상 정의되어 있지 않습니다.",

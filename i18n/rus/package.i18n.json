@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "Аргументы для перехода к пробному вызову make",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "Имена средств компилятора, которые будут добавлены в список известных расширений",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "Имена средств компилятора, исключаемых из списка известных расширений",
+	"makefile-tools.configuration.makefile.safeCommands.description": "Команды, безопасные для выполнения подстановки команд с помощью",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Автоматическая настройка каталогов проекта файла makefile при их открытии",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Автоматически настраивать каталоги проекта файла makefile при изменении любых соответствующих make-файлов и/или параметров.",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Автоматически настраивать каталоги проекта файла makefile после соответствующих операций, таких как изменение конфигурации сборки или цели файла makefile.",

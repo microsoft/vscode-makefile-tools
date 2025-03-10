@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "Argumenty, které se mají předat při zkušebním volání maku",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "Názvy kompilačních nástrojů, které se mají přidat na seznam známých rozšíření",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "Názvy kompilačních nástrojů, které se mají vyloučit ze seznamu známých rozšíření",
+	"makefile-tools.configuration.makefile.safeCommands.description": "Příkazy, pomocí kterých lze bezpečně nahrazovat příkazy",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Automaticky nakonfigurovat adresáře projektu souboru pravidel při jejich otevření",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Automaticky nakonfigurovat adresáře projektu souboru pravidel při změně všech relevantních souborů pravidel nebo nastavení",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Automaticky nakonfigurovat adresáře projektu souboru pravidel po relevantních operacích, například po změně konfigurace sestavení nebo cíle souboru pravidel",

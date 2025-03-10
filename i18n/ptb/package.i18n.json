@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "Argumentos a serem passados para a invocação do make de simulação",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "Nomes de ferramentas do compilador a serem adicionados na lista de extensões conhecidas",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "Nomes de ferramentas do compilador a serem excluídas da lista de extensões conhecidas",
+	"makefile-tools.configuration.makefile.safeCommands.description": "Comandos que são seguros para executar a substituição de comando com",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Configurar os diretórios de projeto do Makefile automaticamente quando eles forem abertos",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Configurar automaticamente os diretórios do projeto Makefile quando os makefiles e/ou as configurações relevantes forem alterados",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Configurar automaticamente diretórios de projeto Makefile após operações relevantes, como alterar a configuração de complicação ou o destino do makefile",

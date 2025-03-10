@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "Argumenty do przekazania do przywołania przebiegu próbnego make",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "Nazwy narzędzi kompilatora do dodania do listy znanych rozszerzeń",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "Nazwy narzędzi kompilatora do wykluczenia z listy znanych rozszerzeń",
+	"makefile-tools.configuration.makefile.safeCommands.description": "Polecenia bezpieczne do wykonywania podstawienia poleceń za pomocą",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Automatycznie konfiguruj katalogi projektu pliku reguł programu make po ich otwarciu",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Automatycznie konfiguruj katalogi projektu pliku reguł programu make, gdy zostaną zmienione odpowiednie pliki reguł programu make i/lub ustawienia",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Automatycznie konfiguruj katalogi projektu pliku reguł programu make po odpowiednich operacjach, takich jak zmiana konfiguracji kompilacji lub obiekt docelowy pliku reguł programu make",

@@ -57,6 +57,7 @@
 	"makefile-tools.configuration.makefile.dryrunSwitches.description": "Prova make çağrısına geçirilecek bağımsız değişkenler",
 	"makefile-tools.configuration.makefile.additionalCompilerNames.description": "Bilinen uzantı listesine eklenecek derleyici araçlarının adları",
 	"makefile-tools.configuration.makefile.excludeCompilerNames.description": "Bilinen uzantı listesinden çıkarılacak derleyici araçlarının adları",
+	"makefile-tools.configuration.makefile.safeCommands.description": "Komut değiştirme işleminin güvenli olduğu komutlar",
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Make proje dizinleri açıldığında bu dizinleri otomatik olarak yapılandırın.",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Herhangi bir ilgili derleme görevleri dosyası ve/veya ayar değiştirildiğinde Derleme görevleri dosyası proje dizinlerini otomatik olarak yapılandırın",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Derleme görevleri dosyası proje dizinlerini, derleme yapılandırmasını değiştirme veya derleme görevleri dosyası hedefi gibi ilgili işlemlerden sonra otomatik olarak yapılandırın",

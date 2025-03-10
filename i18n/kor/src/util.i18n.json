@@ -9,6 +9,7 @@
 	"killing.process": "프로세스 PID를 종료하는 중 = {0}",
 	"utils.terminate.process": "PID=${0} 프로세스를 종료하는 중 ...",
 	"utils.quoting": "다음을 사용하여 자식 프로세스 생성:\n 프로세스 이름: {0}\n 프로세스 인수: {1}\n 작업 디렉터리: {2}\n 셸 유형: {3}",
+	"unsafe.command": "명령을 셸에서 실행하려면 먼저 안전한 것으로 표시해야 합니다. 이 명령을 실행해도 안전한 경우 {1} 설정에 {0} 추가",
 	"utils.overwriting.property": "대상 개체의 속성 {0}이(가) 이미 {1}(으)로 설정되어 있습니다. {2}을(를) 사용하여 원본에서 덮어쓰기",
 	"utils.dryrun.detailed.output": "자세한 시험 실행 출력은 {0}에서 볼 수 있습니다.",
 	"utils.dryrun.error.environment": "확장 프로그램이 개발 프롬프트 환경과 동일한 make 명령을 호출하고 있는지 확인하세요.",
