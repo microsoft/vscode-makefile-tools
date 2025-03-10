@@ -1,9 +1,48 @@
-# VS Code Makefile Tools
+<h1 align=center> <img align=center width=48 src="res/makefile-logo-no-background.png" alt="Makefile Logo"/> Makefile Tools </h1>
 
-This extension provides IntelliSense configurations to the VS Code C/C++ Extension for Makefile projects.
+<p align=center ><i>Enhancing Makefile development in VS Code.</i></p>
+
+<div align=center>
+    <img alt="VS Code" src="https://img.shields.io/badge/VSCode-7d57c2?style=for-the-badge&logo=visual%20studio%20code&logoColor=white"/>
+    <img alt="Makefile" src="https://img.shields.io/badge/MAKEFILE-white?style=for-the-badge&color=7d57c2&cacheSeconds=3600">
+    <img alt="C" src="https://img.shields.io/badge/C-7d57c2?style=for-the-badge&logo=c&logoColor=white"/>
+    <img alt="C++" src="https://img.shields.io/badge/C%2B%2B-7d57c2?style=for-the-badge&logo=c%2B%2B&logoColor=white"/>
+</div>
+
+<div align=center>
+    <img alt="VS Code Marketplace Downloads" src="https://img.shields.io/visual-studio-marketplace/d/ms-vscode.makefile-tools?style=for-the-badge&color=064f8c&cacheSeconds=3600&link=https%3A%2F%2Fmarketplace.visualstudio.com%2Fitems%3FitemName%3Dms-vscode.makefile-tools">
+    <img alt="VS Code Marketplace Version" src="https://img.shields.io/visual-studio-marketplace/v/ms-vscode.makefile-tools?style=for-the-badge&color=be2128&cacheSeconds=3600&link=https%3A%2F%2Fmarketplace.visualstudio.com%2Fitems%2Fms-vscode.makefile-tools%2Fchangelog">
+    <img alt="Closed Issues" src="https://img.shields.io/github/issues-closed/microsoft/vscode-makefile-tools?style=for-the-badge&color=249847&cacheSeconds=3600&link=https%3A%2F%2Fgithub.com%2Fmicrosoft%2Fvscode-makefile-tools%2Fissues">
+</div>
+
+<br/>
+<img style="width: 100%" src="res/graphics/makefile-tools-banner.png" alt="Makefile Tools Banner"/>
+
+## Introduction
+
+[Makefile Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools) provides IntelliSense configurations to the VS Code C/C++ Extension for Makefile projects.
 It also provides convenient commands to build, debug, and run your targets.
 
-# Getting Started
+<details open>
+<summary>
+ Features
+</summary><br/>
+
+<p align=center>
+    <img width="49%" src="res/graphics/project-outline-feature.png" alt="Project Outline"/>
+&nbsp;
+    <img width="49%" src="res/graphics/compile-commands-generation-feature.png" alt="Compile Commands Generation"/>
+</p>
+<p align=center>
+    <img width="49%" src="res/graphics/pre-and-post-configure-scripts-feature.png" alt="Pre & Post-Configure Scripts"/>
+&nbsp;
+    <img width="49%" src="res/graphics/multiple-configurations-feature.png" alt="Multiple Configurations"/>
+</p>
+
+</details>
+
+
+## Getting Started
 
 ### Activating the extension
 The extension will activate when it finds a Makefile in your `${workspaceFolder}`. If your Makefile does not
@@ -68,15 +107,13 @@ command to start debugging or running the target without a debugger attached.
 If you need to pass additional arguments to your targets, update the `makefile.launchConfigurations` by adding
 the `binaryArgs` property to the configuration.
 
-# Troubleshooting
+## Resources
+- [Makefile Settings](docs/makefile-settings.md) for command and variable substitutions.
+- [Repositories](docs/repositories.md) to get the settings and configurations for a select number of repositories that we have tested.
+- [Troubleshooting](docs/troubleshooting.md) for reasons and workarounds for errors you might run into when using the Makefile Tools extension.
+- [Github](https://github.com/microsoft/vscode-makefile-tools) for source code, issues, and contributing.
 
-We documented the settings and configurations needed for a select number of repositories that we have
-tested. The document can be found here: [docs/repositories.md](./docs/repositories.md). Contributions to this
-document (e.g. for additional repositories that we have not tested) are welcome.
-
-A more in-depth troubleshooting guide can be found here: [docs/troubleshooting.md](./docs/troubleshooting.md)
-
-# Feedback and Suggestions
+## Feedback and Suggestions
 
 We'd love to hear what you think! If you are having trouble with the extension, please
 [open an issue](https://github.com/microsoft/vscode-makefile-tools/issues/new).
@@ -84,7 +121,7 @@ We'd love to hear what you think! If you are having trouble with the extension, 
 You can also leave us a rating on the VS Code Marketplace and let us know what you like about the extension
 or would like to see improved.
 
-# Contributing
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
@@ -94,10 +131,28 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
 provided by the bot. You will only need to do this once across all repos using our CLA.
 
+You can file issues with us using one of our templates:
+
+[Bug Report](https://github.com/microsoft/vscode-makefile-tools/issues/new?template=bugreport.yml): If you see an error message or encounter an issue while using the Makefile Tools extension.
+
+[Feature Request](https://github.com/microsoft/vscode-makefile-tools/issues/new?template=featurerequest.yml): If you have a suggestion or need a feature that would enhance development.
+
+[Documentation Request](https://github.com/microsoft/vscode-makefile-tools/issues/new?template=docrequest.yml): Requesting changes or additions to the Makefile Tools documentation.
+
+##
+
+### Microsoft Open Source Code of Conduct
+
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-## Data and telemetry
+### Data and telemetry
 
 This extension collects usage data and sends it to Microsoft to help improve our products and services. Collection of telemetry is controlled via the same setting provided by Visual Studio Code: `"telemetry.enableTelemetry"`. Read our [privacy statement](https://privacy.microsoft.com/en-us/privacystatement) to learn more.
+
+### Contributors
+
+<a href="https://github.com/microsoft/vscode-makefile-tools/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=microsoft/vscode-makefile-tools" alt="Contributors"/>
+</a>
