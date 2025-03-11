@@ -41,7 +41,7 @@ async function main(): Promise<void> {
       extensionTestsPath: extensionTestsPath,
       extensionTestsEnv: {
         MAKEFILE_TOOLS_TESTING: "1",
-        WindowsSDKVersion: "12.3.45678.9\\",
+        WindowsSDKVersion: "12.34.56789\\",
       },
     };
     await testRunner.runTests(myOpt);

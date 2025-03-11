@@ -7,7 +7,7 @@ schedules:
   - cron: 0 6 * * 0
     branches:
       include:
-        - refs/heads/main
+        - main
     always: true
 
 resources:
