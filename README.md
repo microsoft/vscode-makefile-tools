@@ -118,14 +118,6 @@ the `binaryArgs` property to the configuration.
 - [Troubleshooting](docs/troubleshooting.md) for reasons and workarounds for errors you might run into.
 - [Github](https://github.com/microsoft/vscode-makefile-tools) for source code, issues, and contributing.
 
-## Feedback and Suggestions
-
-We'd love to hear what you think! If you are having trouble with the extension, please
-[open an issue](https://github.com/microsoft/vscode-makefile-tools/issues/new).
-
-You can also leave us a rating on the VS Code Marketplace and let us know what you like about the extension
-or would like to see improved.
-
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
