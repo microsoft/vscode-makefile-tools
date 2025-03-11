@@ -1,4 +1,3 @@
-// Testing Comment Change
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
