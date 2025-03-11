@@ -29,14 +29,19 @@ It also provides convenient commands to build, debug, and run your targets.
 </summary><br/>
 
 <p align=center>
-    <img width="49%" src="res/graphics/project-outline-feature.png" alt="Project Outline"/>
+    <img width="49%" src="res/graphics/built-in-makefile-language-services-feature.png" alt="Built-In Makefile Language Services"/>
 &nbsp;
-    <img width="49%" src="res/graphics/compile-commands-generation-feature.png" alt="Compile Commands Generation"/>
+    <img width="49%" src="res/graphics/project-outline-feature.png" alt="Project Outline"/>
 </p>
 <p align=center>
     <img width="49%" src="res/graphics/pre-and-post-configure-scripts-feature.png" alt="Pre & Post-Configure Scripts"/>
 &nbsp;
     <img width="49%" src="res/graphics/multiple-configurations-feature.png" alt="Multiple Configurations"/>
+</p>
+<p align=center>
+    <img width="49%" src="res/graphics/environment-variable-configuration-feature.png" alt="Environment Variable Configuration"/>
+&nbsp;
+    <img width="49%" src="res/graphics/compile-commands-generation-feature.png" alt="Compile Commands Generation"/>
 </p>
 
 </details>
@@ -109,8 +114,8 @@ the `binaryArgs` property to the configuration.
 
 ## Resources
 - [Makefile Settings](docs/makefile-settings.md) for command and variable substitutions.
-- [Repositories](docs/repositories.md) to get the settings and configurations for a select number of repositories that we have tested.
-- [Troubleshooting](docs/troubleshooting.md) for reasons and workarounds for errors you might run into when using the Makefile Tools extension.
+- [Repositories](docs/repositories.md) to get the configurations for a select number of repositories that we have tested.
+- [Troubleshooting](docs/troubleshooting.md) for reasons and workarounds for errors you might run into.
 - [Github](https://github.com/microsoft/vscode-makefile-tools) for source code, issues, and contributing.
 
 ## Feedback and Suggestions
