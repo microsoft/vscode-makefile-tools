@@ -20,8 +20,7 @@
 
 ## Introduction
 
-[Makefile Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools) provides IntelliSense configurations to the VS Code C/C++ Extension for Makefile projects.
-It also provides convenient commands to build, debug, and run your targets.
+[Makefile Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools) provides the native developer a full-featured, convenient, and powerful workflow for Makefile-based projects in Visual Studio Code. It enhances the development experience with pre and post-configuration script automation, allows for easy switching between multiple configurations, and supports rich IntelliSense features for Makefile. The customizable Project Outline view and environment variable management also simplifies the development experience. Additionally, it can generate a compilation database for integration with Clang tools and other editors/IDEs.
 
 <details open>
 <summary>
