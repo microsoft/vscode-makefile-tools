@@ -75,7 +75,7 @@ Now, you are ready to configure your project. If you normally just run `make` in
 configure/build your project, you shouldn't need to do anything else at this point besides accept the prompt
 from cpptools to allow this extension to configure IntelliSense:
 
-![image](https://user-images.githubusercontent.com/12818240/94731434-9d1e3380-0319-11eb-98c4-cb80218b1b8b.png)
+![image](res/graphics/prompt.png)
 
 If you don't see that message, or you accidentally dismissed it, you can grant Makefile Tools permission to
 configure IntelliSense by running the `C/C++: Change Configuration Provider...` command and selecting Makefile
