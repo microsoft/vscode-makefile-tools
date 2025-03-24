@@ -73,7 +73,7 @@ The extension can also avoid running the `make` program when it configures your 
 
 Now, you are ready to configure your project. If you normally just run `make` in the terminal to
 configure/build your project, you shouldn't need to do anything else at this point besides accept the prompt
-from cpptools to allow this extension to configure IntelliSense:
+from [cpptools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools) to allow this extension to configure IntelliSense:
 
 ![image](res/graphics/prompt.png)
 
