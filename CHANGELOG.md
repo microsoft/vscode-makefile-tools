@@ -7,6 +7,7 @@ Improvements:
 - Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
 - While parsing, don't replace characters with newlines if they are inside quotes. [#671](https://github.com/microsoft/vscode-makefile-tools/issues/671)
 - Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
+- Created issue templates for bug reporting and docs/feature requests. [#702](https://github.com/microsoft/vscode-makefile-tools/issues/702)
 
 Bug Fixes:
 
