@@ -188,8 +188,8 @@ suite("Fake dryrun parsing", () => {
     // than without debugging/loading the project before.
     // If we define extension log here instead of .vscode/settings.json, we also have to clean it up
     // because at project load time, there is no makefile log identified and no file is deleted on activation.
-    let extensionLogPath: string = path.join(
-      vscode.workspace.rootPath || "./",
+    const extensionLogPath: string = path.join(
+      vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
       ".vscode/Makefile.out"
     );
     if (util.checkFileExistsSync(extensionLogPath)) {
@@ -201,7 +201,7 @@ suite("Fake dryrun parsing", () => {
     await vscode.commands.executeCommand(
       "makefile.setPreconfigureScriptByPath",
       path.join(
-        vscode.workspace.rootPath || "./",
+        vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
         systemPlatform === "win32"
           ? ".vscode/preconfigure.bat"
           : ".vscode/preconfigure_nonwin.sh"
@@ -265,7 +265,7 @@ suite("Fake dryrun parsing", () => {
       // because at project load time, there is no makefile log identified and no file is deleted on activation.
       let extensionLogPath: string =
         configuration.getExtensionLog() ||
-        path.join(vscode.workspace.rootPath || "./", ".vscode/Makefile.out");
+        path.join(vscode.workspace.workspaceFolders?.[0]?.uri.path || "./", ".vscode/Makefile.out");
       if (util.checkFileExistsSync(extensionLogPath)) {
         util.deleteFileSync(extensionLogPath);
       }
@@ -275,7 +275,7 @@ suite("Fake dryrun parsing", () => {
 
       await vscode.commands.executeCommand(
         "makefile.setPreconfigureScriptByPath",
-        path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure.bat")
+        path.join(vscode.workspace.workspaceFolders?.[0]?.uri.path || "./", ".vscode/preconfigure.bat")
       );
       await vscode.commands.executeCommand("makefile.preConfigure");
 
@@ -326,7 +326,7 @@ suite("Fake dryrun parsing", () => {
       // Extension log is defined in the test .vscode/settings.json but delete it now
       // because we are interested to compare against a baseline from this point further.
       let extensionLogPath: string = path.join(
-        vscode.workspace.rootPath || "./",
+        vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
         ".vscode/Makefile.out"
       );
       if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
@@ -337,7 +337,7 @@ suite("Fake dryrun parsing", () => {
       // from this extension repository instead of a real VS installation that happens to be in the path.
       await vscode.commands.executeCommand(
         "makefile.setPreconfigureScriptByPath",
-        path.join(vscode.workspace.rootPath || "./", ".vscode/preconfigure.bat")
+        path.join(vscode.workspace.workspaceFolders?.[0]?.uri.path || "./", ".vscode/preconfigure.bat")
       );
       await vscode.commands.executeCommand("makefile.preConfigure");
 
@@ -355,7 +355,7 @@ suite("Fake dryrun parsing", () => {
       for (const config of launchConfigurations) {
         await vscode.commands.executeCommand(
           "makefile.setLaunchConfigurationByName",
-          vscode.workspace.rootPath + ">" + config
+          vscode.workspace.workspaceFolders?.[0]?.uri.path + ">" + config
         );
         let status: string = await vscode.commands.executeCommand(
           "makefile.validateLaunchConfiguration"
@@ -444,7 +444,7 @@ suite("Fake dryrun parsing", () => {
       // Extension log is defined in the test .vscode/settings.json but delete it now
       // because we are interested to compare against a baseline from this point further.
       let extensionLogPath: string = path.join(
-        vscode.workspace.rootPath || "./",
+        vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
         ".vscode/Makefile.out"
       );
       if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
@@ -456,7 +456,7 @@ suite("Fake dryrun parsing", () => {
       await vscode.commands.executeCommand(
         "makefile.setPreconfigureScriptByPath",
         path.join(
-          vscode.workspace.rootPath || "./",
+          vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
           ".vscode/preconfigure_nonwin.sh"
         )
       );
@@ -472,7 +472,7 @@ suite("Fake dryrun parsing", () => {
       for (const config of launchConfigurations) {
         await vscode.commands.executeCommand(
           "makefile.setLaunchConfigurationByName",
-          vscode.workspace.rootPath + ">" + config
+          vscode.workspace.workspaceFolders?.[0]?.uri.path + ">" + config
         );
         let status: string = await vscode.commands.executeCommand(
           "makefile.validateLaunchConfiguration"
@@ -539,7 +539,7 @@ suite("Fake dryrun parsing", () => {
       // Extension log is defined in the test .vscode/settings.json but delete it now
       // because we are interested to compare against a baseline from this point further.
       let extensionLogPath: string = path.join(
-        vscode.workspace.rootPath || "./",
+        vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
         ".vscode/Makefile.out"
       );
       if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
@@ -551,7 +551,7 @@ suite("Fake dryrun parsing", () => {
       await vscode.commands.executeCommand(
         "makefile.setPreconfigureScriptByPath",
         path.join(
-          vscode.workspace.rootPath || "./",
+          vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
           ".vscode/preconfigure_nonwin.sh"
         )
       );
@@ -567,7 +567,7 @@ suite("Fake dryrun parsing", () => {
       for (const config of launchConfigurations) {
         await vscode.commands.executeCommand(
           "makefile.setLaunchConfigurationByName",
-          vscode.workspace.rootPath + ">" + config
+          vscode.workspace.workspaceFolders?.[0]?.uri.path + ">" + config
         );
         let status: string = await vscode.commands.executeCommand(
           "makefile.validateLaunchConfiguration"
@@ -637,7 +637,7 @@ suite("Fake dryrun parsing", () => {
       // Extension log is defined in the test .vscode/settings.json but delete it now
       // because we are interested to compare against a baseline from this point further.
       let extensionLogPath: string = path.join(
-        vscode.workspace.rootPath || "./",
+        vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
         ".vscode/Makefile.out"
       );
       if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
@@ -649,7 +649,7 @@ suite("Fake dryrun parsing", () => {
       await vscode.commands.executeCommand(
         "makefile.setPreconfigureScriptByPath",
         path.join(
-          vscode.workspace.rootPath || "./",
+          vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
           ".vscode/preconfigure_nonwin.sh"
         )
       );
@@ -667,7 +667,7 @@ suite("Fake dryrun parsing", () => {
       for (const config of launchConfigurations) {
         await vscode.commands.executeCommand(
           "makefile.setLaunchConfigurationByName",
-          vscode.workspace.rootPath + ">" + config
+          vscode.workspace.workspaceFolders?.[0]?.uri.path + ">" + config
         );
         let status: string = await vscode.commands.executeCommand(
           "makefile.validateLaunchConfiguration"
@@ -732,7 +732,7 @@ suite("Fake dryrun parsing", () => {
     // Extension log is defined in the test .vscode/settings.json but delete it now
     // because we are interested to compare against a baseline from this point further.
     let extensionLogPath: string = path.join(
-      vscode.workspace.rootPath || "./",
+      vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
       ".vscode/Makefile.out"
     );
     if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
@@ -797,7 +797,7 @@ suite("Fake dryrun parsing", () => {
     // Delete extension log a bit later than other tests. For this one, we only care to capture varexp.
     // All else that happens before, it was covered during the other tests in this suite.
     let extensionLogPath: string = path.join(
-      vscode.workspace.rootPath || "./",
+      vscode.workspace.workspaceFolders?.[0]?.uri.path || "./",
       ".vscode/Makefile.out"
     );
     if (extensionLogPath && util.checkFileExistsSync(extensionLogPath)) {
