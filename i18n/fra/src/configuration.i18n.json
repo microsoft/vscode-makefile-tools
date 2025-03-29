@@ -56,7 +56,7 @@
 	"build.before.launch": "Build avant le lancement : {0}",
 	"clear.output.before.build": "Effacer la sortie avant la génération : {0}",
 	"ignore.directory.commands": "Ignorer les commandes d’annuaire : {0}",
-	"configurating.after.settings.or.makefile.changes": "Configuration après les paramètres ou modifications apportées au fichier...",
+	"configurating.after.settings.or.makefile.changes": "Configuration après les paramètres ou modifications apportées au makefile...",
 	"key.setting.changed": "Le paramètre {0} a changé.",
 	"setting.configuration": "Définition de la configuration – {0}",
 	"re.reading.settings.after.configuration.change": "Relecteur des paramètres après modification de la configuration.",
