@@ -50,7 +50,7 @@
 	"make.postconfigure.cancelling.title": "Yapılandırma sonrası iptal ediliyor",
 	"pre.configuring.script": "Önceden yapılandırılıyor...\nBetik: \"{0}\"",
 	"preconfigure.succeeded": "Önceden yapılandırma başarılı oldu.",
-	"preconfigure.succeeded.with.some.error": "Önceden yapılandırma betiği başarı kodu döndürdü, ancak önceden yapılandırma işlemi sırasında hatalar bildirildi. Derleme Görevleri Dosyası Araçları kanalında önceden yapılandırma çıkışını yeniden denetleyin.",
+	"preconfigure.succeeded.with.some.error": "Önceden yapılandırma betiği başarı kodu döndürdü, ancak önceden yapılandırma işlemi sırasında hatalar bildirildi. Makefile Araçları kanalında önceden yapılandırma çıkışını yeniden denetleyin.",
 	"preconfigure.script.failed": "Önceden yapılandırma betiği başarısız oldu. Bu proje başarıyla yapılandırılmayabilir.",
 	"post.configure.script": "Yapılandırma sonrası işlem uygulanıyor... \nBetik: \"{0}\"",
 	"postconfigure.succeeded": "Yapılandırma sonrası işlemi başarılı oldu.",

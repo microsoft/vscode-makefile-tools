@@ -6,7 +6,7 @@
 {
 	"configuration.for.file.not.found": "ファイル {0} の構成ファイルが見つかりませんでした。現在の構成の一時ファイル インデックスで検索しています。",
 	"configuration.for.file.not.found.default": "ファイル {0} の構成ファイルが見つかりませんでした。CppTools は既定の構成を設定します",
-	"support.only.single.root": "メイクファイル ツールは、現時点で 1 つのルートをサポートしています。",
+	"support.only.single.root": "Makefile ツールは、現時点で 1 つのルートをサポートしています。",
 	"sending.workspace.browse.configuration": "ワークスペースの参照構成を送信しています: -----------------------------------",
 	"browse.path": "    参照パス: {0}",
 	"standard": "    標準: {0}",
