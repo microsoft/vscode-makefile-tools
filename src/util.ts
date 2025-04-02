@@ -415,8 +415,13 @@ export function spawnChildProcess(
     let lenv: EnvironmentVariables;
     let lshell: string | boolean;
     let lshell_describe: string;
-    if (typeof shellType !== "object") {
+    if (
+      typeof shellType !== "object" ||
+      qProcessName.startsWith("cmd") ||
+      qProcessName.startsWith("/bin/bash")
+    ) {
       // no profile specified -> start process on default shell
+      // also not trying to execute other shell commands in the automationShell, to avoid casting issues
       lprocessname = qProcessName;
       largs = qArgs;
       lshell = true;
