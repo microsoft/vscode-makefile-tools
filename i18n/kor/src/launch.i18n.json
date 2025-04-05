@@ -10,7 +10,7 @@
 	"no": "아니요",
 	"yes": "예",
 	"build.failed.continue.anyway": "빌드하지 못했습니다. 계속하시겠습니까?",
-	"cannot.op.no.launch.config.targets": "시작 구성 집합이 없고 시작 대상 목록이 비어 있기 때문에 {0}할 수 없습니다. makefile 구성과 빌드 대상을 다시 확인하세요.",
+	"cannot.op.no.launch.config.targets": "시작 구성 집합이 없고 시작 대상 목록이 비어 있기 때문에 {0}할 수 없습니다. Makefile 구성과 빌드 대상을 다시 확인하세요.",
 	"cannot.op.choose.launch.config": "시작 구성 집합이 없으므로 {0}할 수 없습니다. 빠른 선택에서 하나를 선택합니다.",
 	"cannot.op.without.launch.config": "활성 시작 구성을 선택할 때까지 {0}할 수 없습니다.",
 	"running.command.in.terminal": "'{1}' 위치의 터미널에서 '{0}' 명령 실행"
