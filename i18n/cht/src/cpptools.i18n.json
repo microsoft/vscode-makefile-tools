@@ -6,7 +6,7 @@
 {
 	"configuration.for.file.not.found": "找不到檔案 {0} 的設定。正在搜尋目前設定的暫存檔案索引。",
 	"configuration.for.file.not.found.default": "找不到檔案 {0} 的設定。CppTools 將設定預設設定",
-	"support.only.single.root": "makefile 工具目前支援單一根目錄。",
+	"support.only.single.root": "Makefile 工具目前支援單一根目錄。",
 	"sending.workspace.browse.configuration": "傳送工作區瀏覽設定： -----------------------------------",
 	"browse.path": "    瀏覽路徑：{0}",
 	"standard": "    標準：{0}",

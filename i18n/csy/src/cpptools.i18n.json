@@ -6,7 +6,7 @@
 {
 	"configuration.for.file.not.found": "Konfigurace pro soubor {0} se nenašla. Vyhledávání v aktuálním indexu dočasného souboru konfigurace.",
 	"configuration.for.file.not.found.default": "Konfigurace pro soubor {0} se nenašla. CppTools nastaví výchozí konfiguraci.",
-	"support.only.single.root": "Nástroje makefile zatím podporují jeden kořenový adresář.",
+	"support.only.single.root": "Makefile Tools zatím podporují jeden kořenový adresář.",
 	"sending.workspace.browse.configuration": "Odesílání konfigurace procházení pracovního prostoru: -----------------------------------",
 	"browse.path": "    Procházet cestu: {0}",
 	"standard": "    Standard: {0}",
