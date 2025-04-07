@@ -13,7 +13,7 @@
 	"makefile-tools.command.makefile.setBuildConfiguration.title": "Archivo Make: Establecer la configuración de compilación actual",
 	"makefile-tools.command.makefile.setBuildTarget.title": "Archivo Make: Establecer el destino que se va a compilar mediante make",
 	"makefile-tools.command.makefile.setLaunchConfiguration.title": "Archivo Make: Establecer la configuración de inicio de make",
-	"makefile-tools.command.makefile.openMakefilePathSetting.title": "Archivo Make:Abrir Make Path Setting",
+	"makefile-tools.command.makefile.openMakefilePathSetting.title": "Archivo Make: Abrir Make Path Setting",
 	"makefile-tools.command.makefile.openMakePathSetting.title": "Archivo Make: Abrir Make Path Setting",
 	"makefile-tools.command.makefile.openBuildLogSetting.title": "Archivo Make: Open Build Log Setting",
 	"makefile-tools.command.makefile.openBuildLogFile.title": "Archivo Make: Abrir archivo de registro de construcción",

@@ -6,7 +6,7 @@
 {
 	"configuration.for.file.not.found": "Nie znaleziono pliku konfiguracji {0}. Wyszukiwanie w bieżącym konfiguracyjnym indeksie plików tymczasowych.",
 	"configuration.for.file.not.found.default": "Nie znaleziono pliku konfiguracji {0}. Narzędzie CppTools ustawi konfigurację domyślną",
-	"support.only.single.root": "Narzędzia makefile obsługują na razie pojedynczy katalog główny.",
+	"support.only.single.root": "Narzędzia pliku reguł Makefile obsługują na razie pojedynczy katalog główny.",
 	"sending.workspace.browse.configuration": "Wysyłanie konfiguracji przeglądania obszaru roboczego: -----------------------------------",
 	"browse.path": "    Przeglądaj ścieżkę: {0}",
 	"standard": "    Standardowa: {0}",

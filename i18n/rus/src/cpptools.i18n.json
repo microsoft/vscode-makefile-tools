@@ -6,7 +6,7 @@
 {
 	"configuration.for.file.not.found": "Конфигурация для файла {0} не найдена. Поиск в текущем индексе временного файла конфигурации.",
 	"configuration.for.file.not.found.default": "Конфигурация для файла {0} не найдена. CppTools задает конфигурацию по умолчанию",
-	"support.only.single.root": "Средства makefile в настоящее время поддерживают один корень.",
+	"support.only.single.root": "Средства Makefile в настоящее время поддерживают один корень.",
 	"sending.workspace.browse.configuration": "Отправка конфигурации обзора рабочей области: -----------------------------------",
 	"browse.path": "    Путь к обзору: {0}",
 	"standard": "    Стандартный: {0}",

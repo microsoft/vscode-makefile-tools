@@ -15,7 +15,7 @@
 	"utils.dryrun.error.environment": "确保扩展调用的 make 命令与在开发提示器环境中调用的命令相同。",
 	"utils.dryrun.error.makefile": "可能需要通过 “makefile.configurations” 在设置中定义或调整自定义生成文件配置，如下所述: [link]",
 	"utils.dryrun.error.knownissues": "此外，请确保代码库没有此扩展使用的试运行交换机(makefile.dryrunSwitches)的任何已知问题。",
-	"utils.dryrun.error.github": "如果无法修复试运行，请在生成文件工具存储库中打开 GitHub 问题: https://github.com/microsoft/vscode-makefile-tools/issues",
+	"utils.dryrun.error.github": "如果无法修复试运行，请在 Makefile 工具存储库中打开 GitHub 问题: https://github.com/microsoft/vscode-makefile-tools/issues",
 	"utils.exception.expanding": "展开字符串“{0}.{1}”时出现异常:“{2}”",
 	"detected.escape.patterns": "在值“{1}”内的设置“{0}”中检测到已转义的变量扩展模式。",
 	"exception.executing": "执行命令“{0}”出现异常:“{1}”",
