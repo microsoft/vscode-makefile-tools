@@ -688,12 +688,16 @@ export async function generateParseContent(
       }
     });
 
+    const backgroundGeneration = localize(
+      "generating.configurating.cache.background",
+      "Generating in the background a new configuration cache with command: "
+    );
+    const regularGeneration = localize(
+      "generating.configurating.cache",
+      "Generating configuration cache with command: "
+    );
     logger.messageNoCR(
-      localize(
-        "generating.configurating.cache",
-        "Generating {0}configuration cache with command: ",
-        getConfigureIsInBackground() ? "in the background a new " : ""
-      )
+      getConfigureIsInBackground() ? backgroundGeneration : regularGeneration
     );
   }
 
