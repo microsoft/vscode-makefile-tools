@@ -13,7 +13,7 @@
 	"utils.overwriting.property": "目的地物件已將屬性 {0} 設為 {1}。正在使用 {2} 覆寫來源",
 	"utils.dryrun.detailed.output": "您可以在 {0} 看到詳細的空運行輸出",
 	"utils.dryrun.error.environment": "請確定延伸模組叫用的 Make 命令與開發提示環境中的命令相同。",
-	"utils.dryrun.error.makefile": "您可能需要透過 'makefile.configurations' 在設定中定義或調整自訂 makefile 設定，如下所述：[link]",
+	"utils.dryrun.error.makefile": "您可能需要透過 'makefile.configurations' 在設定中定義或調整自訂 Makefile 設定，如下所述：[link]",
 	"utils.dryrun.error.knownissues": "另請確定您的程式碼基底與此延伸模組 (makefile.dryrunSwitches) 使用的空運行切換沒有任何已知問題。",
 	"utils.dryrun.error.github": "如果您無法修正空運行，請在 Makefile 工具存放庫中開啟 GitHub 問題： https://github.com/microsoft/vscode-makefile-tools/issues",
 	"utils.exception.expanding": "展開字串「{0}。{1}」時發生例外狀況：「{2}」",

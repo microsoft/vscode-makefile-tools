@@ -21,7 +21,7 @@
 	"workbench.action.openWorkspaceSettings.title": "喜好設定: 開啟工作區設定",
 	"makefile-tools.command.makefile.configure.title": "Makefile: 設定",
 	"makefile-tools.command.makefile.cleanConfigure.title": "Makefile: 清除設定",
-	"makefile-tools.command.makefile.preConfigure.title": "MMakefile: 預先設定",
+	"makefile-tools.command.makefile.preConfigure.title": "Makefile: 預先設定",
 	"makefile-tools.command.makefile.postConfigure.title": "Makefile: 設定後",
 	"makefile-tools.command.makefile.resetState.title": "Makefile: 重設 Makefile 工具延伸模組工作區狀態 (用於疑難排解)",
 	"makefile-tools.configuration.views.makefile.outline.description": "專案大綱",

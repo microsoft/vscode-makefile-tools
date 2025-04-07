@@ -14,7 +14,7 @@
 	"makefile-tools.command.makefile.setBuildTarget.title": "Makefile: definir o destino a ser criado pelo make",
 	"makefile-tools.command.makefile.setLaunchConfiguration.title": "Makefile: definir a configuração de inicialização do make",
 	"makefile-tools.command.makefile.openMakefilePathSetting.title": "Makefile: Abrir Configuração de Caminho do Makefile",
-	"makefile-tools.command.makefile.openMakePathSetting.title": "Makefile: Abrir Configuração de Caminho de Marca",
+	"makefile-tools.command.makefile.openMakePathSetting.title": "Makefile: Abrir Configuração de Caminho do Make",
 	"makefile-tools.command.makefile.openBuildLogSetting.title": "Makefile: Abrir Configuração do Log de Compilação",
 	"makefile-tools.command.makefile.openBuildLogFile.title": "Makefile: Abrir Arquivo do Log de Compilação",
 	"makefile-tools.command.makefile.openMakefileFile.title": "Makefile: Abrir Arquivo Makefile",

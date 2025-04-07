@@ -13,7 +13,7 @@
 	"utils.overwriting.property": "Для конечного объекта для свойства {0} задано значение {1}. Перезапись из источника с помощью {2}",
 	"utils.dryrun.detailed.output": "Подробные выходные данные пробного запуска можно просмотреть в {0}",
 	"utils.dryrun.error.environment": "Убедитесь, что расширение выполняет вызов той же команды make, что и в среде запроса на разработку.",
-	"utils.dryrun.error.makefile": "Возможно, вам потребуется определить или настроить пользовательскую конфигурацию файла makefile в параметрах с помощью \"makefile.configurations\", как описано здесь: [link]",
+	"utils.dryrun.error.makefile": "Возможно, вам потребуется определить или настроить пользовательскую конфигурацию Makefile в параметрах с помощью \"makefile.configurations\", как описано здесь: [link]",
 	"utils.dryrun.error.knownissues": "Также убедитесь, что в базе кода нет известных проблем с коммутаторами пробного запуска, используемыми этим расширением (makefile.dryrunSwitches).",
 	"utils.dryrun.error.github": "Если вы не можете исправить пробный запуск, откройте проблему GitHub в репозитории инструментов Makefile: https://github.com/microsoft/vscode-makefile-tools/issues",
 	"utils.exception.expanding": "Исключение при развертывании строки \"{0}.{1}\": \"{2}\"",

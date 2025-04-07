@@ -37,7 +37,7 @@
 	"make.prePostConfigure.cancelling": "Annullamento in corso...",
 	"attempting.to.kill.console.process": "Tentativo di terminare il processo della console (PID = {0}) e tutti i relativi sottoprocessi figlio...",
 	"no.preconfigure.script.provided": "Pre-configurazione non riuscita: non è stato specificato alcuno script.",
-	"no.pre.configure.script.define.settings": "Nelle impostazioni non è impostato alcuno script di preconfigurazione. Assicurati che sia definito un percorso di script di preconfigurazione con makefile.preConfigureScript.",
+	"no.pre.configure.script.define.settings": "Nelle impostazioni non è impostato alcuno script di preconfigurazione. Assicurarsi che sia definito un percorso di script di preconfigurazione con makefile.preConfigureScript.",
 	"could.not.find.preconfigure.popup": "Non è possibile trovare lo script di preconfigurazione.",
 	"could.not.find.pre.configure.on.disk": "Non è stato possibile trovare lo script preconfigurato specificato \"{0}\" su disco.",
 	"make.preconfigure.title": "Preconfigurazione di {0}",

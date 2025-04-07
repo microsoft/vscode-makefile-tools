@@ -10,7 +10,7 @@
 	"no": "Hayır",
 	"yes": "Evet",
 	"build.failed.continue.anyway": "Derleme başarısız oldu. Yine de devam etmek istiyor musunuz?",
-	"cannot.op.no.launch.config.targets": "Başlatma {0} kümesi olmadığından ve başlatma hedefleri listesi boş olduğundan bu ayar oluşturulamadı. Derleme görevleri dosyası yapılandırmasını ve derleme hedeflerini bir kez daha denetleyin.",
+	"cannot.op.no.launch.config.targets": "Başlatma {0} kümesi olmadığından ve başlatma hedefleri listesi boş olduğundan bu ayar oluşturulamadı. Makefile yapılandırmasını ve derleme hedeflerini bir kez daha denetleyin.",
 	"cannot.op.choose.launch.config": "Başlatma {0} kümesi olmadığından bu ayar kaldırılamıyor. Hızlı seçimden birini seçin.",
 	"cannot.op.without.launch.config": "Etkin {0} yapılandırmayı seçene kadar yeniden başlatılamıyor.",
 	"running.command.in.terminal": "'{0}' komutu '{1}' konumundan terminalde çalıştırılıyor"
