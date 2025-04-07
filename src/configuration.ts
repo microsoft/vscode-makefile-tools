@@ -2327,7 +2327,10 @@ export function prepareConfigurationsQuickPick(): string[] {
 
   if (items.length === 0) {
     logger.message(
-      "No configurations defined in makefile.configurations setting."
+      localize(
+        "no.configurations.defined",
+        "No configurations defined in makefile.configurations setting."
+      )
     );
     items.push("Default");
   }
