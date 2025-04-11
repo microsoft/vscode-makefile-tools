@@ -60,6 +60,7 @@
 	"key.setting.changed": "Nastavení {0} se změnilo.",
 	"setting.configuration": "Konfigurace nastavení – {0}",
 	"re.reading.settings.after.configuration.change": "Po změně konfigurace se znovu čte nastavení.",
+	"no.configurations.defined": "V nastavení makefile.configurations nejsou definovány žádné konfigurace.",
 	"automatically.reconfiguring.project.after.change": "Po změně konfigurace makefile se projekt automaticky překonfiguruje.",
 	"setting.target": "Nastavování cíle {0}",
 	"rereading.settings.after.target.change": "Po změně cíle se znovu čte nastavení.",
