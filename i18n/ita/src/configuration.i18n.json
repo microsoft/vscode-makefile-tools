@@ -60,6 +60,7 @@
 	"key.setting.changed": "L'impostazione {0} è stata modificata.",
 	"setting.configuration": "Impostazione della configurazione - {0}",
 	"re.reading.settings.after.configuration.change": "Riesegui la lettura delle impostazioni dopo la modifica della configurazione.",
+	"no.configurations.defined": "Nessuna configurazione definita nell'impostazione makefile.configurations.",
 	"automatically.reconfiguring.project.after.change": "Riconfigurazione automatica del progetto dopo una modifica alla configurazione makefile.",
 	"setting.target": "Impostazione di destinazione {0}",
 	"rereading.settings.after.target.change": "Rieseguire la lettura delle impostazioni dopo la modifica della destinazione.",

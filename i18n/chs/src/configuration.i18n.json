@@ -60,6 +60,7 @@
 	"key.setting.changed": "{0} 设置已更改。",
 	"setting.configuration": "正在设置配置 - {0}",
 	"re.reading.settings.after.configuration.change": "配置更改后正在重新读取设置。",
+	"no.configurations.defined": "makefile.configurations 设置中未定义任何配置。",
 	"automatically.reconfiguring.project.after.change": "makefile 配置更改后正在自动重新配置项目。",
 	"setting.target": "设置目标 {0}",
 	"rereading.settings.after.target.change": "目标更改后正在重新读取设置。",

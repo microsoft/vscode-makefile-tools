@@ -60,6 +60,7 @@
 	"key.setting.changed": "{0} 設定已變更。",
 	"setting.configuration": "正在設定設定 - {0}",
 	"re.reading.settings.after.configuration.change": "設定變更後重新讀取設定。",
+	"no.configurations.defined": "Makefile.configurations 設定中未定義任何設定。",
 	"automatically.reconfiguring.project.after.change": "Makefile 設定變更後自動重新設定專案。",
 	"setting.target": "正在設定目標 {0}",
 	"rereading.settings.after.target.change": "在目標變更後重新讀取設定。",
