@@ -629,6 +629,7 @@ async function parseAnySwitchFromToolArguments(
           "compiler.args.parser.failed",
           "The compiler args parser script '{0}' failed with error code {1} for regions ({2})",
           parseCompilerArgsScriptFile,
+          result.returnCode,
           compilerArgRegions
         ),
         "Normal"
