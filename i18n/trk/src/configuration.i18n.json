@@ -60,6 +60,7 @@
 	"key.setting.changed": "{0} ayarı değiştirildi.",
 	"setting.configuration": "Yapılandırma ayarlanıyor - {0}",
 	"re.reading.settings.after.configuration.change": "Yapılandırma değişikliğinden sonra ayarlar yeniden okunuyor.",
+	"no.configurations.defined": "makefile.configurations ayarında yapılandırma tanımlanmadı.",
 	"automatically.reconfiguring.project.after.change": "Makefile yapılandırma değişikliğinden sonra projeyi otomatik olarak yeniden yapılandırın.",
 	"setting.target": "{0} hedefi ayarlanıyor",
 	"rereading.settings.after.target.change": "Hedef değişikliğinden sonra ayarlar yeniden okunuyor.",

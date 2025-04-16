@@ -60,6 +60,7 @@
 	"key.setting.changed": "Параметр {0} изменен.",
 	"setting.configuration": "Настройка конфигурации — {0}",
 	"re.reading.settings.after.configuration.change": "Повторное чтение параметров после изменения конфигурации.",
+	"no.configurations.defined": "В параметре makefile.configurations не определены конфигурации.",
 	"automatically.reconfiguring.project.after.change": "Автоматическая повторная настройка проекта после изменения конфигурации Makefile.",
 	"setting.target": "Настройка целевого объекта {0}",
 	"rereading.settings.after.target.change": "Повторное чтение параметров после изменения целевого объекта.",
