@@ -60,6 +60,7 @@
 	"key.setting.changed": "{0} 설정이 변경되었습니다.",
 	"setting.configuration": "설정 구성 - {0}",
 	"re.reading.settings.after.configuration.change": "구성 변경 후 설정을 다시 읽습니다.",
+	"no.configurations.defined": "makefile.configurations 설정에 정의된 구성이 없습니다.",
 	"automatically.reconfiguring.project.after.change": "Makefile 구성이 변경된 후 프로젝트를 자동으로 다시 구성합니다.",
 	"setting.target": "대상 {0} 설정",
 	"rereading.settings.after.target.change": "대상 변경 후 설정을 다시 읽기.",
