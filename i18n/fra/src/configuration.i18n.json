@@ -60,6 +60,7 @@
 	"key.setting.changed": "Le paramètre {0} a changé.",
 	"setting.configuration": "Définition de la configuration – {0}",
 	"re.reading.settings.after.configuration.change": "Relecteur des paramètres après modification de la configuration.",
+	"no.configurations.defined": "Aucune configuration définie dans le paramètre makefile.configurations.",
 	"automatically.reconfiguring.project.after.change": "Reconfiguration automatique du projet après une modification de configuration makefile.",
 	"setting.target": "Définition de la {0} cible",
 	"rereading.settings.after.target.change": "Relecture des paramètres après modification de la cible.",

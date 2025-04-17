@@ -1,43 +1,119 @@
 {
-  "makefile-tools.command.makefile.buildTarget.title": "Makefile: Build the current target",
-  "makefile-tools.command.makefile.buildTarget.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.buildCleanTarget.title": "Makefile: Clean and build the current target",
-  "makefile-tools.command.makefile.buildCleanTarget.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.buildAll.title": "Makefile: Build the target ALL",
-  "makefile-tools.command.makefile.buildAll.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.buildCleanAll.title": "Makefile: Clean and build the target ALL",
-  "makefile-tools.command.makefile.buildCleanAll.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.launchDebug.title": "Makefile: Debug the selected binary target",
-  "makefile-tools.command.makefile.launchDebug.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.launchRun.title": "Makefile: Run the selected binary target in the terminal",
-  "makefile-tools.command.makefile.launchRun.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.setBuildConfiguration.title": "Makefile: Set the current build configuration",
-  "makefile-tools.command.makefile.setBuildConfiguration.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.setBuildTarget.title": "Makefile: Set the target to be built by make",
-  "makefile-tools.command.makefile.setBuildTarget.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.setLaunchConfiguration.title": "Makefile: Set the make launch configuration",
-  "makefile-tools.command.makefile.setLaunchConfiguration.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.openMakefilePathSetting.title": "Makefile: Open Makefile Path Setting",
-  "makefile-tools.command.makefile.openMakefilePathSetting.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.openMakePathSetting.title": "Makefile: Open Make Path Setting",
-  "makefile-tools.command.makefile.openMakePathSetting.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.openBuildLogSetting.title": "Makefile: Open Build Log Setting",
-  "makefile-tools.command.makefile.openBuildLogSetting.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.openBuildLogFile.title": "Makefile: Open Build Log File",
-  "makefile-tools.command.makefile.openBuildLogFile.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.openMakefileFile.title": "Makefile: Open Makefile File",
-  "makefile-tools.command.makefile.openMakefileFile.title.__comment__": "'Makefile' should not be translated",
+  "makefile-tools.command.makefile.buildTarget.title": {
+    "message": "Makefile: Build the current target",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.buildCleanTarget.title": {
+    "message": "Makefile: Clean and build the current target",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.buildAll.title": {
+    "message": "Makefile: Build the target ALL",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.buildCleanAll.title": {
+    "message": "Makefile: Clean and build the target ALL",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.launchDebug.title": {
+    "message": "Makefile: Debug the selected binary target",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.launchRun.title": {
+    "message": "Makefile: Run the selected binary target in the terminal",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.setBuildConfiguration.title": {
+    "message": "Makefile: Set the current build configuration",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.setBuildTarget.title": {
+    "message": "Makefile: Set the target to be built by make",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.setLaunchConfiguration.title": {
+    "message": "Makefile: Set the make launch configuration",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.openMakefilePathSetting.title": {
+    "message": "Makefile: Open Makefile Path Setting",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.openMakePathSetting.title": {
+    "message": "Makefile: Open Make Path Setting",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.openBuildLogSetting.title": {
+    "message": "Makefile: Open Build Log Setting",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.openBuildLogFile.title": {
+    "message": "Makefile: Open Build Log File",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.openMakefileFile.title": {
+    "message": "Makefile: Open Makefile File",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
   "workbench.action.openWorkspaceSettings.title": "Preferences: Open Workspace Settings",
-  "makefile-tools.command.makefile.configure.title": "Makefile: Configure",
-  "makefile-tools.command.makefile.configure.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.cleanConfigure.title": "Makefile: Clean Configure",
-  "makefile-tools.command.makefile.cleanConfigure.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.preConfigure.title": "Makefile: Pre-Configure",
-  "makefile-tools.command.makefile.preConfigure.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.postConfigure.title": "Makefile: Post-Configure",
-  "makefile-tools.command.makefile.postConfigure.title.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.command.makefile.resetState.title": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)",
-  "makefile-tools.command.makefile.resetState.title.__comment__": "'Makefile' and 'Makefile Tools' should not be translated",
+  "makefile-tools.command.makefile.configure.title": {
+    "message": "Makefile: Configure",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.cleanConfigure.title": {
+    "message": "Makefile: Clean Configure",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.preConfigure.title": {
+    "message": "Makefile: Pre-Configure",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.postConfigure.title": {
+    "message": "Makefile: Post-Configure",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.command.makefile.resetState.title": {
+    "message": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)",
+    "comment": [
+      "'Makefile' and 'Makefile Tools' should not be translated"
+    ]
+  },
   "makefile-tools.configuration.views.makefile.outline.description": "Project Outline",
   "makefile-tools.configuration.makefile.makePath.description": "The path to the make tool",
   "makefile-tools.configuration.makefile.configurations.description": "The user defined makefile configurations",
@@ -66,19 +142,35 @@
   "makefile-tools.configuration.makefile.makefilePath.description": "The path to the makefile of the project",
   "makefile-tools.configuration.makefile.buildLog.description": "The path to the build log that is read to bypass a dry-run",
   "makefile-tools.configuration.makefile.extensionOutputFolder.description": "The path to various output files produced by the extension. Defaults to the VS Code workspace storage location.",
-  "makefile-tools.configuration.makefile.extensionLog.description": "The path to an output file storing all content from the Makefile output channel. Defaults to the value of the 'makefile.extensionOutputFolder' setting.",
-  "makefile-tools.configuration.makefile.extensionLog.description.__comment__": "'Makefile' should not be translated",
+  "makefile-tools.configuration.makefile.extensionLog.description": {
+    "message": "The path to an output file storing all content from the Makefile output channel. Defaults to the value of the 'makefile.extensionOutputFolder' setting.",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
   "makefile-tools.configuration.makefile.configurationCachePath.description": "The path to a cache file storing the output of the last dry-run make command. When unset, a file named 'configurationCache.log' is stored at the path specified by the 'makefile.extensionOutputFolder' setting.",
   "makefile-tools.configuration.makefile.dryrunSwitches.description": "Arguments to pass to the dry-run make invocation",
   "makefile-tools.configuration.makefile.additionalCompilerNames.description": "Names of compiler tools to be added to the extension known list",
   "makefile-tools.configuration.makefile.excludeCompilerNames.description": "Names of compiler tools to be excluded from the extension known list",
   "makefile-tools.configuration.makefile.safeCommands.description": "Commands that are safe to perform command substitution with",
-  "makefile-tools.configuration.makefile.configureOnOpen.description": "Automatically configure Makefile project directories when they are opened",
-  "makefile-tools.configuration.makefile.configureOnOpen.description.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.configuration.makefile.configureOnEdit.description": "Automatically configure Makefile project directories when any relevant makefiles and/or settings are changed",
-  "makefile-tools.configuration.makefile.configureOnEdit.description.__comment__": "'Makefile' should not be translated",
-  "makefile-tools.configuration.makefile.configureAfterCommand.description": "Automatically configure Makefile project directories after relevant operations, like change build configuration or makefile target",
-  "makefile-tools.configuration.makefile.configureAfterCommand.description.__comment__": "'Makefile' should not be translated",
+  "makefile-tools.configuration.makefile.configureOnOpen.description": {
+    "message": "Automatically configure Makefile project directories when they are opened",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.configuration.makefile.configureOnEdit.description": {
+    "message": "Automatically configure Makefile project directories when any relevant makefiles and/or settings are changed",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
+  "makefile-tools.configuration.makefile.configureAfterCommand.description": {
+    "message": "Automatically configure Makefile project directories after relevant operations, like change build configuration or makefile target",
+    "comment": [
+      "'Makefile' should not be translated"
+    ]
+  },
   "makefile-tools.configuration.makefile.preConfigureScript.description": "The path to the script that needs to be run at least once before configure",
   "makefile-tools.configuration.makefile.preConfigureArgs.description": "Arguments to pass to the pre-configure script",
   "makefile-tools.configuration.makefile.postConfigureScript.description": "The path to the script that needs to be run at least once after configure",
@@ -93,6 +185,10 @@
   "makefile-tools.configuration.makefile.compileCommandsPath.description": "The path to the compilation database file",
   "makefile-tools.configuration.makefile.panel.visibility.debug.description": "Enable debugging locally (in this host) images built by this extension",
   "makefile-tools.configuration.makefile.panel.visibility.run.description": "Enable running locally (in this host) images built by this extension",
-  "makefile-tools.configuration.makefile.panel.visibility.description": "Modify this setting to control the visibility setting in the Makefile Project Outline panel.",
-  "makefile-tools.configuration.makefile.panel.visibility.description.__comment__": "'Makefile Project Outline' should not be translated"
+  "makefile-tools.configuration.makefile.panel.visibility.description": {
+    "message": "Modify this setting to control the visibility setting in the Makefile Project Outline panel.",
+    "comment": [
+      "'Makefile Project Outline' should not be translated"
+    ]
+  }
 }
