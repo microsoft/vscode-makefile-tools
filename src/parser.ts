@@ -463,6 +463,34 @@ async function parseLineAsTool(
   };
 }
 
+// Helper function to find index where quoted string ends.
+// Opening quote passed in 'quote' and searching starts from 'str[start]'.
+function findNextQuoteIndex(str: string, start: number, quote: string): number {
+  // State variable means that in previous step we encountered quote.
+  // 'true' means we are currently escaping this character.
+  let escaping = false;
+  for (let index = start; index < str.length; index++) {
+    const char = str[index];
+    if (escaping) {
+      escaping = false;
+      continue;
+    }
+
+    if (char === '\\') {
+      escaping = true;
+      continue;
+    }
+  
+    if (char === quote) {
+      return index;
+    }
+  }
+
+  // Maybe we hit end without quoted string end.
+  // This can mean, that string is misformed.
+  return str.length;
+}
+
 // Helper to identify anything that looks like a compiler switch in the given command string.
 // The result is passed to IntelliSense custom configuration provider as compilerArgs.
 // excludeArgs helps with narrowing down the search, when we know for sure that we're not
@@ -476,14 +504,17 @@ async function parseAnySwitchFromToolArguments(
   excludeArgs: string[]
 ): Promise<string[]> {
   // Identify the non value part of the switch: prefix, switch name
-  // and what may separate this from an eventual switch value
+  // and what may separate this from an eventual switch value.
+  // Also, try to match quoted value in right part to parse whole string.
   let switches: string[] = [];
   let regExpStr: string =
     "(^|\\s+)(--|-" +
     // On Win32 allow '/' as switch prefix as well,
     // otherwise it conflicts with path character
-    (process.platform === "win32" ? "|\\/" : "") +
-    ")([a-zA-Z0-9_]+)";
+    (process.platform === "win32" ? "|\\/)" : ")") +
+    "([a-zA-Z0-9_]+)" + 
+    // Try to match quoted value of argument
+    "(=(\"|\'))?";
   let regexp: RegExp = RegExp(regExpStr, "mg");
   let match1: RegExpExecArray | null;
   let match2: RegExpExecArray | null;
@@ -524,12 +555,24 @@ async function parseAnySwitchFromToolArguments(
       index2 = args.length;
     }
 
-    // The substring to analyze for the current switch.
-    // It doesn't help to look beyond the next switch match.
-    let partialArgs: string = args.substring(index1, index2);
-    let swi: string = match1[3];
-    swi = swi.trim();
+    let partialArgs: string;
+    let swi: string;
 
+    // Argument can have assignment with quoted value.
+    // If we found one, than go ahead, find end of it and update 'index2'.
+    if (match1[4]) {
+      index2 = findNextQuoteIndex(args, index1 + match1[0].length, match1[5]);
+
+      // Reset global regex state to match new next argument.
+      args = args.substring(index2 + 1);
+      regexp = RegExp(regexp.source, regexp.flags);
+      match2 = regexp.exec(args);
+    }
+
+    partialArgs = args.substring(index1, index2);
+    swi = match1[3];
+    swi = swi.trim();
+    
     // Skip over any switches that we know we don't need
     let exclude: boolean = false;
     for (const arg of excludeArgs) {
@@ -629,6 +672,7 @@ async function parseAnySwitchFromToolArguments(
           "compiler.args.parser.failed",
           "The compiler args parser script '{0}' failed with error code {1} for regions ({2})",
           parseCompilerArgsScriptFile,
+          result.returnCode,
           compilerArgRegions
         ),
         "Normal"
