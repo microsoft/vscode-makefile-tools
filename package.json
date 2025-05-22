@@ -12,7 +12,7 @@
   },
   "license": "SEE LICENSE IN LICENSE.txt",
   "engines": {
-    "vscode": "^1.74.0"
+    "vscode": "^1.95.0"
   },
   "bugs": {
     "url": "https://github.com/Microsoft/vscode-makefile-tools/issues",
@@ -78,6 +78,29 @@
   ],
   "main": "./dist/main",
   "contributes": {
+    "languageModelTools": [
+      {
+        "name": "makefile-tools-build",
+        "tags": [
+          "makefile",
+          "build"
+        ],
+        "toolReferenceName": "makefileToolsBuilds",
+        "displayName": "Makefile Tools Build",
+        "modelDescription": "Build a Makefile project",
+        "userDescription": "Build a Makefile project using the Makefile Tools extension.",
+        "canBeReferencedInPrompt": true,
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "buildTarget": {
+              "type": "string",
+              "description": "The specific build target to build. If not specified, the default build target will be used."
+            }
+          }
+        }
+      }
+    ],
     "commands": [
       {
         "command": "makefile.buildTarget",
@@ -874,7 +897,7 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "^20.14.2",
     "@types/uuid": "^9.0.7",
-    "@types/vscode": "^1.74.0",
+    "@types/vscode": "^1.95.0",
     "@vscode/vsce": "^3.1.0",
     "tslint": "^5.20.1",
     "tslint-microsoft-contrib": "^6.2.0",

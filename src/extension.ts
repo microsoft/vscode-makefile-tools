@@ -20,6 +20,7 @@ import * as cpp from "vscode-cpptools";
 
 import * as nls from "vscode-nls";
 import { TelemetryEventProperties } from "@vscode/extension-telemetry";
+import { BuildTool } from "./languageModelTools/buildTool";
 nls.config({
   messageFormat: nls.MessageFormat.bundle,
   bundleFormat: nls.BundleFormat.standalone,
@@ -279,6 +280,10 @@ export async function activate(
   await extension.setFullFeatureSet(false);
 
   telemetry.activate();
+
+  context.subscriptions.push(
+    vscode.lm.registerTool("makefile-tools-build", new BuildTool())
+  );
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
