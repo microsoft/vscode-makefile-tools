@@ -87,7 +87,7 @@
         ],
         "toolReferenceName": "makefileToolsBuilds",
         "displayName": "Makefile Tools Build",
-        "modelDescription": "Build a Makefile project",
+        "modelDescription": "Build a Makefile project. If a project is asked to be built that has a Makefile, this tool can be used to build it.",
         "userDescription": "Build a Makefile project using the Makefile Tools extension.",
         "canBeReferencedInPrompt": true,
         "inputSchema": {
@@ -98,7 +98,8 @@
               "description": "The specific build target to build. If not specified, the default build target will be used."
             }
           }
-        }
+        },
+        "when": "makefile:fullFeatureSet && isWorkspaceTrusted"
       }
     ],
     "commands": [
