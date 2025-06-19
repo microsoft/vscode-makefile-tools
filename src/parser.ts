@@ -2149,8 +2149,6 @@ export function parseStandard(
 ): util.StandardVersion | undefined {
   let canUseGnu: boolean =
     cppVersion !== undefined && cppVersion >= cpp.Version.v4;
-  let canUseCxx23: boolean =
-    cppVersion !== undefined && cppVersion >= cpp.Version.v6;
   let standard: util.StandardVersion | undefined;
   if (cppVersion && cppVersion >= cpp.Version.v5 && std === undefined) {
     // C/C++ standard is optional for CppTools v5+ and is determined by CppTools.
@@ -2165,7 +2163,7 @@ export function parseStandard(
       return "c++17";
     }
   } else if (language === "cpp") {
-    standard = parseCppStandard(std, canUseGnu, canUseCxx23);
+    standard = parseCppStandard(std, canUseGnu);
     if (!standard) {
       logger.message(
         localize(
@@ -2189,7 +2187,7 @@ export function parseStandard(
       );
     }
   } else if (language === undefined) {
-    standard = parseCppStandard(std, canUseGnu, canUseCxx23);
+    standard = parseCppStandard(std, canUseGnu);
     if (!standard) {
       standard = parseCStandard(std, canUseGnu);
     }
@@ -2212,21 +2210,15 @@ export function parseStandard(
 
 function parseCppStandard(
   std: string,
-  canUseGnu: boolean,
-  canUseCxx23: boolean
+  canUseGnu: boolean
 ): util.StandardVersion | undefined {
   const isGnu: boolean = canUseGnu && std.startsWith("gnu");
   if (
-    std.endsWith("++23") ||
-    std.endsWith("++2b") ||
-    std.endsWith("++latest")
+    std === "c++latest" ||
+    std.endsWith("++26") || std.endsWith("++2c") ||
+    std.endsWith("++23") || std.endsWith("++2b") || std === "c++23preview" ||
+    std.endsWith("++20") || std.endsWith("++2a")
   ) {
-    if (canUseCxx23) {
-      return isGnu ? "gnu++23" : "c++23";
-    } else {
-      return isGnu ? "gnu++20" : "c++20";
-    }
-  } else if (std.endsWith("++2a") || std.endsWith("++20")) {
     return isGnu ? "gnu++20" : "c++20";
   } else if (std.endsWith("++17") || std.endsWith("++1z")) {
     return isGnu ? "gnu++17" : "c++17";
@@ -2255,7 +2247,7 @@ function parseCStandard(
     return isGnu ? "gnu99" : "c99";
   } else if (/(c|gnu)(11|1x|iso9899:2011)/.test(std)) {
     return isGnu ? "gnu11" : "c11";
-  } else if (/(c|gnu)(17|18|iso9899:(2017|2018))/.test(std)) {
+  } else if (/(c|gnu)(17|18|23|2x|2y|iso9899:(2017|2018|2023))/.test(std)) {
     if (canUseGnu) {
       // cpptools supports 'c17' in same version it supports GNU std.
       return isGnu ? "gnu17" : "c17";
