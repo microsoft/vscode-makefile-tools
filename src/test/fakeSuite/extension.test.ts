@@ -359,7 +359,7 @@ suite("Fake dryrun parsing", () => {
         );
         let status: string = await vscode.commands.executeCommand(
           "makefile.validateLaunchConfiguration"
-        );
+        ) ?? "";
         let launchConfiguration: configuration.LaunchConfiguration | undefined;
         if (status === launch.LaunchStatuses.success) {
           launchConfiguration = await vscode.commands.executeCommand(
@@ -476,7 +476,7 @@ suite("Fake dryrun parsing", () => {
         );
         let status: string = await vscode.commands.executeCommand(
           "makefile.validateLaunchConfiguration"
-        );
+        ) ?? "";
         let launchConfiguration: configuration.LaunchConfiguration | undefined;
         if (status === launch.LaunchStatuses.success) {
           launchConfiguration = await vscode.commands.executeCommand(
@@ -571,7 +571,7 @@ suite("Fake dryrun parsing", () => {
         );
         let status: string = await vscode.commands.executeCommand(
           "makefile.validateLaunchConfiguration"
-        );
+        ) ?? "";
         let launchConfiguration: configuration.LaunchConfiguration | undefined;
         if (status === launch.LaunchStatuses.success) {
           launchConfiguration = await vscode.commands.executeCommand(
@@ -671,7 +671,7 @@ suite("Fake dryrun parsing", () => {
         );
         let status: string = await vscode.commands.executeCommand(
           "makefile.validateLaunchConfiguration"
-        );
+        ) ?? "";
         let launchConfiguration: configuration.LaunchConfiguration | undefined;
         if (status === launch.LaunchStatuses.success) {
           launchConfiguration = await vscode.commands.executeCommand(
@@ -814,7 +814,7 @@ suite("Fake dryrun parsing", () => {
       "makefile.expandVariablesInSetting",
       "defaultLaunchConfiguration.stopAtEntry",
       "${config:makefile.panel.visibility.debug}"
-    );
+    ) ?? "";
     let tmpDefaultLaunchConfiguration: configuration.DefaultLaunchConfiguration =
       {
         miDebuggerPath:

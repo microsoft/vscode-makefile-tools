@@ -290,7 +290,7 @@ export class Launcher implements vscode.Disposable {
           make.TriggeredBy.buildTarget,
           currentBuildTarget,
           false
-        )) === make.ConfigureBuildReturnCodeTypes.success;
+        )).result === make.ConfigureBuildReturnCodeTypes.success;
       if (!buildSuccess) {
         logger.message(
           localize(

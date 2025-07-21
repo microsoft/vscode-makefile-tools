@@ -17,6 +17,8 @@ import * as vscode from "vscode";
 import { v4 as uuidv4 } from "uuid";
 
 import * as nls from "vscode-nls";
+import { CustomBuildTaskTerminal } from "./build/customBuildTask";
+import { CommandResult } from "vscode-makefile-tools-api";
 nls.config({
   messageFormat: nls.MessageFormat.bundle,
   bundleFormat: nls.BundleFormat.standalone,
@@ -118,6 +120,7 @@ export enum TriggeredBy {
   configureBeforeLaunchTargetChange = "configureDirty (before launch target change), settings (configureAfterCommand)",
   launch = "Launch (debug|run)",
   tests = "Makefile Tools Regression Tests",
+  api = "Makefile Tools API"
 }
 
 let fileIndex: Map<string, cpptools.SourceFileConfigurationItem> = new Map<
@@ -284,14 +287,15 @@ const makefileBuildTaskName: string = "Makefile Tools Build Task";
 export async function buildTarget(
   triggeredBy: TriggeredBy,
   target: string,
-  clean: boolean = false
-): Promise<number> {
+  clean: boolean = false,
+  cancellationToken?: vscode.CancellationToken
+): Promise<CommandResult> {
   if (blockedByOp(Operations.build)) {
-    return ConfigureBuildReturnCodeTypes.blocked;
+    return { result: ConfigureBuildReturnCodeTypes.blocked };
   }
 
   if (!saveAll()) {
-    return ConfigureBuildReturnCodeTypes.saveFailed;
+    return { result: ConfigureBuildReturnCodeTypes.saveFailed };
   }
 
   // Same start time for build and an eventual configure.
@@ -304,7 +308,7 @@ export async function buildTarget(
     logger.message(
       localize(
         "project.needs.configure.for.build",
-        "The project needs to configure in order to build properly the current target."
+        "The project needs to configure in order to build properly."
       )
     );
     if (configuration.getConfigureAfterCommand()) {
@@ -327,7 +331,7 @@ export async function buildTarget(
     configuration.getCurrentMakefileConfiguration();
   let configAndTarget: string = config;
   if (target) {
-    target = target.trimLeft();
+    target = target.trimStart();
     if (target !== "") {
       configAndTarget += "/" + target;
     }
@@ -356,7 +360,8 @@ export async function buildTarget(
         cancellable: true,
       },
       async (progress, cancel) => {
-        cancel.onCancellationRequested(async () => {
+        const combinedToken = util.createCombinedCancellationToken(cancel, cancellationToken);
+        combinedToken.onCancellationRequested(async () => {
           progress.report({
             increment: 1,
             message: localize("make.build.cancelling", "Cancelling..."),
@@ -405,7 +410,7 @@ export async function buildTarget(
           await doBuildTarget(progress, "clean", clearOutput);
         }
 
-        let retc: number = await doBuildTarget(
+        let retc: CommandResult = await doBuildTarget(
           progress,
           target,
           clearOutput && !clean
@@ -414,7 +419,7 @@ export async function buildTarget(
         // We need to know whether this build was cancelled by the user
         // more than the real exit code of the make process in this circumstance.
         if (cancelBuild) {
-          retc = ConfigureBuildReturnCodeTypes.cancelled;
+          retc.result = ConfigureBuildReturnCodeTypes.cancelled;
         }
 
         let buildElapsedTime: number = util.elapsedTimeSince(buildStartTime);
@@ -451,18 +456,10 @@ export async function doBuildTarget(
   progress: vscode.Progress<{}>,
   target: string,
   clearTerminalOutput: boolean
-): Promise<number> {
+): Promise<CommandResult> {
   let makeArgs: string[] = prepareBuildTarget(target);
   try {
-    const quotingStlye: vscode.ShellQuoting = vscode.ShellQuoting.Strong;
     const quotingStyleName: string = "Strong";
-    let myTaskCommand: vscode.ShellQuotedString = {
-      value: configuration.getConfigurationMakeCommand(),
-      quoting: quotingStlye,
-    };
-    let myTaskArgs: vscode.ShellQuotedString[] = makeArgs.map((arg) => {
-      return { value: arg, quoting: quotingStlye };
-    });
 
     const cwd: string = configuration.makeBaseDirectory();
     if (!util.checkDirectoryExistsSync(cwd)) {
@@ -474,31 +471,29 @@ export async function doBuildTarget(
           cwd
         )
       );
-      return ConfigureBuildReturnCodeTypes.notFound;
+      return { result: ConfigureBuildReturnCodeTypes.notFound };
     }
 
-    let myTaskOptions: vscode.ShellExecutionOptions = {
-      // Only pass a defined environment if there are modified environment variables.
-      env:
-        Object.keys(util.modifiedEnvironmentVariables).length > 0
-          ? util.mergeEnvironment(
-              util.modifiedEnvironmentVariables as util.EnvironmentVariables
-            )
-          : undefined,
-      cwd,
-    };
-
-    let shellExec: vscode.ShellExecution = new vscode.ShellExecution(
-      myTaskCommand,
-      myTaskArgs,
-      myTaskOptions
-    );
+    const customBuildTask = new CustomBuildTaskTerminal(
+            configuration.getConfigurationMakeCommand(),
+            makeArgs,
+            cwd,
+            Object.keys(util.modifiedEnvironmentVariables).length > 0
+              ? util.mergeEnvironment(
+                  util.modifiedEnvironmentVariables as util.EnvironmentVariables
+                )
+              : undefined
+          );
     let myTask: vscode.Task = new vscode.Task(
       { type: "shell", group: "build", label: makefileBuildTaskName },
       vscode.TaskScope.Workspace,
       makefileBuildTaskName,
       "makefile",
-      shellExec
+      new vscode.CustomExecution(
+        async(): Promise<vscode.Pseudoterminal> => {
+          return customBuildTask;
+        }
+      )
     );
 
     myTask.problemMatchers = configuration.getConfigurationProblemMatchers();
@@ -511,25 +506,31 @@ export async function doBuildTarget(
         'Executing task: "{0}" with quoting style "{1}"\n command name: {2}\n command args {3}',
         myTask.name,
         quotingStyleName,
-        myTaskCommand.value,
+        configuration.getConfigurationMakeCommand(),
         makeArgs.join()
       ),
       "Debug"
     );
     await vscode.tasks.executeTask(myTask);
 
-    const result: number = await new Promise<number>((resolve) => {
+    const result: CommandResult = await new Promise<CommandResult>((resolve) => {
       let disposable: vscode.Disposable = vscode.tasks.onDidEndTaskProcess(
         (e: vscode.TaskProcessEndEvent) => {
           if (e.execution.task.name === makefileBuildTaskName) {
             disposable.dispose();
-            resolve(e.exitCode ?? ConfigureBuildReturnCodeTypes.other);
+            if (e.exitCode !== undefined) {
+              resolve({
+                result: e.exitCode,
+                stdout: customBuildTask.stdout,
+                stderr: customBuildTask.stderr,
+              })
+            }
           }
         }
       );
     });
 
-    if (result !== ConfigureBuildReturnCodeTypes.success) {
+    if (result.result !== ConfigureBuildReturnCodeTypes.success) {
       logger.message(
         localize(
           "target.failed.to.build",
@@ -547,11 +548,11 @@ export async function doBuildTarget(
       );
     }
 
-    return result;
+    return result
   } catch (error) {
     // No need for notification popup, since the build result is visible already in the output channel
     logger.message(error);
-    return ConfigureBuildReturnCodeTypes.notFound;
+    return { result: ConfigureBuildReturnCodeTypes.notFound };
   }
 }
 
@@ -805,11 +806,12 @@ export async function generateParseContent(
       stdoutCallback: stdout,
       stderrCallback: stderr,
     };
-    const result: util.SpawnProcessResult = await util.spawnChildProcess(
+    const spawnProcess: util.SpawnProcess = util.spawnChildProcess(
       configuration.getConfigurationMakeCommand(),
       makeArgs,
       opts
     );
+    const result: util.SpawnProcessResult = await spawnProcess.result;
     clearInterval(timeout);
     let elapsedTime: number = util.elapsedTimeSince(startTime);
     logger.message(
@@ -930,7 +932,7 @@ export async function prePostConfigureHelper(
               cancellable: false,
             },
             async (progress) => {
-              await util.killTree(progress, curPID);
+              await util.killTree(curPID, progress);
             }
           );
         });
@@ -1185,11 +1187,12 @@ export async function runPrePostConfigureScript(
       stdoutCallback: stdout,
       stderrCallback: stderr,
     };
-    const result: util.SpawnProcessResult = await util.spawnChildProcess(
+    const spawnProcess: util.SpawnProcess = util.spawnChildProcess(
       runCommand,
       concreteScriptArgs,
       opts
     );
+    const result: util.SpawnProcessResult = await spawnProcess.result;
     if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
       if (someErr) {
         // Depending how the preconfigure scripts (and any inner called sub-scripts) are written,
@@ -1550,7 +1553,7 @@ export async function configure(
                 cancellable: false,
               },
               async (progress) => {
-                return util.killTree(progress, curPID);
+                return util.killTree(curPID, progress);
               }
             );
           } else {
