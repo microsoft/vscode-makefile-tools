@@ -378,7 +378,7 @@ export async function buildTarget(
           // This will take care of all processes that were spawned.
           let myTask: vscode.TaskExecution | undefined =
             vscode.tasks.taskExecutions.find((tsk) => {
-              if (tsk.task.name === makefileBuildTaskName) {
+              if (tsk.task.name.startsWith(makefileBuildTaskName)) {
                 return tsk;
               }
             });
@@ -474,8 +474,10 @@ export async function doBuildTarget(
       return { result: ConfigureBuildReturnCodeTypes.notFound };
     }
 
+    const makeCommand = configuration.getConfigurationMakeCommand();
+
     const customBuildTask = new CustomBuildTaskTerminal(
-            configuration.getConfigurationMakeCommand(),
+            makeCommand,
             makeArgs,
             cwd,
             Object.keys(util.modifiedEnvironmentVariables).length > 0
@@ -484,10 +486,12 @@ export async function doBuildTarget(
                 )
               : undefined
           );
+
+    const label = `${makefileBuildTaskName} "${makeCommand} ${makeArgs.join(" ")}"`;
     let myTask: vscode.Task = new vscode.Task(
-      { type: "shell", group: "build", label: makefileBuildTaskName },
+      { type: "shell", group: "build", label: label },
       vscode.TaskScope.Workspace,
-      makefileBuildTaskName,
+      label,
       "makefile",
       new vscode.CustomExecution(
         async(): Promise<vscode.Pseudoterminal> => {
@@ -506,7 +510,7 @@ export async function doBuildTarget(
         'Executing task: "{0}" with quoting style "{1}"\n command name: {2}\n command args {3}',
         myTask.name,
         quotingStyleName,
-        configuration.getConfigurationMakeCommand(),
+        makeCommand,
         makeArgs.join()
       ),
       "Debug"
@@ -516,7 +520,7 @@ export async function doBuildTarget(
     const result: CommandResult = await new Promise<CommandResult>((resolve) => {
       let disposable: vscode.Disposable = vscode.tasks.onDidEndTaskProcess(
         (e: vscode.TaskProcessEndEvent) => {
-          if (e.execution.task.name === makefileBuildTaskName) {
+          if (e.execution.task.name.startsWith(makefileBuildTaskName)) {
             disposable.dispose();
             if (e.exitCode !== undefined) {
               resolve({
