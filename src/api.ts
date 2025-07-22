@@ -23,9 +23,9 @@ export class MakefileToolsApiImpl implements api.MakefileToolsApi {
   }
 }
 
-function logApiTelemetry(event: string, version: api.Version): void {
+function logApiTelemetry(method: string, version: api.Version): void {
   logEvent("api", {
-    event: event,
-    version: api.Version.v1.toString(),
+    method: method,
+    version: version.toString(),
   });
 }
