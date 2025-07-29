@@ -291,11 +291,11 @@ export async function buildTarget(
   cancellationToken?: vscode.CancellationToken
 ): Promise<CommandResult> {
   if (blockedByOp(Operations.build)) {
-    return { result: ConfigureBuildReturnCodeTypes.blocked };
+    return { exitCode: ConfigureBuildReturnCodeTypes.blocked };
   }
 
   if (!saveAll()) {
-    return { result: ConfigureBuildReturnCodeTypes.saveFailed };
+    return { exitCode: ConfigureBuildReturnCodeTypes.saveFailed };
   }
 
   // Same start time for build and an eventual configure.
@@ -419,7 +419,7 @@ export async function buildTarget(
         // We need to know whether this build was cancelled by the user
         // more than the real exit code of the make process in this circumstance.
         if (cancelBuild) {
-          retc.result = ConfigureBuildReturnCodeTypes.cancelled;
+          retc.exitCode = ConfigureBuildReturnCodeTypes.cancelled;
         }
 
         let buildElapsedTime: number = util.elapsedTimeSince(buildStartTime);
@@ -471,7 +471,7 @@ export async function doBuildTarget(
           cwd
         )
       );
-      return { result: ConfigureBuildReturnCodeTypes.notFound };
+      return { exitCode: ConfigureBuildReturnCodeTypes.notFound };
     }
 
     const makeCommand = configuration.getConfigurationMakeCommand();
@@ -524,7 +524,7 @@ export async function doBuildTarget(
             disposable.dispose();
             if (e.exitCode !== undefined) {
               resolve({
-                result: e.exitCode,
+                exitCode: e.exitCode,
                 stdout: customBuildTask.stdout,
                 stderr: customBuildTask.stderr,
               })
@@ -534,7 +534,7 @@ export async function doBuildTarget(
       );
     });
 
-    if (result.result !== ConfigureBuildReturnCodeTypes.success) {
+    if (result.exitCode !== ConfigureBuildReturnCodeTypes.success) {
       logger.message(
         localize(
           "target.failed.to.build",
@@ -556,7 +556,7 @@ export async function doBuildTarget(
   } catch (error) {
     // No need for notification popup, since the build result is visible already in the output channel
     logger.message(error);
-    return { result: ConfigureBuildReturnCodeTypes.notFound };
+    return { exitCode: ConfigureBuildReturnCodeTypes.notFound };
   }
 }
 

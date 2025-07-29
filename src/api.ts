@@ -1,9 +1,8 @@
 import * as api from "vscode-makefile-tools-api";
 import * as vscode from "vscode";
 import * as make from "./make";
-import { getBuildTargets } from "./configuration";
+import { getTargets } from "./configuration";
 import { logEvent } from "./telemetry";
-import { log } from "console";
 
 export class MakefileToolsApiImpl implements api.MakefileToolsApi {
   constructor(public version: api.Version = api.Version.v1) {
@@ -19,7 +18,7 @@ export class MakefileToolsApiImpl implements api.MakefileToolsApi {
   }
   async listBuildTargets(): Promise<string[] | undefined> {
     logApiTelemetry("listBuildTargets", this.version);
-    return getBuildTargets();
+    return getTargets();
   }
 }
 

@@ -912,7 +912,7 @@
     "vscode-nls": "^5.0.0",
     "@vscode/extension-telemetry": "^0.9.6",
     "vscode-jsonrpc": "^3.6.2",
-    "vscode-makefile-tools-api": "file:../gcampbell/vscode-makefile-tools-api"
+    "vscode-makefile-tools-api": "file:../vscode-makefile-tools-api"
   },
   "resolutions": {
     "ansi-regex": "^5.0.1",

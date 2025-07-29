@@ -5782,8 +5782,8 @@ vscode-jsonrpc@^3.6.2:
   resolved "https://pkgs.dev.azure.com/azure-public/VisualCpp/_packaging/cpp_PublicPackages/npm/registry/vscode-jsonrpc/-/vscode-jsonrpc-3.6.2.tgz#3b5eef691159a15556ecc500e9a8a0dd143470c8"
   integrity "sha1-O17vaRFZoVVW7MUA6aig3RQ0cMg= sha512-T24Jb5V48e4VgYliUXMnZ379ItbrXgOimweKaJshD84z+8q7ZOZjJan0MeDe+Ugb+uqERDVV8SBmemaGMSMugA=="
 
-"vscode-makefile-tools-api@file:../gcampbell/vscode-makefile-tools-api":
-  version "1.0.0"
+"vscode-makefile-tools-api@file:../vscode-makefile-tools-api":
+  version "0.0.1"
 
 vscode-nls-dev@^3.3.2:
   version "3.3.2"

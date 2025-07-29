@@ -2429,7 +2429,7 @@ export async function setTargetByName(targetName: string): Promise<void> {
   extension._projectOutlineProvider.updateBuildTarget(targetName);
 }
 
-export async function getTargets(): Promise<string[]> {
+export function getTargets(): string[] {
   // Ensure "all" is always available as a target to select.
   // There are scenarios when "all" might not be present in the list of available targets,
   // for example when the extension is using a build log or dryrun cache of a previous state
@@ -2485,7 +2485,7 @@ export async function selectTarget(): Promise<void> {
     }
   }
 
-  getBuildTargets();
+  getTargets();
 
   const chosen: string | undefined = await vscode.window.showQuickPick(
     buildTargets
