@@ -1403,7 +1403,7 @@ export function createCombinedCancellationToken(...tokens: (vscode.CancellationT
     }
 
     combinedSource.token.onCancellationRequested(() => {
-        disposables.forEach(d => d.dispose());
+      setImmediate(() => disposables.forEach(d => d.dispose()));
     });
 
     return combinedSource.token;
