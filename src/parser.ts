@@ -661,11 +661,12 @@ async function parseAnySwitchFromToolArguments(
       stdoutCallback: stdout,
       stderrCallback: stderr,
     };
-    const result: util.SpawnProcessResult = await util.spawnChildProcess(
+    const spawnProcess: util.SpawnProcess = util.spawnChildProcess(
       runCommand,
       scriptArgs,
       opts
     );
+    const result: util.SpawnProcessResult = await spawnProcess.result;
     if (result.returnCode !== 0) {
       logger.message(
         localize(

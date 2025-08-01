@@ -20,6 +20,8 @@ import * as cpp from "vscode-cpptools";
 
 import * as nls from "vscode-nls";
 import { TelemetryEventProperties } from "@vscode/extension-telemetry";
+import { Version, MakefileToolsApi, MakefileToolsExtensionExports } from "vscode-makefile-tools-api";
+import { MakefileToolsApiImpl } from "./api";
 nls.config({
   messageFormat: nls.MessageFormat.bundle,
   bundleFormat: nls.BundleFormat.standalone,
@@ -31,7 +33,7 @@ let launcher: launch.Launcher = launch.getLauncher();
 
 export let extension: MakefileToolsExtension;
 
-export class MakefileToolsExtension {
+export class MakefileToolsExtension implements MakefileToolsExtensionExports {
   public readonly _projectOutlineProvider = new tree.ProjectOutlineProvider();
   private readonly _projectOutlineTreeView = vscode.window.createTreeView(
     "makefile.outline",
@@ -51,10 +53,18 @@ export class MakefileToolsExtension {
   private cppToolsAPI?: cpp.CppToolsApi;
   private cppConfigurationProviderRegister?: Promise<void>;
   private compilerFullPath?: string;
+  public api: MakefileToolsApiImpl;
 
   public constructor(
-    public readonly extensionContext: vscode.ExtensionContext
-  ) {}
+    public readonly extensionContext: vscode.ExtensionContext,
+    apiVersion: Version = Version.v1
+  ) {
+    this.api = new MakefileToolsApiImpl(apiVersion);
+  }
+
+  getApi(version: Version): MakefileToolsApi {
+    return new MakefileToolsApiImpl(version);
+  }
 
   public updateBuildLogPresent(newValue: boolean): void {
     vscode.commands.executeCommand(
@@ -258,7 +268,7 @@ export class MakefileToolsExtension {
 
 export async function activate(
   context: vscode.ExtensionContext
-): Promise<void> {
+): Promise<MakefileToolsExtensionExports> {
   if (process.env["MAKEFILE_TOOLS_TESTING"] === "1") {
     await vscode.commands.executeCommand(
       "setContext",
@@ -858,6 +868,11 @@ export async function activate(
   if (telemetryProperties && util.hasProperties(telemetryProperties)) {
     telemetry.logEvent("settings", telemetryProperties);
   }
+
+  return { getApi: (_version: Version) => {
+        return extension.api;
+    }
+  };
 }
 
 export async function deactivate(): Promise<void> {
