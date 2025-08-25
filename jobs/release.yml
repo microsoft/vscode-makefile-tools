@@ -2,12 +2,11 @@
 # Licensed under the MIT License.
 
 parameters:
-  - name: SignTypeOverride
-    displayName: Signing Type Override
+  - name: signType
+    displayName: Signing Type
     type: string
-    default: default
+    default: test
     values:
-      - default
       - test
       - real
   - name: VerifyChangelog
@@ -68,11 +67,27 @@ extends:
     customBuildTags:
       - ES365AIMigrationTooling
     stages:
+      - stage: verify_parameters
+        jobs:
+          - job: verify
+            steps:
+              - checkout: none
+              # Introduce pipeline compilation errors to block scheduling if the requisite parameters are not set
+              - ${{ if not(eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+                  - "This pipeline can only be run on main branch."
+
       - stage: stage
         jobs:
           - job: Job_1
             displayName: Build release
             templateContext:
+              mb: # Enable the MicroBuild Signing toolset
+                signing:
+                  enabled: true
+                  signType: ${{ parameters.signType }}
+                  zipSources: false
+                  ${{ if eq(parameters.signType, 'real') }}:
+                    signWithProd: true
               outputs:
                 - output: pipelineArtifact
                   displayName: "Publish VSIX"
@@ -93,3 +108,4 @@ extends:
               - template: /jobs/shared/build.yml@self
                 parameters:
                   ReleaseVersion: ${{ parameters.ReleaseVersion }}
+                  signType: ${{ parameters.signType }}
