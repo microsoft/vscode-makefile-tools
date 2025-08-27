@@ -42,11 +42,36 @@ extends:
     customBuildTags:
       - ES365AIMigrationTooling
     stages:
+      - stage: verify_parameters
+        jobs:
+          - job: verify
+            displayName: Verify parameters
+            steps:
+              - checkout: none
+              # breaking issue: variables['Build.SourceBranch'] is evaluating to ''.
+              # TODO: Figure out why
+              #- ${{ if not(eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+              #  - 'This pipeline can only be run on main branch.'
+
+              # Workaround for the previous check not working
+              - powershell: |
+                  Write-Host "##vso[task.logissue type=error]This pipeline can only be run from the main branch. Actual: $(Build.SourceBranch)"
+                  exit 1
+                displayName: "Enforce main branch"
+                condition: ne(variables['Build.SourceBranch'], 'refs/heads/main')
+
       - stage: stage
+        dependsOn: verify_parameters
         jobs:
           - job: Job_1
             displayName: Build pre-release
             templateContext:
+              mb: # Enable the MicroBuild Signing toolset
+                signing:
+                  enabled: true
+                  signType: real
+                  zipSources: false
+                  signWithProd: true
               outputs:
                 - output: pipelineArtifact
                   displayName: "Publish VSIX"
@@ -98,3 +123,4 @@ extends:
               - template: /jobs/shared/build.yml@self
                 parameters:
                   ReleaseVersion: $(ReleaseVersion)
+                  signType: real
