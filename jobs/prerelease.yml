@@ -28,8 +28,6 @@ variables:
     value: unset
   - name: TeamName
     value: C++ Cross Platform and Cloud
-  - name: SignType
-    value: real
 
 extends:
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
@@ -41,6 +39,7 @@ extends:
         name: VSEngSS-MicroBuild2022-1ES
     customBuildTags:
       - ES365AIMigrationTooling
+
     stages:
       - stage: verify_parameters
         jobs:
