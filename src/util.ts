@@ -72,6 +72,7 @@ export interface ProcOptions {
   ensureQuoted?: boolean;
   stdoutCallback?: (stdout: string) => void;
   stderrCallback?: (stderr: string) => void;
+  env?: { [key: string]: string };
 }
 
 export function checkFileExistsSync(filePath: string): boolean {
@@ -236,8 +237,8 @@ function taskKill(pid: number): Promise<void> {
 }
 
 export async function killTree(
-  progress: vscode.Progress<{}>,
-  pid: number
+  pid: number,
+  progress?: vscode.Progress<{}>,
 ): Promise<void> {
   if (process.platform === "win32") {
     try {
@@ -270,11 +271,12 @@ export async function killTree(
       stdoutCallback: stdout,
     };
     // pgrep should run on english, regardless of the system setting.
-    const result: SpawnProcessResult = await spawnChildProcess(
+    const process: SpawnProcess = spawnChildProcess(
       "pgrep",
       ["-P", pid.toString()],
       opts
     );
+    const result: SpawnProcessResult = await process.result;
     if (!!stdoutStr.length) {
       children = stdoutStr
         .split("\n")
@@ -289,7 +291,7 @@ export async function killTree(
       );
       for (const other of children) {
         if (other) {
-          await killTree(progress, other);
+          await killTree(other, progress);
         }
       }
     }
@@ -302,7 +304,7 @@ export async function killTree(
     logger.message(
       localize("killing.process", "Killing process PID = {0}", pid)
     );
-    progress.report({
+    progress?.report({
       increment: 1,
       message: localize(
         "utils.terminate.process",
@@ -354,13 +356,18 @@ export interface SpawnProcessResult {
   signal: string;
 }
 
+export interface SpawnProcess {
+  result: Promise<SpawnProcessResult>;
+  child: child_process.ChildProcess | undefined;
+}
+
 // Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
 // forceEnglish is true when the caller relies on parsing english words from the output.
 export function spawnChildProcess(
   processName: string,
   args: string[],
   options: ProcOptions
-): Promise<SpawnProcessResult> {
+): SpawnProcess {
   const localeOverride: EnvironmentVariables = {
     LANG: "C",
     LC_ALL: "C",
@@ -372,10 +379,13 @@ export function spawnChildProcess(
     : {};
   const finalEnvironment: EnvironmentVariables = mergeEnvironment(
     process.env as EnvironmentVariables,
+    options.env ? options.env : {},
     environment
   );
 
-  return new Promise<SpawnProcessResult>((resolve, reject) => {
+  let child: child_process.ChildProcess | undefined;
+
+  const result = new Promise<SpawnProcessResult>((resolve, reject) => {
     // Honor the "terminal.integrated.automationShell.<platform>" setting.
     // According to documentation (and settings.json schema), the three allowed values for <platform> are "windows", "linux" and "osx".
     // child_process.SpawnOptions accepts a string (which can be read from the above setting) or the boolean true to let VSCode pick a default
@@ -425,7 +435,7 @@ export function spawnChildProcess(
       );
     }
 
-    const child: child_process.ChildProcess = child_process.spawn(
+    child = child_process.spawn(
       qProcessName,
       qArgs,
       {
@@ -462,6 +472,8 @@ export function spawnChildProcess(
       reject(new Error(`Failed to spawn process: ${processName} ${args}`));
     }
   });
+
+  return { child, result };
 }
 
 export async function replaceCommands(
@@ -1176,7 +1188,7 @@ export async function expandVariablesInSetting(
       telemetryProperties.pattern = result[4];
       telemetryProperties.info = result[5];
       try {
-        toStr = await vscode.commands.executeCommand(result[5]);
+        toStr = await vscode.commands.executeCommand(result[5]) ?? "";
       } catch (e) {
         toStr = "unknown";
         logger.message(
@@ -1371,4 +1383,26 @@ export function thisExtensionPackage(): PackageJSON {
 
 export function thisExtensionPath(): string {
   return thisExtension().extensionPath;
+}
+
+export function createCombinedCancellationToken(...tokens: (vscode.CancellationToken | undefined)[]): vscode.CancellationToken {
+    const combinedSource = new vscode.CancellationTokenSource();
+
+    const disposables: vscode.Disposable[] = [];
+
+    for (const token of tokens) {
+        if (token !== undefined) {
+            if (token.isCancellationRequested) {
+                combinedSource.cancel();
+                break;
+            }
+            disposables.push(token.onCancellationRequested(() => combinedSource.cancel()));
+        }
+    }
+
+    combinedSource.token.onCancellationRequested(() => {
+      setImmediate(() => disposables.forEach(d => d.dispose()));
+    });
+
+    return combinedSource.token;
 }
