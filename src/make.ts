@@ -494,7 +494,7 @@ export async function doBuildTarget(
       myTaskOptions
     );
     let myTask: vscode.Task = new vscode.Task(
-      { type: "shell", group: "build", label: makefileBuildTaskName },
+      { type: "makefile", group: "build", label: makefileBuildTaskName },
       vscode.TaskScope.Workspace,
       makefileBuildTaskName,
       "makefile",
