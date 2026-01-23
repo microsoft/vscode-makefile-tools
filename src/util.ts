@@ -778,6 +778,8 @@ export function replaceStringNotInQuotes(
 // Replaces all occurrences of stringToBeReplaced with replacementString,
 // but only when inside single or double quotes.
 // This is the inverse of replaceStringNotInQuotes.
+// Note: This function is intended for replacing characters that are not quote
+// characters themselves. Replacing quote characters would produce unexpected results.
 export function replaceStringInQuotes(
   value: string,
   stringToBeReplaced: string,
