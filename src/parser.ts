@@ -607,6 +607,13 @@ async function parseAnySwitchFromToolArguments(
       /\=/gm,
       "DONT_USE_EQUAL_AS_SEPARATOR"
     );
+    // Also escape spaces inside quotes to prevent the batch script from splitting them.
+    // See https://github.com/microsoft/vscode-makefile-tools/issues/659
+    compilerArgRegions = util.replaceStringInQuotes(
+      compilerArgRegions,
+      " ",
+      "DONT_USE_SPACE_AS_SEPARATOR"
+    );
   }
 
   let scriptArgs: string[] = [];
@@ -626,9 +633,10 @@ async function parseAnySwitchFromToolArguments(
   try {
     let stdout: any = (result: string): void => {
       if (process.platform === "win32") {
-        // Restore the commas and equals that were hidden from the script invocation.
+        // Restore the commas, equals, and spaces that were hidden from the script invocation.
         result = result.replace(/DONT_USE_COMMA_AS_SEPARATOR/gm, ",");
         result = result.replace(/DONT_USE_EQUAL_AS_SEPARATOR/gm, "=");
+        result = result.replace(/DONT_USE_SPACE_AS_SEPARATOR/gm, " ");
       }
       let results: string[] = result.replace(/\r\n/gm, "\n").split("\n");
       // In case of concatenated separators, the shell sees different empty arguments

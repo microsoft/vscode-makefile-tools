@@ -130,6 +130,82 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
   });
 });
 
+suite("Unit testing replacing characters in quotes (replaceStringInQuotes)", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  setup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("Test with no quotes - no replacement", () => {
+    const tests = ["hello world", "no quotes here", " "];
+    const expectedResults = ["hello world", "no quotes here", " "];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringInQuotes(tests[i], " ", "_")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+
+  test("Test with double quotes", () => {
+    const tests = ['"hello world"', 'before "hello world" after'];
+    const expectedResults = ['"hello_world"', 'before "hello_world" after'];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringInQuotes(tests[i], " ", "_")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+
+  test("Test with single quotes", () => {
+    const tests = ["'hello world'", "before 'hello world' after"];
+    const expectedResults = ["'hello_world'", "before 'hello_world' after"];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringInQuotes(tests[i], " ", "_")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+
+  test("Test with complex macro containing spaces in quotes", () => {
+    // This is the actual bug scenario from issue #659
+    const tests = [
+      "-D'LFS_ASSERT(test)'='do { if(!(test)) {return -1;} } while(0)'",
+    ];
+    const expectedResults = [
+      "-D'LFS_ASSERT(test)'='do__{__if(!(test))__{return__-1;}__}__while(0)'",
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringInQuotes(tests[i], " ", "__")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+
+  test("Test with mixed quotes", () => {
+    const tests = [
+      "'-DTEST'='a b c'",
+      'outside "inside space" outside \'more space\' end',
+    ];
+    const expectedResults = [
+      "'-DTEST'='a_b_c'",
+      'outside "inside_space" outside \'more_space\' end',
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringInQuotes(tests[i], " ", "_")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+});
+
 // TODO: refactor initialization and cleanup of each test
 suite("Fake dryrun parsing", () => {
   suiteSetup(async function (this: Mocha.Context) {
