@@ -171,6 +171,14 @@
       "'Makefile' should not be translated"
     ]
   },
+  "makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description": {
+    "message": "Use Clean Configure (which uses --always-make to regenerate all commands) instead of regular Configure when switching build configurations. Clean Configure produces a complete compilation database, while regular Configure only includes out-of-date targets.",
+    "comment": [
+      "'Clean Configure' and 'Configure' refer to extension commands and should not be translated",
+      "'--always-make' is a command line option and should not be translated",
+      "'Makefile' should not be translated"
+    ]
+  },
   "makefile-tools.configuration.makefile.preConfigureScript.description": "The path to the script that needs to be run at least once before configure",
   "makefile-tools.configuration.makefile.preConfigureArgs.description": "Arguments to pass to the pre-configure script",
   "makefile-tools.configuration.makefile.postConfigureScript.description": "The path to the script that needs to be run at least once after configure",
