@@ -36,6 +36,86 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
+suite("Unit testing parseShellSetting", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  setup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("parseShellSetting with undefined returns all undefined", () => {
+    const result = util.parseShellSetting(undefined);
+    expect(result.shellPath).to.be.undefined;
+    expect(result.shellArgs).to.be.undefined;
+    expect(result.shellEnv).to.be.undefined;
+  });
+
+  test("parseShellSetting with string path returns path only", () => {
+    const result = util.parseShellSetting("/usr/bin/bash");
+    expect(result.shellPath).to.equal("/usr/bin/bash");
+    expect(result.shellArgs).to.be.undefined;
+    expect(result.shellEnv).to.be.undefined;
+  });
+
+  test("parseShellSetting with object containing path only", () => {
+    const result = util.parseShellSetting({
+      path: "C:/msys64/usr/bin/bash.exe",
+    });
+    expect(result.shellPath).to.equal("C:/msys64/usr/bin/bash.exe");
+    expect(result.shellArgs).to.be.undefined;
+    expect(result.shellEnv).to.be.undefined;
+  });
+
+  test("parseShellSetting with object containing path and args", () => {
+    const result = util.parseShellSetting({
+      path: "C:/msys64/usr/bin/bash.exe",
+      args: ["--login", "-i"],
+    });
+    expect(result.shellPath).to.equal("C:/msys64/usr/bin/bash.exe");
+    expect(result.shellArgs).to.deep.equal(["--login", "-i"]);
+    expect(result.shellEnv).to.be.undefined;
+  });
+
+  test("parseShellSetting with full automation profile object", () => {
+    const result = util.parseShellSetting({
+      path: "C:/msys64/usr/bin/bash.exe",
+      args: ["--login", "-i"],
+      env: {
+        MSYSTEM: "UCRT64",
+        CHERE_INVOKING: "1",
+        MSYS2_PATH_TYPE: "inherit",
+      },
+    });
+    expect(result.shellPath).to.equal("C:/msys64/usr/bin/bash.exe");
+    expect(result.shellArgs).to.deep.equal(["--login", "-i"]);
+    expect(result.shellEnv).to.deep.equal({
+      MSYSTEM: "UCRT64",
+      CHERE_INVOKING: "1",
+      MSYS2_PATH_TYPE: "inherit",
+    });
+  });
+
+  test("parseShellSetting with empty args array", () => {
+    const result = util.parseShellSetting({
+      path: "/bin/bash",
+      args: [],
+    });
+    expect(result.shellPath).to.equal("/bin/bash");
+    expect(result.shellArgs).to.deep.equal([]);
+    expect(result.shellEnv).to.be.undefined;
+  });
+
+  test("parseShellSetting with null returns all undefined", () => {
+    // This tests the edge case where the setting value might be null
+    const result = util.parseShellSetting(null as unknown as undefined);
+    expect(result.shellPath).to.be.undefined;
+    expect(result.shellArgs).to.be.undefined;
+    expect(result.shellEnv).to.be.undefined;
+  });
+});
+
 suite("Unit testing replacing characters in and outside of quotes", () => {
   suiteSetup(async function (this: Mocha.Context) {
     this.timeout(100000);

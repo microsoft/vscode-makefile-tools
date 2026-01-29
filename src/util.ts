@@ -354,6 +354,42 @@ export interface SpawnProcessResult {
   signal: string;
 }
 
+// Interface for VS Code's terminal.integrated.automationProfile setting
+// This matches the schema defined by VS Code for automationProfile settings
+export interface AutomationProfileSetting {
+  path?: string;
+  args?: string[];
+  env?: EnvironmentVariables;
+}
+
+// Result type for parsed shell configuration
+export interface ParsedShellConfiguration {
+  shellPath: string | undefined;
+  shellArgs: string[] | undefined;
+  shellEnv: EnvironmentVariables | undefined;
+}
+
+// Helper function to parse automation profile settings into a structured shell configuration
+// Exported for testing purposes
+export function parseShellSetting(
+  shellSetting: string | AutomationProfileSetting | undefined
+): ParsedShellConfiguration {
+  let shellPath: string | undefined;
+  let shellArgs: string[] | undefined;
+  let shellEnv: EnvironmentVariables | undefined;
+
+  // Extract shell path, args, and env from the setting
+  if (typeof shellSetting === "object" && shellSetting !== null) {
+    shellPath = shellSetting.path;
+    shellArgs = shellSetting.args;
+    shellEnv = shellSetting.env;
+  } else if (typeof shellSetting === "string") {
+    shellPath = shellSetting;
+  }
+
+  return { shellPath, shellArgs, shellEnv };
+}
+
 // Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
 // forceEnglish is true when the caller relies on parsing english words from the output.
 export function spawnChildProcess(
@@ -376,11 +412,10 @@ export function spawnChildProcess(
   );
 
   return new Promise<SpawnProcessResult>((resolve, reject) => {
-    // Honor the "terminal.integrated.automationShell.<platform>" setting.
+    // Honor the "terminal.integrated.automationProfile.<platform>" or deprecated "automationShell.<platform>" setting.
     // According to documentation (and settings.json schema), the three allowed values for <platform> are "windows", "linux" and "osx".
     // child_process.SpawnOptions accepts a string (which can be read from the above setting) or the boolean true to let VSCode pick a default
     // based on where it is running.
-    let shellType: string | undefined;
     let shellPlatform: string =
       process.platform === "win32"
         ? "windows"
@@ -389,16 +424,23 @@ export function spawnChildProcess(
         : "osx";
     let workspaceConfiguration: vscode.WorkspaceConfiguration =
       vscode.workspace.getConfiguration("terminal");
-    shellType =
-      workspaceConfiguration.get<string>(
+
+    // First try to get automationProfile (preferred), then fall back to deprecated automationShell
+    let shellSetting: string | AutomationProfileSetting | undefined =
+      workspaceConfiguration.get<string | AutomationProfileSetting>(
         `integrated.automationProfile.${shellPlatform}`
-      ) || // automationShell is deprecated
+      ) ||
       workspaceConfiguration.get<string>(
         `integrated.automationShell.${shellPlatform}`
-      ); // and replaced with automationProfile
+      ); // automationShell is deprecated and replaced with automationProfile
 
-    if (typeof shellType === "object") {
-      shellType = shellType["path"];
+    // Parse shell configuration from the setting
+    const { shellPath, shellArgs, shellEnv } = parseShellSetting(shellSetting);
+
+    // Merge shell environment from automationProfile with existing environment
+    let spawnEnvironment = finalEnvironment;
+    if (shellEnv) {
+      spawnEnvironment = mergeEnvironment(finalEnvironment, shellEnv);
     }
 
     // Final quoting decisions for process name and args before being executed.
@@ -415,25 +457,36 @@ export function spawnChildProcess(
       logger.message(
         localize(
           "utils.quoting",
-          "Spawning child process with:\n process name: {0}\n process args: {1}\n working directory: {2}\n shell type: {3}",
+          "Spawning child process with:\n process name: {0}\n process args: {1}\n working directory: {2}\n shell path: {3}\n shell args: {4}",
           qProcessName,
           qArgs.join(","),
           options.workingDirectory,
-          shellType || "default"
+          shellPath || "default",
+          shellArgs?.join(",") || "none"
         ),
         "Debug"
       );
     }
 
-    const child: child_process.ChildProcess = child_process.spawn(
-      qProcessName,
-      qArgs,
-      {
+    // Determine how to spawn the process based on shell configuration
+    let child: child_process.ChildProcess;
+    if (shellPath && shellArgs && shellArgs.length > 0) {
+      // When shell args are specified (e.g., ["--login", "-i"]), we need to spawn the shell directly
+      // and pass the command via -c flag, as child_process.spawn's shell option doesn't support shell args.
+      const commandLine = `${qProcessName} ${qArgs.join(" ")}`;
+      child = child_process.spawn(shellPath, [...shellArgs, "-c", commandLine], {
         cwd: options.workingDirectory,
-        shell: shellType || true,
-        env: finalEnvironment,
-      }
-    );
+        shell: false,
+        env: spawnEnvironment,
+      });
+    } else {
+      // Standard spawn with shell option (either a path or true for default shell)
+      child = child_process.spawn(qProcessName, qArgs, {
+        cwd: options.workingDirectory,
+        shell: shellPath || true,
+        env: spawnEnvironment,
+      });
+    }
     if (child.pid) {
       make.setCurPID(child.pid);
     }
