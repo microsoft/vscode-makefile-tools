@@ -858,6 +858,18 @@ export function hasProperties(obj: any): boolean {
   return props && props.length > 0;
 }
 
+// Helper for comparing launch configuration strings.
+// On Windows, paths are case-insensitive, so we need to do a case-insensitive comparison.
+export function areLaunchConfigurationStringsEqual(
+  str1: string,
+  str2: string
+): boolean {
+  if (process.platform === "win32") {
+    return str1.toLowerCase() === str2.toLowerCase();
+  }
+  return str1 === str2;
+}
+
 // Apply any properties from source to destination, logging for overwrite.
 // To make things simpler for the caller, create a valid dst if given null or undefined.
 export function mergeProperties(dst: any, src: any): any {
