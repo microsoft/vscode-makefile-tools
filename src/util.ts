@@ -1372,3 +1372,9 @@ export function thisExtensionPackage(): PackageJSON {
 export function thisExtensionPath(): string {
   return thisExtension().extensionPath;
 }
+
+// Escapes special regex characters in a string so it can be safely used in a RegExp.
+// This is useful when user-provided strings need to be included in a regex pattern.
+export function escapeStringForRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}

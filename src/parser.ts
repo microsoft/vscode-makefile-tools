@@ -377,7 +377,9 @@ async function parseLineAsTool(
   if (isCompilerOrLinker) {
     configuration.getAdditionalCompilerNames()?.forEach((compiler) => {
       if (!toolNames.includes(compiler)) {
-        versionedToolNames.push(`${prefixRegex}${compiler}${suffixRegex}`);
+        // Escape special regex characters in user-provided compiler names
+        const escapedCompiler = util.escapeStringForRegex(compiler);
+        versionedToolNames.push(`${prefixRegex}${escapedCompiler}${suffixRegex}`);
       }
     });
   }
