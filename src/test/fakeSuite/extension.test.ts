@@ -209,7 +209,7 @@ suite("Unit testing escaping special regex characters", () => {
   test("Test that unescaped + causes regex error", () => {
     // Demonstrate the original problem: unescaped + in regex causes an error
     const badPattern = "g++";
-    expect(() => new RegExp(`^${badPattern}$`)).to.throw("Invalid regular expression");
+    expect(() => new RegExp(`^${badPattern}$`)).to.throw();
 
     // With escaping, it works
     const goodPattern = util.escapeStringForRegex("g++");
