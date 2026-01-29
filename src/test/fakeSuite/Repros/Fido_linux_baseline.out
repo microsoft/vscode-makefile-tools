@@ -1,5 +1,5 @@
 Pre-configuring...
-Script: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh"
+Script: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh
 The pre-configure succeeded.
 Setting configuration - Fido_linux
 Re-reading settings after configuration change.
