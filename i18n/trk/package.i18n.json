@@ -14,7 +14,7 @@
 	"makefile-tools.command.makefile.setBuildTarget.title": "Makefile: Hedefi make tarafından oluşturulacak şekilde ayarlamak",
 	"makefile-tools.command.makefile.setLaunchConfiguration.title": "Makefile: Make başlatma yapılandırmasını ayarlamak",
 	"makefile-tools.command.makefile.openMakefilePathSetting.title": "Makefile: Makefile Yol Ayarını Aç",
-	"makefile-tools.command.makefile.openMakePathSetting.title": "Makefile: Yol Oluştur Ayarını Aç",
+	"makefile-tools.command.makefile.openMakePathSetting.title": "Makefile: Make Yol Ayarını Aç",
 	"makefile-tools.command.makefile.openBuildLogSetting.title": "Makefile: Derleme Günlüğü Ayarını Aç",
 	"makefile-tools.command.makefile.openBuildLogFile.title": "Makefile: Derleme Günlüğü Dosyasını Aç",
 	"makefile-tools.command.makefile.openMakefileFile.title": "Makefile: Makefile'ı Aç",

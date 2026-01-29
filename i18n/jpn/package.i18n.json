@@ -14,7 +14,7 @@
 	"makefile-tools.command.makefile.setBuildTarget.title": "Makefile: make によってビルドされるターゲットを設定します",
 	"makefile-tools.command.makefile.setLaunchConfiguration.title": "Makefile: make launch 構成を設定する",
 	"makefile-tools.command.makefile.openMakefilePathSetting.title": "Makefile: Makefile パス設定を開く",
-	"makefile-tools.command.makefile.openMakePathSetting.title": "Makefile: メイク パスの設定を開く",
+	"makefile-tools.command.makefile.openMakePathSetting.title": "Makefile: Make パスの設定を開く",
 	"makefile-tools.command.makefile.openBuildLogSetting.title": "Makefile: ビルド ログ設定を開く",
 	"makefile-tools.command.makefile.openBuildLogFile.title": "Makefile: ビルド ログ ファイルを開く",
 	"makefile-tools.command.makefile.openMakefileFile.title": "Makefile: Makefile ファイルを開く",

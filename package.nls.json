@@ -44,13 +44,13 @@
   "makefile-tools.command.makefile.setBuildTarget.title": {
     "message": "Makefile: Set the target to be built by make",
     "comment": [
-      "'Makefile' should not be translated"
+      "'Makefile' and 'make' should not be translated"
     ]
   },
   "makefile-tools.command.makefile.setLaunchConfiguration.title": {
     "message": "Makefile: Set the make launch configuration",
     "comment": [
-      "'Makefile' should not be translated"
+      "'Makefile' and 'make' should not be translated"
     ]
   },
   "makefile-tools.command.makefile.openMakefilePathSetting.title": {
@@ -62,7 +62,7 @@
   "makefile-tools.command.makefile.openMakePathSetting.title": {
     "message": "Makefile: Open Make Path Setting",
     "comment": [
-      "'Makefile' should not be translated"
+      "'Makefile' and 'Make' should not be translated"
     ]
   },
   "makefile-tools.command.makefile.openBuildLogSetting.title": {

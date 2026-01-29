@@ -14,7 +14,7 @@
 	"makefile-tools.command.makefile.setBuildTarget.title": "Plik reguł Makefile: ustawienie obiektu docelowego, który ma zostać skompilowany przez funkcję make",
 	"makefile-tools.command.makefile.setLaunchConfiguration.title": "Plik reguł Makefile: ustawienie konfiguracji tworzenia uruchamiania",
 	"makefile-tools.command.makefile.openMakefilePathSetting.title": "Plik reguł Makefile: otwórz ustawienie ścieżki pliku reguł Makefile",
-	"makefile-tools.command.makefile.openMakePathSetting.title": "Plik reguł Makefile: otwórz ustawienie Utwórz ścieżkę",
+	"makefile-tools.command.makefile.openMakePathSetting.title": "Plik reguł Makefile: otwórz ustawienie ścieżki Make",
 	"makefile-tools.command.makefile.openBuildLogSetting.title": "Plik reguł Makefile: otwórz ustawienia dziennika kompilacji",
 	"makefile-tools.command.makefile.openBuildLogFile.title": "Plik reguł Makefile: otwórz plik dziennika kompilacji",
 	"makefile-tools.command.makefile.openMakefileFile.title": "Plik reguł Makefile: otwórz plik reguł Makefile",
