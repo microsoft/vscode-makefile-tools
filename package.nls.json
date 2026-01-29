@@ -154,7 +154,7 @@
   "makefile-tools.configuration.makefile.excludeCompilerNames.description": "Names of compiler tools to be excluded from the extension known list",
   "makefile-tools.configuration.makefile.safeCommands.description": "Commands that are safe to perform command substitution with",
   "makefile-tools.configuration.makefile.configureOnOpen.description": {
-    "message": "Automatically configure Makefile project directories when they are opened",
+    "message": "Automatically configure Makefile project directories when they are opened. If not set, projects will be automatically configured on first open and prompt on subsequent opens.",
     "comment": [
       "'Makefile' should not be translated"
     ]
