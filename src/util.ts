@@ -597,6 +597,72 @@ export async function ensureWindowsPath(path: string): Promise<string> {
   return winPath;
 }
 
+// Check if the default terminal shell on Windows is a Cygwin/MSYS bash.
+// This is determined by looking at the terminal.integrated.defaultProfile.windows setting
+// and checking if the corresponding profile uses a bash.exe from cygwin or msys paths.
+export function isWindowsTerminalUsingCygwinOrMsysBash(): boolean {
+  if (process.platform !== "win32") {
+    return false;
+  }
+
+  const terminalConfig = vscode.workspace.getConfiguration("terminal");
+  const defaultProfileName = terminalConfig.get<string>(
+    "integrated.defaultProfile.windows"
+  );
+
+  if (!defaultProfileName) {
+    return false;
+  }
+
+  const profiles = terminalConfig.get<Record<string, { path?: string }>>(
+    "integrated.profiles.windows"
+  );
+
+  if (!profiles) {
+    return false;
+  }
+
+  const profile = profiles[defaultProfileName];
+  if (!profile || !profile.path) {
+    return false;
+  }
+
+  const shellPath = profile.path.toLowerCase();
+  // Check if the shell is a bash from cygwin or msys paths
+  return (
+    (shellPath.includes("cygwin") || shellPath.includes("msys")) &&
+    shellPath.endsWith("bash.exe")
+  );
+}
+
+// Convert a Windows path (C:\path\to\file) into a POSIX path for use with Cygwin/MSYS bash.
+// This is the inverse of ensureWindowsPath.
+// Example: C:\cygwin64\bin\make.exe -> /cygdrive/c/cygwin64/bin/make.exe
+export function windowsPathToPosix(windowsPath: string): string {
+  if (!windowsPath) {
+    return windowsPath;
+  }
+
+  // Check if it's already a POSIX path
+  if (windowsPath.startsWith("/")) {
+    return windowsPath;
+  }
+
+  // Check if it's a Windows absolute path (e.g., C:\path or C:/path)
+  const windowsAbsolutePathRegex = /^([A-Za-z]):[\\\/]/;
+  const match = windowsPath.match(windowsAbsolutePathRegex);
+
+  if (match) {
+    const driveLetter = match[1].toLowerCase();
+    // Remove the drive letter and colon, replace backslashes with forward slashes
+    const restOfPath = windowsPath.substring(2).replace(/\\/g, "/");
+    return `/cygdrive/${driveLetter}${restOfPath}`;
+  }
+
+  // For relative paths or paths without a drive letter, just replace backslashes
+  return windowsPath.replace(/\\/g, "/");
+}
+
 // Helper to reinterpret one relative path (to the given current path) printed by make as full path
 export async function makeFullPath(
   relPath: string,
