@@ -744,96 +744,104 @@ export async function activate(
   if (extension.getFullFeatureSet()) {
     let shouldConfigure = configuration.getConfigureOnOpen();
     if (shouldConfigure === null) {
-      // Ask if the user wants to configure on open with the Makefile Tools extension.
-      interface Choice1 {
+      // Ask if the user wants to configure this Makefile project.
+      interface ConfigureChoice {
         title: string;
         doConfigure: boolean;
       }
-      vscode.window
-        .showInformationMessage<Choice1>(
+      const chosen = await vscode.window.showInformationMessage<ConfigureChoice>(
+        localize(
+          "extension.configureOnOpen",
+          "Would you like to configure this Makefile project?"
+        ),
+        {},
+        { title: localize("yes", "Yes"), doConfigure: true },
+        { title: localize("no", "No"), doConfigure: false }
+      );
+
+      if (!chosen) {
+        // User dismissed the popup without selecting an option.
+        // Don't persist anything, popup will reappear next time.
+        telemetry.logConfigureOnOpenTelemetry(false);
+      } else if (chosen.doConfigure) {
+        // User selected Yes - ask if they always want to configure on open.
+        interface PersistChoice {
+          title: string;
+          persistMode: telemetry.ConfigureOnOpenScope;
+        }
+        const persistChoice = await vscode.window.showInformationMessage<PersistChoice>(
           localize(
-            "extension.configureOnOpen",
-            "Would you like to configure C++ IntelliSense for this workspace using information from your Makefiles?"
+            "always.configure.on.open",
+            "Always configure projects upon opening?"
           ),
           {},
-          { title: localize("yes", "Yes"), doConfigure: true },
-          { title: localize("no", "No"), doConfigure: false }
-        )
-        .then(async (chosen) => {
-          if (!chosen) {
-            // User cancelled, they don't want to configure.
-            shouldConfigure = false;
-            telemetry.logConfigureOnOpenTelemetry(false);
-          } else {
-            // ask them if they always want to configure on open.
-            // TODO: More work to do here to have the right flow.
-            const persistMessage = chosen.doConfigure
-              ? localize(
-                  "always.configure.on.open",
-                  "Always configure C++ IntelliSense using information from your Makefiles upon opening?"
-                )
-              : localize(
-                  "never.configure.on.open",
-                  "Configure C++ IntelliSense using information from your Makefiles upon opening?"
-                );
-            const buttonMessages = chosen.doConfigure
-              ? [localize("yes.button", "Yes"), localize("no.button", "No")]
-              : [
-                  localize("never.button", "Never"),
-                  localize(
-                    "never.for.this.workspace.button",
-                    "Not for this workspace"
-                  ),
-                ];
-            interface Choice2 {
-              title: string;
-              persistMode: telemetry.ConfigureOnOpenScope;
-            }
+          { title: localize("yes.button", "Yes"), persistMode: "user" },
+          { title: localize("no.button", "No"), persistMode: "workspace" }
+        );
 
-            vscode.window
-              .showInformationMessage<Choice2>(
-                persistMessage,
-                {},
-                { title: buttonMessages[0], persistMode: "user" },
-                { title: buttonMessages[1], persistMode: "workspace" }
-              )
-              .then(async (choice) => {
-                if (!choice) {
-                  // User cancelled. Do nothing.
-                  telemetry.logConfigureOnOpenTelemetry(chosen.doConfigure);
-                  return;
-                }
-
-                let configTarget = vscode.ConfigurationTarget.Global;
-                if (choice.persistMode === "workspace") {
-                  configTarget = vscode.ConfigurationTarget.Workspace;
-                }
-                const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-                if (workspaceFolder) {
-                  await vscode.workspace
-                    .getConfiguration(undefined, workspaceFolder)
-                    .update(
-                      "makefile.configureOnOpen",
-                      chosen.doConfigure,
-                      configTarget
-                    );
-                }
-
-                telemetry.logConfigureOnOpenTelemetry(
-                  chosen.doConfigure,
-                  choice.persistMode
-                );
-              });
-
-            shouldConfigure = chosen.doConfigure;
-            if (shouldConfigure === true) {
-              await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
-            }
+        if (persistChoice) {
+          // Persist the setting based on user choice
+          const configTarget =
+            persistChoice.persistMode === "user"
+              ? vscode.ConfigurationTarget.Global
+              : vscode.ConfigurationTarget.Workspace;
+          const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+          if (workspaceFolder) {
+            await vscode.workspace
+              .getConfiguration(undefined, workspaceFolder)
+              .update("makefile.configureOnOpen", true, configTarget);
           }
-        });
-    }
 
-    if (shouldConfigure === true) {
+          telemetry.logConfigureOnOpenTelemetry(true, persistChoice.persistMode);
+        } else {
+          // User dismissed the second popup - still configure this time but don't persist
+          telemetry.logConfigureOnOpenTelemetry(true);
+        }
+
+        // Configure the project now since user selected Yes
+        await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
+      } else {
+        // User selected No - ask about future behavior.
+        interface NeverConfigureChoice {
+          title: string;
+          persistMode: telemetry.ConfigureOnOpenScope;
+        }
+        const neverChoice = await vscode.window.showInformationMessage<NeverConfigureChoice>(
+          localize(
+            "never.configure.on.open",
+            "Do you want to configure projects on opening?"
+          ),
+          {},
+          { title: localize("never.button", "Never"), persistMode: "user" },
+          {
+            title: localize(
+              "never.for.this.workspace.button",
+              "Not for this workspace"
+            ),
+            persistMode: "workspace",
+          }
+        );
+
+        if (neverChoice) {
+          // Persist the setting based on user choice
+          const configTarget =
+            neverChoice.persistMode === "user"
+              ? vscode.ConfigurationTarget.Global
+              : vscode.ConfigurationTarget.Workspace;
+          const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+          if (workspaceFolder) {
+            await vscode.workspace
+              .getConfiguration(undefined, workspaceFolder)
+              .update("makefile.configureOnOpen", false, configTarget);
+          }
+
+          telemetry.logConfigureOnOpenTelemetry(false, neverChoice.persistMode);
+        } else {
+          // User dismissed the second popup - don't persist but also don't configure
+          telemetry.logConfigureOnOpenTelemetry(false);
+        }
+      }
+    } else if (shouldConfigure === true) {
       // We've opened a new workspace folder, and the user wants us to configure it now.
       await make.cleanConfigure(make.TriggeredBy.cleanConfigureOnOpen);
     }
