@@ -88,7 +88,7 @@
 	"running.clean.configure.instead": "대신 clean 구성을 실행합니다.",
 	"load.configuration.from.cache.elapsed": "캐시 경과 시간에서 구성 로드: {0}",
 	"loading.configurations.from.cache.not.necessary": "캐시에서 구성을 로드할 필요가 없습니다.",
-	"preprocessing.parse.file": "전처리: ",
+	"preprocessing.parse.file": "전처리:",
 	"preprocess.elapsed.time": "전처리 경과 시간: {0}",
 	"parsing.for.intellisense": "IntelliSense를 구문 분석하는 중입니다.",
 	"parsing.for.intellisense.elapsed": "IntelliSense 경과 시간에 대한 구문 분석: {0}",
