@@ -781,18 +781,20 @@ export async function activate(
 
         if (persistChoice) {
           // Persist the setting based on user choice
+          // "Yes" = always configure (global true), "No" = don't always configure for this workspace (workspace false)
           const configTarget =
             persistChoice.persistMode === "user"
               ? vscode.ConfigurationTarget.Global
               : vscode.ConfigurationTarget.Workspace;
+          const persistValue = persistChoice.persistMode === "user";
           const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
           if (workspaceFolder) {
             await vscode.workspace
               .getConfiguration(undefined, workspaceFolder)
-              .update("makefile.configureOnOpen", true, configTarget);
+              .update("makefile.configureOnOpen", persistValue, configTarget);
           }
 
-          telemetry.logConfigureOnOpenTelemetry(true, persistChoice.persistMode);
+          telemetry.logConfigureOnOpenTelemetry(persistValue, persistChoice.persistMode);
         } else {
           // User dismissed the second popup - still configure this time but don't persist
           telemetry.logConfigureOnOpenTelemetry(true);
