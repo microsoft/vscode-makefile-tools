@@ -47,7 +47,7 @@
 	"makefile-tools.configuration.makefile.launchConfigurations.miDebuggerPath.description": "Ruta de acceso al depurador que no es de VS (gdb o lldb)",
 	"makefile-tools.configuration.makefile.launchConfigurations.stopAtEntry.description": "Detenerse en el punto de entrada del destino",
 	"makefile-tools.configuration.makefile.launchConfigurations.symbolSearchPath.description": "Ruta de acceso a los símbolos",
-	"makefile-tools.configuration.makefile.loggingLevel.description": "Nivel de registro de la extensión de herramientas del archivo Make",
+	"makefile-tools.configuration.makefile.loggingLevel.description": "Nivel de registro de la extensión Makefile Tools",
 	"makefile-tools.configuration.makefile.makeDirectory.description": "Ruta de acceso a la carpeta que se va a pasar a través del modificador -C",
 	"makefile-tools.configuration.makefile.makefilePath.description": "Ruta de acceso al archivo Make del proyecto",
 	"makefile-tools.configuration.makefile.buildLog.description": "Ruta de acceso al registro de compilación que se lee para omitir un simulacro",

@@ -47,7 +47,7 @@
 	"makefile-tools.configuration.makefile.launchConfigurations.miDebuggerPath.description": "Ścieżka do debugera innego niż VS (gdb lub lldb)",
 	"makefile-tools.configuration.makefile.launchConfigurations.stopAtEntry.description": "Zatrzymaj w punkcie wejścia elementu docelowego",
 	"makefile-tools.configuration.makefile.launchConfigurations.symbolSearchPath.description": "Ścieżka do symboli",
-	"makefile-tools.configuration.makefile.loggingLevel.description": "Poziom rejestrowania rozszerzenia narzędzi pliku reguł Makefile",
+	"makefile-tools.configuration.makefile.loggingLevel.description": "Poziom rejestrowania rozszerzenia Makefile Tools",
 	"makefile-tools.configuration.makefile.makeDirectory.description": "Ścieżka folderu do przekazania za pomocą przełącznika -C",
 	"makefile-tools.configuration.makefile.makefilePath.description": "Ścieżka do pliku reguł Makefile projektu",
 	"makefile-tools.configuration.makefile.buildLog.description": "Ścieżka do dziennika kompilacji, który jest odczytywany, aby obejść przebieg próbny",
