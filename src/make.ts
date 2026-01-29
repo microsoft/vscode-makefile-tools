@@ -2278,7 +2278,7 @@ export async function doConfigure(
 
   // Some initial preprocessing required before any parsing is done.
   logger.message(
-    localize("preprocessing.parse.file", 'Preprocessing: "{0}"', parseFile)
+    localize("preprocessing.parse.file", "Preprocessing:") + ` "${parseFile}"`
   );
   let preprocessedDryrunOutput: string;
   let preprocessedDryrunOutputResult: parser.PreprocessDryRunOutputReturnType =
@@ -2413,9 +2413,8 @@ export async function doConfigure(
     logger.message(
       localize(
         "parsing.build.targets.from.parse.file",
-        'Parsing for build targets from: "{0}"',
-        parseFile
-      )
+        "Parsing for build targets from:"
+      ) + ` "${parseFile}"`
     );
     subphaseStats.parseTargets = await parseTargets(
       progress,
