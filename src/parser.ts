@@ -385,9 +385,9 @@ async function parseLineAsTool(
   // - any spaces/tabs before the tool invocation
   // - with or without path (relative -to the makefile location- or full)
   // - with or without extension (windows only)
-  // - with or without quotes
+  // - with or without quotes (single or double, to support mingw-make)
   // - must have at least one space or tab after the tool invocation
-  let regexpStr: string = '^[\\s\\"]*(.*?)(';
+  let regexpStr: string = "^[\\s\\\"']*(.*?)(";
   if (process.platform === "win32") {
     regexpStr += versionedToolNames.join("\\.exe|");
 
@@ -399,7 +399,7 @@ async function parseLineAsTool(
     regexpStr += "|";
   }
 
-  regexpStr += versionedToolNames.join("|") + ')(\\s|\\"\\s)(.*)$';
+  regexpStr += versionedToolNames.join("|") + ')(\\s|[\\"\']\\s)(.*)$';
 
   let regexp: RegExp = RegExp(regexpStr, "mg");
   let match: RegExpExecArray | null = regexp.exec(line);
