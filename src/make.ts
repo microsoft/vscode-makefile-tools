@@ -1225,11 +1225,8 @@ export async function runPreConfigureScript(
   scriptFile: string
 ): Promise<number> {
   logger.message(
-    localize(
-      "pre.configuring.script",
-      'Pre-configuring...\nScript: "{0}"',
-      configuration.getPreConfigureScript()
-    )
+    localize("pre.configuring.script", "Pre-configuring...\nScript: ") +
+      `"${configuration.getPreConfigureScript()}"`
   );
 
   const currentConfigPreConfigureArgs =
@@ -1262,11 +1259,8 @@ export async function runPostConfigureScript(
   scriptFile: string
 ): Promise<number> {
   logger.message(
-    localize(
-      "post.configure.script",
-      'Post-configuring... \nScript: "{0}"',
-      configuration.getPostConfigureScript()
-    )
+    localize("post.configure.script", "Post-configuring... \nScript: ") +
+      `"${configuration.getPostConfigureScript()}"`
   );
 
   const currentConfigPostConfigureArgs =
