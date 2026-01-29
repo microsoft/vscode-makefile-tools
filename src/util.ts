@@ -473,6 +473,9 @@ export function spawnChildProcess(
     if (shellPath && shellArgs && shellArgs.length > 0) {
       // When shell args are specified (e.g., ["--login", "-i"]), we need to spawn the shell directly
       // and pass the command via -c flag, as child_process.spawn's shell option doesn't support shell args.
+      // Note: This uses -c which is the standard flag for POSIX-compatible shells (bash, sh, zsh).
+      // This is the expected use case when using automationProfile with args for shells like msys2, git-bash, etc.
+      // The qProcessName and qArgs are already processed by quoteStringIfNeeded which handles spaces and ampersands.
       const commandLine = `${qProcessName} ${qArgs.join(" ")}`;
       child = child_process.spawn(shellPath, [...shellArgs, "-c", commandLine], {
         cwd: options.workingDirectory,
