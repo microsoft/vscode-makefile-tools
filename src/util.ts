@@ -859,15 +859,46 @@ export function hasProperties(obj: any): boolean {
 }
 
 // Helper for comparing launch configuration strings.
-// On Windows, paths are case-insensitive, so we need to do a case-insensitive comparison.
+// On Windows, paths are case-insensitive, so we need to do a case-insensitive comparison
+// for the path portions (cwd and binaryPath), while keeping the arguments case-sensitive.
+// Launch configuration string format: [CWD path]>[binaryPath]([binaryArg1,binaryArg2,...])
 export function areLaunchConfigurationStringsEqual(
   str1: string,
   str2: string
 ): boolean {
-  if (process.platform === "win32") {
+  // Handle null/undefined inputs
+  if (str1 === null || str1 === undefined) {
+    return str2 === null || str2 === undefined;
+  }
+  if (str2 === null || str2 === undefined) {
+    return false;
+  }
+
+  if (process.platform !== "win32") {
+    return str1 === str2;
+  }
+
+  // On Windows, parse the launch configuration strings to compare
+  // paths case-insensitively while keeping arguments case-sensitive.
+  // Format: [CWD path]>[binaryPath]([binaryArg1,binaryArg2,...])
+  const regexp: RegExp = /^(.*)\>(.*)\((.*)\)$/;
+  const match1: RegExpExecArray | null = regexp.exec(str1);
+  const match2: RegExpExecArray | null = regexp.exec(str2);
+
+  // If either string doesn't match the expected format, fall back to case-insensitive comparison
+  if (!match1 || !match2) {
     return str1.toLowerCase() === str2.toLowerCase();
   }
-  return str1 === str2;
+
+  // Compare cwd and binaryPath case-insensitively, and args case-sensitively
+  const cwd1: string = match1[1].toLowerCase();
+  const cwd2: string = match2[1].toLowerCase();
+  const binPath1: string = match1[2].toLowerCase();
+  const binPath2: string = match2[2].toLowerCase();
+  const args1: string = match1[3];
+  const args2: string = match2[3];
+
+  return cwd1 === cwd2 && binPath1 === binPath2 && args1 === args2;
 }
 
 // Apply any properties from source to destination, logging for overwrite.

@@ -149,20 +149,46 @@ suite("Launch configuration string comparison", () => {
     expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
   });
 
-  // On Windows, paths are case-insensitive
+  test("areLaunchConfigurationStringsEqual - handles null/undefined", () => {
+    expect(util.areLaunchConfigurationStringsEqual(null as any, null as any)).to
+      .be.true;
+    expect(
+      util.areLaunchConfigurationStringsEqual(undefined as any, undefined as any)
+    ).to.be.true;
+    expect(
+      util.areLaunchConfigurationStringsEqual(
+        "c:\\Users\\test\\project>out()",
+        null as any
+      )
+    ).to.be.false;
+    expect(
+      util.areLaunchConfigurationStringsEqual(
+        null as any,
+        "c:\\Users\\test\\project>out()"
+      )
+    ).to.be.false;
+  });
+
+  // On Windows, paths are case-insensitive but arguments are case-sensitive
   if (process.platform === "win32") {
-    test("areLaunchConfigurationStringsEqual - different case on Windows", () => {
+    test("areLaunchConfigurationStringsEqual - different path case on Windows", () => {
       const str1 = "c:\\Users\\test\\project>out()";
       const str2 = "C:\\Users\\Test\\Project>OUT()";
       expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
     });
 
-    test("areLaunchConfigurationStringsEqual - different case with args on Windows", () => {
+    test("areLaunchConfigurationStringsEqual - different path case same args on Windows", () => {
+      const str1 = "c:\\users\\test\\project>out(arg1,arg2)";
+      const str2 = "C:\\Users\\TEST\\Project>Out(arg1,arg2)";
+      // Paths are compared case-insensitively, args are case-sensitive
+      expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
+    });
+
+    test("areLaunchConfigurationStringsEqual - different args case on Windows", () => {
       const str1 = "c:\\users\\test\\project>out(arg1,arg2)";
       const str2 = "C:\\Users\\TEST\\Project>Out(Arg1,Arg2)";
-      // Note: args themselves might have case-sensitive values, but the whole string comparison
-      // is made case-insensitive on Windows because the path portion is case-insensitive
-      expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
+      // Arguments are case-sensitive even on Windows
+      expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.false;
     });
   }
 });
