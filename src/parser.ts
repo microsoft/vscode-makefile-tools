@@ -1624,12 +1624,9 @@ export async function parseLaunchConfigurations(
                   );
                 }
               } else {
-                // On Windows, if the binary has no extension, append .exe
+                // If the binary has no extension, append .exe
                 // This ensures VS Code can properly link to the file in the output
-                if (
-                  process.platform === "win32" &&
-                  !path.extname(compilerTargetBinary)
-                ) {
+                if (!path.extname(compilerTargetBinary)) {
                   compilerTargetBinary += ".exe";
                 }
                 logger.message(
