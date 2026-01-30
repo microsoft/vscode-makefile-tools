@@ -1624,6 +1624,14 @@ export async function parseLaunchConfigurations(
                   );
                 }
               } else {
+                // On Windows, if the binary has no extension, append .exe
+                // This ensures VS Code can properly link to the file in the output
+                if (
+                  process.platform === "win32" &&
+                  !path.extname(compilerTargetBinary)
+                ) {
+                  compilerTargetBinary += ".exe";
+                }
                 logger.message(
                   localize(
                     "producing.target.binary",
@@ -1707,6 +1715,15 @@ export async function parseLaunchConfigurations(
               linkerTool.arguments,
               ["out", "o"]
             );
+            // On Windows, if the binary has no extension, append .exe
+            // This ensures VS Code can properly link to the file in the output
+            if (
+              linkerTargetBinary &&
+              process.platform === "win32" &&
+              !path.extname(linkerTargetBinary)
+            ) {
+              linkerTargetBinary += ".exe";
+            }
             logger.message(
               localize(
                 "found.linker.command",
