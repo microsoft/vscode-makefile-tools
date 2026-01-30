@@ -2213,12 +2213,15 @@ function parseCppStandard(
   canUseGnu: boolean
 ): util.StandardVersion | undefined {
   const isGnu: boolean = canUseGnu && std.startsWith("gnu");
-  if (
-    std === "c++latest" ||
-    std.endsWith("++26") || std.endsWith("++2c") ||
-    std.endsWith("++23") || std.endsWith("++2b") || std === "c++23preview" ||
-    std.endsWith("++20") || std.endsWith("++2a")
+  if (std === "c++latest" || std.endsWith("++26") || std.endsWith("++2c")) {
+    return isGnu ? "gnu++26" : "c++26";
+  } else if (
+    std.endsWith("++23") ||
+    std.endsWith("++2b") ||
+    std === "c++23preview"
   ) {
+    return isGnu ? "gnu++23" : "c++23";
+  } else if (std.endsWith("++20") || std.endsWith("++2a")) {
     return isGnu ? "gnu++20" : "c++20";
   } else if (std.endsWith("++17") || std.endsWith("++1z")) {
     return isGnu ? "gnu++17" : "c++17";
