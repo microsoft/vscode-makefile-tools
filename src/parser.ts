@@ -1626,6 +1626,7 @@ export async function parseLaunchConfigurations(
               } else {
                 // If the binary has no extension, append .exe
                 // This ensures VS Code can properly link to the file in the output
+                // Note: No platform check needed here - this entire block is Windows-specific (see line 1553)
                 if (!path.extname(compilerTargetBinary)) {
                   compilerTargetBinary += ".exe";
                 }
