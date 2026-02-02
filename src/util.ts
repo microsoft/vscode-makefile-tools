@@ -457,7 +457,7 @@ export function spawnChildProcess(
       logger.message(
         localize(
           "utils.quoting",
-          "Spawning child process with:\n process name: {0}\n process args: {1}\n working directory: {2}\n shell path: {3}\n shell args: {4}",
+          "Spawning child process with:\n process name: {0}\n process args: {1}\n working directory: {2}\n shell type: {3}\n shell args: {4}",
           qProcessName,
           qArgs.join(","),
           options.workingDirectory,
