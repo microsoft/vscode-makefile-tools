@@ -37,7 +37,7 @@ Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Rep
 Deduced command 'c:/some/other/fake/make PEDANTIC=yes' for configuration "tinyvm_linux_pedantic"
 Saving opened files before build.
 Loading configurations from cache is not necessary.
-Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Preprocessing: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log
 Preprocess elapsed time: 0
 Parsing for IntelliSense.
 Updating the CppTools IntelliSense Configuration Provider.
@@ -173,7 +173,7 @@ Found the following 2 launch targets defined in the makefile: {REPO:VSCODE-MAKEF
 Complete list of launch targets: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin>tdb();{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/bin>tvmi()
 Parsing for launch targets elapsed time: 0
 Generating parse content for build targets.
-Parsing for build targets from: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log"
+Parsing for build targets from: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/tinyvm_linux_dryrunPedantic.log
 Found the following 21 build targets defined in the makefile: all;clean;install;libtvm;libtvm/tvm.o;libtvm/tvm_file.o;libtvm/tvm_htab.o;libtvm/tvm_lexer.o;libtvm/tvm_memory.o;libtvm/tvm_parser.o;libtvm/tvm_preprocessor.o;libtvm/tvm_program.o;mlibc;profile;rebuild;submodules;tdb;tdb/main.o;tdb/tdb.o;tvmi;uninstall
 Complete list of build targets: all;clean;install;libtvm;libtvm/tvm.o;libtvm/tvm_file.o;libtvm/tvm_htab.o;libtvm/tvm_lexer.o;libtvm/tvm_memory.o;libtvm/tvm_parser.o;libtvm/tvm_preprocessor.o;libtvm/tvm_program.o;mlibc;profile;rebuild;submodules;tdb;tdb/main.o;tdb/tdb.o;tvmi;uninstall
 Parsing build targets elapsed time: 0

@@ -55,7 +55,7 @@ Make sure that the extension is invoking the same make command as in your develo
 You may need to define or tweak a custom makefile configuration in settings via 'makefile.configurations' like described here: [link]
 Also make sure your code base does not have any known issues with the dry-run switches used by this extension (makefile.dryrunSwitches).
 If you are not able to fix the dry-run, open a GitHub issue in Makefile Tools repo: https://github.com/microsoft/vscode-makefile-tools/issues
-Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/dryrun.log"
+Preprocessing: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/dryrun.log
 Preprocess elapsed time: 0
 Parsing for IntelliSense.
 Updating the CppTools IntelliSense Configuration Provider.
@@ -80,7 +80,7 @@ Spawning child process with:
  working directory: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros
  shell type: default
 Generating dry-run elapsed time: 0
-Parsing for build targets from: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/targets.log"
+Parsing for build targets from: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/targets.log
 No build targets have been detected.
 Complete list of build targets: 
 Parsing build targets elapsed time: 0
