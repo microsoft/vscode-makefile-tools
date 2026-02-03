@@ -71,7 +71,6 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "Exibir apenas os destinos falsos",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Salvar os arquivos abertos antes de compilar ou configurar",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Compilar o destino atual antes da inicialização (depuração/execução)",
-	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Limpar o canal de saída no início de uma compilação",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "O caminho para o arquivo de banco de dados da compilação",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Habilitar a depuração local (neste host) de imagens criadas por esta extensão",

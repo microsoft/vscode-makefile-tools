@@ -54,7 +54,6 @@
 	"only.phony.targets": "Tylko miejsca docelowe .PHONY {0}",
 	"save.before.build.or.configure": "Zapisz przed kompilacją lub skonfiguruj: {0}",
 	"build.before.launch": "Kompiluj przed premierą: {0}",
-	"build.on.save": "Build on save: {0}",
 	"clear.output.before.build": "Wyczyść dane wyjściowe przed kompilacją: {0}",
 	"ignore.directory.commands": "Ignoruj polecenia katalogu: {0}",
 	"configurating.after.settings.or.makefile.changes": "Trwa konfigurowanie po ustawieniu lub wprowadzanie zmian w pliku reguł Makefile...",

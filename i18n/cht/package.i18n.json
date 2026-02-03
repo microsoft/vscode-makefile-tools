@@ -71,7 +71,6 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "僅顯示詐騙目標",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "組建或設定之前先儲存開啟的檔案",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "在啟動 (偵錯/執行) 之前先組建目前的目標",
-	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "清除組建開頭的輸出通道",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "編譯資料庫檔案的路徑",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "在本機 (在此主機) 啟用此延伸模組建置的偵錯映像",

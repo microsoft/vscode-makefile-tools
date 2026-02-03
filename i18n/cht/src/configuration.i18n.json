@@ -54,7 +54,6 @@
 	"only.phony.targets": "只限 .PHONY 目標：{0}",
 	"save.before.build.or.configure": "組建或設定前儲存：{0}",
 	"build.before.launch": "啟動前組建：{0}",
-	"build.on.save": "Build on save: {0}",
 	"clear.output.before.build": "組建前清除輸出：{0}",
 	"ignore.directory.commands": "忽略目錄命令：{0}",
 	"configurating.after.settings.or.makefile.changes": "設定或 Makefile 變更後進行設定...",

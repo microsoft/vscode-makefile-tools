@@ -54,7 +54,6 @@
 	"only.phony.targets": "Yalnızca .PHONY hedefleri: {0}",
 	"save.before.build.or.configure": "Derlemeden veya yapılandırmadan önce kaydet: {0}",
 	"build.before.launch": "Başlatmadan önce derle: {0}",
-	"build.on.save": "Build on save: {0}",
 	"clear.output.before.build": "Derlemeden önce çıkışı temizle: {0}",
 	"ignore.directory.commands": "Dizin komutlarını yoksay: {0}",
 	"configurating.after.settings.or.makefile.changes": "Ayarlardan veya makefile değişikliğinden sonra yapılandırılıyor...",
