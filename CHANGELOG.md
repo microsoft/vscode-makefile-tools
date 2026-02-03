@@ -16,6 +16,7 @@ Bug Fixes:
 - Fix incorrect parsing of environment variables with quoted values containing spaces. [#729](https://github.com/microsoft/vscode-makefile-tools/issues/729)
 - Added support for C++23 and C++26 standard flags. [#752](https://github.com/microsoft/vscode-makefile-tools/issues/752)
 - Fix localization issue where "Make" as a proper noun was being translated. [#730](https://github.com/microsoft/vscode-makefile-tools/issues/730)
+- Fix "Makefile Tools" being translated in localized languages when it should remain as a proper noun. [#731](https://github.com/microsoft/vscode-makefile-tools/issues/731)
 
 ## 0.11
 

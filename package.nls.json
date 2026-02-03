@@ -109,7 +109,7 @@
     ]
   },
   "makefile-tools.command.makefile.resetState.title": {
-    "message": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)",
+    "message": "Makefile: Reset the Makefile Tools extension workspace state (For troubleshooting)",
     "comment": [
       "'Makefile' and 'Makefile Tools' should not be translated"
     ]
@@ -137,7 +137,12 @@
   "makefile-tools.configuration.makefile.launchConfigurations.miDebuggerPath.description": "Path to the non VS debugger (gdb or lldb)",
   "makefile-tools.configuration.makefile.launchConfigurations.stopAtEntry.description": "Stop at the entry point of the target",
   "makefile-tools.configuration.makefile.launchConfigurations.symbolSearchPath.description": "The path to the symbols",
-  "makefile-tools.configuration.makefile.loggingLevel.description": "The logging level for the makefile tools extension",
+  "makefile-tools.configuration.makefile.loggingLevel.description": {
+    "message": "The logging level for the Makefile Tools extension",
+    "comment": [
+      "'Makefile Tools' should not be translated"
+    ]
+  },
   "makefile-tools.configuration.makefile.makeDirectory.description": "The folder path to be passed to make via the switch -C",
   "makefile-tools.configuration.makefile.makefilePath.description": "The path to the makefile of the project",
   "makefile-tools.configuration.makefile.buildLog.description": "The path to the build log that is read to bypass a dry-run",
