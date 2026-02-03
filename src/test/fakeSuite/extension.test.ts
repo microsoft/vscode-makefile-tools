@@ -130,6 +130,49 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
   });
 });
 
+suite("Unit testing binary path extension handling", () => {
+  // Tests for the logic that appends .exe extension on Windows
+  // when binary paths have no extension (fixes issue #698)
+
+  test("path.extname returns empty string for paths without extension", () => {
+    expect(path.extname("app")).to.be.equal("");
+    expect(path.extname("/path/to/app")).to.be.equal("");
+    expect(path.extname("C:\\path\\to\\app")).to.be.equal("");
+  });
+
+  test("path.extname returns extension for paths with extension", () => {
+    expect(path.extname("app.exe")).to.be.equal(".exe");
+    expect(path.extname("/path/to/app.exe")).to.be.equal(".exe");
+    expect(path.extname("C:\\path\\to\\app.exe")).to.be.equal(".exe");
+    expect(path.extname("lib.dll")).to.be.equal(".dll");
+    expect(path.extname("file.out")).to.be.equal(".out");
+  });
+
+  test("Appending .exe only when no extension present", () => {
+    // Simulates the logic in parser.ts for appending .exe on Windows
+    const appendExeIfNoExtension = (binaryPath: string): string => {
+      if (!path.extname(binaryPath)) {
+        return binaryPath + ".exe";
+      }
+      return binaryPath;
+    };
+
+    // Paths without extension should get .exe appended
+    expect(appendExeIfNoExtension("app")).to.be.equal("app.exe");
+    expect(appendExeIfNoExtension("/path/to/app")).to.be.equal(
+      "/path/to/app.exe"
+    );
+    expect(appendExeIfNoExtension("C:\\path\\to\\app")).to.be.equal(
+      "C:\\path\\to\\app.exe"
+    );
+
+    // Paths with extension should remain unchanged
+    expect(appendExeIfNoExtension("app.exe")).to.be.equal("app.exe");
+    expect(appendExeIfNoExtension("lib.dll")).to.be.equal("lib.dll");
+    expect(appendExeIfNoExtension("file.out")).to.be.equal("file.out");
+  });
+});
+
 // TODO: refactor initialization and cleanup of each test
 suite("Fake dryrun parsing", () => {
   suiteSetup(async function (this: Mocha.Context) {
