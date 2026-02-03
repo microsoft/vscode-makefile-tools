@@ -117,6 +117,7 @@ export function readCurrentMakefileConfiguration(): void {
 type MakefilePanelVisibility = {
   debug: boolean;
   run: boolean;
+  buildCleanTarget: boolean;
 };
 
 // internal, runtime representation of an optional feature
@@ -146,6 +147,12 @@ class MakefilePanelVisibilityDescriptions {
       propertyName: "run",
       enablement: "makefile:localRunFeature",
       default: true,
+      value: false,
+    },
+    {
+      propertyName: "buildCleanTarget",
+      enablement: "makefile:localBuildCleanTargetFeature",
+      default: false,
       value: false,
     },
   ];
