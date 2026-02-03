@@ -1224,7 +1224,15 @@ export async function runPreConfigureScript(
   progress: vscode.Progress<{}>,
   scriptFile: string
 ): Promise<number> {
-  logger.message("Pre-configuring...");
+  // Use the localized message but extract only the status part (before newline)
+  // and log the path separately without quotes to ensure it's clickable
+  const localizedMessage = localize(
+    "pre.configuring.script",
+    'Pre-configuring...\nScript: "{0}"',
+    ""
+  );
+  const statusMessage = localizedMessage.split("\n")[0];
+  logger.message(statusMessage);
   logger.message(`Script: ${configuration.getPreConfigureScript()}`);
 
   const currentConfigPreConfigureArgs =
@@ -1256,7 +1264,15 @@ export async function runPostConfigureScript(
   progress: vscode.Progress<{}>,
   scriptFile: string
 ): Promise<number> {
-  logger.message("Post-configuring...");
+  // Use the localized message but extract only the status part (before newline)
+  // and log the path separately without quotes to ensure it's clickable
+  const localizedMessage = localize(
+    "post.configure.script",
+    'Post-configuring... \nScript: "{0}"',
+    ""
+  );
+  const statusMessage = localizedMessage.split("\n")[0];
+  logger.message(statusMessage);
   logger.message(`Script: ${configuration.getPostConfigureScript()}`);
 
   const currentConfigPostConfigureArgs =
