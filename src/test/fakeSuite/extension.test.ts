@@ -132,6 +132,69 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
   });
 });
 
+suite("Launch configuration string comparison", () => {
+  test("areLaunchConfigurationStringsEqual - same strings", () => {
+    const str1 = "c:\\Users\\test\\project>out()";
+    const str2 = "c:\\Users\\test\\project>out()";
+    expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
+  });
+
+  test("areLaunchConfigurationStringsEqual - different strings", () => {
+    const str1 = "c:\\Users\\test\\project>out()";
+    const str2 = "c:\\Users\\test\\project>out(arg1)";
+    expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.false;
+  });
+
+  test("areLaunchConfigurationStringsEqual - same strings with args", () => {
+    const str1 = "c:\\Users\\test\\project>out(arg1,arg2)";
+    const str2 = "c:\\Users\\test\\project>out(arg1,arg2)";
+    expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
+  });
+
+  test("areLaunchConfigurationStringsEqual - handles null/undefined", () => {
+    expect(util.areLaunchConfigurationStringsEqual(null as any, null as any)).to
+      .be.true;
+    expect(
+      util.areLaunchConfigurationStringsEqual(undefined as any, undefined as any)
+    ).to.be.true;
+    expect(
+      util.areLaunchConfigurationStringsEqual(
+        "c:\\Users\\test\\project>out()",
+        null as any
+      )
+    ).to.be.false;
+    expect(
+      util.areLaunchConfigurationStringsEqual(
+        null as any,
+        "c:\\Users\\test\\project>out()"
+      )
+    ).to.be.false;
+  });
+
+  // On Windows, paths are case-insensitive but arguments are case-sensitive
+  if (process.platform === "win32") {
+    test("areLaunchConfigurationStringsEqual - different path case on Windows", () => {
+      const str1 = "c:\\Users\\test\\project>out()";
+      const str2 = "C:\\Users\\Test\\Project>OUT()";
+      expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
+    });
+
+    test("areLaunchConfigurationStringsEqual - different path case same args on Windows", () => {
+      const str1 = "c:\\users\\test\\project>out(arg1,arg2)";
+      const str2 = "C:\\Users\\TEST\\Project>Out(arg1,arg2)";
+      // Paths are compared case-insensitively, args are case-sensitive
+      expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
+    });
+
+    test("areLaunchConfigurationStringsEqual - different args case on Windows", () => {
+      const str1 = "c:\\users\\test\\project>out(arg1,arg2)";
+      const str2 = "C:\\Users\\TEST\\Project>Out(Arg1,Arg2)";
+      // Arguments are case-sensitive even on Windows
+      expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.false;
+    });
+  }
+});
+
 // TODO: refactor initialization and cleanup of each test
 suite("Fake dryrun parsing", () => {
   suiteSetup(async function (this: Mocha.Context) {
