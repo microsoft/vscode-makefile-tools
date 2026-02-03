@@ -130,6 +130,112 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
   });
 });
 
+// Unit test for the regex pattern used in parseLineAsTool to support
+// both single and double quotes in tool invocations (issue #739: mingw-make support)
+suite("Unit testing tool invocation regex pattern for single and double quotes", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  setup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  // Helper to build the regex pattern similar to parseLineAsTool in parser.ts
+  function buildToolInvocationRegex(toolNames: string[]): RegExp {
+    const prefixRegex = "(([a-zA-Z0-9-_.]*-)*";
+    const suffixRegex = "(-[a-zA-Z0-9-_.]*)*)";
+    const versionedToolNames = toolNames.map(
+      (t) => `${prefixRegex}${t}${suffixRegex}`
+    );
+
+    // Pattern from parser.ts that supports both single and double quotes
+    let regexpStr = "^[\\s\\\"']*(.*?)(";
+    regexpStr += versionedToolNames.join("|") + ")(\\s|[\\\"']\\s)(.*)$";
+
+    return new RegExp(regexpStr, "mg");
+  }
+
+  test("Test tool invocation with double quotes (original behavior)", () => {
+    const regex = buildToolInvocationRegex(["gcc", "cc", "clang"]);
+    const testCases = [
+      { input: 'gcc -c main.c', shouldMatch: true },
+      { input: '"gcc" -c main.c', shouldMatch: true },
+      { input: '"/usr/bin/gcc" -c main.c', shouldMatch: true },
+    ];
+
+    for (const testCase of testCases) {
+      regex.lastIndex = 0;
+      const match = regex.exec(testCase.input);
+      expect(match !== null).to.equal(
+        testCase.shouldMatch,
+        `Expected "${testCase.input}" to ${testCase.shouldMatch ? "match" : "not match"}`
+      );
+    }
+  });
+
+  test("Test tool invocation with single quotes (mingw-make style)", () => {
+    const regex = buildToolInvocationRegex(["gcc", "cc", "clang"]);
+    const testCases = [
+      { input: "'gcc' -c main.c", shouldMatch: true },
+      { input: "'/usr/bin/gcc' -c main.c", shouldMatch: true },
+      { input: "'clang' -c main.cpp", shouldMatch: true },
+    ];
+
+    for (const testCase of testCases) {
+      regex.lastIndex = 0;
+      const match = regex.exec(testCase.input);
+      expect(match !== null).to.equal(
+        testCase.shouldMatch,
+        `Expected "${testCase.input}" to ${testCase.shouldMatch ? "match" : "not match"}`
+      );
+    }
+  });
+
+  test("Test tool invocation without quotes", () => {
+    const regex = buildToolInvocationRegex(["gcc", "cc", "clang"]);
+    const testCases = [
+      { input: "gcc -c main.c", shouldMatch: true },
+      { input: "/usr/bin/gcc -c main.c", shouldMatch: true },
+      { input: "clang -c main.cpp", shouldMatch: true },
+      { input: "cc -c test.c", shouldMatch: true },
+    ];
+
+    for (const testCase of testCases) {
+      regex.lastIndex = 0;
+      const match = regex.exec(testCase.input);
+      expect(match !== null).to.equal(
+        testCase.shouldMatch,
+        `Expected "${testCase.input}" to ${testCase.shouldMatch ? "match" : "not match"}`
+      );
+    }
+  });
+
+  test("Test tool path extraction with various quote styles", () => {
+    const regex = buildToolInvocationRegex(["gcc"]);
+    const testCases = [
+      { input: "/usr/bin/gcc -c main.c", expectedPath: "/usr/bin/" },
+      { input: '"/usr/bin/gcc" -c main.c', expectedPath: "/usr/bin/" },
+      { input: "'/usr/bin/gcc' -c main.c", expectedPath: "/usr/bin/" },
+      { input: "gcc -c main.c", expectedPath: "" },
+      { input: "'gcc' -c main.c", expectedPath: "" },
+      { input: '"gcc" -c main.c', expectedPath: "" },
+    ];
+
+    for (const testCase of testCases) {
+      regex.lastIndex = 0;
+      const match = regex.exec(testCase.input);
+      expect(match).to.not.be.null;
+      if (match) {
+        expect(match[1]).to.equal(
+          testCase.expectedPath,
+          `Expected path "${testCase.expectedPath}" for input "${testCase.input}", got "${match[1]}"`
+        );
+      }
+    }
+  });
+});
+
 // TODO: refactor initialization and cleanup of each test
 suite("Fake dryrun parsing", () => {
   suiteSetup(async function (this: Mocha.Context) {
