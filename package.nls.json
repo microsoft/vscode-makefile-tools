@@ -191,5 +191,7 @@
     "comment": [
       "'Makefile Project Outline' should not be translated"
     ]
-  }
+  },
+  "makefile-tools.message.preprocessing": "Preprocessing:",
+  "makefile-tools.message.parsing.build.targets.from": "Parsing for build targets from:"
 }
