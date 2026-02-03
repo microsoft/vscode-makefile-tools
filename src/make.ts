@@ -2277,11 +2277,8 @@ export async function doConfigure(
   }
 
   // Some initial preprocessing required before any parsing is done.
-  // Use localized label but keep file path with ASCII quotes for link detection
-  // (localized quotes like「」, „", «» break VSCode's link detection)
   logger.message(
-    localize("makefile-tools.message.preprocessing", "Preprocessing:") +
-      ` "${parseFile}"`
+    localize("preprocessing.parse.file", "Preprocessing: {0}", parseFile)
   );
   let preprocessedDryrunOutput: string;
   let preprocessedDryrunOutputResult: parser.PreprocessDryRunOutputReturnType =
@@ -2413,13 +2410,12 @@ export async function doConfigure(
       return subphaseStats;
     }
 
-    // Use localized label but keep file path with ASCII quotes for link detection
-    // (localized quotes like「」, „", «» break VSCode's link detection)
     logger.message(
       localize(
-        "makefile-tools.message.parsing.build.targets.from",
-        "Parsing for build targets from:"
-      ) + ` "${parseFile}"`
+        "parsing.build.targets.from.parse.file",
+        "Parsing for build targets from: {0}",
+        parseFile
+      )
     );
     subphaseStats.parseTargets = await parseTargets(
       progress,
