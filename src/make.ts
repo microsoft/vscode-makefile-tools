@@ -2277,9 +2277,9 @@ export async function doConfigure(
   }
 
   // Some initial preprocessing required before any parsing is done.
-  logger.message(
-    localize("preprocessing.parse.file", "Preprocessing:") + ` "${parseFile}"`
-  );
+  // Use non-localized message to ensure file path link detection works
+  // (localized quotes like「」, „", «» break VSCode's link detection)
+  logger.message(`Preprocessing: "${parseFile}"`);
   let preprocessedDryrunOutput: string;
   let preprocessedDryrunOutputResult: parser.PreprocessDryRunOutputReturnType =
     await preprocessDryRun(
@@ -2410,12 +2410,9 @@ export async function doConfigure(
       return subphaseStats;
     }
 
-    logger.message(
-      localize(
-        "parsing.build.targets.from.parse.file",
-        "Parsing for build targets from:"
-      ) + ` "${parseFile}"`
-    );
+    // Use non-localized message to ensure file path link detection works
+    // (localized quotes like「」, „", «» break VSCode's link detection)
+    logger.message(`Parsing for build targets from: "${parseFile}"`);
     subphaseStats.parseTargets = await parseTargets(
       progress,
       cancel,
