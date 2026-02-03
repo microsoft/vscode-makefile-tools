@@ -47,7 +47,7 @@
 	"makefile-tools.configuration.makefile.launchConfigurations.miDebuggerPath.description": "Chemin vers le débogueur non VS (gdb ou lldb)",
 	"makefile-tools.configuration.makefile.launchConfigurations.stopAtEntry.description": "Arrêter au point d'entrée de la cible",
 	"makefile-tools.configuration.makefile.launchConfigurations.symbolSearchPath.description": "Le chemin vers les symboles",
-	"makefile-tools.configuration.makefile.loggingLevel.description": "Le niveau de journalisation pour l’extension Makefile Tools",
+	"makefile-tools.configuration.makefile.loggingLevel.description": "Le niveau de journalisation pour l’extension des outils makefile",
 	"makefile-tools.configuration.makefile.makeDirectory.description": "Le chemin du dossier à passer à make via le switch -C",
 	"makefile-tools.configuration.makefile.makefilePath.description": "Le chemin vers le makefile du projet",
 	"makefile-tools.configuration.makefile.buildLog.description": "Le chemin d’accès au journal de génération qui est lu pour contourner un essai à blanc",

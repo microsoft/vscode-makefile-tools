@@ -47,7 +47,7 @@
 	"makefile-tools.configuration.makefile.launchConfigurations.miDebuggerPath.description": "Cesta k ladicímu programu mimo VS (gdb nebo lldb)",
 	"makefile-tools.configuration.makefile.launchConfigurations.stopAtEntry.description": "Zastavit na vstupním bodu cíle",
 	"makefile-tools.configuration.makefile.launchConfigurations.symbolSearchPath.description": "Cesta k symbolům",
-	"makefile-tools.configuration.makefile.loggingLevel.description": "Úroveň protokolování pro rozšíření Makefile Tools",
+	"makefile-tools.configuration.makefile.loggingLevel.description": "Úroveň protokolování pro rozšíření nástrojů souboru pravidel",
 	"makefile-tools.configuration.makefile.makeDirectory.description": "Cesta ke složce, která se má předat maku přepínačem -C",
 	"makefile-tools.configuration.makefile.makefilePath.description": "Cesta k souboru pravidel projektu",
 	"makefile-tools.configuration.makefile.buildLog.description": "Cesta k protokolu o sestavení, která se přečte, aby se obešlo zkušební spuštění",
