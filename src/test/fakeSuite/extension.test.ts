@@ -132,6 +132,71 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
   });
 });
 
+suite("Unit testing Windows to POSIX path conversion", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  setup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("Test windowsPathToPosix with absolute Windows paths", () => {
+    const tests = [
+      "C:\\cygwin64\\bin\\make.exe",
+      "D:\\projects\\myapp\\Makefile",
+      "c:\\Users\\user\\git\\project",
+      "E:/path/with/forward/slashes",
+    ];
+    const expectedResults = [
+      "/cygdrive/c/cygwin64/bin/make.exe",
+      "/cygdrive/d/projects/myapp/Makefile",
+      "/cygdrive/c/Users/user/git/project",
+      "/cygdrive/e/path/with/forward/slashes",
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.windowsPathToPosix(tests[i])).to.be.equal(expectedResults[i]);
+    }
+  });
+
+  test("Test windowsPathToPosix with already POSIX paths", () => {
+    const tests = [
+      "/usr/bin/make",
+      "/cygdrive/c/path/to/file",
+      "/home/user/project",
+    ];
+    // POSIX paths should be returned unchanged
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.windowsPathToPosix(tests[i])).to.be.equal(tests[i]);
+    }
+  });
+
+  test("Test windowsPathToPosix with relative paths", () => {
+    const tests = [
+      "relative\\path\\to\\file",
+      "..\\parent\\dir",
+      ".\\current\\dir",
+      "just-a-filename.txt",
+    ];
+    const expectedResults = [
+      "relative/path/to/file",
+      "../parent/dir",
+      "./current/dir",
+      "just-a-filename.txt",
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.windowsPathToPosix(tests[i])).to.be.equal(expectedResults[i]);
+    }
+  });
+
+  test("Test windowsPathToPosix with empty and special cases", () => {
+    expect(util.windowsPathToPosix("")).to.be.equal("");
+    expect(util.windowsPathToPosix("make")).to.be.equal("make");
+  });
+});
+
 // TODO: refactor initialization and cleanup of each test
 suite("Fake dryrun parsing", () => {
   suiteSetup(async function (this: Mocha.Context) {

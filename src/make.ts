@@ -456,8 +456,28 @@ export async function doBuildTarget(
   try {
     const quotingStlye: vscode.ShellQuoting = vscode.ShellQuoting.Strong;
     const quotingStyleName: string = "Strong";
+
+    // Check if the terminal is using Cygwin/MSYS bash and convert paths accordingly
+    const usingCygwinBash = util.isWindowsTerminalUsingCygwinOrMsysBash();
+    let commandValue = configuration.getConfigurationMakeCommand();
+    let cwdValue: string = configuration.makeBaseDirectory();
+
+    if (usingCygwinBash) {
+      // Convert Windows paths to POSIX paths for Cygwin/MSYS bash compatibility
+      commandValue = util.windowsPathToPosix(commandValue);
+      cwdValue = util.windowsPathToPosix(cwdValue);
+      // Convert any path arguments (like -f makefile path)
+      makeArgs = makeArgs.map((arg) => {
+        // Check if the argument looks like a Windows absolute path
+        if (/^[A-Za-z]:[\\\/]/.test(arg)) {
+          return util.windowsPathToPosix(arg);
+        }
+        return arg;
+      });
+    }
+
     let myTaskCommand: vscode.ShellQuotedString = {
-      value: configuration.getConfigurationMakeCommand(),
+      value: commandValue,
       quoting: quotingStlye,
     };
     let myTaskArgs: vscode.ShellQuotedString[] = makeArgs.map((arg) => {
@@ -485,7 +505,7 @@ export async function doBuildTarget(
               util.modifiedEnvironmentVariables as util.EnvironmentVariables
             )
           : undefined,
-      cwd,
+      cwd: cwdValue,
     };
 
     let shellExec: vscode.ShellExecution = new vscode.ShellExecution(
