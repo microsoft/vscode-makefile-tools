@@ -1224,7 +1224,7 @@ export async function runPreConfigureScript(
   progress: vscode.Progress<{}>,
   scriptFile: string
 ): Promise<number> {
-  logger.message(localize("pre.configuring", "Pre-configuring..."));
+  logger.message("Pre-configuring...");
   logger.message(`Script: ${configuration.getPreConfigureScript()}`);
 
   const currentConfigPreConfigureArgs =
@@ -1256,7 +1256,7 @@ export async function runPostConfigureScript(
   progress: vscode.Progress<{}>,
   scriptFile: string
 ): Promise<number> {
-  logger.message(localize("post.configuring", "Post-configuring..."));
+  logger.message("Post-configuring...");
   logger.message(`Script: ${configuration.getPostConfigureScript()}`);
 
   const currentConfigPostConfigureArgs =

@@ -13,6 +13,7 @@ Bug Fixes:
 
 - Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526), [#465](https://github.com/microsoft/vscode-makefile-tools/issues/465)
 - Fix incorrect parsing of environment variables with quoted values containing spaces. [#729](https://github.com/microsoft/vscode-makefile-tools/issues/729)
+- Fix script path links not being clickable in localized output for CHS/CHT/DEU/FRA/PLK. [#724](https://github.com/microsoft/vscode-makefile-tools/issues/724)
 
 ## 0.11
 
