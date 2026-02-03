@@ -71,6 +71,7 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "Wyświetl tylko fałszywe obiekty docelowe",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Zapisz otwarte pliki przed skompilowaniem lub skonfigurowaniem",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Skompiluj bieżący element docelowy przed uruchomieniem (debugowanie/uruchamianie)",
+	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Wyczyść kanał wyjściowy na początku kompilacji",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Ścieżka do pliku bazy danych kompilacji",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Włącz debugowanie obrazów lokalnie (na tym hoście) utworzonych przez to rozszerzenie",

@@ -71,6 +71,7 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "Zobrazit pouze falešné cíle",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Před sestavením nebo konfigurací uložit otevřené soubory",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Před spuštěním sestavit aktuální cíl (ladění/spuštění)",
+	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Na začátku sestavování vyčistit výstupní kanál",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Cesta k souboru kompilační databáze",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Povolit místní ladění imagí (v tomto hostiteli) sestavených tímto rozšířením",

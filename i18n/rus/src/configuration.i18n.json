@@ -54,6 +54,7 @@
 	"only.phony.targets": "Только целевые объекты .PHONY: {0}",
 	"save.before.build.or.configure": "Сохранить перед сборкой или настроить: {0}",
 	"build.before.launch": "Сборка перед запуском: {0}",
+	"build.on.save": "Build on save: {0}",
 	"clear.output.before.build": "Очистить выходные данные перед сборкой: {0}",
 	"ignore.directory.commands": "Игнорировать команды каталога: {0}",
 	"configurating.after.settings.or.makefile.changes": "Настройка после параметров или внесения изменений в Makefile...",

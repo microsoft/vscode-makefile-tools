@@ -29,6 +29,7 @@ Configure after command: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/compile_commands.json
@@ -301,6 +302,7 @@ Configure after command: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/compile_commands.json
@@ -342,6 +344,7 @@ Configure after command: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/compile_commands.json

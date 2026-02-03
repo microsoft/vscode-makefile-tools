@@ -71,6 +71,7 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "Visualizza solo le destinazioni phony",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Salvare i file aperti prima di compilare o configurare",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Compilare la destinazione corrente prima dell'avvio (debug/esecuzione)",
+	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Cancellare il canale di output all'inizio di una compilazione",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Percorso del file del database di compilazione",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Consente di abilitare il debug locale (in questo host) delle immagini compilate da questa estensione",

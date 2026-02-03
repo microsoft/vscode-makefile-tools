@@ -71,6 +71,7 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "Nur die falschen Ziele anzeigen",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Geöffnete Dateien vor dem Erstellen oder Konfigurieren speichern",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Aktuelles Ziel vor dem Start erstellen (debuggen/ausführen)",
+	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Ausgabekanal am Anfang eines Builds löschen",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Der Pfad zur Datenbankdatei der Kompilierung",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Aktivieren Sie das lokale Debuggen (in diesem Host) von Images, die von dieser Erweiterung erstellt wurden",

@@ -54,6 +54,7 @@
 	"only.phony.targets": "Jenom cíle .PHONY: {0}",
 	"save.before.build.or.configure": "Uložit před sestavením nebo konfigurací: {0}",
 	"build.before.launch": "Sestavit před spuštěním: {0}",
+	"build.on.save": "Build on save: {0}",
 	"clear.output.before.build": "Vymazat výstup před sestavením: {0}",
 	"ignore.directory.commands": "Ignorovat příkazy adresáře: {0}",
 	"configurating.after.settings.or.makefile.changes": "Probíhá konfigurace po nastavení nebo změnách souboru pravidel...",

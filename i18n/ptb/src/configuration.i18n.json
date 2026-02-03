@@ -54,6 +54,7 @@
 	"only.phony.targets": "Somente destinos .PHONY: {0}",
 	"save.before.build.or.configure": "Salve antes de compilar ou configurar: {0}",
 	"build.before.launch": "Compilar antes da inicialização: {0}",
+	"build.on.save": "Build on save: {0}",
 	"clear.output.before.build": "Limpe a saída antes do build: {0}",
 	"ignore.directory.commands": "Ignorar comandos de diretório: {0}",
 	"configurating.after.settings.or.makefile.changes": "Configurando após as configurações ou alterações do makefile...",

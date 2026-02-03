@@ -71,6 +71,7 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "仅显示虚假目标",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "在生成或配置之前保存打开的文件",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "在启动之前生成当前目标(调试/运行)",
+	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "在生成开始时清除输出通道",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "编译数据库文件的路径",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "启用此扩展生成的本地(在此主机中)映像的调试",
