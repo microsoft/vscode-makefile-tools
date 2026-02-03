@@ -8,11 +8,13 @@ Improvements:
 - While parsing, don't replace characters with newlines if they are inside quotes. [#671](https://github.com/microsoft/vscode-makefile-tools/issues/671)
 - Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
 - Created issue templates for bug reporting and docs/feature requests. [#702](https://github.com/microsoft/vscode-makefile-tools/issues/702)
+- Added buildCleanTarget to panel visibility settings. [#744](https://github.com/microsoft/vscode-makefile-tools/issues/744).
 
 Bug Fixes:
 
 - Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526), [#465](https://github.com/microsoft/vscode-makefile-tools/issues/465)
 - Fix incorrect parsing of environment variables with quoted values containing spaces. [#729](https://github.com/microsoft/vscode-makefile-tools/issues/729)
+- Added support for C++23 and C++26 standard flags. [#752](https://github.com/microsoft/vscode-makefile-tools/issues/752)
 - Fix path link detection in output panel for non-English locales. [#723](https://github.com/microsoft/vscode-makefile-tools/issues/723)
 
 ## 0.11
