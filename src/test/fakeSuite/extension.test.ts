@@ -132,6 +132,93 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
   });
 });
 
+suite("Unit testing escaping special regex characters", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  setup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("Test escaping special characters for regex", () => {
+    // Characters that need escaping in regex: . * + ? ^ $ { } ( ) | [ ] \
+    const tests = [
+      "g++",
+      "c++",
+      "nios2-elf-g++",
+      "arm-none-eabi-g++",
+      "clang++",
+      "simple-name",
+      "test.name",
+      "name*pattern",
+      "name?char",
+      "name^start",
+      "name$end",
+      "name{brace}",
+      "name(paren)",
+      "name|pipe",
+      "name[bracket]",
+      "name\\backslash",
+      "complex.name++with*special?chars",
+    ];
+    const expectedResults = [
+      "g\\+\\+",
+      "c\\+\\+",
+      "nios2-elf-g\\+\\+",
+      "arm-none-eabi-g\\+\\+",
+      "clang\\+\\+",
+      "simple-name",
+      "test\\.name",
+      "name\\*pattern",
+      "name\\?char",
+      "name\\^start",
+      "name\\$end",
+      "name\\{brace\\}",
+      "name\\(paren\\)",
+      "name\\|pipe",
+      "name\\[bracket\\]",
+      "name\\\\backslash",
+      "complex\\.name\\+\\+with\\*special\\?chars",
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.escapeStringForRegex(tests[i])).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
+
+  test("Test escaped strings work in regex", () => {
+    // Verify that escaped strings can be used in RegExp without throwing
+    const compilerNames = [
+      "g++",
+      "c++",
+      "nios2-elf-g++",
+      "arm-none-eabi-g++",
+      "clang++",
+    ];
+
+    for (const name of compilerNames) {
+      const escaped = util.escapeStringForRegex(name);
+      // This should not throw an error
+      const regex = new RegExp(`^${escaped}$`);
+      // The regex should match the original string exactly
+      expect(regex.test(name)).to.be.true;
+    }
+  });
+
+  test("Test that unescaped + causes regex error", () => {
+    // Demonstrate the original problem: unescaped + in regex causes an error
+    const badPattern = "g++";
+    expect(() => new RegExp(`^${badPattern}$`)).to.throw();
+
+    // With escaping, it works
+    const goodPattern = util.escapeStringForRegex("g++");
+    expect(() => new RegExp(`^${goodPattern}$`)).to.not.throw();
+  });
+});
+
 // TODO: refactor initialization and cleanup of each test
 suite("Fake dryrun parsing", () => {
   suiteSetup(async function (this: Mocha.Context) {
