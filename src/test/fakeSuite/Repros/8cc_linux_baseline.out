@@ -1,5 +1,5 @@
 Pre-configuring...
-Script: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh"
+Script: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/.vscode/preconfigure_nonwin.sh
 The pre-configure succeeded.
 Setting configuration - 8cc_linux
 Re-reading settings after configuration change.
@@ -37,7 +37,7 @@ Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Rep
 Deduced command 'c:/some/other/fake/path ' for configuration "8cc_linux"
 Saving opened files before build.
 Loading configurations from cache is not necessary.
-Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
+Preprocessing: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log
 Preprocess elapsed time: 0
 Parsing for IntelliSense.
 Updating the CppTools IntelliSense Configuration Provider.
@@ -209,7 +209,7 @@ Found the following 1 launch targets defined in the makefile: {REPO:VSCODE-MAKEF
 Complete list of launch targets: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros>8cc()
 Parsing for launch targets elapsed time: 0
 Generating parse content for build targets.
-Parsing for build targets from: "{REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log"
+Parsing for build targets from: {REPO:VSCODE-MAKEFILE-TOOLS}/src/test/fakeSuite/Repros/8cc_linux_dryrun.log
 Found the following 29 build targets defined in the makefile: 8cc;all;buffer.o;clean;cleanobj;cpp.o;debug.o;dict.o;encoding.o;error.o;file.o;fulltest;gen.o;lex.o;main.o;map.o;parse.o;path.o;runtests;self;set.o;stage1;stage2;stage3;test;testtest;utiltest;utiltest.o;vector.o
 Complete list of build targets: 8cc;all;buffer.o;clean;cleanobj;cpp.o;debug.o;dict.o;encoding.o;error.o;file.o;fulltest;gen.o;lex.o;main.o;map.o;parse.o;path.o;runtests;self;set.o;stage1;stage2;stage3;test;testtest;utiltest;utiltest.o;vector.o
 Parsing build targets elapsed time: 0
