@@ -2436,6 +2436,25 @@ export async function setTargetByName(targetName: string): Promise<void> {
   extension._projectOutlineProvider.updateBuildTarget(targetName);
 }
 
+export function getTargets(): string[] {
+  // Ensure "all" is always available as a target to select.
+  // There are scenarios when "all" might not be present in the list of available targets,
+  // for example when the extension is using a build log or dryrun cache of a previous state
+  // when a particular target was selected and a dryrun applied on that is producing a subset of targets,
+  // making it impossible to select "all" back again without resetting the Makefile Tools state
+  // or switching to a different makefile configuration or implementing an editable target quick pick.
+  // Another situation where "all" would inconveniently miss from the quick pick is when the user is
+  // providing a build log without the required verbosity for parsing targets (-p or --print-data-base switches).
+  // When the extension is not reading from build log or dryrun cache, we have logic to prevent
+  // "all" from getting lost: make sure the target is not appended to the make invocation
+  // whose output is used to parse the targets (as opposed to parsing for IntelliSense or launch targets
+  // when the current target must be appended to the make command).
+  if (!buildTargets.includes("all")) {
+    buildTargets.push("all");
+  }
+  return buildTargets;
+}
+
 // Fill a drop-down with all the target names run by building the makefile for the current configuration
 // Triggers a cpptools configuration provider update after selection.
 // TODO: change the UI list to multiple selections mode and store an array of current active targets
@@ -2473,21 +2492,7 @@ export async function selectTarget(): Promise<void> {
     }
   }
 
-  // Ensure "all" is always available as a target to select.
-  // There are scenarios when "all" might not be present in the list of available targets,
-  // for example when the extension is using a build log or dryrun cache of a previous state
-  // when a particular target was selected and a dryrun applied on that is producing a subset of targets,
-  // making it impossible to select "all" back again without resetting the Makefile Tools state
-  // or switching to a different makefile configuration or implementing an editable target quick pick.
-  // Another situation where "all" would inconveniently miss from the quick pick is when the user is
-  // providing a build log without the required verbosity for parsing targets (-p or --print-data-base switches).
-  // When the extension is not reading from build log or dryrun cache, we have logic to prevent
-  // "all" from getting lost: make sure the target is not appended to the make invocation
-  // whose output is used to parse the targets (as opposed to parsing for IntelliSense or launch targets
-  // when the current target must be appended to the make command).
-  if (!buildTargets.includes("all")) {
-    buildTargets.push("all");
-  }
+  getTargets();
 
   const chosen: string | undefined = await vscode.window.showQuickPick(
     buildTargets
