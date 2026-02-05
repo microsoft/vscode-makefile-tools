@@ -493,13 +493,21 @@ export async function doBuildTarget(
       myTaskArgs,
       myTaskOptions
     );
+    const taskDefinition: vscode.TaskDefinition = {
+      type: "shell",
+      command: myTaskCommand.value,
+      args: makeArgs,
+    };
     let myTask: vscode.Task = new vscode.Task(
-      { type: "shell", group: "build", label: makefileBuildTaskName },
+      taskDefinition,
       vscode.TaskScope.Workspace,
       makefileBuildTaskName,
       "makefile",
       shellExec
     );
+    // Reassign the definition to prevent VS Code from overwriting it internally
+    // See: https://github.com/microsoft/vscode/issues/195584
+    myTask.definition = taskDefinition;
 
     myTask.problemMatchers = configuration.getConfigurationProblemMatchers();
     myTask.presentationOptions.clear = clearTerminalOutput;

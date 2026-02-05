@@ -14,6 +14,7 @@ Bug Fixes:
 
 - Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526), [#465](https://github.com/microsoft/vscode-makefile-tools/issues/465)
 - Fix incorrect parsing of environment variables with quoted values containing spaces. [#729](https://github.com/microsoft/vscode-makefile-tools/issues/729)
+- Fix build task failure where task definition was missing command property. [#748](https://github.com/microsoft/vscode-makefile-tools/issues/748)
 - Added support for C++23 and C++26 standard flags. [#752](https://github.com/microsoft/vscode-makefile-tools/issues/752)
 - Fix path link detection in output panel for non-English locales. [#723](https://github.com/microsoft/vscode-makefile-tools/issues/723)
 - Fix script path links not being clickable in localized output for CHS/CHT/DEU/FRA/PLK. [#724](https://github.com/microsoft/vscode-makefile-tools/issues/724)
