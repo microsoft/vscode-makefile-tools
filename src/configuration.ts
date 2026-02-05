@@ -2394,24 +2394,30 @@ export async function setNewConfiguration(): Promise<void> {
 
     await setConfigurationByName(chosen);
 
-    if (configureAfterCommand) {
+    // Determine whether to configure and which type:
+    // - cleanConfigureOnConfigurationChange: true (default) -> always clean configure
+    // - cleanConfigureOnConfigurationChange: false AND configureAfterCommand: true -> regular configure
+    // - cleanConfigureOnConfigurationChange: false AND configureAfterCommand: false -> don't configure
+    if (cleanConfigureOnConfigurationChange !== false) {
+      logger.message(
+        localize(
+          "automatically.clean.reconfiguring.project.after.change",
+          "Automatically clean reconfiguring the project after a makefile configuration change."
+        )
+      );
+      await make.cleanConfigure(
+        make.TriggeredBy.configureAfterConfigurationChange
+      );
+    } else if (configureAfterCommand) {
       logger.message(
         localize(
           "automatically.reconfiguring.project.after.change",
           "Automatically reconfiguring the project after a makefile configuration change."
         )
       );
-      // Use cleanConfigure if cleanConfigureOnConfigurationChange is true (default),
-      // otherwise use regular configure
-      if (cleanConfigureOnConfigurationChange !== false) {
-        await make.cleanConfigure(
-          make.TriggeredBy.configureAfterConfigurationChange
-        );
-      } else {
-        await make.configure(
-          make.TriggeredBy.configureAfterConfigurationChange
-        );
-      }
+      await make.configure(
+        make.TriggeredBy.configureAfterConfigurationChange
+      );
     }
 
     // Refresh telemetry for this new makefile configuration
