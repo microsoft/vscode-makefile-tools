@@ -1600,6 +1600,26 @@ export async function readConfigureAfterCommand(): Promise<void> {
   );
 }
 
+let cleanConfigureOnConfigurationChange: boolean | undefined;
+export function getCleanConfigureOnConfigurationChange(): boolean | undefined {
+  return cleanConfigureOnConfigurationChange;
+}
+export function setCleanConfigureOnConfigurationChange(clean: boolean): void {
+  cleanConfigureOnConfigurationChange = clean;
+}
+export async function readCleanConfigureOnConfigurationChange(): Promise<void> {
+  cleanConfigureOnConfigurationChange = await util.getExpandedSetting<boolean>(
+    "cleanConfigureOnConfigurationChange"
+  );
+  logger.message(
+    localize(
+      "clean.configure.on.configuration.change",
+      "Clean configure on configuration change: {0}",
+      cleanConfigureOnConfigurationChange
+    )
+  );
+}
+
 let phonyOnlyTargets: boolean | undefined;
 export function getPhonyOnlyTargets(): boolean | undefined {
   return phonyOnlyTargets;
@@ -1756,6 +1776,7 @@ export async function initFromSettings(
   await readConfigureOnOpen();
   await readConfigureOnEdit();
   await readConfigureAfterCommand();
+  await readCleanConfigureOnConfigurationChange();
   await readPhonyOnlyTargets();
   await readSaveBeforeBuildOrConfigure();
   await readBuildBeforeLaunch();
@@ -2173,6 +2194,17 @@ export async function initFromSettings(
         updatedSettingsSubkeys.push(subKey);
       }
 
+      subKey = "cleanConfigureOnConfigurationChange";
+      let updatedCleanConfigureOnConfigurationChange: boolean | undefined =
+        await util.getExpandedSetting<boolean>(subKey);
+      if (
+        updatedCleanConfigureOnConfigurationChange !==
+        cleanConfigureOnConfigurationChange
+      ) {
+        await readCleanConfigureOnConfigurationChange();
+        updatedSettingsSubkeys.push(subKey);
+      }
+
       subKey = "phonyOnlyTargets";
       let updatedPhonyOnlyTargets: boolean | undefined =
         await util.getExpandedSetting<boolean>(subKey);
@@ -2369,14 +2401,28 @@ export async function setNewConfiguration(): Promise<void> {
 
     await setConfigurationByName(chosen);
 
-    if (configureAfterCommand) {
+    // Determine whether to configure and which type:
+    // - cleanConfigureOnConfigurationChange: true (default) -> always clean configure
+    // - cleanConfigureOnConfigurationChange: false AND configureAfterCommand: true -> regular configure
+    // - cleanConfigureOnConfigurationChange: false AND configureAfterCommand: false -> don't configure
+    if (cleanConfigureOnConfigurationChange !== false) {
+      logger.message(
+        localize(
+          "automatically.clean.reconfiguring.project.after.change",
+          "Automatically clean reconfiguring the project after a makefile configuration change."
+        )
+      );
+      await make.cleanConfigure(
+        make.TriggeredBy.configureAfterConfigurationChange
+      );
+    } else if (configureAfterCommand) {
       logger.message(
         localize(
           "automatically.reconfiguring.project.after.change",
           "Automatically reconfiguring the project after a makefile configuration change."
         )
       );
-      await make.cleanConfigure(
+      await make.configure(
         make.TriggeredBy.configureAfterConfigurationChange
       );
     }

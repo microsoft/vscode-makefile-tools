@@ -506,6 +506,12 @@
           "description": "%makefile-tools.configuration.makefile.configureAfterCommand.description%",
           "scope": "resource"
         },
+        "makefile.cleanConfigureOnConfigurationChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "%makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description%",
+          "scope": "resource"
+        },
         "makefile.preConfigureScript": {
           "type": "string",
           "description": "%makefile-tools.configuration.makefile.preConfigureScript.description%",

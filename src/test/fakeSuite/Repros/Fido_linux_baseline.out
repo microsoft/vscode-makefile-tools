@@ -26,6 +26,7 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
@@ -298,6 +299,7 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
@@ -339,6 +341,7 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false

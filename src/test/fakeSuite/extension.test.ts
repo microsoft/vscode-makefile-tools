@@ -132,6 +132,42 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
   });
 });
 
+suite("Configuration settings", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  setup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("cleanConfigureOnConfigurationChange defaults to true", async () => {
+    // The setting should default to true when not explicitly set
+    const value = configuration.getCleanConfigureOnConfigurationChange();
+    // When the setting is not set, getExpandedSetting returns undefined,
+    // and the code treats undefined the same as true (cleanConfigureOnConfigurationChange !== false)
+    // So either true or undefined are valid default values
+    expect(value === true || value === undefined).to.be.true;
+  });
+
+  test("cleanConfigureOnConfigurationChange can be set to false", async () => {
+    // Save the original value
+    const originalValue = configuration.getCleanConfigureOnConfigurationChange();
+
+    // Set to false using the setter
+    configuration.setCleanConfigureOnConfigurationChange(false);
+
+    // Verify it was set
+    expect(configuration.getCleanConfigureOnConfigurationChange()).to.be.false;
+
+    // Restore original value - if it was undefined, we reset to true (the default)
+    // to ensure subsequent tests start with the expected default behavior
+    configuration.setCleanConfigureOnConfigurationChange(
+      originalValue !== undefined ? originalValue : true
+    );
+  });
+});
+
 // TODO: refactor initialization and cleanup of each test
 suite("Fake dryrun parsing", () => {
   suiteSetup(async function (this: Mocha.Context) {
