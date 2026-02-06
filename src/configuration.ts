@@ -1887,6 +1887,19 @@ export async function initFromSettings(
     if (buildOnSave && extension.getFullFeatureSet()) {
       // Avoid building when already building, configuring, or pre/post configuring.
       if (!make.blockedByOp(make.Operations.build, false)) {
+        // If the project needs to configure first, do so before building
+        if (extension.getState().configureDirty) {
+          logger.message(
+            localize("configuring.before.build.on.save", "Configuring before build on save...")
+          );
+          const configureResult = await make.configure(make.TriggeredBy.configureBeforeBuild);
+          if (configureResult !== make.ConfigureBuildReturnCodeTypes.success) {
+            logger.message(
+              localize("configure.failed.skipping.build", "Configure failed, skipping build on save.")
+            );
+            return;
+          }
+        }
         logger.message(
           localize("building.on.save", "Building on save...")
         );
