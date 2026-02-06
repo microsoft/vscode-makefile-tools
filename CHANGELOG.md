@@ -5,15 +5,24 @@
 Improvements:
 
 - Add `makefile.buildOnSave` setting to automatically build the current target when a file is saved. [#558](https://github.com/microsoft/vscode-makefile-tools/issues/558)
+- Add `makefile.cleanConfigureOnConfigurationChange` setting to always run Clean Configure when switching build configurations. [#534](https://github.com/microsoft/vscode-makefile-tools/issues/534)
 - Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
 - While parsing, don't replace characters with newlines if they are inside quotes. [#671](https://github.com/microsoft/vscode-makefile-tools/issues/671)
 - Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
 - Created issue templates for bug reporting and docs/feature requests. [#702](https://github.com/microsoft/vscode-makefile-tools/issues/702)
+- Added buildCleanTarget to panel visibility settings. [#744](https://github.com/microsoft/vscode-makefile-tools/issues/744).
 
 Bug Fixes:
 
 - Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526), [#465](https://github.com/microsoft/vscode-makefile-tools/issues/465)
 - Fix incorrect parsing of environment variables with quoted values containing spaces. [#729](https://github.com/microsoft/vscode-makefile-tools/issues/729)
+- Fix build task failure where task definition was missing command property. [#748](https://github.com/microsoft/vscode-makefile-tools/issues/748)
+- Added support for C++23 and C++26 standard flags. [#752](https://github.com/microsoft/vscode-makefile-tools/issues/752)
+- Fix path link detection in output panel for non-English locales. [#723](https://github.com/microsoft/vscode-makefile-tools/issues/723)
+- Fix script path links not being clickable in localized output for CHS/CHT/DEU/FRA/PLK. [#724](https://github.com/microsoft/vscode-makefile-tools/issues/724)
+- Fix file path links not being clickable in output panel for certain locales. [#725](https://github.com/microsoft/vscode-makefile-tools/issues/725)
+- Fix localization issue where "Make" as a proper noun was being translated. [#730](https://github.com/microsoft/vscode-makefile-tools/issues/730)
+- Fix "Makefile Tools" being translated in localized languages when it should remain as a proper noun. [#731](https://github.com/microsoft/vscode-makefile-tools/issues/731)
 
 ## 0.11
 

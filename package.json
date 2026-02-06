@@ -141,7 +141,9 @@
       },
       {
         "command": "makefile.outline.buildCleanTarget",
-        "title": "%makefile-tools.command.makefile.buildCleanTarget.title%"
+        "title": "%makefile-tools.command.makefile.buildCleanTarget.title%",
+        "icon": "$(refresh)",
+        "enablement": "makefile:localBuildCleanTargetFeature"
       },
       {
         "command": "makefile.outline.launchDebug",
@@ -504,6 +506,12 @@
           "description": "%makefile-tools.configuration.makefile.configureAfterCommand.description%",
           "scope": "resource"
         },
+        "makefile.cleanConfigureOnConfigurationChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "%makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description%",
+          "scope": "resource"
+        },
         "makefile.preConfigureScript": {
           "type": "string",
           "description": "%makefile-tools.configuration.makefile.preConfigureScript.description%",
@@ -600,6 +608,11 @@
               "type": "boolean",
               "description": "%makefile-tools.configuration.makefile.panel.visibility.run.description%",
               "default": true
+            },
+            "buildCleanTarget": {
+              "type": "boolean",
+              "description": "%makefile-tools.configuration.makefile.panel.visibility.buildCleanTarget.description%",
+              "default": false
             }
           }
         }
@@ -775,7 +788,12 @@
         },
         {
           "command": "makefile.outline.buildCleanTarget",
-          "when": "makefile:fullFeatureSet && view == makefile.outline",
+          "when": "makefile:fullFeatureSet && view == makefile.outline && makefile:localBuildCleanTargetFeature",
+          "group": "navigation@4"
+        },
+        {
+          "command": "makefile.outline.buildCleanTarget",
+          "when": "makefile:fullFeatureSet && view == makefile.outline && !makefile:localBuildCleanTargetFeature",
           "group": "1_makefileOutline@4"
         },
         {

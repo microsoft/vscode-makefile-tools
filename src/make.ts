@@ -494,13 +494,21 @@ export async function doBuildTarget(
       myTaskArgs,
       myTaskOptions
     );
+    const taskDefinition: vscode.TaskDefinition = {
+      type: "shell",
+      command: myTaskCommand.value,
+      args: makeArgs,
+    };
     let myTask: vscode.Task = new vscode.Task(
-      { type: "shell", group: "build", label: makefileBuildTaskName },
+      taskDefinition,
       vscode.TaskScope.Workspace,
       makefileBuildTaskName,
       "makefile",
       shellExec
     );
+    // Reassign the definition to prevent VS Code from overwriting it internally
+    // See: https://github.com/microsoft/vscode/issues/195584
+    myTask.definition = taskDefinition;
 
     myTask.problemMatchers = configuration.getConfigurationProblemMatchers();
     myTask.presentationOptions.clear = clearTerminalOutput;
@@ -1228,7 +1236,7 @@ export async function runPreConfigureScript(
   logger.message(
     localize(
       "pre.configuring.script",
-      'Pre-configuring...\nScript: "{0}"',
+      "Pre-configuring...\nScript: {0}",
       configuration.getPreConfigureScript()
     )
   );
@@ -1265,7 +1273,7 @@ export async function runPostConfigureScript(
   logger.message(
     localize(
       "post.configure.script",
-      'Post-configuring... \nScript: "{0}"',
+      "Post-configuring...\nScript: {0}",
       configuration.getPostConfigureScript()
     )
   );
@@ -2279,7 +2287,7 @@ export async function doConfigure(
 
   // Some initial preprocessing required before any parsing is done.
   logger.message(
-    localize("preprocessing.parse.file", 'Preprocessing: "{0}"', parseFile)
+    localize("preprocessing.parse.file", "Preprocessing: {0}", parseFile)
   );
   let preprocessedDryrunOutput: string;
   let preprocessedDryrunOutputResult: parser.PreprocessDryRunOutputReturnType =
@@ -2414,7 +2422,7 @@ export async function doConfigure(
     logger.message(
       localize(
         "parsing.build.targets.from.parse.file",
-        'Parsing for build targets from: "{0}"',
+        "Parsing for build targets from: {0}",
         parseFile
       )
     );

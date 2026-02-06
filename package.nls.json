@@ -44,13 +44,13 @@
   "makefile-tools.command.makefile.setBuildTarget.title": {
     "message": "Makefile: Set the target to be built by make",
     "comment": [
-      "'Makefile' should not be translated"
+      "'Makefile' and 'make' should not be translated"
     ]
   },
   "makefile-tools.command.makefile.setLaunchConfiguration.title": {
     "message": "Makefile: Set the make launch configuration",
     "comment": [
-      "'Makefile' should not be translated"
+      "'Makefile' and 'make' should not be translated"
     ]
   },
   "makefile-tools.command.makefile.openMakefilePathSetting.title": {
@@ -62,7 +62,7 @@
   "makefile-tools.command.makefile.openMakePathSetting.title": {
     "message": "Makefile: Open Make Path Setting",
     "comment": [
-      "'Makefile' should not be translated"
+      "'Makefile' and 'Make' should not be translated"
     ]
   },
   "makefile-tools.command.makefile.openBuildLogSetting.title": {
@@ -109,7 +109,7 @@
     ]
   },
   "makefile-tools.command.makefile.resetState.title": {
-    "message": "Makefile: Reset the Makefile Tools Extension workspace state (For troubleshooting)",
+    "message": "Makefile: Reset the Makefile Tools extension workspace state (For troubleshooting)",
     "comment": [
       "'Makefile' and 'Makefile Tools' should not be translated"
     ]
@@ -137,7 +137,12 @@
   "makefile-tools.configuration.makefile.launchConfigurations.miDebuggerPath.description": "Path to the non VS debugger (gdb or lldb)",
   "makefile-tools.configuration.makefile.launchConfigurations.stopAtEntry.description": "Stop at the entry point of the target",
   "makefile-tools.configuration.makefile.launchConfigurations.symbolSearchPath.description": "The path to the symbols",
-  "makefile-tools.configuration.makefile.loggingLevel.description": "The logging level for the makefile tools extension",
+  "makefile-tools.configuration.makefile.loggingLevel.description": {
+    "message": "The logging level for the Makefile Tools extension",
+    "comment": [
+      "'Makefile Tools' should not be translated"
+    ]
+  },
   "makefile-tools.configuration.makefile.makeDirectory.description": "The folder path to be passed to make via the switch -C",
   "makefile-tools.configuration.makefile.makefilePath.description": "The path to the makefile of the project",
   "makefile-tools.configuration.makefile.buildLog.description": "The path to the build log that is read to bypass a dry-run",
@@ -171,6 +176,14 @@
       "'Makefile' should not be translated"
     ]
   },
+  "makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description": {
+    "message": "When true (default), always run Clean Configure (which uses --always-make) when switching build configurations. When false, the configureAfterCommand setting determines if regular Configure runs. Clean Configure produces a complete compilation database, while regular Configure only includes out-of-date targets.",
+    "comment": [
+      "'Clean Configure' and 'Configure' refer to extension commands and should not be translated",
+      "'--always-make' is a command line option and should not be translated",
+      "'Makefile' should not be translated"
+    ]
+  },
   "makefile-tools.configuration.makefile.preConfigureScript.description": "The path to the script that needs to be run at least once before configure",
   "makefile-tools.configuration.makefile.preConfigureArgs.description": "Arguments to pass to the pre-configure script",
   "makefile-tools.configuration.makefile.postConfigureScript.description": "The path to the script that needs to be run at least once after configure",
@@ -186,6 +199,7 @@
   "makefile-tools.configuration.makefile.compileCommandsPath.description": "The path to the compilation database file",
   "makefile-tools.configuration.makefile.panel.visibility.debug.description": "Enable debugging locally (in this host) images built by this extension",
   "makefile-tools.configuration.makefile.panel.visibility.run.description": "Enable running locally (in this host) images built by this extension",
+  "makefile-tools.configuration.makefile.panel.visibility.buildCleanTarget.description": "Show the clean and build button in the Makefile Project Outline panel toolbar",
   "makefile-tools.configuration.makefile.panel.visibility.description": {
     "message": "Modify this setting to control the visibility setting in the Makefile Project Outline panel.",
     "comment": [
