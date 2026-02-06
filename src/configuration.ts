@@ -1887,8 +1887,10 @@ export async function initFromSettings(
     if (buildOnSave && extension.getFullFeatureSet()) {
       // Avoid building when already building, configuring, or pre/post configuring.
       if (!make.blockedByOp(make.Operations.build, false)) {
-        // If the project needs to configure first, do so before building
-        if (extension.getState().configureDirty) {
+        // If the project needs to configure first and configureAfterCommand is disabled,
+        // we need to configure explicitly. If configureAfterCommand is enabled,
+        // buildTarget will handle the configure automatically.
+        if (extension.getState().configureDirty && !getConfigureAfterCommand()) {
           logger.message(
             localize("configuring.before.build.on.save", "Configuring before build on save...")
           );
