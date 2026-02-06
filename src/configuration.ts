@@ -1674,6 +1674,20 @@ export async function readBuildBeforeLaunch(): Promise<void> {
   );
 }
 
+let buildOnSave: boolean | undefined;
+export function getBuildOnSave(): boolean | undefined {
+  return buildOnSave;
+}
+export function setBuildOnSave(build: boolean): void {
+  buildOnSave = build;
+}
+export async function readBuildOnSave(): Promise<void> {
+  buildOnSave = await util.getExpandedSetting<boolean>("buildOnSave");
+  logger.message(
+    localize("build.on.save", "Build on save: {0}", buildOnSave)
+  );
+}
+
 let clearOutputBeforeBuild: boolean | undefined;
 export function getClearOutputBeforeBuild(): boolean | undefined {
   return clearOutputBeforeBuild;
@@ -1780,6 +1794,7 @@ export async function initFromSettings(
   await readPhonyOnlyTargets();
   await readSaveBeforeBuildOrConfigure();
   await readBuildBeforeLaunch();
+  await readBuildOnSave();
   await readClearOutputBeforeBuild();
   await readIgnoreDirectoryCommands();
   await readCompileCommandsPath();
@@ -1862,9 +1877,40 @@ export async function initFromSettings(
   //       We can't listen only to the makefile pointed to by makefile.makefilePath or makefile.makeDirectory,
   //       because that is only the entry point and can refer to other relevant makefiles.
   // TODO: don't trigger an update for any dummy save, verify how the content changed.
-  vscode.workspace.onDidSaveTextDocument((e) => {
+  vscode.workspace.onDidSaveTextDocument(async (e) => {
     if (e.uri.fsPath.toLowerCase().endsWith("makefile")) {
       extension.getState().configureDirty = true;
+    }
+
+    // If buildOnSave is enabled, trigger a build when any file in the workspace is saved.
+    // This is useful for TDD workflows where tests are run automatically on save.
+    if (buildOnSave && extension.getFullFeatureSet()) {
+      // Avoid building when already building, configuring, or pre/post configuring.
+      if (!make.blockedByOp(make.Operations.build, false)) {
+        // If the project needs to configure first and configureAfterCommand is disabled,
+        // we need to configure explicitly. If configureAfterCommand is enabled,
+        // buildTarget will handle the configure automatically.
+        if (extension.getState().configureDirty && !getConfigureAfterCommand()) {
+          logger.message(
+            localize("configuring.before.build.on.save", "Configuring before build on save...")
+          );
+          const configureResult = await make.configure(make.TriggeredBy.configureBeforeBuild);
+          if (configureResult !== make.ConfigureBuildReturnCodeTypes.success) {
+            logger.message(
+              localize("configure.failed.skipping.build", "Configure failed, skipping build on save.")
+            );
+            return;
+          }
+        }
+        logger.message(
+          localize("building.on.save", "Building on save...")
+        );
+        await make.buildTarget(
+          make.TriggeredBy.buildOnSave,
+          getCurrentTarget() || "",
+          false
+        );
+      }
     }
   });
 
@@ -2226,6 +2272,14 @@ export async function initFromSettings(
         await util.getExpandedSetting<boolean>(subKey);
       if (updatedBuildBeforeLaunch !== buildBeforeLaunch) {
         await readBuildBeforeLaunch();
+        updatedSettingsSubkeys.push(subKey);
+      }
+
+      subKey = "buildOnSave";
+      let updatedBuildOnSave: boolean | undefined =
+        await util.getExpandedSetting<boolean>(subKey);
+      if (updatedBuildOnSave !== buildOnSave) {
+        await readBuildOnSave();
         updatedSettingsSubkeys.push(subKey);
       }
 

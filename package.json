@@ -576,6 +576,12 @@
           "description": "%makefile-tools.configuration.makefile.buildBeforeLaunch.description%",
           "scope": "resource"
         },
+        "makefile.buildOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "%makefile-tools.configuration.makefile.buildOnSave.description%",
+          "scope": "resource"
+        },
         "makefile.clearOutputBeforeBuild": {
           "type": "boolean",
           "default": true,
