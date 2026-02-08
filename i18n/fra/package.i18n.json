@@ -61,6 +61,7 @@
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Configurer automatiquement les répertoires de projet Makefile lorsqu’ils sont ouverts",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Configurer automatiquement les répertoires de projet Makefile lorsque des makefiles et/ou paramètres pertinents sont modifiés",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Configurez automatiquement les répertoires de projet Makefile après les opérations pertinentes, comme modifier la configuration de la construction ou la cible du makefile",
+	"makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description": "When true (default), always run Clean Configure (which uses --always-make) when switching build configurations. When false, the configureAfterCommand setting determines if regular Configure runs. Clean Configure produces a complete compilation database, while regular Configure only includes out-of-date targets.",
 	"makefile-tools.configuration.makefile.preConfigureScript.description": "Le chemin d’accès au script qui doit être exécuté au moins une fois avant la configuration",
 	"makefile-tools.configuration.makefile.preConfigureArgs.description": "Arguments à transmettre au script de pré-configuration",
 	"makefile-tools.configuration.makefile.postConfigureScript.description": "Le chemin d'accès au script qui doit être exécuté au moins une fois après la configuration",
@@ -71,9 +72,11 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "Afficher uniquement les fausses cibles",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Enregistrez les fichiers ouverts avant de créer ou de configurer",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Construire la cible actuelle avant le lancement (debug/run)",
+	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Effacer le canal de sortie au début d’une construction",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Le chemin d’accès au fichier de base de données de compilation",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Activer le débogage local (dans cet hôte) des images construites par cette extension",
 	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Activer l’exécution locale (dans cet hôte) des images créées par cette extension",
+	"makefile-tools.configuration.makefile.panel.visibility.buildCleanTarget.description": "Afficher le bouton Nettoyer et générer dans la barre d’outils du panneau Plan de projet Makefile",
 	"makefile-tools.configuration.makefile.panel.visibility.description": "Modifier ce paramètre pour contrôler le paramètre de visibilité dans le panneau Plan du projet Makefile."
 }
