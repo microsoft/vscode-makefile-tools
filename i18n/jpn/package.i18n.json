@@ -61,6 +61,7 @@
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Makefile プロジェクト ディレクトリを開いたときに自動的に構成する",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "関連する Makefile や設定が変更されたときにMakefile プロジェクト ディレクトリを自動的に構成する",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "ビルド構成の変更や Makefile ターゲットなど、関連する操作の後に Makefile プロジェクト ディレクトリを自動的に構成する",
+	"makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description": "true (既定値) の場合、ビルド構成を切り替えるときは常にクリーン構成 (--always-make を使用) を実行します。false の場合、configureAfterCommand 設定によって、通常の構成が実行されるかどうかが決定されます。Clean Configure は完全なコンパイル データベースを生成しますが、通常の構成には古いターゲットのみが含まれます。",
 	"makefile-tools.configuration.makefile.preConfigureScript.description": "構成する前に少なくとも 1 回実行する必要があるスクリプトへのパス",
 	"makefile-tools.configuration.makefile.preConfigureArgs.description": "事前構成スクリプトに渡す引数",
 	"makefile-tools.configuration.makefile.postConfigureScript.description": "構成後に少なくとも 1 回実行する必要があるスクリプトへのパス",
@@ -71,9 +72,11 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "偽のターゲットのみを表示する",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "ビルドまたは構成する前に開いているファイルを保存する",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "起動前に現在のターゲットをビルドする (デバッグ/実行)",
+	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "ビルドの開始時に出力チャネルをクリアする",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "コンパイル データベース ファイルへのパス",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "この拡張機能によってビルドされたイメージの、ローカル (このホスト内) でのデバッグを有効にする",
 	"makefile-tools.configuration.makefile.panel.visibility.run.description": "この拡張機能によってビルドされたイメージの、ローカル (このホスト内) での実行を有効にする",
+	"makefile-tools.configuration.makefile.panel.visibility.buildCleanTarget.description": "[メイクファイル プロジェクト アウトライン] パネルのツールバーに [クリーンとビルド] ボタンを表示します",
 	"makefile-tools.configuration.makefile.panel.visibility.description": "この設定を変更して、[Makefile プロジェクト アウトライン] パネルの表示設定を制御します。"
 }

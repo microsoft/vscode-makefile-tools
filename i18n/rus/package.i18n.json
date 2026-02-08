@@ -61,6 +61,7 @@
 	"makefile-tools.configuration.makefile.configureOnOpen.description": "Автоматическая настройка каталогов проекта Makefile при их открытии",
 	"makefile-tools.configuration.makefile.configureOnEdit.description": "Автоматически настраивать каталоги проекта Makefile при изменении любых соответствующих Makefile и/или параметров",
 	"makefile-tools.configuration.makefile.configureAfterCommand.description": "Автоматически настраивать каталоги проекта Makefile после соответствующих операций, таких как изменение конфигурации сборки или цели Makefile",
+	"makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description": "Если значение равно true (по умолчанию), при изменении конфигурации сборки всегда запускать команду Clean Configure (она использует параметр --always-make). Если значение равно false, параметр configureAfterCommand определяет, будет ли запускаться обычная команда Configure. Команда Clean Configure создаёт полную базу данных компиляции, тогда как обычная Configure включает только устаревшие цели.",
 	"makefile-tools.configuration.makefile.preConfigureScript.description": "Путь к сценарию, который необходимо выполнить хотя бы один раз перед настройкой",
 	"makefile-tools.configuration.makefile.preConfigureArgs.description": "Аргументы, передаваемые в сценарий предварительной настройки",
 	"makefile-tools.configuration.makefile.postConfigureScript.description": "Путь к сценарию, который необходимо выполнить хотя бы один раз после настройки",
@@ -71,9 +72,11 @@
 	"makefile-tools.configuration.makefile.phonyOnlyTargets.description": "Отображать только целевые объекты телефонии",
 	"makefile-tools.configuration.makefile.saveBeforeBuildOrConfigure.description": "Сохранять открытые файлы перед сборкой или настройкой",
 	"makefile-tools.configuration.makefile.buildBeforeLaunch.description": "Сборка текущего целевого объекта перед запуском (отладка/запуск)",
+	"makefile-tools.configuration.makefile.buildOnSave.description": "Build the current target when a file in the workspace is saved",
 	"makefile-tools.configuration.makefile.clearOutputBeforeBuild.description": "Очистить канал вывода в начале сборки",
 	"makefile-tools.configuration.makefile.compileCommandsPath.description": "Путь к файлу базы данных компиляции",
 	"makefile-tools.configuration.makefile.panel.visibility.debug.description": "Включить локальную (в этом узле) отладку образов, созданных этим расширением",
 	"makefile-tools.configuration.makefile.panel.visibility.run.description": "Включить локальный (в этом узле) запуск образов, созданных этим расширением",
+	"makefile-tools.configuration.makefile.panel.visibility.buildCleanTarget.description": "Отображать кнопки очистки и сборки на панели инструментов раздела \"Структура проекта Makefile\"",
 	"makefile-tools.configuration.makefile.panel.visibility.description": "Измените этот параметр, чтобы управлять параметром видимости на панели структуры проекта Makefile."
 }
