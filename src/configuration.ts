@@ -1898,7 +1898,8 @@ export async function initFromSettings(
       extension.getState().configureDirty = true;
     }
 
-    // If buildOnSave is enabled, trigger a build when any file in the workspace is saved.
+    // If buildOnSave or runOnSave is enabled, trigger a build when any file in the workspace is saved.
+    // runOnSave will additionally run the target after a successful build.
     // This is useful for TDD workflows where tests are run automatically on save.
     if ((buildOnSave || runOnSave) && extension.getFullFeatureSet()) {
       // Avoid building when already building, configuring, or pre/post configuring.
@@ -1919,7 +1920,9 @@ export async function initFromSettings(
           }
         }
         logger.message(
-          localize("building.on.save", "Building on save...")
+          runOnSave
+            ? localize("building.and.running.on.save", "Building and running on save...")
+            : localize("building.on.save", "Building on save...")
         );
         const buildResult = await make.buildTarget(
           runOnSave ? make.TriggeredBy.runOnSave : make.TriggeredBy.buildOnSave,
