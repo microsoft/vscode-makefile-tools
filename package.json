@@ -74,10 +74,23 @@
     "onCommand:makefile.resetState",
     "workspaceContains:**/makefile",
     "workspaceContains:**/Makefile",
-    "workspaceContains:**/GNUmakefile"
+    "workspaceContains:**/GNUmakefile",
+    "workspaceContains:**/*.Makefile",
+    "workspaceContains:**/Makefile.*",
+    "workspaceContains:**/*.makefile"
   ],
   "main": "./dist/main",
   "contributes": {
+    "languages": [
+      {
+        "id": "makefile",
+        "filenamePatterns": [
+          "*.Makefile",
+          "Makefile.*",
+          "*.makefile"
+        ]
+      }
+    ],
     "commands": [
       {
         "command": "makefile.buildTarget",

@@ -4,6 +4,7 @@
 
 Improvements:
 
+- Add native support for custom `Makefile` naming conventions such as `*.Makefile`, `Makefile.*`, and `*.makefile`. [#645](https://github.com/microsoft/vscode-makefile-tools/issues/645)
 - Add `makefile.buildOnSave` setting to automatically build the current target when a file is saved. [#558](https://github.com/microsoft/vscode-makefile-tools/issues/558)
 - Add `makefile.cleanConfigureOnConfigurationChange` setting to always run Clean Configure when switching build configurations. [#534](https://github.com/microsoft/vscode-makefile-tools/issues/534)
 - Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
