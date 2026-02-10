@@ -204,6 +204,33 @@ suite("Unit testing replacing characters in quotes (replaceStringInQuotes)", () 
       );
     }
   });
+
+  test("Test with unbalanced quotes - no replacement", () => {
+    // When quotes are unbalanced, the function should return the original string
+    // to avoid incorrectly processing partial quoted regions.
+    // This can happen when compilerArgRegions is a fragment that starts mid-quote
+    // (e.g., after -D exclusion leaves a partial quoted define).
+    const tests = [
+      // Simulates a partial region after -D exclusion: only the closing quote and
+      // subsequent args remain, causing 1 unbalanced single quote
+      " -1;} } while(0)' main.c -o main",
+      // Unclosed double quote - would incorrectly treat everything after as quoted
+      'unbalanced "double quote',
+      // Odd number of single quotes - also indicates truncated/partial content
+      "three ' quotes ' here '",
+    ];
+    const expectedResults = [
+      " -1;} } while(0)' main.c -o main", // No change - unbalanced
+      'unbalanced "double quote',          // No change - unbalanced
+      "three ' quotes ' here '",           // No change - unbalanced
+    ];
+
+    for (let i = 0; i < tests.length; i++) {
+      expect(util.replaceStringInQuotes(tests[i], " ", "_")).to.be.equal(
+        expectedResults[i]
+      );
+    }
+  });
 });
 
 // TODO: refactor initialization and cleanup of each test
