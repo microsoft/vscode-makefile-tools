@@ -932,7 +932,7 @@
     "jsonc-parser": "^3.0.0",
     "@vscode/test-electron": "^2.3.8",
     "ts-loader": "^8.0.17",
-    "webpack": "^5.94.0",
+    "webpack": "^5.104.1",
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
