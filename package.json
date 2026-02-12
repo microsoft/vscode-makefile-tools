@@ -356,6 +356,14 @@
             "type": "object",
             "default": null,
             "properties": {
+              "name": {
+                "type": "string",
+                "description": "%makefile-tools.configuration.makefile.launchConfigurations.name.description%"
+              },
+              "description": {
+                "type": "string",
+                "description": "%makefile-tools.configuration.makefile.launchConfigurations.description.description%"
+              },
               "binaryPath": {
                 "type": "string",
                 "description": "%makefile-tools.configuration.makefile.launchConfigurations.binaryPath.description%"
