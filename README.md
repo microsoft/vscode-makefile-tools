@@ -112,7 +112,7 @@ If you need to pass additional arguments to your targets, update the `makefile.l
 the `binaryArgs` property to the configuration.
 
 ## Resources
-- [Makefile Settings](docs/makefile-settings.md) for command and variable substitutions.
+- [Makefile Settings](docs/makefile-settings.md) for all available settings, defaults, and substitution support.
 - [Repositories](docs/repositories.md) to get the configurations for a select number of repositories that we have tested.
 - [Troubleshooting](docs/troubleshooting.md) for reasons and workarounds for errors you might run into.
 - [Github](https://github.com/microsoft/vscode-makefile-tools) for source code, issues, and contributing.
