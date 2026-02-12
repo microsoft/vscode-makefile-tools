@@ -775,35 +775,16 @@ export function replaceStringNotInQuotes(
   return result;
 }
 
-// Check if a string has balanced quotes (even number of both single and double quotes)
-function hasBalancedQuotes(value: string): boolean {
-  let singleQuoteCount = 0;
-  let doubleQuoteCount = 0;
-  for (const char of value) {
-    if (char === "'") singleQuoteCount++;
-    if (char === '"') doubleQuoteCount++;
-  }
-  return singleQuoteCount % 2 === 0 && doubleQuoteCount % 2 === 0;
-}
-
 // Replaces all occurrences of stringToBeReplaced with replacementString,
 // but only when inside single or double quotes.
 // This is the inverse of replaceStringNotInQuotes.
 // Note: This function is intended for replacing characters that are not quote
 // characters themselves. Replacing quote characters would produce unexpected results.
-// If quotes are unbalanced, returns the original string unchanged to avoid
-// incorrectly processing partial quoted regions.
 export function replaceStringInQuotes(
   value: string,
   stringToBeReplaced: string,
   replacementString: string
 ): string {
-  // If quotes are unbalanced, return the original string unchanged
-  // to avoid incorrectly processing partial quoted regions
-  if (!hasBalancedQuotes(value)) {
-    return value;
-  }
-
   let withinDoubleQuotesString = false;
   let withinSingleQuoteString = false;
   let result = "";

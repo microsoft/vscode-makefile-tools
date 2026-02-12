@@ -512,7 +512,9 @@ async function parseAnySwitchFromToolArguments(
     // On Win32 allow '/' as switch prefix as well,
     // otherwise it conflicts with path character
     (process.platform === "win32" ? "|\\/)" : ")") +
-    "([a-zA-Z0-9_]+)" + 
+    // Switch names must start with a letter (not a digit) to avoid matching
+    // things like "-1" inside quoted values like "'do { return -1; }'"
+    "([a-zA-Z][a-zA-Z0-9_]*)" +
     // Try to match quoted value of argument
     "(=(\"|\'))?";
   let regexp: RegExp = RegExp(regExpStr, "mg");
