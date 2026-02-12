@@ -8,7 +8,7 @@ All settings for the Makefile Tools extension can be configured in your `setting
 |---------|------|---------|-------------|
 | `makefile.configurations` | array | `[]` | The user defined makefile configurations. Each configuration is an object with optional properties: `name`, `makefilePath`, `makePath`, `makeDirectory`, `makeArgs` (default `[]`), `problemMatchers` (default `["$gcc", "$msvc"]`), `buildLog`, `preConfigureArgs` (default `[]`), `postConfigureArgs` (default `[]`). |
 | `makefile.defaultLaunchConfiguration` | object | `null` | Various global debugger settings. Properties: `MIMode` (`"gdb"` or `"lldb"`), `miDebuggerPath`, `stopAtEntry` (default `false`), `symbolSearchPath`. |
-| `makefile.launchConfigurations` | array | `[]` | The user defined launch (debug/run) configurations. Each configuration is an object with optional properties: `binaryPath`, `binaryArgs` (default `[]`), `cwd`, `MIMode` (`"gdb"` or `"lldb"`), `miDebuggerPath`, `stopAtEntry` (default `false`), `symbolSearchPath`. |
+| `makefile.launchConfigurations` | array | `[]` | The user defined launch (debug/run) configurations. Each configuration is an object with optional properties: `name`, `description`, `binaryPath`, `binaryArgs` (default `[]`), `cwd`, `MIMode` (`"gdb"` or `"lldb"`), `miDebuggerPath`, `stopAtEntry` (default `false`), `symbolSearchPath`. |
 | `makefile.loggingLevel` | string | `"Normal"` | The logging level for the Makefile Tools extension. Possible values: `"Normal"`, `"Verbose"`, `"Debug"`. |
 | `makefile.makePath` | string | `"make"` | The path to the make tool used by the extension. |
 | `makefile.makeDirectory` | string | *undefined* | The folder path to be passed to make via the `-C` switch. |
