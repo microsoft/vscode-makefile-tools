@@ -76,3 +76,4 @@ Supported macros for substitution:
 |`${command:makefile.getConfiguration}`| The active configuration of your makefile project (i.e. `debug_x86`) |
 |`${buildTarget}`| The active build target of your makefile target {i.e. `target.exe`} |
 |`${command:makefile.getBuildTarget}`| The active build target of your makefile target {i.e. `target.exe`} |
+
