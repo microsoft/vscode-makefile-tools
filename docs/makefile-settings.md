@@ -13,8 +13,8 @@ For command and variable substitution support, see [Makefile Substitutions](make
 | `makefile.launchConfigurations` | array | `[]` | The user defined launch (debug/run) configurations. Each configuration is an object with optional properties: `binaryPath`, `binaryArgs` (default `[]`), `cwd`, `MIMode` (`"gdb"` or `"lldb"`), `miDebuggerPath`, `stopAtEntry` (default `false`), `symbolSearchPath`. |
 | `makefile.loggingLevel` | string | `"Normal"` | The logging level for the Makefile Tools extension. Possible values: `"Normal"`, `"Verbose"`, `"Debug"`. |
 | `makefile.makePath` | string | `"make"` | The path to the make tool used by the extension. |
-| `makefile.makeDirectory` | string | | The folder path to be passed to make via the `-C` switch. |
-| `makefile.makefilePath` | string | | The path to the makefile of the project. |
+| `makefile.makeDirectory` | string | *undefined* | The folder path to be passed to make via the `-C` switch. |
+| `makefile.makefilePath` | string | *undefined* | The path to the makefile of the project. |
 | `makefile.buildLog` | string | `null` | The path to the build log that is read to bypass a dry-run. |
 | `makefile.extensionOutputFolder` | string | `""` | The path to various output files produced by the extension. Defaults to the VS Code workspace storage location. |
 | `makefile.extensionLog` | string | `""` | The path to an output file storing all content from the Makefile output channel. Defaults to the value of the `makefile.extensionOutputFolder` setting. |
