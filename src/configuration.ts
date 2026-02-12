@@ -2812,7 +2812,7 @@ export async function selectLaunchConfiguration(): Promise<void> {
       if (matchingConfig?.name) {
         return {
           label: matchingConfig.name,
-          description: matchingConfig.description || "",
+          description: matchingConfig.description,
           detail: target,
           id: target,
         };
