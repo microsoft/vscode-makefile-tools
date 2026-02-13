@@ -88,7 +88,7 @@
           "*.Makefile",
           "Makefile.*",
           "*.makefile"
-        ]
+        ],
         "configuration": "./makefile-language-configuration.json"
       }
     ],
