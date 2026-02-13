@@ -5,6 +5,7 @@
 Improvements:
 
 - Add `# region` / `# endregion` folding support for makefiles. [#544](https://github.com/microsoft/vscode-makefile-tools/issues/544)
+- Add `name` and `description` fields to `makefile.launchConfigurations` to allow user-friendly labeling of launch configurations. [#568](https://github.com/microsoft/vscode-makefile-tools/issues/568)
 - Add `makefile.runOnSave` setting to automatically build and run the current target when a file is saved. [#786](https://github.com/microsoft/vscode-makefile-tools/issues/786)
 - Add `makefile.buildOnSave` setting to automatically build the current target when a file is saved. [#558](https://github.com/microsoft/vscode-makefile-tools/issues/558)
 - Add `makefile.cleanConfigureOnConfigurationChange` setting to always run Clean Configure when switching build configurations. [#534](https://github.com/microsoft/vscode-makefile-tools/issues/534)
@@ -13,6 +14,7 @@ Improvements:
 - Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
 - Created issue templates for bug reporting and docs/feature requests. [#702](https://github.com/microsoft/vscode-makefile-tools/issues/702)
 - Added buildCleanTarget to panel visibility settings. [#744](https://github.com/microsoft/vscode-makefile-tools/issues/744).
+- Document all `makefile.*` settings with types, defaults, and descriptions. [#790](https://github.com/microsoft/vscode-makefile-tools/issues/790)
 
 Bug Fixes:
 
