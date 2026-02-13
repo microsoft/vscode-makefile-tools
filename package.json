@@ -78,6 +78,12 @@
   ],
   "main": "./dist/main",
   "contributes": {
+    "languages": [
+      {
+        "id": "makefile",
+        "configuration": "./makefile-language-configuration.json"
+      }
+    ],
     "commands": [
       {
         "command": "makefile.buildTarget",
