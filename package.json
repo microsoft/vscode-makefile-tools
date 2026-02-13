@@ -89,6 +89,7 @@
           "Makefile.*",
           "*.makefile"
         ]
+        "configuration": "./makefile-language-configuration.json"
       }
     ],
     "commands": [
@@ -369,6 +370,14 @@
             "type": "object",
             "default": null,
             "properties": {
+              "name": {
+                "type": "string",
+                "description": "%makefile-tools.configuration.makefile.launchConfigurations.name.description%"
+              },
+              "description": {
+                "type": "string",
+                "description": "%makefile-tools.configuration.makefile.launchConfigurations.description.description%"
+              },
               "binaryPath": {
                 "type": "string",
                 "description": "%makefile-tools.configuration.makefile.launchConfigurations.binaryPath.description%"
@@ -593,6 +602,12 @@
           "type": "boolean",
           "default": false,
           "description": "%makefile-tools.configuration.makefile.buildOnSave.description%",
+          "scope": "resource"
+        },
+        "makefile.runOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "%makefile-tools.configuration.makefile.runOnSave.description%",
           "scope": "resource"
         },
         "makefile.clearOutputBeforeBuild": {

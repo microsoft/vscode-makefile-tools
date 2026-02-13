@@ -103,6 +103,7 @@ export enum TriggeredBy {
   buildAll = "command pallette (buildAll)",
   buildCleanAll = "command pallette (buildCleanAll)",
   buildOnSave = "settings (buildOnSave)",
+  runOnSave = "settings (runOnSave)",
   preconfigure = "command pallette (preConfigure)",
   alwaysPreconfigure = "settings (alwaysPreConfigure)",
   postConfigure = "command pallette (postConfigure)",
