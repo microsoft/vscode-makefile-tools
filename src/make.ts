@@ -745,7 +745,6 @@ export async function generateParseContent(
 
     let completeOutput: string = "";
     let stderrStr: string = "";
-    let heartBeat: number = Date.now();
 
     let stdout: any = (result: string): void => {
       const appendStr: string = `${result} ${lineEnding}`;
@@ -759,8 +758,6 @@ export async function generateParseContent(
           (recursive ? ` ${recursiveString}` : "") +
           (forTargets ? ` ${forTargetsString}` : "" + "..."),
       });
-
-      heartBeat = Date.now();
     };
 
     let stderr: any = (result: string): void => {
@@ -781,32 +778,6 @@ export async function generateParseContent(
       completeOutput += appendStr;
     };
 
-    const heartBeatTimeout: number = 30; // half minute. TODO: make this a setting
-    let timeout: NodeJS.Timeout = setInterval(function (): void {
-      let elapsedHeartBit: number = util.elapsedTimeSince(heartBeat);
-      if (elapsedHeartBit > heartBeatTimeout) {
-        vscode.window.showWarningMessage(
-          "Dryrun timeout. See Makefile Tools Output Channel for details."
-        );
-        logger.message(
-          localize(
-            "dryrun.timeout.verify",
-            "Dryrun timeout. Verify that the make command works properly in your development terminal (it could wait for stdin)."
-          )
-        );
-        logger.message(
-          localize(
-            "double.check.dryrun",
-            "Double check the dryrun output log: {0}",
-            dryrunFile
-          )
-        );
-
-        // It's enough to show this warning popup once.
-        clearInterval(timeout);
-      }
-    }, 5 * 1000);
-
     // The dry-run analysis should operate on english.
     const opts: util.ProcOptions = {
       workingDirectory: util.getWorkspaceRoot(),
@@ -820,7 +791,6 @@ export async function generateParseContent(
       makeArgs,
       opts
     );
-    clearInterval(timeout);
     let elapsedTime: number = util.elapsedTimeSince(startTime);
     logger.message(
       localize(
