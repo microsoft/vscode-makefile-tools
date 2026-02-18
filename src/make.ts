@@ -111,6 +111,7 @@ export enum TriggeredBy {
   configure = "command pallette (configure)",
   configureOnOpen = "settings (configureOnOpen)",
   cleanConfigureOnOpen = "configure dirty (on open), settings (configureOnOpen)",
+  automaticConfigureOnOpen = "automatic (on open, first time)",
   cleanConfigure = "command pallette (clean configure)",
   configureBeforeBuild = "configure dirty (before build), settings (configureAfterCommand)",
   configureAfterConfigurationChange = "settings (configureAfterCommand), command pallette (setBuildConfiguration)",

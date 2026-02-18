@@ -910,6 +910,19 @@ suite("Fake dryrun parsing", () => {
   });
 });
 
+suite("Unit testing TriggeredBy enum", () => {
+  test("TriggeredBy.automaticConfigureOnOpen should exist", () => {
+    expect(make.TriggeredBy.automaticConfigureOnOpen).to.equal(
+      "automatic (on open, first time)"
+    );
+  });
+
+  test("TriggeredBy enum should have automatic configure on open value", () => {
+    const triggeredByValues = Object.values(make.TriggeredBy);
+    expect(triggeredByValues).to.include("automatic (on open, first time)");
+  });
+});
+
 suite("Unit testing parseStandard for C++ standards", () => {
   suiteSetup(async function (this: Mocha.Context) {
     this.timeout(100000);
