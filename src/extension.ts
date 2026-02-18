@@ -769,7 +769,7 @@ export async function activate(
           .showInformationMessage<Choice1>(
             localize(
               "extension.configureOnOpen",
-              "Would you like to configure C++ IntelliSense for this workspace using information from your Makefiles?"
+              "Would you like to configure this project for C++ IntelliSense using information from your Makefiles?"
             ),
             {},
             { title: localize("yes", "Yes"), doConfigure: true },
@@ -784,11 +784,11 @@ export async function activate(
               const persistMessage = chosen.doConfigure
                 ? localize(
                     "always.configure.on.open",
-                    "Always configure C++ IntelliSense using information from your Makefiles upon opening?"
+                    "Always configure this project for C++ IntelliSense using information from your Makefiles upon opening?"
                   )
                 : localize(
                     "never.configure.on.open",
-                    "Configure C++ IntelliSense using information from your Makefiles upon opening?"
+                    "Configure this project for C++ IntelliSense using information from your Makefiles upon opening?"
                   );
               const buttonMessages = chosen.doConfigure
                 ? [localize("yes.button", "Yes"), localize("no.button", "No")]
