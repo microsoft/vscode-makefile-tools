@@ -387,7 +387,7 @@ async function parseLineAsTool(
   // - with or without extension (windows only)
   // - with or without quotes
   // - must have at least one space or tab after the tool invocation
-  let regexpStr: string = '^[\\s\\"]*(.*?)(';
+  let regexpStr: string = "^[\\s\\\"\\']*(.*?)(";
   if (process.platform === "win32") {
     regexpStr += versionedToolNames.join("\\.exe|");
 
@@ -399,7 +399,7 @@ async function parseLineAsTool(
     regexpStr += "|";
   }
 
-  regexpStr += versionedToolNames.join("|") + ')(\\s|\\"\\s)(.*)$';
+  regexpStr += versionedToolNames.join("|") + ")(\\s|\\\"\\s|\\'\\s)(.*)$";
 
   let regexp: RegExp = RegExp(regexpStr, "mg");
   let match: RegExpExecArray | null = regexp.exec(line);
@@ -476,11 +476,11 @@ function findNextQuoteIndex(str: string, start: number, quote: string): number {
       continue;
     }
 
-    if (char === '\\') {
+    if (char === "\\") {
       escaping = true;
       continue;
     }
-  
+
     if (char === quote) {
       return index;
     }
@@ -512,9 +512,9 @@ async function parseAnySwitchFromToolArguments(
     // On Win32 allow '/' as switch prefix as well,
     // otherwise it conflicts with path character
     (process.platform === "win32" ? "|\\/)" : ")") +
-    "([a-zA-Z0-9_]+)" + 
+    "([a-zA-Z0-9_]+)" +
     // Try to match quoted value of argument
-    "(=(\"|\'))?";
+    "(=(\"|'))?";
   let regexp: RegExp = RegExp(regExpStr, "mg");
   let match1: RegExpExecArray | null;
   let match2: RegExpExecArray | null;
@@ -572,7 +572,7 @@ async function parseAnySwitchFromToolArguments(
     partialArgs = args.substring(index1, index2);
     swi = match1[3];
     swi = swi.trim();
-    
+
     // Skip over any switches that we know we don't need
     let exclude: boolean = false;
     for (const arg of excludeArgs) {
