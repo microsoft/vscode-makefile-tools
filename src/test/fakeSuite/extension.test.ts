@@ -31,7 +31,9 @@ import * as configuration from "../../configuration";
 import { expect } from "chai";
 import * as launch from "../../launch";
 import * as make from "../../make";
+import * as parser from "../../parser";
 import * as util from "../../util";
+import * as cpp from "vscode-cpptools";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -127,6 +129,42 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
         expectedResults[i]
       );
     }
+  });
+});
+
+suite("Configuration settings", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  setup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("cleanConfigureOnConfigurationChange defaults to true", async () => {
+    // The setting should default to true when not explicitly set
+    const value = configuration.getCleanConfigureOnConfigurationChange();
+    // When the setting is not set, getExpandedSetting returns undefined,
+    // and the code treats undefined the same as true (cleanConfigureOnConfigurationChange !== false)
+    // So either true or undefined are valid default values
+    expect(value === true || value === undefined).to.be.true;
+  });
+
+  test("cleanConfigureOnConfigurationChange can be set to false", async () => {
+    // Save the original value
+    const originalValue = configuration.getCleanConfigureOnConfigurationChange();
+
+    // Set to false using the setter
+    configuration.setCleanConfigureOnConfigurationChange(false);
+
+    // Verify it was set
+    expect(configuration.getCleanConfigureOnConfigurationChange()).to.be.false;
+
+    // Restore original value - if it was undefined, we reset to true (the default)
+    // to ensure subsequent tests start with the expected default behavior
+    configuration.setCleanConfigureOnConfigurationChange(
+      originalValue !== undefined ? originalValue : true
+    );
   });
 });
 
@@ -869,5 +907,104 @@ suite("Fake dryrun parsing", () => {
     // fs.writeFileSync(path.join(parsedPath.dir, "base1.out"), baselineLogContent);
     // fs.writeFileSync(path.join(parsedPath.dir, "diff1.out"), extensionLogContent);
     expect(extensionLogContent).to.be.equal(baselineLogContent);
+  });
+});
+
+suite("Unit testing TriggeredBy enum", () => {
+  test("TriggeredBy.automaticConfigureOnOpen should exist", () => {
+    expect(make.TriggeredBy.automaticConfigureOnOpen).to.equal(
+      "automatic (on open, first time)"
+    );
+  });
+
+  test("TriggeredBy enum should have automatic configure on open value", () => {
+    const triggeredByValues = Object.values(make.TriggeredBy);
+    expect(triggeredByValues).to.include("automatic (on open, first time)");
+  });
+});
+
+suite("Unit testing parseStandard for C++ standards", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("Test C++26 standard parsing", () => {
+    // Test c++26 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c++26", "cpp")).to.be.equal(
+      "c++26"
+    );
+    // Test c++2c flag (draft name for C++26)
+    expect(parser.parseStandard(cpp.Version.v6, "c++2c", "cpp")).to.be.equal(
+      "c++26"
+    );
+    // Test gnu++26 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu++26", "cpp")).to.be.equal(
+      "gnu++26"
+    );
+    // Test gnu++2c flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu++2c", "cpp")).to.be.equal(
+      "gnu++26"
+    );
+    // Test c++latest maps to c++26
+    expect(
+      parser.parseStandard(cpp.Version.v6, "c++latest", "cpp")
+    ).to.be.equal("c++26");
+  });
+
+  test("Test C++23 standard parsing", () => {
+    // Test c++23 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c++23", "cpp")).to.be.equal(
+      "c++23"
+    );
+    // Test c++2b flag (draft name for C++23)
+    expect(parser.parseStandard(cpp.Version.v6, "c++2b", "cpp")).to.be.equal(
+      "c++23"
+    );
+    // Test gnu++23 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu++23", "cpp")).to.be.equal(
+      "gnu++23"
+    );
+    // Test gnu++2b flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu++2b", "cpp")).to.be.equal(
+      "gnu++23"
+    );
+    // Test c++23preview flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "c++23preview", "cpp")
+    ).to.be.equal("c++23");
+  });
+
+  test("Test C++20 standard parsing", () => {
+    // Test c++20 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c++20", "cpp")).to.be.equal(
+      "c++20"
+    );
+    // Test c++2a flag (draft name for C++20)
+    expect(parser.parseStandard(cpp.Version.v6, "c++2a", "cpp")).to.be.equal(
+      "c++20"
+    );
+    // Test gnu++20 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu++20", "cpp")).to.be.equal(
+      "gnu++20"
+    );
+    // Test gnu++2a flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu++2a", "cpp")).to.be.equal(
+      "gnu++20"
+    );
+  });
+
+  test("Test older C++ standard parsing", () => {
+    // Test c++17 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c++17", "cpp")).to.be.equal(
+      "c++17"
+    );
+    // Test c++14 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c++14", "cpp")).to.be.equal(
+      "c++14"
+    );
+    // Test c++11 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c++11", "cpp")).to.be.equal(
+      "c++11"
+    );
   });
 });

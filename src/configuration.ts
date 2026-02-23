@@ -4,6 +4,7 @@
 // Configuration support
 
 import { extension } from "./extension";
+import * as launch from "./launch";
 import * as logger from "./logger";
 import * as make from "./make";
 import * as ui from "./ui";
@@ -117,6 +118,7 @@ export function readCurrentMakefileConfiguration(): void {
 type MakefilePanelVisibility = {
   debug: boolean;
   run: boolean;
+  buildCleanTarget: boolean;
 };
 
 // internal, runtime representation of an optional feature
@@ -146,6 +148,12 @@ class MakefilePanelVisibilityDescriptions {
       propertyName: "run",
       enablement: "makefile:localRunFeature",
       default: true,
+      value: false,
+    },
+    {
+      propertyName: "buildCleanTarget",
+      enablement: "makefile:localBuildCleanTargetFeature",
+      default: false,
       value: false,
     },
   ];
@@ -806,6 +814,8 @@ export interface LaunchConfiguration {
   cwd: string; // folder from where the binary is run
 
   // The following represent optional properties that can be additionally defined by the user in settings.
+  name?: string;
+  description?: string;
   MIMode?: string;
   miDebuggerPath?: string;
   stopAtEntry?: boolean;
@@ -851,6 +861,15 @@ export function launchConfigurationToString(
   return `${configuration.cwd}>${binPath}(${binArgs})`;
 }
 
+// Helper returning the user-friendly display name for a launch configuration.
+// Returns the user-defined "name" when available, otherwise falls back to
+// the technical launchConfigurationToString representation.
+export function launchConfigurationDisplayName(
+  configuration: LaunchConfiguration
+): string {
+  return configuration.name || launchConfigurationToString(configuration);
+}
+
 // Helper used to construct a minimal launch configuration object
 // (only cwd, binary path and arguments) from a string that respects
 // the syntax of its quick pick.
@@ -885,7 +904,7 @@ export async function setCurrentLaunchConfiguration(
 ): Promise<void> {
   currentLaunchConfiguration = configuration;
   let launchConfigStr: string = currentLaunchConfiguration
-    ? launchConfigurationToString(currentLaunchConfiguration)
+    ? launchConfigurationDisplayName(currentLaunchConfiguration)
     : "";
   statusBar.setLaunchConfiguration(launchConfigStr);
   await extension._projectOutlineProvider.updateLaunchTarget(launchConfigStr);
@@ -915,7 +934,7 @@ async function readCurrentLaunchConfiguration(): Promise<void> {
 
   let launchConfigStr: string = "No launch configuration set.";
   if (currentLaunchConfiguration) {
-    launchConfigStr = launchConfigurationToString(currentLaunchConfiguration);
+    launchConfigStr = launchConfigurationDisplayName(currentLaunchConfiguration);
     logger.message(
       localize(
         "reading.current.launch.configuration",
@@ -1593,6 +1612,26 @@ export async function readConfigureAfterCommand(): Promise<void> {
   );
 }
 
+let cleanConfigureOnConfigurationChange: boolean | undefined;
+export function getCleanConfigureOnConfigurationChange(): boolean | undefined {
+  return cleanConfigureOnConfigurationChange;
+}
+export function setCleanConfigureOnConfigurationChange(clean: boolean): void {
+  cleanConfigureOnConfigurationChange = clean;
+}
+export async function readCleanConfigureOnConfigurationChange(): Promise<void> {
+  cleanConfigureOnConfigurationChange = await util.getExpandedSetting<boolean>(
+    "cleanConfigureOnConfigurationChange"
+  );
+  logger.message(
+    localize(
+      "clean.configure.on.configuration.change",
+      "Clean configure on configuration change: {0}",
+      cleanConfigureOnConfigurationChange
+    )
+  );
+}
+
 let phonyOnlyTargets: boolean | undefined;
 export function getPhonyOnlyTargets(): boolean | undefined {
   return phonyOnlyTargets;
@@ -1644,6 +1683,34 @@ export async function readBuildBeforeLaunch(): Promise<void> {
       "Build before launch: {0}",
       buildBeforeLaunch
     )
+  );
+}
+
+let buildOnSave: boolean | undefined;
+export function getBuildOnSave(): boolean | undefined {
+  return buildOnSave;
+}
+export function setBuildOnSave(build: boolean): void {
+  buildOnSave = build;
+}
+export async function readBuildOnSave(): Promise<void> {
+  buildOnSave = await util.getExpandedSetting<boolean>("buildOnSave");
+  logger.message(
+    localize("build.on.save", "Build on save: {0}", buildOnSave)
+  );
+}
+
+let runOnSave: boolean | undefined;
+export function getRunOnSave(): boolean | undefined {
+  return runOnSave;
+}
+export function setRunOnSave(run: boolean): void {
+  runOnSave = run;
+}
+export async function readRunOnSave(): Promise<void> {
+  runOnSave = await util.getExpandedSetting<boolean>("runOnSave");
+  logger.message(
+    localize("run.on.save", "Run on save: {0}", runOnSave)
   );
 }
 
@@ -1749,9 +1816,12 @@ export async function initFromSettings(
   await readConfigureOnOpen();
   await readConfigureOnEdit();
   await readConfigureAfterCommand();
+  await readCleanConfigureOnConfigurationChange();
   await readPhonyOnlyTargets();
   await readSaveBeforeBuildOrConfigure();
   await readBuildBeforeLaunch();
+  await readBuildOnSave();
+  await readRunOnSave();
   await readClearOutputBeforeBuild();
   await readIgnoreDirectoryCommands();
   await readCompileCommandsPath();
@@ -1834,9 +1904,51 @@ export async function initFromSettings(
   //       We can't listen only to the makefile pointed to by makefile.makefilePath or makefile.makeDirectory,
   //       because that is only the entry point and can refer to other relevant makefiles.
   // TODO: don't trigger an update for any dummy save, verify how the content changed.
-  vscode.workspace.onDidSaveTextDocument((e) => {
+  vscode.workspace.onDidSaveTextDocument(async (e) => {
     if (e.uri.fsPath.toLowerCase().endsWith("makefile")) {
       extension.getState().configureDirty = true;
+    }
+
+    // If buildOnSave or runOnSave is enabled, trigger a build when any file in the workspace is saved.
+    // runOnSave will additionally run the target after a successful build.
+    // This is useful for TDD workflows where tests are run automatically on save.
+    if ((buildOnSave || runOnSave) && extension.getFullFeatureSet()) {
+      // Avoid building when already building, configuring, or pre/post configuring.
+      if (!make.blockedByOp(make.Operations.build, false)) {
+        // If the project needs to configure first and configureAfterCommand is disabled,
+        // we need to configure explicitly. If configureAfterCommand is enabled,
+        // buildTarget will handle the configure automatically.
+        if (extension.getState().configureDirty && !getConfigureAfterCommand()) {
+          logger.message(
+            localize("configuring.before.build.on.save", "Configuring before build on save...")
+          );
+          const configureResult = await make.configure(make.TriggeredBy.configureBeforeBuild);
+          if (configureResult !== make.ConfigureBuildReturnCodeTypes.success) {
+            logger.message(
+              localize("configure.failed.skipping.build", "Configure failed, skipping build on save.")
+            );
+            return;
+          }
+        }
+        logger.message(
+          runOnSave
+            ? localize("building.and.running.on.save", "Building and running on save...")
+            : localize("building.on.save", "Building on save...")
+        );
+        const buildResult = await make.buildTarget(
+          runOnSave ? make.TriggeredBy.runOnSave : make.TriggeredBy.buildOnSave,
+          getCurrentTarget() || "",
+          false
+        );
+
+        // If runOnSave is enabled and build succeeded, run the target.
+        if (runOnSave && buildResult === make.ConfigureBuildReturnCodeTypes.success) {
+          logger.message(
+            localize("running.on.save", "Running on save...")
+          );
+          await launch.getLauncher().runCurrentTarget();
+        }
+      }
     }
   });
 
@@ -2166,6 +2278,17 @@ export async function initFromSettings(
         updatedSettingsSubkeys.push(subKey);
       }
 
+      subKey = "cleanConfigureOnConfigurationChange";
+      let updatedCleanConfigureOnConfigurationChange: boolean | undefined =
+        await util.getExpandedSetting<boolean>(subKey);
+      if (
+        updatedCleanConfigureOnConfigurationChange !==
+        cleanConfigureOnConfigurationChange
+      ) {
+        await readCleanConfigureOnConfigurationChange();
+        updatedSettingsSubkeys.push(subKey);
+      }
+
       subKey = "phonyOnlyTargets";
       let updatedPhonyOnlyTargets: boolean | undefined =
         await util.getExpandedSetting<boolean>(subKey);
@@ -2187,6 +2310,22 @@ export async function initFromSettings(
         await util.getExpandedSetting<boolean>(subKey);
       if (updatedBuildBeforeLaunch !== buildBeforeLaunch) {
         await readBuildBeforeLaunch();
+        updatedSettingsSubkeys.push(subKey);
+      }
+
+      subKey = "buildOnSave";
+      let updatedBuildOnSave: boolean | undefined =
+        await util.getExpandedSetting<boolean>(subKey);
+      if (updatedBuildOnSave !== buildOnSave) {
+        await readBuildOnSave();
+        updatedSettingsSubkeys.push(subKey);
+      }
+
+      subKey = "runOnSave";
+      let updatedRunOnSave: boolean | undefined =
+        await util.getExpandedSetting<boolean>(subKey);
+      if (updatedRunOnSave !== runOnSave) {
+        await readRunOnSave();
         updatedSettingsSubkeys.push(subKey);
       }
 
@@ -2362,14 +2501,28 @@ export async function setNewConfiguration(): Promise<void> {
 
     await setConfigurationByName(chosen);
 
-    if (configureAfterCommand) {
+    // Determine whether to configure and which type:
+    // - cleanConfigureOnConfigurationChange: true (default) -> always clean configure
+    // - cleanConfigureOnConfigurationChange: false AND configureAfterCommand: true -> regular configure
+    // - cleanConfigureOnConfigurationChange: false AND configureAfterCommand: false -> don't configure
+    if (cleanConfigureOnConfigurationChange !== false) {
+      logger.message(
+        localize(
+          "automatically.clean.reconfiguring.project.after.change",
+          "Automatically clean reconfiguring the project after a makefile configuration change."
+        )
+      );
+      await make.cleanConfigure(
+        make.TriggeredBy.configureAfterConfigurationChange
+      );
+    } else if (configureAfterCommand) {
       logger.message(
         localize(
           "automatically.reconfiguring.project.after.change",
           "Automatically reconfiguring the project after a makefile configuration change."
         )
       );
-      await make.cleanConfigure(
+      await make.configure(
         make.TriggeredBy.configureAfterConfigurationChange
       );
     }
@@ -2563,7 +2716,10 @@ export async function setLaunchConfigurationByName(
       )
     );
     extension.getState().launchConfiguration = launchConfigurationName;
-    statusBar.setLaunchConfiguration(launchConfigurationName);
+    let displayName: string = launchConfigurationDisplayName(
+      currentLaunchConfiguration
+    );
+    statusBar.setLaunchConfiguration(displayName);
   } else {
     if (launchConfigurationName === "") {
       logger.message(
@@ -2594,7 +2750,9 @@ export async function setLaunchConfigurationByName(
   );
   await initFromSettings();
   await extension._projectOutlineProvider.updateLaunchTarget(
-    launchConfigurationName
+    currentLaunchConfiguration
+      ? launchConfigurationDisplayName(currentLaunchConfiguration)
+      : launchConfigurationName
   );
 }
 
@@ -2635,9 +2793,6 @@ export async function selectLaunchConfiguration(): Promise<void> {
     }
   }
 
-  // TODO: create a quick pick with description and details for items
-  // to better view the long targets commands
-
   // In the quick pick, include also any makefile.launchConfigurations entries,
   // as long as they exist on disk and without allowing duplicates.
   let launchTargetsNames: string[] = [...launchTargets];
@@ -2647,28 +2802,46 @@ export async function selectLaunchConfiguration(): Promise<void> {
     }
   });
   launchTargetsNames = util.sortAndRemoveDuplicates(launchTargetsNames);
+
+  // Build QuickPickItems, using name/description from matching launch
+  // configurations when available.
+  let launchTargetItems: (vscode.QuickPickItem & { id: string })[] =
+    launchTargetsNames.map((target) => {
+      let matchingConfig: LaunchConfiguration | undefined =
+        getLaunchConfiguration(target);
+      if (matchingConfig?.name) {
+        return {
+          label: matchingConfig.name,
+          description: matchingConfig.description,
+          detail: target,
+          id: target,
+        };
+      }
+      return { label: target, id: target };
+    });
+
   let options: vscode.QuickPickOptions = {};
   if (launchTargets.length === 0) {
     options.placeHolder = "No launch targets identified";
   }
-  const chosen: string | undefined = await vscode.window.showQuickPick(
-    launchTargetsNames,
-    options
-  );
+  const chosen:
+    | (vscode.QuickPickItem & { id: string })
+    | undefined = await vscode.window.showQuickPick(launchTargetItems, options);
 
   if (chosen) {
+    let chosenId: string = chosen.id;
     let currentLaunchConfiguration: LaunchConfiguration | undefined =
       getCurrentLaunchConfiguration();
     if (
       !currentLaunchConfiguration ||
-      chosen !== launchConfigurationToString(currentLaunchConfiguration)
+      chosenId !== launchConfigurationToString(currentLaunchConfiguration)
     ) {
       let telemetryProperties: telemetry.Properties | null = {
         state: "launchConfiguration",
       };
       telemetry.logEvent("stateChanged", telemetryProperties);
 
-      await setLaunchConfigurationByName(chosen);
+      await setLaunchConfigurationByName(chosenId);
 
       // Refresh telemetry for this new launch configuration
       // (this will find the corresponding item in the makefile.launchConfigurations array
