@@ -4,6 +4,7 @@
 
 Improvements:
 
+- Remove dry-run timeout popup during configuration. [#572](https://github.com/microsoft/vscode-makefile-tools/issues/572)
 - Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
 - While parsing, don't replace characters with newlines if they are inside quotes. [#671](https://github.com/microsoft/vscode-makefile-tools/issues/671)
 - Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
