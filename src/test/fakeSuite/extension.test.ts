@@ -1008,3 +1008,66 @@ suite("Unit testing parseStandard for C++ standards", () => {
     );
   });
 });
+
+suite("Unit testing parseStandard for C standards", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("Test C23 standard parsing", () => {
+    // Test c23 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c23", "c")).to.be.equal(
+      "c23"
+    );
+    // Test c2x flag (draft name for C23)
+    expect(parser.parseStandard(cpp.Version.v6, "c2x", "c")).to.be.equal(
+      "c23"
+    );
+    // Test gnu23 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu23", "c")).to.be.equal(
+      "gnu23"
+    );
+    // Test gnu2x flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu2x", "c")).to.be.equal(
+      "gnu23"
+    );
+    // Test iso9899:2024 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:2024", "c")
+    ).to.be.equal("c23");
+  });
+
+  test("Test C17 standard parsing", () => {
+    // Test c17 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c17", "c")).to.be.equal(
+      "c17"
+    );
+    // Test c18 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c18", "c")).to.be.equal(
+      "c17"
+    );
+    // Test gnu17 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu17", "c")).to.be.equal(
+      "gnu17"
+    );
+    // Test gnu18 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu18", "c")).to.be.equal(
+      "gnu17"
+    );
+  });
+
+  test("Test older C standard parsing", () => {
+    // Test c11 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c11", "c")).to.be.equal(
+      "c11"
+    );
+    // Test c99 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c99", "c")).to.be.equal(
+      "c99"
+    );
+    // Test c89 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c89", "c")).to.be.equal(
+      "c89"
+    );
+  });
+});
