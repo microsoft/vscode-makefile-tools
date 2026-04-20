@@ -139,4 +139,3 @@ The repo uses an Azure Artifacts npm feed (`.npmrc`). To add or update dependenc
 - **Output panel text or log level** → `src/logger.ts`
 - **Telemetry** → `src/telemetry.ts`
 - **Persistent state** → `src/state.ts` `StateManager`
-
