@@ -11,7 +11,7 @@ applyTo: "**/*.ts,**/*.tsx,**/package.json"
 yarn install          # Install dependencies
 yarn compile          # Build (dev mode, uses webpack)
 yarn compile-watch    # Build in watch mode
-gulp lint             # Lint (uses eslint via gulp, config in .eslintrc.js)
+gulp lint             # Lint (uses eslint via gulp)
 yarn test             # Run tests (compiles test.tsconfig.json, then runs via @vscode/test-electron)
 yarn pretest          # Compile tests only (tsc -p test.tsconfig.json)
 ```
@@ -139,3 +139,4 @@ The repo uses an Azure Artifacts npm feed (`.npmrc`). To add or update dependenc
 - **Output panel text or log level** → `src/logger.ts`
 - **Telemetry** → `src/telemetry.ts`
 - **Persistent state** → `src/state.ts` `StateManager`
+
