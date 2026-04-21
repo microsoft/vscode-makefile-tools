@@ -2244,16 +2244,23 @@ function parseCStandard(
 ): util.StandardVersion | undefined {
   // GNU options from: https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#C-Dialect-Options
   const isGnu: boolean = canUseGnu && std.startsWith("gnu");
-  if (/(c|gnu)(90|89|iso9899:(1990|199409))/.test(std)) {
+  if (/(c|gnu)(90|89)/.test(std) || /iso9899:(1990|199409)/.test(std)) {
     return isGnu ? "gnu89" : "c89";
-  } else if (/(c|gnu)(99|9x|iso9899:(1999|199x))/.test(std)) {
+  } else if (/(c|gnu)(99|9x)/.test(std) || /iso9899:(1999|199x)/.test(std)) {
     return isGnu ? "gnu99" : "c99";
-  } else if (/(c|gnu)(11|1x|iso9899:2011)/.test(std)) {
+  } else if (/(c|gnu)(11|1x)/.test(std) || /iso9899:2011/.test(std)) {
     return isGnu ? "gnu11" : "c11";
-  } else if (/(c|gnu)(17|18|23|2x|iso9899:(2017|2018|2024))/.test(std)) {
+  } else if (/(c|gnu)(17|18)/.test(std) || /iso9899:(2017|2018)/.test(std)) {
     if (canUseGnu) {
-      // cpptools supports 'c17' in same version it supports GNU std.
+      // cpptools v4+ supports 'c17'/'gnu17'; older versions fall back to 'c11'.
       return isGnu ? "gnu17" : "c17";
+    } else {
+      return "c11";
+    }
+  } else if (/(c|gnu)(23|2x)/.test(std) || /iso9899:2024/.test(std)) {
+    if (canUseGnu) {
+      // cpptools v4+ supports 'c23'/'gnu23'; older versions fall back to 'c11'.
+      return isGnu ? "gnu23" : "c23";
     } else {
       return "c11";
     }

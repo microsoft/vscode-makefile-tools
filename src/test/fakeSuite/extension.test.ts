@@ -1008,3 +1008,97 @@ suite("Unit testing parseStandard for C++ standards", () => {
     );
   });
 });
+
+suite("Unit testing parseStandard for C standards", () => {
+  suiteSetup(async function (this: Mocha.Context) {
+    this.timeout(100000);
+  });
+
+  test("Test C23 standard parsing", () => {
+    // Test c23 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c23", "c")).to.be.equal(
+      "c23"
+    );
+    // Test c2x flag (draft name for C23)
+    expect(parser.parseStandard(cpp.Version.v6, "c2x", "c")).to.be.equal(
+      "c23"
+    );
+    // Test gnu23 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu23", "c")).to.be.equal(
+      "gnu23"
+    );
+    // Test gnu2x flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu2x", "c")).to.be.equal(
+      "gnu23"
+    );
+    // Test iso9899:2024 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:2024", "c")
+    ).to.be.equal("c23");
+    // Test c23 falls back to c11 on cpptools < v4
+    expect(parser.parseStandard(cpp.Version.v3, "c23", "c")).to.be.equal(
+      "c11"
+    );
+    expect(parser.parseStandard(cpp.Version.v3, "gnu23", "c")).to.be.equal(
+      "c11"
+    );
+  });
+
+  test("Test C17 standard parsing", () => {
+    // Test c17 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c17", "c")).to.be.equal(
+      "c17"
+    );
+    // Test c18 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c18", "c")).to.be.equal(
+      "c17"
+    );
+    // Test gnu17 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu17", "c")).to.be.equal(
+      "gnu17"
+    );
+    // Test gnu18 flag
+    expect(parser.parseStandard(cpp.Version.v6, "gnu18", "c")).to.be.equal(
+      "gnu17"
+    );
+    // Test iso9899:2017 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:2017", "c")
+    ).to.be.equal("c17");
+    // Test iso9899:2018 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:2018", "c")
+    ).to.be.equal("c17");
+  });
+
+  test("Test older C standard parsing", () => {
+    // Test c11 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c11", "c")).to.be.equal(
+      "c11"
+    );
+    // Test iso9899:2011 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:2011", "c")
+    ).to.be.equal("c11");
+    // Test c99 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c99", "c")).to.be.equal(
+      "c99"
+    );
+    // Test iso9899:1999 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:1999", "c")
+    ).to.be.equal("c99");
+    // Test c89 flag
+    expect(parser.parseStandard(cpp.Version.v6, "c89", "c")).to.be.equal(
+      "c89"
+    );
+    // Test iso9899:1990 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:1990", "c")
+    ).to.be.equal("c89");
+    // Test iso9899:199409 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:199409", "c")
+    ).to.be.equal("c89");
+  });
+});
