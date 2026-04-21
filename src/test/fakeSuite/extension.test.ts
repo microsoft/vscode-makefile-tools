@@ -1035,6 +1035,13 @@ suite("Unit testing parseStandard for C standards", () => {
     expect(
       parser.parseStandard(cpp.Version.v6, "iso9899:2024", "c")
     ).to.be.equal("c23");
+    // Test c23 falls back to c11 on cpptools < v4
+    expect(parser.parseStandard(cpp.Version.v3, "c23", "c")).to.be.equal(
+      "c11"
+    );
+    expect(parser.parseStandard(cpp.Version.v3, "gnu23", "c")).to.be.equal(
+      "c11"
+    );
   });
 
   test("Test C17 standard parsing", () => {

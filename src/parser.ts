@@ -2252,13 +2252,18 @@ function parseCStandard(
     return isGnu ? "gnu11" : "c11";
   } else if (/(c|gnu)(17|18)/.test(std) || /iso9899:(2017|2018)/.test(std)) {
     if (canUseGnu) {
-      // cpptools supports 'c17' in same version it supports GNU std.
+      // cpptools v4+ supports 'c17'/'gnu17'; older versions fall back to 'c11'.
       return isGnu ? "gnu17" : "c17";
     } else {
       return "c11";
     }
   } else if (/(c|gnu)(23|2x)/.test(std) || /iso9899:2024/.test(std)) {
-    return isGnu ? "gnu23" : "c23";
+    if (canUseGnu) {
+      // cpptools v4+ supports 'c23'/'gnu23'; older versions fall back to 'c11'.
+      return isGnu ? "gnu23" : "c23";
+    } else {
+      return "c11";
+    }
   } else {
     return undefined;
   }
