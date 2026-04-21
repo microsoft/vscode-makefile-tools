@@ -29,6 +29,7 @@ Bug Fixes:
 - Fix file path links not being clickable in output panel for certain locales. [#725](https://github.com/microsoft/vscode-makefile-tools/issues/725)
 - Fix localization issue where "Make" as a proper noun was being translated. [#730](https://github.com/microsoft/vscode-makefile-tools/issues/730)
 - Fix "Makefile Tools" being translated in localized languages when it should remain as a proper noun. [#731](https://github.com/microsoft/vscode-makefile-tools/issues/731)
+- Fix binary path links in output log not being clickable on Windows when the path has no .exe extension. [#698](https://github.com/microsoft/vscode-makefile-tools/issues/698)
 
 ## 0.11
 
