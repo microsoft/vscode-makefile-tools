@@ -1054,6 +1054,14 @@ suite("Unit testing parseStandard for C standards", () => {
     expect(parser.parseStandard(cpp.Version.v6, "gnu18", "c")).to.be.equal(
       "gnu17"
     );
+    // Test iso9899:2017 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:2017", "c")
+    ).to.be.equal("c17");
+    // Test iso9899:2018 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:2018", "c")
+    ).to.be.equal("c17");
   });
 
   test("Test older C standard parsing", () => {
@@ -1061,13 +1069,29 @@ suite("Unit testing parseStandard for C standards", () => {
     expect(parser.parseStandard(cpp.Version.v6, "c11", "c")).to.be.equal(
       "c11"
     );
+    // Test iso9899:2011 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:2011", "c")
+    ).to.be.equal("c11");
     // Test c99 flag
     expect(parser.parseStandard(cpp.Version.v6, "c99", "c")).to.be.equal(
       "c99"
     );
+    // Test iso9899:1999 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:1999", "c")
+    ).to.be.equal("c99");
     // Test c89 flag
     expect(parser.parseStandard(cpp.Version.v6, "c89", "c")).to.be.equal(
       "c89"
     );
+    // Test iso9899:1990 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:1990", "c")
+    ).to.be.equal("c89");
+    // Test iso9899:199409 flag
+    expect(
+      parser.parseStandard(cpp.Version.v6, "iso9899:199409", "c")
+    ).to.be.equal("c89");
   });
 });
