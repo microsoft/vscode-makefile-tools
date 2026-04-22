@@ -959,7 +959,7 @@
   },
   "dependencies": {
     "module-alias": "^2.2.2",
-    "uuid": "^9.0.1",
+    "uuid": "^14.0.0",
     "vscode-cpptools": "^7.1.1",
     "vscode-nls": "^5.0.0",
     "@vscode/extension-telemetry": "^0.9.6",
