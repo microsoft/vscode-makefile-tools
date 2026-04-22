@@ -170,6 +170,55 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
   });
 });
 
+suite("Unit testing parseMultipleSwitchFromToolArguments", () => {
+  test("Quoted define with name=value using single quotes", () => {
+    const args =
+      "gcc -Wall -D'MY_ASSERT(test)'='do { if(!(test)) {return -1;} } while(0)' -o main main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal(
+      "MY_ASSERT(test)=do { if(!(test)) {return -1;} } while(0)"
+    );
+  });
+
+  test("Simple define without value", () => {
+    const args = "gcc -DSIMPLE main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal("SIMPLE");
+  });
+
+  test("Simple define with unquoted value", () => {
+    const args = "gcc -DNAME=VALUE main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal("NAME=VALUE");
+  });
+
+  test("Define with quoted value containing spaces", () => {
+    const args = 'gcc -D"MY DEFINE" main.c';
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal("MY DEFINE");
+  });
+
+  test("Define with single-quoted name only", () => {
+    const args = "gcc -D'MY_DEFINE' main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal("MY_DEFINE");
+  });
+
+  test("Multiple defines parsed correctly", () => {
+    const args = "gcc -DFOO -DBAR=baz -D'QUOTED' main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(3);
+    expect(result[0]).to.equal("FOO");
+    expect(result[1]).to.equal("BAR=baz");
+    expect(result[2]).to.equal("QUOTED");
+  });
+});
+
 suite("Configuration settings", () => {
   suiteSetup(async function (this: Mocha.Context) {
     this.timeout(100000);

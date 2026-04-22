@@ -697,7 +697,7 @@ async function parseAnySwitchFromToolArguments(
 // removeSurroundingQuotes: needs to be false when called from parseAnySwitchFromToolArguments,
 // and true otherwise. We need to analyze more scenarios before setting in stone a particular algorithm
 // regarding the decision to remove or not to remove them.
-function parseMultipleSwitchFromToolArguments(
+export function parseMultipleSwitchFromToolArguments(
   args: string,
   sw: string,
   removeSurroundingQuotes: boolean = true
@@ -780,6 +780,7 @@ function parseMultipleSwitchFromToolArguments(
       // switch value
       "(" +
       anythingBetweenQuotes(fullyQuoted) +
+      "(?!=)" + // Don't match a quoted value when followed by '=' (e.g. -D'NAME'='VALUE')
       "|" +
       // not fully quoted switch value scenarios
       "(" +
@@ -829,6 +830,10 @@ function parseMultipleSwitchFromToolArguments(
     if (result) {
       if (removeSurroundingQuotes) {
         result = util.removeSurroundingQuotes(result);
+        // After stripping outer quotes, clean up shell-style concatenated quoting
+        // around '='. For example, -D'NAME'='VALUE' becomes NAME'='VALUE after outer
+        // quote removal. The inner '=' needs to become a plain =.
+        result = result.replace(/'='/, "=").replace(/"="/, "=");
       }
       results.push(result);
     }
