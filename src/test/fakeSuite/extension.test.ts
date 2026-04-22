@@ -130,6 +130,44 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
       );
     }
   });
+
+  test("Test semicolon not replaced inside quotes after make directory banner", () => {
+    // GNU make outputs: Entering directory `path'
+    // The trailing ' must not open a phantom quote context that leaks
+    // into subsequent lines when processing the whole dry-run output.
+    // Processing per-line prevents this cross-line leakage.
+    const enteringDir = "make.exe: Entering directory `c:/project'";
+    const compilerCmd =
+      "gcc -D'MY_ASSERT(test)'='do { if(!(test)) {return -1;} } while(0)' -o main main.c";
+    const leavingDir = "make.exe: Leaving directory `c:/project'";
+    const input = [enteringDir, compilerCmd, leavingDir].join("\n");
+
+    // Per-line processing: each line is independent, so the directory
+    // banner's trailing ' does not affect the compiler command line.
+    const result = input
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, ";", "\n"))
+      .join("\n");
+
+    // The compiler command line should be preserved intact
+    // (semicolons inside the quoted value should NOT be replaced)
+    expect(result).to.contain(compilerCmd);
+  });
+
+  test("Test && not replaced inside quotes after make directory banner", () => {
+    const enteringDir = "make.exe: Entering directory `c:/project'";
+    const compilerCmd =
+      "gcc -D'CHECK(a,b)'='do { if(a && b) {return 0;} } while(0)' -o main main.c";
+    const leavingDir = "make.exe: Leaving directory `c:/project'";
+    const input = [enteringDir, compilerCmd, leavingDir].join("\n");
+
+    const result = input
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, " && ", "\n"))
+      .join("\n");
+
+    expect(result).to.contain(compilerCmd);
+  });
 });
 
 suite("Configuration settings", () => {

@@ -263,21 +263,24 @@ export async function preprocessDryRunOutput(
   // Oherwise, this scenario interferes with the line ending '\' in some cases
   // (see MAKE repo, ar.c compiler command, for example).
   // Split multiple commands concatenated by '&&'
+  // Process per-line to prevent quote state from leaking across lines.
+  // GNU make outputs directory banners like: Entering directory `path'
+  // The trailing single quote would open a phantom quote context that shifts
+  // all subsequent quote boundaries if processed as a single multi-line string.
   preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = util.replaceStringNotInQuotes(
-      preprocessedDryRunOutputStr,
-      " && ",
-      "\n"
-    );
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, " && ", "\n"))
+      .join("\n");
   });
 
   // Split multiple commands concatenated by ";"
+  // Process per-line for the same reason as '&&' above.
   preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = util.replaceStringNotInQuotes(
-      preprocessedDryRunOutputStr,
-      ";",
-      "\n"
-    );
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, ";", "\n"))
+      .join("\n");
   });
 
   // Replace multiple "-" sequence because it hangs the regular expression engine.
