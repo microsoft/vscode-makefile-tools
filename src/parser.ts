@@ -1311,23 +1311,6 @@ export async function parseCustomConfigProvider(
         let compilerArgs: string[] = [];
         let compilerFragments: string[] = [];
 
-        if (useCompilerFragments) {
-          // This is a temporary solution where we are only using compiler fragments here to pass the
-          // -D defines to the compiler (to fix intellisense issues). We still separately parse defines.
-          // There is still an issue tracking using compilerFragments fully instead of compilerArgs:
-          // https://github.com/microsoft/vscode-makefile-tools/issues/352.
-          let tempFragments: string[] = compilerTool.arguments
-            .trim()
-            .split(" -D");
-          if (tempFragments.length > 1) {
-            for (let i: number = 1; i < tempFragments.length; i++) {
-              compilerFragments.push(
-                "-D" + tempFragments[i].trim().split("/s+/")[0]
-              );
-            }
-          }
-        }
-
         compilerArgs = await parseAnySwitchFromToolArguments(
           compilerTool.arguments,
           ["I", "FI", "include", "D", "std", "MF"]
@@ -1355,6 +1338,20 @@ export async function parseCustomConfigProvider(
           compilerTool.arguments,
           "D"
         );
+
+        if (useCompilerFragments) {
+          // Build compiler fragments from the already-parsed defines rather than
+          // naively splitting the command line (which breaks on quoted values with spaces).
+          // compilerFragments are shell-parsed by CppTools, so values with spaces
+          // must be quoted. See https://github.com/microsoft/vscode-makefile-tools/issues/352.
+          for (const define of defines) {
+            if (define.includes(" ")) {
+              compilerFragments.push("-D'" + define + "'");
+            } else {
+              compilerFragments.push("-D" + define);
+            }
+          }
+        }
 
         // Parse the IntelliSense mode
         // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
