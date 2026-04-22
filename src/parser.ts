@@ -1626,6 +1626,12 @@ export async function parseLaunchConfigurations(
                   );
                 }
               } else {
+                // If the binary has no extension, append .exe
+                // This ensures VS Code can properly link to the file in the output
+                // Note: No platform check needed here - this entire block is Windows-specific (see line 1553)
+                if (!path.extname(compilerTargetBinary)) {
+                  compilerTargetBinary += ".exe";
+                }
                 logger.message(
                   localize(
                     "producing.target.binary",
@@ -1709,6 +1715,15 @@ export async function parseLaunchConfigurations(
               linkerTool.arguments,
               ["out", "o"]
             );
+            // On Windows, if the binary has no extension, append .exe
+            // This ensures VS Code can properly link to the file in the output
+            if (
+              linkerTargetBinary &&
+              process.platform === "win32" &&
+              !path.extname(linkerTargetBinary)
+            ) {
+              linkerTargetBinary += ".exe";
+            }
             logger.message(
               localize(
                 "found.linker.command",
@@ -2215,12 +2230,15 @@ function parseCppStandard(
   canUseGnu: boolean
 ): util.StandardVersion | undefined {
   const isGnu: boolean = canUseGnu && std.startsWith("gnu");
-  if (
-    std === "c++latest" ||
-    std.endsWith("++26") || std.endsWith("++2c") ||
-    std.endsWith("++23") || std.endsWith("++2b") || std === "c++23preview" ||
-    std.endsWith("++20") || std.endsWith("++2a")
+  if (std === "c++latest" || std.endsWith("++26") || std.endsWith("++2c")) {
+    return isGnu ? "gnu++26" : "c++26";
+  } else if (
+    std.endsWith("++23") ||
+    std.endsWith("++2b") ||
+    std === "c++23preview"
   ) {
+    return isGnu ? "gnu++23" : "c++23";
+  } else if (std.endsWith("++20") || std.endsWith("++2a")) {
     return isGnu ? "gnu++20" : "c++20";
   } else if (std.endsWith("++17") || std.endsWith("++1z")) {
     return isGnu ? "gnu++17" : "c++17";
@@ -2243,16 +2261,23 @@ function parseCStandard(
 ): util.StandardVersion | undefined {
   // GNU options from: https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#C-Dialect-Options
   const isGnu: boolean = canUseGnu && std.startsWith("gnu");
-  if (/(c|gnu)(90|89|iso9899:(1990|199409))/.test(std)) {
+  if (/(c|gnu)(90|89)/.test(std) || /iso9899:(1990|199409)/.test(std)) {
     return isGnu ? "gnu89" : "c89";
-  } else if (/(c|gnu)(99|9x|iso9899:(1999|199x))/.test(std)) {
+  } else if (/(c|gnu)(99|9x)/.test(std) || /iso9899:(1999|199x)/.test(std)) {
     return isGnu ? "gnu99" : "c99";
-  } else if (/(c|gnu)(11|1x|iso9899:2011)/.test(std)) {
+  } else if (/(c|gnu)(11|1x)/.test(std) || /iso9899:2011/.test(std)) {
     return isGnu ? "gnu11" : "c11";
-  } else if (/(c|gnu)(17|18|23|2x|iso9899:(2017|2018|2024))/.test(std)) {
+  } else if (/(c|gnu)(17|18)/.test(std) || /iso9899:(2017|2018)/.test(std)) {
     if (canUseGnu) {
-      // cpptools supports 'c17' in same version it supports GNU std.
+      // cpptools v4+ supports 'c17'/'gnu17'; older versions fall back to 'c11'.
       return isGnu ? "gnu17" : "c17";
+    } else {
+      return "c11";
+    }
+  } else if (/(c|gnu)(23|2x)/.test(std) || /iso9899:2024/.test(std)) {
+    if (canUseGnu) {
+      // cpptools v4+ supports 'c23'/'gnu23'; older versions fall back to 'c11'.
+      return isGnu ? "gnu23" : "c23";
     } else {
       return "c11";
     }

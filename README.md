@@ -112,7 +112,7 @@ If you need to pass additional arguments to your targets, update the `makefile.l
 the `binaryArgs` property to the configuration.
 
 ## Resources
-- [Makefile Settings](docs/makefile-settings.md) for command and variable substitutions.
+- [Makefile Settings](docs/makefile-settings.md) for all available settings, defaults, and substitution support.
 - [Repositories](docs/repositories.md) to get the configurations for a select number of repositories that we have tested.
 - [Troubleshooting](docs/troubleshooting.md) for reasons and workarounds for errors you might run into.
 - [Github](https://github.com/microsoft/vscode-makefile-tools) for source code, issues, and contributing.
@@ -145,7 +145,7 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 ### Data and telemetry
 
-This extension collects usage data and sends it to Microsoft to help improve our products and services. Collection of telemetry is controlled via the same setting provided by Visual Studio Code: `"telemetry.enableTelemetry"`. Read our [privacy statement](https://privacy.microsoft.com/en-us/privacystatement) to learn more.
+This extension collects usage data and sends it to Microsoft to help improve our products and services. Collection of telemetry is controlled via the same setting provided by Visual Studio Code: `"telemetry.enableTelemetry"`. Read our [privacy statement](https://go.microsoft.com/fwlink/?LinkId=521839) to learn more.
 
 ### Contributors
 
