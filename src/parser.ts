@@ -833,7 +833,7 @@ export function parseMultipleSwitchFromToolArguments(
         // After stripping outer quotes, clean up shell-style concatenated quoting
         // around '='. For example, -D'NAME'='VALUE' becomes NAME'='VALUE after outer
         // quote removal. The inner '=' needs to become a plain =.
-        result = result.replace(/'='/, "=").replace(/"="/, "=");
+        result = result.replace(/'='(?!')/, "=").replace(/"="(?!")/, "=");
       }
       results.push(result);
     }
