@@ -30,6 +30,7 @@ Bug Fixes:
 - Fix localization issue where "Make" as a proper noun was being translated. [#730](https://github.com/microsoft/vscode-makefile-tools/issues/730)
 - Fix "Makefile Tools" being translated in localized languages when it should remain as a proper noun. [#731](https://github.com/microsoft/vscode-makefile-tools/issues/731)
 - Fix binary path links in output log not being clickable on Windows when the path has no .exe extension. [#698](https://github.com/microsoft/vscode-makefile-tools/issues/698)
+- Fix `parseCompilerArgs.bat` failing when macro definitions contain numeric expressions like `-1` inside quoted values. [#755](https://github.com/microsoft/vscode-makefile-tools/issues/755)
 
 ## 0.11
 
