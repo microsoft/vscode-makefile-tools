@@ -130,6 +130,93 @@ suite("Unit testing replacing characters in and outside of quotes", () => {
       );
     }
   });
+
+  test("Test semicolon not replaced inside quotes after make directory banner", () => {
+    // GNU make outputs: Entering directory `path'
+    // The trailing ' must not open a phantom quote context that leaks
+    // into subsequent lines when processing the whole dry-run output.
+    // Processing per-line prevents this cross-line leakage.
+    const enteringDir = "make.exe: Entering directory `c:/project'";
+    const compilerCmd =
+      "gcc -D'MY_ASSERT(test)'='do { if(!(test)) {return -1;} } while(0)' -o main main.c";
+    const leavingDir = "make.exe: Leaving directory `c:/project'";
+    const input = [enteringDir, compilerCmd, leavingDir].join("\n");
+
+    // Per-line processing: each line is independent, so the directory
+    // banner's trailing ' does not affect the compiler command line.
+    const result = input
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, ";", "\n"))
+      .join("\n");
+
+    // The compiler command line should be preserved intact
+    // (semicolons inside the quoted value should NOT be replaced)
+    expect(result).to.contain(compilerCmd);
+  });
+
+  test("Test && not replaced inside quotes after make directory banner", () => {
+    const enteringDir = "make.exe: Entering directory `c:/project'";
+    const compilerCmd =
+      "gcc -D'CHECK(a,b)'='do { if(a && b) {return 0;} } while(0)' -o main main.c";
+    const leavingDir = "make.exe: Leaving directory `c:/project'";
+    const input = [enteringDir, compilerCmd, leavingDir].join("\n");
+
+    const result = input
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, " && ", "\n"))
+      .join("\n");
+
+    expect(result).to.contain(compilerCmd);
+  });
+});
+
+suite("Unit testing parseMultipleSwitchFromToolArguments", () => {
+  test("Quoted define with name=value using single quotes", () => {
+    const args =
+      "gcc -Wall -D'MY_ASSERT(test)'='do { if(!(test)) {return -1;} } while(0)' -o main main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal(
+      "MY_ASSERT(test)=do { if(!(test)) {return -1;} } while(0)"
+    );
+  });
+
+  test("Simple define without value", () => {
+    const args = "gcc -DSIMPLE main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal("SIMPLE");
+  });
+
+  test("Simple define with unquoted value", () => {
+    const args = "gcc -DNAME=VALUE main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal("NAME=VALUE");
+  });
+
+  test("Define with quoted value containing spaces", () => {
+    const args = 'gcc -D"MY DEFINE" main.c';
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal("MY DEFINE");
+  });
+
+  test("Define with single-quoted name only", () => {
+    const args = "gcc -D'MY_DEFINE' main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(1);
+    expect(result[0]).to.equal("MY_DEFINE");
+  });
+
+  test("Multiple defines parsed correctly", () => {
+    const args = "gcc -DFOO -DBAR=baz -D'QUOTED' main.c";
+    const result = parser.parseMultipleSwitchFromToolArguments(args, "D");
+    expect(result).to.have.lengthOf(3);
+    expect(result[0]).to.equal("FOO");
+    expect(result[1]).to.equal("BAR=baz");
+    expect(result[2]).to.equal("QUOTED");
+  });
 });
 
 suite("Configuration settings", () => {

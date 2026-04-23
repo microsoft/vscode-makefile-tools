@@ -263,21 +263,24 @@ export async function preprocessDryRunOutput(
   // Oherwise, this scenario interferes with the line ending '\' in some cases
   // (see MAKE repo, ar.c compiler command, for example).
   // Split multiple commands concatenated by '&&'
+  // Process per-line to prevent quote state from leaking across lines.
+  // GNU make outputs directory banners like: Entering directory `path'
+  // The trailing single quote would open a phantom quote context that shifts
+  // all subsequent quote boundaries if processed as a single multi-line string.
   preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = util.replaceStringNotInQuotes(
-      preprocessedDryRunOutputStr,
-      " && ",
-      "\n"
-    );
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, " && ", "\n"))
+      .join("\n");
   });
 
   // Split multiple commands concatenated by ";"
+  // Process per-line for the same reason as '&&' above.
   preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = util.replaceStringNotInQuotes(
-      preprocessedDryRunOutputStr,
-      ";",
-      "\n"
-    );
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, ";", "\n"))
+      .join("\n");
   });
 
   // Replace multiple "-" sequence because it hangs the regular expression engine.
@@ -512,7 +515,9 @@ async function parseAnySwitchFromToolArguments(
     // On Win32 allow '/' as switch prefix as well,
     // otherwise it conflicts with path character
     (process.platform === "win32" ? "|\\/)" : ")") +
-    "([a-zA-Z0-9_]+)" + 
+    // Switch names must start with a letter (not a digit) to avoid matching
+    // things like "-1" inside quoted values like "'do { return -1; }'"
+    "([a-zA-Z_][a-zA-Z0-9_]*)" +
     // Try to match quoted value of argument
     "(=(\"|\'))?";
   let regexp: RegExp = RegExp(regExpStr, "mg");
@@ -692,7 +697,7 @@ async function parseAnySwitchFromToolArguments(
 // removeSurroundingQuotes: needs to be false when called from parseAnySwitchFromToolArguments,
 // and true otherwise. We need to analyze more scenarios before setting in stone a particular algorithm
 // regarding the decision to remove or not to remove them.
-function parseMultipleSwitchFromToolArguments(
+export function parseMultipleSwitchFromToolArguments(
   args: string,
   sw: string,
   removeSurroundingQuotes: boolean = true
@@ -775,6 +780,7 @@ function parseMultipleSwitchFromToolArguments(
       // switch value
       "(" +
       anythingBetweenQuotes(fullyQuoted) +
+      "(?!=)" + // Don't match a quoted value when followed by '=' (e.g. -D'NAME'='VALUE')
       "|" +
       // not fully quoted switch value scenarios
       "(" +
@@ -824,6 +830,10 @@ function parseMultipleSwitchFromToolArguments(
     if (result) {
       if (removeSurroundingQuotes) {
         result = util.removeSurroundingQuotes(result);
+        // After stripping outer quotes, clean up shell-style concatenated quoting
+        // around '='. For example, -D'NAME'='VALUE' becomes NAME'='VALUE after outer
+        // quote removal. The inner '=' needs to become a plain =.
+        result = result.replace(/'='(?!')/, "=").replace(/"="(?!")/, "=");
       }
       results.push(result);
     }
@@ -1301,23 +1311,6 @@ export async function parseCustomConfigProvider(
         let compilerArgs: string[] = [];
         let compilerFragments: string[] = [];
 
-        if (useCompilerFragments) {
-          // This is a temporary solution where we are only using compiler fragments here to pass the
-          // -D defines to the compiler (to fix intellisense issues). We still separately parse defines.
-          // There is still an issue tracking using compilerFragments fully instead of compilerArgs:
-          // https://github.com/microsoft/vscode-makefile-tools/issues/352.
-          let tempFragments: string[] = compilerTool.arguments
-            .trim()
-            .split(" -D");
-          if (tempFragments.length > 1) {
-            for (let i: number = 1; i < tempFragments.length; i++) {
-              compilerFragments.push(
-                "-D" + tempFragments[i].trim().split("/s+/")[0]
-              );
-            }
-          }
-        }
-
         compilerArgs = await parseAnySwitchFromToolArguments(
           compilerTool.arguments,
           ["I", "FI", "include", "D", "std", "MF"]
@@ -1345,6 +1338,15 @@ export async function parseCustomConfigProvider(
           compilerTool.arguments,
           "D"
         );
+
+        if (useCompilerFragments) {
+          // Previously, -D defines were passed as compilerFragments as a workaround
+          // for issue #526 where the parser couldn't handle escaped-quote defines.
+          // The parser now handles these correctly, so defines are only sent via the
+          // defines array. Sending them via compilerFragments too caused duplicates
+          // and CppTools' fragment parser could mangle values with spaces.
+          // See https://github.com/microsoft/vscode-makefile-tools/issues/352.
+        }
 
         // Parse the IntelliSense mode
         // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
