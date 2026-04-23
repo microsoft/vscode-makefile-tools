@@ -294,6 +294,22 @@ suite("Launch configuration string comparison", () => {
     ).to.be.false;
   });
 
+  // When the string doesn't match the expected cwd>binary(args) format,
+  // the function falls back to case-insensitive comparison on Windows.
+  if (process.platform === "win32") {
+    test("areLaunchConfigurationStringsEqual - fallback for non-standard format on Windows", () => {
+      const str1 = "some-random-string";
+      const str2 = "Some-Random-String";
+      expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.true;
+    });
+
+    test("areLaunchConfigurationStringsEqual - fallback mismatch for non-standard format on Windows", () => {
+      const str1 = "some-random-string";
+      const str2 = "different-string";
+      expect(util.areLaunchConfigurationStringsEqual(str1, str2)).to.be.false;
+    });
+  }
+
   // On Windows, paths are case-insensitive but arguments are case-sensitive
   if (process.platform === "win32") {
     test("areLaunchConfigurationStringsEqual - different path case on Windows", () => {
