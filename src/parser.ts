@@ -517,7 +517,7 @@ async function parseAnySwitchFromToolArguments(
     (process.platform === "win32" ? "|\\/)" : ")") +
     // Switch names must start with a letter (not a digit) to avoid matching
     // things like "-1" inside quoted values like "'do { return -1; }'"
-    "([a-zA-Z][a-zA-Z0-9_]*)" +
+    "([a-zA-Z_][a-zA-Z0-9_]*)" +
     // Try to match quoted value of argument
     "(=(\"|\'))?";
   let regexp: RegExp = RegExp(regExpStr, "mg");
@@ -1340,17 +1340,12 @@ export async function parseCustomConfigProvider(
         );
 
         if (useCompilerFragments) {
-          // Build compiler fragments from the already-parsed defines rather than
-          // naively splitting the command line (which breaks on quoted values with spaces).
-          // compilerFragments are shell-parsed by CppTools, so values with spaces
-          // must be quoted. See https://github.com/microsoft/vscode-makefile-tools/issues/352.
-          for (const define of defines) {
-            if (define.includes(" ")) {
-              compilerFragments.push("-D'" + define + "'");
-            } else {
-              compilerFragments.push("-D" + define);
-            }
-          }
+          // Previously, -D defines were passed as compilerFragments as a workaround
+          // for issue #526 where the parser couldn't handle escaped-quote defines.
+          // The parser now handles these correctly, so defines are only sent via the
+          // defines array. Sending them via compilerFragments too caused duplicates
+          // and CppTools' fragment parser could mangle values with spaces.
+          // See https://github.com/microsoft/vscode-makefile-tools/issues/352.
         }
 
         // Parse the IntelliSense mode
