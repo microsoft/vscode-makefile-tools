@@ -932,7 +932,7 @@ async function readCurrentLaunchConfiguration(): Promise<void> {
     );
   }
 
-  let launchConfigStr: string = "No launch configuration set.";
+  let launchConfigStr: string = "";
   if (currentLaunchConfiguration) {
     launchConfigStr = launchConfigurationDisplayName(currentLaunchConfiguration);
     logger.message(
@@ -970,7 +970,9 @@ async function readCurrentLaunchConfiguration(): Promise<void> {
     }
   }
 
-  statusBar.setLaunchConfiguration(launchConfigStr);
+  statusBar.setLaunchConfiguration(
+    launchConfigStr || localize("no.launch.configuration.set", "No launch configuration set")
+  );
   await extension._projectOutlineProvider.updateLaunchTarget(launchConfigStr);
 }
 
@@ -1834,7 +1836,9 @@ export async function initFromSettings(
   await extension._projectOutlineProvider.update(
     extension.getState().buildConfiguration,
     extension.getState().buildTarget,
-    extension.getState().launchConfiguration,
+    currentLaunchConfiguration
+      ? launchConfigurationDisplayName(currentLaunchConfiguration)
+      : undefined,
     getConfigurationMakefile(),
     getConfigurationMakeCommand(),
     getConfigurationBuildLog()
