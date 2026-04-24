@@ -31,6 +31,7 @@ Bug Fixes:
 - Fix "Makefile Tools" being translated in localized languages when it should remain as a proper noun. [#731](https://github.com/microsoft/vscode-makefile-tools/issues/731)
 - Fix binary path links in output log not being clickable on Windows when the path has no .exe extension. [#698](https://github.com/microsoft/vscode-makefile-tools/issues/698)
 - Fix `parseCompilerArgs.bat` failing when macro definitions contain numeric expressions like `-1` inside quoted values. [#755](https://github.com/microsoft/vscode-makefile-tools/issues/755)
+- Fix launch target resetting to "Unset" when `binaryArgs` is added to `makefile.launchConfigurations` on Windows. [#737](https://github.com/microsoft/vscode-makefile-tools/issues/737)
 - Fix Project Outline showing "Unset" for launch configurations that have a `name` field. [#808](https://github.com/microsoft/vscode-makefile-tools/issues/808)
 
 ## 0.11

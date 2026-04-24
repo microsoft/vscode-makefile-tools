@@ -912,7 +912,12 @@ export async function setCurrentLaunchConfiguration(
 
 function getLaunchConfiguration(name: string): LaunchConfiguration | undefined {
   return launchConfigurations.find((k) => {
-    if (launchConfigurationToString(k) === name) {
+    if (
+      util.areLaunchConfigurationStringsEqual(
+        launchConfigurationToString(k),
+        name
+      )
+    ) {
       return { ...k, keep: true };
     }
   });
@@ -2838,7 +2843,10 @@ export async function selectLaunchConfiguration(): Promise<void> {
       getCurrentLaunchConfiguration();
     if (
       !currentLaunchConfiguration ||
-      chosenId !== launchConfigurationToString(currentLaunchConfiguration)
+      !util.areLaunchConfigurationStringsEqual(
+        chosenId,
+        launchConfigurationToString(currentLaunchConfiguration)
+      )
     ) {
       let telemetryProperties: telemetry.Properties | null = {
         state: "launchConfiguration",
