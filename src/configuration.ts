@@ -1836,7 +1836,9 @@ export async function initFromSettings(
   await extension._projectOutlineProvider.update(
     extension.getState().buildConfiguration,
     extension.getState().buildTarget,
-    extension.getState().launchConfiguration,
+    currentLaunchConfiguration
+      ? launchConfigurationDisplayName(currentLaunchConfiguration)
+      : undefined,
     getConfigurationMakefile(),
     getConfigurationMakeCommand(),
     getConfigurationBuildLog()
