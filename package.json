@@ -74,10 +74,24 @@
     "onCommand:makefile.resetState",
     "workspaceContains:**/makefile",
     "workspaceContains:**/Makefile",
-    "workspaceContains:**/GNUmakefile"
+    "workspaceContains:**/GNUmakefile",
+    "workspaceContains:**/*.Makefile",
+    "workspaceContains:**/Makefile.*",
+    "workspaceContains:**/*.makefile"
   ],
   "main": "./dist/main",
   "contributes": {
+    "languages": [
+      {
+        "id": "makefile",
+        "filenamePatterns": [
+          "*.Makefile",
+          "Makefile.*",
+          "*.makefile"
+        ],
+        "configuration": "./makefile-language-configuration.json"
+      }
+    ],
     "commands": [
       {
         "command": "makefile.buildTarget",
@@ -141,7 +155,9 @@
       },
       {
         "command": "makefile.outline.buildCleanTarget",
-        "title": "%makefile-tools.command.makefile.buildCleanTarget.title%"
+        "title": "%makefile-tools.command.makefile.buildCleanTarget.title%",
+        "icon": "$(refresh)",
+        "enablement": "makefile:localBuildCleanTargetFeature"
       },
       {
         "command": "makefile.outline.launchDebug",
@@ -354,6 +370,14 @@
             "type": "object",
             "default": null,
             "properties": {
+              "name": {
+                "type": "string",
+                "description": "%makefile-tools.configuration.makefile.launchConfigurations.name.description%"
+              },
+              "description": {
+                "type": "string",
+                "description": "%makefile-tools.configuration.makefile.launchConfigurations.description.description%"
+              },
               "binaryPath": {
                 "type": "string",
                 "description": "%makefile-tools.configuration.makefile.launchConfigurations.binaryPath.description%"
@@ -504,6 +528,12 @@
           "description": "%makefile-tools.configuration.makefile.configureAfterCommand.description%",
           "scope": "resource"
         },
+        "makefile.cleanConfigureOnConfigurationChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "%makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description%",
+          "scope": "resource"
+        },
         "makefile.preConfigureScript": {
           "type": "string",
           "description": "%makefile-tools.configuration.makefile.preConfigureScript.description%",
@@ -568,6 +598,18 @@
           "description": "%makefile-tools.configuration.makefile.buildBeforeLaunch.description%",
           "scope": "resource"
         },
+        "makefile.buildOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "%makefile-tools.configuration.makefile.buildOnSave.description%",
+          "scope": "resource"
+        },
+        "makefile.runOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "%makefile-tools.configuration.makefile.runOnSave.description%",
+          "scope": "resource"
+        },
         "makefile.clearOutputBeforeBuild": {
           "type": "boolean",
           "default": true,
@@ -594,6 +636,11 @@
               "type": "boolean",
               "description": "%makefile-tools.configuration.makefile.panel.visibility.run.description%",
               "default": true
+            },
+            "buildCleanTarget": {
+              "type": "boolean",
+              "description": "%makefile-tools.configuration.makefile.panel.visibility.buildCleanTarget.description%",
+              "default": false
             }
           }
         }
@@ -769,7 +816,12 @@
         },
         {
           "command": "makefile.outline.buildCleanTarget",
-          "when": "makefile:fullFeatureSet && view == makefile.outline",
+          "when": "makefile:fullFeatureSet && view == makefile.outline && makefile:localBuildCleanTargetFeature",
+          "group": "navigation@4"
+        },
+        {
+          "command": "makefile.outline.buildCleanTarget",
+          "when": "makefile:fullFeatureSet && view == makefile.outline && !makefile:localBuildCleanTargetFeature",
           "group": "1_makefileOutline@4"
         },
         {

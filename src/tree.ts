@@ -81,19 +81,25 @@ export class LaunchTargetNode extends BaseNode {
     let shortName: string;
 
     if (!launchConfiguration) {
-      shortName = localize("Unset", "Unset");
+      // If the name doesn't match the technical cwd>binary(args) format,
+      // it may be a user-friendly display name from the "name" field in
+      // makefile.launchConfigurations. Use it as-is. If empty, show "Unset".
+      shortName = completeLaunchTargetName || localize("Unset", "Unset");
     } else {
+      let binaryPath: string;
       if (vscode.workspace.workspaceFolders) {
         // In a complete launch target string, the binary path is relative to cwd.
         // In here, since we don't show cwd, make it relative to current workspace folder.
-        shortName = util.makeRelPath(
+        binaryPath = util.makeRelPath(
           launchConfiguration.binaryPath,
           vscode.workspace.workspaceFolders[0].uri.fsPath
         );
       } else {
         // Just in case, if for some reason we don't have a workspace folder, return full binary path.
-        shortName = launchConfiguration.binaryPath;
+        binaryPath = launchConfiguration.binaryPath;
       }
+      let binArgs: string = launchConfiguration.binaryArgs.join(",");
+      shortName = `${binaryPath}(${binArgs})`;
     }
 
     return localize(
