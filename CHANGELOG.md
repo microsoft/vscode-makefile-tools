@@ -1,5 +1,11 @@
 # What's New?
 
+## 0.13
+
+Improvements:
+
+- Improve dryrun parsing to support single-quoted tool paths. mingw-make now working. [#739](https://github.com/microsoft/vscode-makefile-tools/issues/739) [@vannaka](https://github.com/vannaka)
+
 ## 0.12
 
 Improvements:
