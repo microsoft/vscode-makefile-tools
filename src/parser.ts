@@ -263,21 +263,24 @@ export async function preprocessDryRunOutput(
   // Oherwise, this scenario interferes with the line ending '\' in some cases
   // (see MAKE repo, ar.c compiler command, for example).
   // Split multiple commands concatenated by '&&'
+  // Process per-line to prevent quote state from leaking across lines.
+  // GNU make outputs directory banners like: Entering directory `path'
+  // The trailing single quote would open a phantom quote context that shifts
+  // all subsequent quote boundaries if processed as a single multi-line string.
   preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = util.replaceStringNotInQuotes(
-      preprocessedDryRunOutputStr,
-      " && ",
-      "\n"
-    );
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, " && ", "\n"))
+      .join("\n");
   });
 
   // Split multiple commands concatenated by ";"
+  // Process per-line for the same reason as '&&' above.
   preprocessTasks.push(function (): void {
-    preprocessedDryRunOutputStr = util.replaceStringNotInQuotes(
-      preprocessedDryRunOutputStr,
-      ";",
-      "\n"
-    );
+    preprocessedDryRunOutputStr = preprocessedDryRunOutputStr
+      .split("\n")
+      .map((line) => util.replaceStringNotInQuotes(line, ";", "\n"))
+      .join("\n");
   });
 
   // Replace multiple "-" sequence because it hangs the regular expression engine.
@@ -512,7 +515,9 @@ async function parseAnySwitchFromToolArguments(
     // On Win32 allow '/' as switch prefix as well,
     // otherwise it conflicts with path character
     (process.platform === "win32" ? "|\\/)" : ")") +
-    "([a-zA-Z0-9_]+)" + 
+    // Switch names must start with a letter (not a digit) to avoid matching
+    // things like "-1" inside quoted values like "'do { return -1; }'"
+    "([a-zA-Z_][a-zA-Z0-9_]*)" +
     // Try to match quoted value of argument
     "(=(\"|\'))?";
   let regexp: RegExp = RegExp(regExpStr, "mg");
@@ -692,7 +697,7 @@ async function parseAnySwitchFromToolArguments(
 // removeSurroundingQuotes: needs to be false when called from parseAnySwitchFromToolArguments,
 // and true otherwise. We need to analyze more scenarios before setting in stone a particular algorithm
 // regarding the decision to remove or not to remove them.
-function parseMultipleSwitchFromToolArguments(
+export function parseMultipleSwitchFromToolArguments(
   args: string,
   sw: string,
   removeSurroundingQuotes: boolean = true
@@ -775,6 +780,7 @@ function parseMultipleSwitchFromToolArguments(
       // switch value
       "(" +
       anythingBetweenQuotes(fullyQuoted) +
+      "(?!=)" + // Don't match a quoted value when followed by '=' (e.g. -D'NAME'='VALUE')
       "|" +
       // not fully quoted switch value scenarios
       "(" +
@@ -824,6 +830,10 @@ function parseMultipleSwitchFromToolArguments(
     if (result) {
       if (removeSurroundingQuotes) {
         result = util.removeSurroundingQuotes(result);
+        // After stripping outer quotes, clean up shell-style concatenated quoting
+        // around '='. For example, -D'NAME'='VALUE' becomes NAME'='VALUE after outer
+        // quote removal. The inner '=' needs to become a plain =.
+        result = result.replace(/'='(?!')/, "=").replace(/"="(?!")/, "=");
       }
       results.push(result);
     }
@@ -1301,23 +1311,6 @@ export async function parseCustomConfigProvider(
         let compilerArgs: string[] = [];
         let compilerFragments: string[] = [];
 
-        if (useCompilerFragments) {
-          // This is a temporary solution where we are only using compiler fragments here to pass the
-          // -D defines to the compiler (to fix intellisense issues). We still separately parse defines.
-          // There is still an issue tracking using compilerFragments fully instead of compilerArgs:
-          // https://github.com/microsoft/vscode-makefile-tools/issues/352.
-          let tempFragments: string[] = compilerTool.arguments
-            .trim()
-            .split(" -D");
-          if (tempFragments.length > 1) {
-            for (let i: number = 1; i < tempFragments.length; i++) {
-              compilerFragments.push(
-                "-D" + tempFragments[i].trim().split("/s+/")[0]
-              );
-            }
-          }
-        }
-
         compilerArgs = await parseAnySwitchFromToolArguments(
           compilerTool.arguments,
           ["I", "FI", "include", "D", "std", "MF"]
@@ -1345,6 +1338,15 @@ export async function parseCustomConfigProvider(
           compilerTool.arguments,
           "D"
         );
+
+        if (useCompilerFragments) {
+          // Previously, -D defines were passed as compilerFragments as a workaround
+          // for issue #526 where the parser couldn't handle escaped-quote defines.
+          // The parser now handles these correctly, so defines are only sent via the
+          // defines array. Sending them via compilerFragments too caused duplicates
+          // and CppTools' fragment parser could mangle values with spaces.
+          // See https://github.com/microsoft/vscode-makefile-tools/issues/352.
+        }
 
         // Parse the IntelliSense mode
         // how to deal with aliases and symlinks (CC, C++), which can point to any toolsets
@@ -1624,6 +1626,12 @@ export async function parseLaunchConfigurations(
                   );
                 }
               } else {
+                // If the binary has no extension, append .exe
+                // This ensures VS Code can properly link to the file in the output
+                // Note: No platform check needed here - this entire block is Windows-specific (see line 1553)
+                if (!path.extname(compilerTargetBinary)) {
+                  compilerTargetBinary += ".exe";
+                }
                 logger.message(
                   localize(
                     "producing.target.binary",
@@ -1707,6 +1715,15 @@ export async function parseLaunchConfigurations(
               linkerTool.arguments,
               ["out", "o"]
             );
+            // On Windows, if the binary has no extension, append .exe
+            // This ensures VS Code can properly link to the file in the output
+            if (
+              linkerTargetBinary &&
+              process.platform === "win32" &&
+              !path.extname(linkerTargetBinary)
+            ) {
+              linkerTargetBinary += ".exe";
+            }
             logger.message(
               localize(
                 "found.linker.command",
@@ -2213,12 +2230,15 @@ function parseCppStandard(
   canUseGnu: boolean
 ): util.StandardVersion | undefined {
   const isGnu: boolean = canUseGnu && std.startsWith("gnu");
-  if (
-    std === "c++latest" ||
-    std.endsWith("++26") || std.endsWith("++2c") ||
-    std.endsWith("++23") || std.endsWith("++2b") || std === "c++23preview" ||
-    std.endsWith("++20") || std.endsWith("++2a")
+  if (std === "c++latest" || std.endsWith("++26") || std.endsWith("++2c")) {
+    return isGnu ? "gnu++26" : "c++26";
+  } else if (
+    std.endsWith("++23") ||
+    std.endsWith("++2b") ||
+    std === "c++23preview"
   ) {
+    return isGnu ? "gnu++23" : "c++23";
+  } else if (std.endsWith("++20") || std.endsWith("++2a")) {
     return isGnu ? "gnu++20" : "c++20";
   } else if (std.endsWith("++17") || std.endsWith("++1z")) {
     return isGnu ? "gnu++17" : "c++17";
@@ -2241,16 +2261,23 @@ function parseCStandard(
 ): util.StandardVersion | undefined {
   // GNU options from: https://gcc.gnu.org/onlinedocs/gcc/C-Dialect-Options.html#C-Dialect-Options
   const isGnu: boolean = canUseGnu && std.startsWith("gnu");
-  if (/(c|gnu)(90|89|iso9899:(1990|199409))/.test(std)) {
+  if (/(c|gnu)(90|89)/.test(std) || /iso9899:(1990|199409)/.test(std)) {
     return isGnu ? "gnu89" : "c89";
-  } else if (/(c|gnu)(99|9x|iso9899:(1999|199x))/.test(std)) {
+  } else if (/(c|gnu)(99|9x)/.test(std) || /iso9899:(1999|199x)/.test(std)) {
     return isGnu ? "gnu99" : "c99";
-  } else if (/(c|gnu)(11|1x|iso9899:2011)/.test(std)) {
+  } else if (/(c|gnu)(11|1x)/.test(std) || /iso9899:2011/.test(std)) {
     return isGnu ? "gnu11" : "c11";
-  } else if (/(c|gnu)(17|18|23|2x|iso9899:(2017|2018|2024))/.test(std)) {
+  } else if (/(c|gnu)(17|18)/.test(std) || /iso9899:(2017|2018)/.test(std)) {
     if (canUseGnu) {
-      // cpptools supports 'c17' in same version it supports GNU std.
+      // cpptools v4+ supports 'c17'/'gnu17'; older versions fall back to 'c11'.
       return isGnu ? "gnu17" : "c17";
+    } else {
+      return "c11";
+    }
+  } else if (/(c|gnu)(23|2x)/.test(std) || /iso9899:2024/.test(std)) {
+    if (canUseGnu) {
+      // cpptools v4+ supports 'c23'/'gnu23'; older versions fall back to 'c11'.
+      return isGnu ? "gnu23" : "c23";
     } else {
       return "c11";
     }

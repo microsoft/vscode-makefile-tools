@@ -1,5 +1,5 @@
 Pre-configuring...
-Script: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat"
+Script: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat
 
 {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros>call "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\preconfigure.bat" 
 The pre-configure succeeded.
@@ -28,9 +28,12 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
+Run on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
@@ -39,7 +42,7 @@ Resolving build log path to "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Rep
 Deduced command 'c:\some\other\fake\path.exe ' for configuration "InterestingSmallMakefile_windows_configDebug"
 Saving opened files before build.
 Loading configurations from cache is not necessary.
-Preprocessing: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Preprocessing: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log
 Preprocess elapsed time: 0
 Parsing for IntelliSense.
 Updating the CppTools IntelliSense Configuration Provider.
@@ -219,7 +222,7 @@ Found the following 6 launch targets defined in the makefile: {REPO:VSCODE-MAKEF
 Complete list of launch targets: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARC H3\Debug\main.exe(str3a,str3b,str3c);{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros>bin\InterestingSmallMakefile\ARCH1\Debug\main.exe(str1a,str1b,str1c);{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARC H3\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH1\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\bin\InterestingSmallMakefile\ARCH2\Debug>main.exe();{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\repros\simple>simple.exe()
 Parsing for launch targets elapsed time: 0
 Generating parse content for build targets.
-Parsing for build targets from: "{REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log"
+Parsing for build targets from: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\InterestingSmallMakefile_windows_dryrunDebug.log
 Found the following 21 build targets defined in the makefile: Arch1_main.exe;Arch2_main.exe;Arch3_main.exe;Execute_Arch1;Execute_Arch2;Execute_Arch3;all;buildArch1;buildArch2;buildArch3;builds;clean;create_dirs;create_dirs_Arch1;create_dirs_Arch2;create_dirs_Arch3;install;rebuild;runs;simple;simple/simple.exe
 Complete list of build targets: Arch1_main.exe;Arch2_main.exe;Arch3_main.exe;Execute_Arch1;Execute_Arch2;Execute_Arch3;all;buildArch1;buildArch2;buildArch3;builds;clean;create_dirs;create_dirs_Arch1;create_dirs_Arch2;create_dirs_Arch3;install;rebuild;runs;simple;simple/simple.exe
 Parsing build targets elapsed time: 0
@@ -282,9 +285,12 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
+Run on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
@@ -354,9 +360,12 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
+Run on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
@@ -429,9 +438,12 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
+Run on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
@@ -473,9 +485,12 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
+Run on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
@@ -505,9 +520,12 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
+Run on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
@@ -534,9 +552,12 @@ Default launch configuration: MIMode = undefined,
 Configure on open: false
 Configure on edit: true
 Configure after command: true
+Clean configure on configuration change: true
 Only .PHONY targets: false
 Save before build or configure: true
 Build before launch: false
+Build on save: false
+Run on save: false
 Clear output before build: true
 Ignore directory commands: true
 compile_commands.json path: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\compile_commands.json
