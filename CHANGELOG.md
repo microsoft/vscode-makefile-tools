@@ -16,6 +16,7 @@ Improvements:
 - Created issue templates for bug reporting and docs/feature requests. [#702](https://github.com/microsoft/vscode-makefile-tools/issues/702)
 - Added buildCleanTarget to panel visibility settings. [#744](https://github.com/microsoft/vscode-makefile-tools/issues/744).
 - Document all `makefile.*` settings with types, defaults, and descriptions. [#790](https://github.com/microsoft/vscode-makefile-tools/issues/790)
+- Support single quotes in dry-run output for mingw-make compatibility. [#739](https://github.com/microsoft/vscode-makefile-tools/issues/739)
 
 Bug Fixes:
 
