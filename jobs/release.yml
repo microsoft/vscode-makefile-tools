@@ -2,12 +2,11 @@
 # Licensed under the MIT License.
 
 parameters:
-  - name: SignTypeOverride
-    displayName: Signing Type Override
+  - name: signType
+    displayName: Signing Type
     type: string
-    default: default
+    default: real
     values:
-      - default
       - test
       - real
   - name: VerifyChangelog
@@ -49,13 +48,6 @@ variables:
   # VerifyNotice is set in the versions tab so it can be edited.
   # VerifyChangelog is set in the versions tab so it can be edited.
   TeamName: C++ Cross Platform and Cloud
-  # If the user didn't override the signing type, then only real-sign on main.
-  ${{ if ne(parameters.SignTypeOverride, 'default') }}:
-    SignType: ${{ parameters.SignTypeOverride }}
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), eq(variables['Build.SourceBranchName'], 'main')) }}:
-    SignType: real
-  ${{ if and(eq(parameters.SignTypeOverride, 'default'), not(eq(variables['Build.SourceBranchName'], 'main'))) }}:
-    SignType: test
 
 extends:
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
@@ -68,11 +60,37 @@ extends:
     customBuildTags:
       - ES365AIMigrationTooling
     stages:
+      - stage: verify_parameters
+        jobs:
+          - job: verify
+            displayName: Verify parameters
+            steps:
+              - checkout: none
+              # breaking issue: variables['Build.SourceBranch'] is evaluating to ''.
+              # TODO: Figure out why
+              #- ${{ if not(eq(variables['Build.SourceBranch'], 'refs/heads/main')) }}:
+              #  - 'This pipeline can only be run on main branch.'
+
+              # Workaround for the previous check not working
+              - powershell: |
+                  Write-Host "##vso[task.logissue type=error]This pipeline can only be run from the main branch. Actual: $(Build.SourceBranch)"
+                  exit 1
+                displayName: "Enforce main branch"
+                condition: ne(variables['Build.SourceBranch'], 'refs/heads/main')
+
       - stage: stage
+        dependsOn: verify_parameters
         jobs:
           - job: Job_1
             displayName: Build release
             templateContext:
+              mb: # Enable the MicroBuild Signing toolset
+                signing:
+                  enabled: true
+                  signType: ${{ parameters.signType }}
+                  zipSources: false
+                  ${{ if eq(parameters.signType, 'real') }}:
+                    signWithProd: true
               outputs:
                 - output: pipelineArtifact
                   displayName: "Publish VSIX"
@@ -93,3 +111,4 @@ extends:
               - template: /jobs/shared/build.yml@self
                 parameters:
                   ReleaseVersion: ${{ parameters.ReleaseVersion }}
+                  signType: ${{ parameters.signType }}

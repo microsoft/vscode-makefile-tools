@@ -74,10 +74,24 @@
     "onCommand:makefile.resetState",
     "workspaceContains:**/makefile",
     "workspaceContains:**/Makefile",
-    "workspaceContains:**/GNUmakefile"
+    "workspaceContains:**/GNUmakefile",
+    "workspaceContains:**/*.Makefile",
+    "workspaceContains:**/Makefile.*",
+    "workspaceContains:**/*.makefile"
   ],
   "main": "./dist/main",
   "contributes": {
+    "languages": [
+      {
+        "id": "makefile",
+        "filenamePatterns": [
+          "*.Makefile",
+          "Makefile.*",
+          "*.makefile"
+        ],
+        "configuration": "./makefile-language-configuration.json"
+      }
+    ],
     "commands": [
       {
         "command": "makefile.buildTarget",
@@ -141,7 +155,9 @@
       },
       {
         "command": "makefile.outline.buildCleanTarget",
-        "title": "%makefile-tools.command.makefile.buildCleanTarget.title%"
+        "title": "%makefile-tools.command.makefile.buildCleanTarget.title%",
+        "icon": "$(refresh)",
+        "enablement": "makefile:localBuildCleanTargetFeature"
       },
       {
         "command": "makefile.outline.launchDebug",
@@ -354,6 +370,14 @@
             "type": "object",
             "default": null,
             "properties": {
+              "name": {
+                "type": "string",
+                "description": "%makefile-tools.configuration.makefile.launchConfigurations.name.description%"
+              },
+              "description": {
+                "type": "string",
+                "description": "%makefile-tools.configuration.makefile.launchConfigurations.description.description%"
+              },
               "binaryPath": {
                 "type": "string",
                 "description": "%makefile-tools.configuration.makefile.launchConfigurations.binaryPath.description%"
@@ -504,6 +528,12 @@
           "description": "%makefile-tools.configuration.makefile.configureAfterCommand.description%",
           "scope": "resource"
         },
+        "makefile.cleanConfigureOnConfigurationChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "%makefile-tools.configuration.makefile.cleanConfigureOnConfigurationChange.description%",
+          "scope": "resource"
+        },
         "makefile.preConfigureScript": {
           "type": "string",
           "description": "%makefile-tools.configuration.makefile.preConfigureScript.description%",
@@ -568,6 +598,18 @@
           "description": "%makefile-tools.configuration.makefile.buildBeforeLaunch.description%",
           "scope": "resource"
         },
+        "makefile.buildOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "%makefile-tools.configuration.makefile.buildOnSave.description%",
+          "scope": "resource"
+        },
+        "makefile.runOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "%makefile-tools.configuration.makefile.runOnSave.description%",
+          "scope": "resource"
+        },
         "makefile.clearOutputBeforeBuild": {
           "type": "boolean",
           "default": true,
@@ -594,6 +636,11 @@
               "type": "boolean",
               "description": "%makefile-tools.configuration.makefile.panel.visibility.run.description%",
               "default": true
+            },
+            "buildCleanTarget": {
+              "type": "boolean",
+              "description": "%makefile-tools.configuration.makefile.panel.visibility.buildCleanTarget.description%",
+              "default": false
             }
           }
         }
@@ -769,7 +816,12 @@
         },
         {
           "command": "makefile.outline.buildCleanTarget",
-          "when": "makefile:fullFeatureSet && view == makefile.outline",
+          "when": "makefile:fullFeatureSet && view == makefile.outline && makefile:localBuildCleanTargetFeature",
+          "group": "navigation@4"
+        },
+        {
+          "command": "makefile.outline.buildCleanTarget",
+          "when": "makefile:fullFeatureSet && view == makefile.outline && !makefile:localBuildCleanTargetFeature",
           "group": "1_makefileOutline@4"
         },
         {
@@ -871,7 +923,7 @@
     "test": "yarn run pretest && node ./out/src/test/runTest.js"
   },
   "devDependencies": {
-    "@types/mocha": "^9.0.0",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^20.14.2",
     "@types/uuid": "^9.0.7",
     "@types/vscode": "^1.74.0",
@@ -882,16 +934,18 @@
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
     "@types/chai-string": "^1.4.2",
+    "@types/glob": "^7.1.1",
     "chai": "^4.3.0",
     "chai-as-promised": "^7.1.1",
     "chai-string": "^1.5.0",
     "typescript": "^5.0.2",
     "vrsource-tslint-rules": "^6.0.0",
     "vscode-nls-dev": "^3.3.2",
+    "glob": "^7.1.6",
     "gulp": "^4.0.2",
     "gulp-eslint": "^6.0.0",
     "gulp-filter": "^6.0.0",
-    "gulp-mocha": "^8.0.0",
+    "gulp-mocha": "^10.0.1",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^5.0.1",
     "fs-extra": "^9.1.0",
@@ -904,11 +958,9 @@
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {
-    "@types/glob": "^7.1.1",
-    "glob": "^7.1.6",
     "module-alias": "^2.2.2",
     "uuid": "^9.0.1",
-    "vscode-cpptools": "^6.1.0",
+    "vscode-cpptools": "^7.1.1",
     "vscode-nls": "^5.0.0",
     "@vscode/extension-telemetry": "^0.9.6",
     "vscode-jsonrpc": "^3.6.2"
@@ -916,11 +968,11 @@
   "resolutions": {
     "ansi-regex": "^5.0.1",
     "glob-parent": "^5.1.2",
-    "markdown-it": "^12.3.2",
-    "minimist": "^1.2.6",
-    "nanoid": "^3.1.20",
-    "minimatch": "^3.0.5",
-    "xml2js": "^0.5.0"
+    "xml2js": "^0.5.0",
+    "braces": "^3.0.3",
+    "jws": "^4.0.1",
+    "postcss": "^8.4.31",
+    "tmp": "^0.2.4"
   },
   "capabilities": {
     "untrustedWorkspaces": {
