@@ -1204,7 +1204,7 @@ export async function runPrePostConfigureScript(
     if (result.returnCode === ConfigureBuildReturnCodeTypes.success) {
       if (someErr) {
         // Depending how the preconfigure scripts (and any inner called sub-scripts) are written,
-        // it may happen that the final error code returned by them to be succesful even if
+        // it may happen that the final error code returned by them to be successful even if
         // previous steps reported errors.
         // Until a better error code analysis, simply warn wih a logger message and turn the successful
         // return code into ConfigureBuildReurnCodeTypes.other, which would let us know in telemetry
@@ -1345,7 +1345,7 @@ interface ConfigureSubphasesStatus {
   recursiveConfigure?: ConfigureSubphasesStatus;
 }
 
-// What makes a configure succesful or failed.
+// What makes a configure successful or failed.
 // This is not called when there was a cancellation, to simplify the logic and rules.
 // Here are some considerations:
 // 1.   If generate parse content returns a non successful return code,

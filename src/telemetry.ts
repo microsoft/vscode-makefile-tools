@@ -204,7 +204,7 @@ function filterKey(key: string): string {
 // Analyze recursively all the settings for telemetry and type validation.
 // Return all the telemetry properties that have been collected throughout this recursive process.
 // If telemetryProperties is null, this function performs only type validation.
-// If analyzeSettings gets called before a configure (or after an unsuccesful one), it is possible to have
+// If analyzeSettings gets called before a configure (or after an unsuccessful one), it is possible to have
 // inaccurate or incomplete telemetry information for makefile and launch configurations.
 // This is not very critical since any of their state changes will update telemetry for them.
 export async function analyzeSettings(
