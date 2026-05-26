@@ -20,7 +20,9 @@ extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
   parameters:
     pool:
-      name: VSEngSS-MicroBuild2022-1ES
+      name: AzurePipelines-EO
+      image: 1ESPT-Windows2025
+      os: windows
 
     stages:
       - stage: Validate
