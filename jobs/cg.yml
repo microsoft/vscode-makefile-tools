@@ -76,9 +76,9 @@ extends:
                 fetchTags: false
 
               - task: NodeTool@0
-                displayName: Use Node 20.x
+                displayName: Use Node 22.x
                 inputs:
-                  versionSpec: 20.x
+                  versionSpec: 22.x
 
               - task: geeklearningio.gl-vsts-tasks-yarn.yarn-installer-task.YarnInstaller@3
                 displayName: Use Yarn 1.x
