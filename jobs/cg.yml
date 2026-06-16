@@ -66,6 +66,8 @@ extends:
         exclusionsFile: $(Build.SourcesDirectory)\jobs\policheckExclusions.xml
     customBuildTags:
       - ES365AIMigrationTooling
+    settings:
+      networkIsolationPolicy: Permissive,CFSClean,CFSClean2,CFSClean3
     stages:
       - stage: stage
         jobs:
@@ -75,34 +77,39 @@ extends:
               - checkout: self
                 fetchTags: false
 
-              - task: NodeTool@0
-                displayName: Use Node 22.x
+              - task: UseNode@1
+                displayName: "Use Node 22.x"
                 inputs:
-                  versionSpec: 22.x
+                  version: "22.x"
 
-              - task: geeklearningio.gl-vsts-tasks-yarn.yarn-installer-task.YarnInstaller@3
-                displayName: Use Yarn 1.x
+              - task: CmdLine@2
+                displayName: IF EXIST %SYSTEMDRIVE%\Users\%USERNAME%\.npmrc del %SYSTEMDRIVE%\Users\%USERNAME%\.npmrc
+                inputs:
+                  script: IF EXIST %SYSTEMDRIVE%\Users\%USERNAME%\.npmrc del %SYSTEMDRIVE%\Users\%USERNAME%\.npmrc
 
-              - task: geeklearningio.gl-vsts-tasks-yarn.yarn-task.Yarn@3
+              - task: CmdLine@2
                 displayName: Yarn install
                 inputs:
-                  arguments: install
+                  script: yarn install
+                env:
+                  npm_config_registry: https://pkgs.dev.azure.com/azure-public/VisualCpp/_packaging/cpp_PublicPackages/npm/registry/
 
-              - script: npm install -g @vscode/vsce
-                displayName: "install vsce"
-
-              - script: yarn compile-production
-                displayName: "Compile production"
+              - task: CmdLine@2
+                displayName: Build files
+                inputs:
+                  script: |
+                    yarn compile-production
+                env:
+                  npm_config_registry: https://pkgs.dev.azure.com/azure-public/VisualCpp/_packaging/cpp_PublicPackages/npm/registry/
 
               - task: CmdLine@2
                 displayName: Run VSCE to package vsix
                 inputs:
                   script: |-
                     echo Building VSIX
-                    vsce package --yarn -o $(Build.StagingDirectory)\makefile-tools.vsix
-
-              - script: npm uninstall -g @vscode/vsce
-                displayName: "uninstall vsce"
+                    yarn run vsce package --yarn -o $(Build.StagingDirectory)\makefile-tools.vsix
+                env:
+                  npm_config_registry: https://pkgs.dev.azure.com/azure-public/VisualCpp/_packaging/cpp_PublicPackages/npm/registry/
 
               - task: DeleteFiles@1
                 displayName: Remove code that should not be scanned

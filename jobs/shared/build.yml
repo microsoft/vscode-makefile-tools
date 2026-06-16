@@ -17,16 +17,10 @@ steps:
     inputs:
       versionSpec: 22.x
 
-  - task: geeklearningio.gl-vsts-tasks-yarn.yarn-installer-task.YarnInstaller@3
-    displayName: Use Yarn 1.x
-
   - task: CmdLine@2
     displayName: IF EXIST %SYSTEMDRIVE%\Users\%USERNAME%\.npmrc del %SYSTEMDRIVE%\Users\%USERNAME%\.npmrc
     inputs:
       script: IF EXIST %SYSTEMDRIVE%\Users\%USERNAME%\.npmrc del %SYSTEMDRIVE%\Users\%USERNAME%\.npmrc
-
-  - script: npm install -g @vscode/vsce
-    displayName: "install vsce"
 
   - task: PowerShell@2
     displayName: Set build name
@@ -66,6 +60,8 @@ steps:
     inputs:
       script: |
         yarn compile-production
+    env:
+      npm_config_registry: https://pkgs.dev.azure.com/azure-public/VisualCpp/_packaging/cpp_PublicPackages/npm/registry/
 
   - task: MSBuild@1
     displayName: Sign files
@@ -78,13 +74,15 @@ steps:
     inputs:
       script: |
         mkdir $(Build.ArtifactStagingDirectory)\vsix
-        if "${{parameters.IsPreRelease}}"=="1" (vsce package --yarn -o $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix --pre-release) else (vsce package --yarn -o $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix)
+        if "${{parameters.IsPreRelease}}"=="1" (yarn run vsce package --yarn -o $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix --pre-release) else (yarn run vsce package --yarn -o $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix)
+    env:
+      npm_config_registry: https://pkgs.dev.azure.com/azure-public/VisualCpp/_packaging/cpp_PublicPackages/npm/registry/
 
   - task: CmdLine@2
     displayName: Generate Extension Manifest
     inputs:
       script: |
-        vsce generate-manifest -i $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix -o $(Build.ArtifactStagingDirectory)\vsix\extension.manifest
+        yarn run vsce generate-manifest -i $(Build.ArtifactStagingDirectory)\vsix\makefile-tools.vsix -o $(Build.ArtifactStagingDirectory)\vsix\extension.manifest
 
   - task: CmdLine@2
     displayName: Prepare manifest for signing

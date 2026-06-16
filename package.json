@@ -979,5 +979,6 @@
       "supported": false,
       "description": ""
     }
-  }
+  },
+  "packageManager": "yarn@1.22.22"
 }
