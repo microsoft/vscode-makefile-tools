@@ -52,7 +52,7 @@ steps:
 
   - template: /jobs/shared/install-nuget.yml@self
 
-  - script: nuget restore $(Build.SourcesDirectory)\build\SignFiles.proj -PackagesDirectory $(Build.SourcesDirectory)\build\packages
+  - script: nuget restore $(Build.SourcesDirectory)\build\SignFiles.proj -PackagesDirectory $(Build.SourcesDirectory)\build\packages -ConfigFile $(Build.SourcesDirectory)\build\NuGet.config
     displayName: Restore MicroBuild Core
 
   - task: CmdLine@2
