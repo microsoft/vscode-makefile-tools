@@ -5,27 +5,17 @@
 Improvements:
 
 - Improve dryrun parsing to support single-quoted tool paths. mingw-make now working. [#739](https://github.com/microsoft/vscode-makefile-tools/issues/739) [@vannaka](https://github.com/vannaka)
-
-## 0.12
-
-Improvements:
-
 - Add native support for custom `Makefile` naming conventions such as `*.Makefile`, `Makefile.*`, and `*.makefile`. [#645](https://github.com/microsoft/vscode-makefile-tools/issues/645)
 - Add `# region` / `# endregion` folding support for makefiles. [#544](https://github.com/microsoft/vscode-makefile-tools/issues/544)
 - Add `name` and `description` fields to `makefile.launchConfigurations` to allow user-friendly labeling of launch configurations. [#568](https://github.com/microsoft/vscode-makefile-tools/issues/568)
 - Add `makefile.runOnSave` setting to automatically build and run the current target when a file is saved. [#786](https://github.com/microsoft/vscode-makefile-tools/issues/786)
 - Add `makefile.buildOnSave` setting to automatically build the current target when a file is saved. [#558](https://github.com/microsoft/vscode-makefile-tools/issues/558)
 - Add `makefile.cleanConfigureOnConfigurationChange` setting to always run Clean Configure when switching build configurations. [#534](https://github.com/microsoft/vscode-makefile-tools/issues/534)
-- Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
-- While parsing, don't replace characters with newlines if they are inside quotes. [#671](https://github.com/microsoft/vscode-makefile-tools/issues/671)
-- Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
-- Created issue templates for bug reporting and docs/feature requests. [#702](https://github.com/microsoft/vscode-makefile-tools/issues/702)
 - Added buildCleanTarget to panel visibility settings. [#744](https://github.com/microsoft/vscode-makefile-tools/issues/744).
 - Document all `makefile.*` settings with types, defaults, and descriptions. [#790](https://github.com/microsoft/vscode-makefile-tools/issues/790)
 
 Bug Fixes:
 
-- Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526), [#465](https://github.com/microsoft/vscode-makefile-tools/issues/465)
 - Fix incorrect parsing of environment variables with quoted values containing spaces. [#729](https://github.com/microsoft/vscode-makefile-tools/issues/729)
 - Fix build task failure where task definition was missing command property. [#748](https://github.com/microsoft/vscode-makefile-tools/issues/748)
 - Added support for C++23 and C++26 standard flags. [#752](https://github.com/microsoft/vscode-makefile-tools/issues/752)
@@ -38,7 +28,21 @@ Bug Fixes:
 - Fix binary path links in output log not being clickable on Windows when the path has no .exe extension. [#698](https://github.com/microsoft/vscode-makefile-tools/issues/698)
 - Fix `parseCompilerArgs.bat` failing when macro definitions contain numeric expressions like `-1` inside quoted values. [#755](https://github.com/microsoft/vscode-makefile-tools/issues/755)
 - Fix launch target resetting to "Unset" when `binaryArgs` is added to `makefile.launchConfigurations` on Windows. [#737](https://github.com/microsoft/vscode-makefile-tools/issues/737)
+- Fix parsing of environment variables with multiline values from preconfigure scripts. [#754](https://github.com/microsoft/vscode-makefile-tools/issues/754)
 - Fix Project Outline showing "Unset" for launch configurations that have a `name` field. [#808](https://github.com/microsoft/vscode-makefile-tools/issues/808)
+
+## 0.12
+
+Improvements:
+
+- Make the wording more clear for the clean and build command. [#136](https://github.com/microsoft/vscode-makefile-tools/issues/136)
+- While parsing, don't replace characters with newlines if they are inside quotes. [#671](https://github.com/microsoft/vscode-makefile-tools/issues/671)
+- Handle line continuation characters during parsing. [#628](https://github.com/microsoft/vscode-makefile-tools/issues/628)
+- Created issue templates for bug reporting and docs/feature requests. [#702](https://github.com/microsoft/vscode-makefile-tools/issues/702)
+
+Bug Fixes:
+
+- Fix intellisense "unrecognized token" issue with define. [#526](https://github.com/microsoft/vscode-makefile-tools/issues/526), [#465](https://github.com/microsoft/vscode-makefile-tools/issues/465)
 
 ## 0.11
 
