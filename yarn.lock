@@ -3699,9 +3699,9 @@ liftoff@^3.1.0:
     resolve "^1.1.7"
 
 linkify-it@^5.0.0:
-  version "5.0.0"
-  resolved "https://pkgs.dev.azure.com/azure-public/VisualCpp/_packaging/cpp_PublicPackages/npm/registry/linkify-it/-/linkify-it-5.0.0.tgz#9ef238bfa6dc70bd8e7f9572b52d369af569b421"
-  integrity sha1-nvI4v6bccL2Of5VytS02mvVptCE=
+  version "5.0.2"
+  resolved "https://pkgs.dev.azure.com/azure-public/VisualCpp/_packaging/cpp_PublicPackages/npm/registry/linkify-it/-/linkify-it-5.0.2.tgz#d3be0a693af3da9df3883f1e346a0e97461a8c19"
+  integrity sha1-074KaTrz2p3ziD8eNGoOl0YajBk=
   dependencies:
     uc.micro "^2.0.0"
 
