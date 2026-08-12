@@ -18,10 +18,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@c6fd00ceb9747fb23ffdf72987450a2664414867 # v2.1.2
         with:
           node-version: '20'
           check-latest: true
@@ -44,7 +44,7 @@ jobs:
           yarn run package
           
       - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2.1.4
+        uses: actions/upload-artifact@58740802ef971a2d71eff71e63d48ab68d1f5507 # v2.1.4
         with:
           name: makefile-tools.vsix
           path: ./makefile-tools.vsix
