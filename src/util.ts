@@ -362,6 +362,8 @@ export interface SpawnProcessResult {
 
 // Helper to spawn a child process, hooked to callbacks that are processing stdout/stderr
 // forceEnglish is true when the caller relies on parsing english words from the output.
+// On non windows platforms the child is spawned into its own process group and session,
+// so that anything it runs can only signal its own subtree and never the extension host.
 export function spawnChildProcess(
   processName: string,
   args: string[],
@@ -431,6 +433,18 @@ export function spawnChildProcess(
       );
     }
 
+    // The command being spawned is under workspace control (a makefile recipe, a
+    // pre-configure script), and --dry-run does not make that safe: GNU make still
+    // executes recipe lines containing $(MAKE) under -n, so configuring a folder can
+    // run arbitrary recipes. Without a process group of its own, a recipe that signals
+    // its group - `trap 'kill 0' EXIT` is a common way to clean up background jobs -
+    // reaches every process in the extension host's group and terminates VS Code.
+    // Detaching bounds that to the spawned subtree. The child is deliberately not
+    // unref'd, so this promise still awaits it, and killTree still walks it by PID.
+    // Not applied on Windows, where detached allocates a new console window instead
+    // and where killTree already isolates via taskkill.
+    const detached: boolean = process.platform !== "win32";
+
     const child: child_process.ChildProcess = child_process.spawn(
       qProcessName,
       qArgs,
@@ -438,6 +452,7 @@ export function spawnChildProcess(
         cwd: options.workingDirectory,
         shell: shellType || true,
         env: finalEnvironment,
+        detached,
       }
     );
     if (child.pid) {
