@@ -6,6 +6,10 @@ Improvements:
 
 - Improve dryrun parsing to support single-quoted tool paths. mingw-make now working. [#739](https://github.com/microsoft/vscode-makefile-tools/issues/739) [@vannaka](https://github.com/vannaka)
 
+Bug Fixes:
+
+- Spawn child processes in their own process group on non-Windows platforms, so that a makefile recipe signalling its process group can no longer terminate VS Code. [#835](https://github.com/microsoft/vscode-makefile-tools/issues/835)
+
 ## 0.12
 
 Improvements:
