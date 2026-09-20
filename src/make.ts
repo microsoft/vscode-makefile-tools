@@ -1107,13 +1107,16 @@ export async function postConfigure(triggeredBy: TriggeredBy): Promise<number> {
 // The input 'content' represents the output of a command that lists all the environment variables:
 // set on windows or printenv on linux/mac.
 async function applyEnvironment(content: string | undefined): Promise<void> {
-  let lines: string[] = content?.split(/\r?\n/) || [];
-  lines.forEach((line) => {
-    let eqPos: number = line.search("=");
-    // Sometimes we get a "" line and searching for = returns -1. Skip.
+  // On Linux/macOS, printenv -0 outputs NUL-separated entries to support multiline values
+  // (e.g., BASH_FUNC_* exported functions). On Windows, 'set' outputs newline-separated entries.
+  const separator = process.platform === "win32" ? /\r?\n/ : /\0/;
+  let entries: string[] = content?.split(separator) || [];
+  entries.forEach((entry) => {
+    let eqPos: number = entry.search("=");
+    // Sometimes we get a "" entry and searching for = returns -1. Skip.
     if (eqPos !== -1) {
-      let envVarName: string = line.substring(0, eqPos);
-      let envVarValue: string = line.substring(eqPos + 1, line.length);
+      let envVarName: string = entry.substring(0, eqPos);
+      let envVarValue: string = entry.substring(eqPos + 1, entry.length);
 
       // Only save to the modified environment values if it's different than the process.env.
       if (!process.env[envVarName] || envVarValue !== process.env[envVarName]) {
@@ -1158,7 +1161,7 @@ export async function runPrePostConfigureScript(
     wrapScriptContent = `source '${scriptFile}' ${
       scriptArgs.length > 0 ? scriptArgs.join(" ").toString() : ""
     }\n`;
-    wrapScriptContent += `printenv > '${wrapScriptOutFile}'`;
+    wrapScriptContent += `printenv -0 > '${wrapScriptOutFile}'`;
     wrapScriptFile += ".sh";
   }
 
