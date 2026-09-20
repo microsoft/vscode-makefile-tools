@@ -46,6 +46,7 @@ Spawning child process with:
  process args: -f,"./SubDir/makefile with space",--dry-run,--always-make,--keep-going,--print-directory
  working directory: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
  shell type: default
+ shell args: none
 Generating dry-run elapsed time: 0
 The make dry-run command failed.
 IntelliSense may work only partially or not at all.
@@ -80,6 +81,7 @@ Spawning child process with:
  process args: all,-f,"./SubDir/makefile with space",--print-data-base,--no-builtin-variables,--no-builtin-rules,--question
  working directory: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros
  shell type: default
+ shell args: none
 Generating dry-run elapsed time: 0
 Parsing for build targets from: {REPO:VSCODE-MAKEFILE-TOOLS}\src\test\fakeSuite\Repros\.vscode\targets.log
 No build targets have been detected.
